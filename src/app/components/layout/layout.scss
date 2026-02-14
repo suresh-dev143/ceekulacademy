@@ -43,7 +43,7 @@
 
 .col-left {
     left: -100%;
-    border-right: 1px solid var(--border-color);
+
 }
 
 .col-left.active {
@@ -53,7 +53,7 @@
 .col-right {
     right: -100%;
     left: auto;
-    border-left: 1px solid var(--border-color);
+
     border-top: none;
 }
 
@@ -79,7 +79,7 @@
     }
 
     &::-webkit-scrollbar-thumb {
-        background: var(--accent-primary);
+        background: var(--row-border);
     }
 }
 
@@ -115,11 +115,11 @@
         position: static;
         grid-area: left;
         height: 100%;
-        border-right: 1px solid var(--border-color);
+        background: #010101;
+        // border-right: 1px solid var(--border-color);
+        // border-top: 1px solid var(--border-color);
         z-index: 10;
         width: auto;
-
-        border-top: none;
         overflow-y: auto;
         padding: 0 1rem 1.5rem;
 
@@ -144,7 +144,6 @@
         position: static;
         grid-area: right;
         height: 100%;
-        border-left: 1px solid var(--border-color);
         border-top: none;
         overflow-y: auto;
         padding: 0 1rem 1.5rem;

@@ -31,7 +31,7 @@ export class SidebarLeftComponent {
 
     menuItems: MenuGroup[] = [
         {
-            title: 'Ray Bareli',
+            title: 'Raebareli',
             type: 'location'
         },
         {
@@ -64,13 +64,13 @@ export class SidebarLeftComponent {
             items: [],
             role: 'Teacher'
         },
-        {
-            title: 'Local Issues',
-            type: 'menu',
-            link: '/issues',
-            items: [],
+        // {
+        //     title: 'Local Issues',
+        //     type: 'menu',
+        //     link: '/issues',
+        //     items: [],
 
-        },
+        // },
         // {
         //     title: 'Director Stats',
         //     type: 'menu',

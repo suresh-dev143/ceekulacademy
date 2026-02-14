@@ -1,20 +1,16 @@
 .issues-ticker-container {
-    margin-top: 2rem;
     padding: 0 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 1rem;
+    padding-top: 0.5rem;
 }
 
 .ticker-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--accent-primary);
+    padding: 0.75rem 1.5rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 1rem;
+    letter-spacing: 2px;
+    opacity: 0.8;
 
     .pulse-dot {
         width: 8px;
@@ -57,8 +53,6 @@
 
 .issue-card {
     background: var(--bg-secondary);
-    border: 1px solid var(--accent-primary);
-    border-radius: 0;
     padding: 0.8rem;
 
     .issue-header {

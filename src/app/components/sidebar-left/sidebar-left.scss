@@ -1,6 +1,6 @@
 /* Sidebar Left Styles */
 .left-menu-item {
-    font-size: 0.85rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-secondary);
     padding: 0.85rem 1.5rem;
@@ -31,16 +31,15 @@
 
     &.location-item {
         background: #000000 !important;
-        border: 1px solid var(--accent-primary);
-        margin: 1rem 1.5rem 2rem;
+        margin: 1rem 0rem;
         color: var(--text-primary);
         text-transform: uppercase;
         letter-spacing: 2px;
         font-weight: 800;
-        font-size: 1rem;
+        font-size: 1.5rem;
         padding: 1rem;
         border-radius: 0;
-        text-align: center;
+
 
         &:hover {
             background: var(--accent-primary) !important;
@@ -50,14 +49,14 @@
 }
 
 .left-menu-group {
-    margin-bottom: 2rem;
     /* border-bottom removed */
     padding-bottom: 0;
+    background: #020202;
 }
 
 .left-menu-title {
-    font-size: 0.75rem;
-    font-weight: 900;
+    font-size: 1rem;
+    font-weight: bold;
     color: var(--accent-primary);
     padding: 0.75rem 1.5rem;
     text-transform: uppercase;

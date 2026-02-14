@@ -51,18 +51,21 @@ export class ProgramsSectionComponent implements OnInit {
 
                     // Handle specific course selection via query param
                     if (courseId) {
-                        const course = program.content.sections.find((s: any) => s.id === courseId || s.title === courseId);
-                        if (course && (course as any).syllabus) {
+                        const course = program.content?.sections?.find((s: any) => s.id === courseId || s.title === courseId);
+                        if (course) {
                             this.selectedCourse.set(course);
-                            this.showCourseSyllabus.set(true);
+                            this.showCourseSyllabus.set(!!(course as any).syllabus);
                         } else {
+                            this.selectedCourse.set(null);
                             this.showCourseSyllabus.set(false);
                         }
                     } else {
+                        this.selectedCourse.set(null);
                         this.showCourseSyllabus.set(false);
                     }
                 } else {
                     this.selectedProgram.set(null);
+                    this.selectedCourse.set(null);
                     this.showResearchForm.set(false);
                     this.showProjectForm.set(false);
                     this.showWebinarForm.set(false);
@@ -71,6 +74,7 @@ export class ProgramsSectionComponent implements OnInit {
                 }
             } else {
                 this.selectedProgram.set(null);
+                this.selectedCourse.set(null);
                 this.showResearchForm.set(false);
                 this.showProjectForm.set(false);
                 this.showWebinarForm.set(false);
@@ -85,16 +89,16 @@ export class ProgramsSectionComponent implements OnInit {
             id: 'innovative',
             title: 'Innovative Courses',
 
-            description: 'Cutting-edge curriculum in AI and automation designed for the future.',
+            description: '',
             subSubtitles: ['User Centric AI', 'AI for Everyone', 'AI for Healthcare', 'AI for Film Education', 'AI for Web Automation', 'AI for Infrastructure Automation', 'AI for Industrial Automation', 'AI for Agriculture Automation', 'AI for Regional Automation', 'AI for Space Automation'],
             content: {
-                description: 'Our innovative AI courses are designed to democratize artificial intelligence and make it accessible across all sectors. We focus on practical applications, hands-on learning, and real-world automation solutions.',
+                description: '',
                 sections: [
                     {
                         id: 'User Centric AI',
                         title: 'User Centric AI',
                         instructor: 'Keshan',
-                        description: 'A comprehensive journey into AI fundamentals, emerging models, tools, and real-world applications.',
+                        description: '',
                         items: ['AI Fundamentals & Genesis', 'Emerging Models & ML/DL', 'AI Tools & Human-AI Collaboration', 'Master Program & Algorithm Design', 'Facility As A Service', 'Futuristic Automation Discussion'],
                         syllabus: [
                             {
@@ -130,7 +134,7 @@ export class ProgramsSectionComponent implements OnInit {
                         id: 'AI for Everyone',
                         title: 'AI for Everyone',
                         instructor: 'Dr Rashmi Chandra and Keshan',
-                        description: 'A transformative course designed for everyone to understand and apply AI in self-improvement, creative expression, family life, and innovation.',
+                        description: '',
                         items: ['Self Improvement & Foundations', 'Creative Expression & Best Practices', 'Innovation & Research Strategies', 'Family Transformation & Dynamics', 'New Future Envisioning', 'Project Ideation & Feasibility'],
                         syllabus: [
                             {
@@ -153,12 +157,12 @@ export class ProgramsSectionComponent implements OnInit {
                             {
                                 section: 'Section 5: Towards A New Future',
                                 items: ['5.1 Envisioning A New Future', '5.2 User Centric Digital System', '5.3 AI Enabled Cosmic Humanity', '5.4 Launch Your Initiatives'],
-                                description: 'The students will discuss online with the invited experts along the following:'
+                                description: ''
                             },
                             {
                                 section: 'Section 6: Identify Your Project',
                                 items: ['6.1 Project Ideation', '6.2 Research & Analysis', '6.3 Feasibility & Viability', '6.4 Discuss Your Project'],
-                                description: 'The students will identify their project for research or entrepreneurship or societal applications etc along the following:',
+                                description: '',
                                 footerNotes: 'They will explore their preferred projects in coming semesters with their choice local experts who may co-supervise them with online global experts.'
                             }
                         ]
@@ -167,7 +171,7 @@ export class ProgramsSectionComponent implements OnInit {
                         id: 'AI for Healthcare',
                         title: 'AI for Healthcare',
                         instructor: 'Dr Rashmi Chandra',
-                        description: 'The field of healthcare is rapidly evolving with the integration of Artificial Intelligence (AI) and Machine Learning (ML) technologies. This course covers various aspects of AI-driven healthcare systems from human growth to automated hospital operations.',
+                        description: '',
                         items: ['Human Body Mechanisms', 'Energy Production & Coherence', 'Integrative Therapies', 'AI for Health & Wellness', 'Care Automation Systems', 'Dissertation/Project Guidance'],
                         syllabus: [
                             {
@@ -282,10 +286,10 @@ export class ProgramsSectionComponent implements OnInit {
             id: 'projects',
             title: 'Project Development',
 
-            description: 'Hands-on project-based learning to build real-world solutions and innovations.',
+            description: '',
             subSubtitles: ['Lifecycle', 'Prototyping', 'Scaling', 'Deployment'],
             content: {
-                description: 'Transform your ideas into reality through our intensive project development programs. We provide the resources, mentorship, and environment needed to build scalable solutions.',
+                description: '',
                 sections: [
                     {
                         title: 'Development Lifecycle',
@@ -296,12 +300,12 @@ export class ProgramsSectionComponent implements OnInit {
         },
         {
             id: 'webinars',
-            title: 'Webinars',
+            title: 'Webinars & Workshops',
 
-            description: 'Interactive online sessions with industry experts and thought leaders from around the world.',
+            description: '',
             subSubtitles: ['Blockchain', 'Leadership', 'Well-being', 'Global Experts'],
             content: {
-                description: 'Connect with global experts through our regular webinars. Stay updated on the latest trends and gain practical insights from those leading their fields.',
+                description: '',
                 sections: [
                     {
                         title: 'Upcoming Webinars',
@@ -310,30 +314,30 @@ export class ProgramsSectionComponent implements OnInit {
                 ]
             }
         },
-        {
-            id: 'workshops',
-            title: 'Workshops',
+        // {
+        //     id: 'workshops',
+        //     title: 'Workshops',
 
-            description: 'Hands-on practical workshops for skill development and interactive learning experiences.',
-            subSubtitles: ['Technical Skills', 'Creative Skills', 'Professional Development', 'Specialized Training'],
-            content: {
-                description: 'Engage in immersive hands-on workshops designed to build practical skills. Learn by doing with expert guidance and personalized feedback.',
-                sections: [
-                    {
-                        title: 'Workshop Categories',
-                        text: 'Our workshops cover technical skills, creative disciplines, professional development, and specialized training tailored to your growth.'
-                    }
-                ]
-            }
-        },
+        //     description: 'Hands-on practical workshops for skill development and interactive learning experiences.',
+        //     subSubtitles: ['Technical Skills', 'Creative Skills', 'Professional Development', 'Specialized Training'],
+        //     content: {
+        //         description: 'Engage in immersive hands-on workshops designed to build practical skills. Learn by doing with expert guidance and personalized feedback.',
+        //         sections: [
+        //             {
+        //                 title: 'Workshop Categories',
+        //                 text: 'Our workshops cover technical skills, creative disciplines, professional development, and specialized training tailored to your growth.'
+        //             }
+        //         ]
+        //     }
+        // },
         {
             id: 'services',
             title: 'Community Services',
 
-            description: 'Digital tools and services designed to enhance learning and professional growth.',
+            description: '',
             subSubtitles: ['Counseling', 'Certification', 'Digital Library', 'Mentorship'],
             content: {
-                description: 'Access a suite of online services tailored to support your educational and professional journey. From career guidance to technical support, we have you covered.',
+                description: '',
                 sections: [
                     {
                         title: 'Available Services',
@@ -352,10 +356,10 @@ export class ProgramsSectionComponent implements OnInit {
             id: 'harmony',
             title: 'Global Harmony & Peace',
 
-            description: 'Initiatives promoting unity, understanding, and peaceful coexistence globally.',
+            description: '',
             subSubtitles: ['Cultural Exchange', 'Dialogue', 'Universal Values', 'Global Unity'],
             content: {
-                description: 'In an increasingly connected world, fostering global harmony is essential. Our programs promote cultural exchange, conflict resolution, and mutual understanding.',
+                description: '',
                 sections: [
                     {
                         title: 'Our Vision',
@@ -375,11 +379,16 @@ export class ProgramsSectionComponent implements OnInit {
     }
 
     goBack() {
-        this.router.navigate([], {
-            relativeTo: this.route,
-            queryParams: { category: null },
-            queryParamsHandling: 'merge'
-        });
+        if (this.selectedCourse()) {
+            this.closeCourseView();
+        } else if (this.selectedProgram()) {
+            this.router.navigate([], {
+                relativeTo: this.route,
+                queryParams: { category: null, course: null },
+                queryParamsHandling: 'merge'
+            });
+            this.selectedProgram.set(null);
+        }
     }
 
     scrollToSection(sectionId: string) {
@@ -982,6 +991,7 @@ export class ProgramsSectionComponent implements OnInit {
         });
         this.showCourseSyllabus.set(false);
         this.selectedCourse.set(null);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     onSubmitUserCentricAIForm() {
