@@ -230,9 +230,72 @@ export class ProgramsSectionComponent implements OnInit {
                             }
                         ]
                     },
+
+
+
+
                     {
+                        id: 'AI for Film Education',
                         title: 'AI for Film Education',
-                        items: ['Script Analysis', 'Video Editing Automation']
+                        instructor: 'Keshan',
+                        description: '',
+                        items: ['Evolution of Film Education', 'Data Driven Content Generation', 'Emerging Tools for Innovation', 'Online Role Playing', 'Goal Directed Auto-Editing', 'Identify Your Project'],
+                        syllabus: [
+                            {
+                                section: 'Section 1: Evolution of Film Education',
+                                items: [
+                                    '1.1 Foundations of Film Education',
+                                    '1.2 Art and Practice of Film Education',
+                                    '1.3 Technology of Film Education',
+                                    '1.4 Your Initiative'
+                                ]
+                            },
+                            {
+                                section: 'Section 2: Data Driven Content Generation',
+                                items: [
+                                    '2.1 Principles of Content Generation',
+                                    '2.2 Dynamic Content Generation',
+                                    '2.3 Neuro-Adaptive Content Modulation',
+                                    '2.4 Your Initiative'
+                                ]
+                            },
+                            {
+                                section: 'Section 3: Emerging Tools for Innovation',
+                                items: [
+                                    '3.1 Imaginative Self Discovery',
+                                    '3.2 Immersive Interaction',
+                                    '3.3 Creative Augmentation',
+                                    '3.4 Your Initiative'
+                                ]
+                            },
+                            {
+                                section: 'Section 4: Online Role Playing',
+                                items: [
+                                    '4.1 Virtual Platform for Role Playing',
+                                    '4.2 Role Playing Process',
+                                    '4.3 Performance Evaluation',
+                                    '4.4 Your Initiative'
+                                ]
+                            },
+                            {
+                                section: 'Section 5: Goal Directed Auto-Editing',
+                                items: [
+                                    '5.1 Essentials of Auto-Editing',
+                                    '5.2 User Defined Auto-Editing',
+                                    '5.3 Real Time Auto-Editing',
+                                    '5.4 Your Initiative'
+                                ]
+                            },
+                            {
+                                section: 'Section 6: Identify Your Projec',
+                                items: [
+                                    '6.1 Project Ideation',
+                                    '6.2 Research & Analysis',
+                                    '6.3 Feasibility & Viability',
+                                    '6.4 Discuss Your Project'
+                                ]
+                            }
+                        ]
                     },
                     {
                         title: 'AI for Web Automation',
