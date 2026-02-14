@@ -1,0 +1,22 @@
+<div class="chat-header">
+    <h3><i class="fas fa-comments"></i> Assistant</h3>
+    <button class="close-chat-btn" (click)="closeChat.emit()">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+
+<div class="chat-messages">
+    @for (message of messages(); track $index) {
+    <div class="chat-message" [class.bot]="message.type === 'bot'" [class.user]="message.type === 'user'">
+        {{ message.text }}
+    </div>
+    }
+</div>
+
+<div class="chat-input-area">
+    <input type="text" class="chat-input" placeholder="Type a message..." [value]="currentMessage()"
+        (input)="currentMessage.set($any($event.target).value)" (keypress)="handleKeyPress($event)">
+    <button class="chat-send-btn" (click)="sendMessage()">
+        <i class="fas fa-paper-plane"></i>
+    </button>
+</div>

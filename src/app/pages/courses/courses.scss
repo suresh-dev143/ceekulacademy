@@ -1,0 +1,181 @@
+.courses-mgmt-container {
+    padding: 1.5rem 1rem;
+    width: 100%;
+    max-width: 100%;
+}
+
+.mgmt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--accent-primary);
+    flex-wrap: wrap;
+    gap: 1.5rem;
+
+    .header-content {
+        flex: 1;
+        min-width: 250px;
+    }
+
+    .page-title {
+        font-family: 'Inter', sans-serif;
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 800;
+        margin: 0;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .page-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin: 0.5rem 0 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    background: #000000;
+    border: 1px solid var(--accent-primary);
+    flex-wrap: wrap;
+    gap: 1.5rem;
+
+    .search-box {
+        flex-grow: 1;
+        max-width: 500px;
+        position: relative;
+        width: 100%;
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-primary);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem 1.2rem 0.8rem 3rem;
+            background: #000000 !important;
+            border: 1px solid var(--row-border) !important;
+            color: var(--text-primary) !important;
+            font-size: 0.9rem;
+            border-radius: 0;
+
+            &:focus {
+                border-color: var(--accent-primary) !important;
+                border-width: 2px !important;
+            }
+        }
+    }
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+
+    label {
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .filter-chips {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+
+        button {
+            padding: 0.5rem 1.2rem;
+            background: transparent;
+            border: 1px solid var(--row-border);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            border-radius: 0;
+
+            &:hover {
+                color: var(--text-primary);
+                border-color: var(--accent-primary);
+            }
+
+            &.active {
+                background: var(--accent-primary);
+                color: #000000;
+                border-color: var(--accent-primary);
+            }
+        }
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    margin-top: 2rem;
+    background: #000000;
+    border: 1px dashed var(--accent-primary);
+
+    h3 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.4rem;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+    }
+
+    p {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        max-width: 100%;
+        margin-inline: auto;
+        font-size: 0.95rem;
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 1rem;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 850px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #000000;
+    border: 1px solid var(--accent-primary);
+    padding: 2rem;
+    position: relative;
+    border-radius: 0;
+}
+
+@media (max-width: 768px) {
+    .courses-mgmt-container {
+        padding: 1rem 0.5rem;
+    }
+}

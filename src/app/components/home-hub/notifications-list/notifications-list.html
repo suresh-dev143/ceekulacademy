@@ -1,0 +1,31 @@
+<div class="hub-section">
+    <div class="section-header">
+        <h3 class="section-title">Notifications & Updates</h3>
+        <button class="view-all-btn">Mark All Read <i class="fas fa-check-double"></i></button>
+    </div>
+
+    <div class="notifications-container">
+        <div class="notification-item" *ngFor="let notification of notifications" [class.unread]="notification.unread">
+            <div class="notif-icon-wrapper" [attr.data-type]="notification.type">
+                <i class="fas" [ngClass]="getIcon(notification.type)"></i>
+                <div class="unread-dot" *ngIf="notification.unread"></div>
+            </div>
+
+            <div class="notif-content">
+                <div class="notif-header">
+                    <h4 class="notif-title">{{ notification.title }}</h4>
+                    <span class="notif-time">{{ notification.time }}</span>
+                </div>
+                <p class="notif-message">{{ notification.message }}</p>
+            </div>
+
+            <button class="notif-action">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <button class="show-more-btn">
+            See all notifications
+        </button>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+<app-layout>
+    <div class="district-page">
+        <h1 class="center-heading">DIRECTORS</h1>
+
+        <section class="goal-box">
+            <h2 class="goal-title">The primary goal of any Director is to</h2>
+
+            <div class="goal-item">
+                <div class="goal-number">1</div>
+                <p>Organize regular seminars and workshops on the automation of services and infrastructure on the
+                    chosen area.</p>
+            </div>
+
+            <div class="goal-item">
+                <div class="goal-number">2</div>
+                <p>Explore the technological solutions to the problems raised by the Ceebrain members with the Vice
+                    Chancellor.</p>
+            </div>
+
+            <div class="goal-item">
+                <div class="goal-number">3</div>
+                <p>Discuss ways to implement the plans finalized by the Executive Council during regular online or
+                    offline meetings of the respective assembly.</p>
+            </div>
+        </section>
+
+        <div class="director-types">
+            There are 2 types of Directors: (1) Director of a particular discipline at a particular Regional Ceekul
+            Center (2) Director of Local Ceekul Center to guide all the disciplines.
+        </div>
+
+        <h3 class="disciplines-heading">The Director will be elected for the term of 4 years for the following
+            disciplines:</h3>
+
+        <div class="directors-list">
+            @for (role of directorRoles; track role) {
+            <div class="director-role" [class.highlighted]="role.highlighted">{{ role.title }}</div>
+            }
+        </div>
+
+        <a href="#" class="btn-create-position">You Can Create A New Position and Apply</a>
+    </div>
+</app-layout>

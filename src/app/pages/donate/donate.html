@@ -1,0 +1,185 @@
+<app-layout [showLeftSidebar]="true" [showRightSidebar]="true">
+    <div class="donate-container">
+        <!-- Success State -->
+        <div class="success-card glass-card animated-fade-in" *ngIf="submissionSuccess()">
+            <div class="icon-circle">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2>Thank You for Your Generosity!</h2>
+            <p>Your contribution of <strong>{{ donation.currency }} {{ donation.amount }}</strong> has been successfully
+                received.</p>
+            <div class="receipt-details">
+                <div class="detail-row">
+                    <span>Transaction ID:</span>
+                    <span class="value">{{ transactionId() }}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Impact Area:</span>
+                    <span class="value">{{ donation.donationArea }}</span>
+                </div>
+                <div class="detail-row" *ngIf="donation.locationScope === 'Local' && donation.location">
+                    <span>Location:</span>
+                    <span class="value">{{ donation.location.city || donation.location.district }}</span>
+                </div>
+            </div>
+            <button class="btn-primary" (click)="resetForm()">Make Another Donation</button>
+        </div>
+
+
+        <!-- Donation Form -->
+        <div class="donation-form glass-card animated-fade-in" *ngIf="!submissionSuccess()">
+            <header class="form-header">
+                <h1>Make a Difference</h1>
+                <p>Empower communities through direct, transparent contribution.</p>
+            </header>
+
+            <form (ngSubmit)="submitDonation()">
+
+                <!-- Section 1: Donor Info -->
+                <div class="form-section">
+                    <h3>1. Who is donating?</h3>
+
+                    <div class="form-group">
+                        <label>Name (Optional)</label>
+                        <input type="text" [(ngModel)]="donation.donorName" name="donorName"
+                            placeholder="Enter your name" [disabled]="donation.isAnonymous">
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="anonymous" [(ngModel)]="donation.isAnonymous" name="isAnonymous">
+                        <label for="anonymous">Donate Anonymously</label>
+                    </div>
+                </div>
+
+                <!-- Section 2: Purpose & Location -->
+                <div class="form-section">
+                    <h3>2. Where should this go?</h3>
+
+                    <div class="form-group">
+                        <label>Impact Area <span class="required">*</span></label>
+                        <select [(ngModel)]="donation.donationArea" name="donationArea" required>
+                            <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
+                        </select>
+                        <p class="hint-text">Your donation will be strictly allocated to <strong>{{
+                                donation.donationArea }}</strong>.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location Scope</label>
+                        <div class="toggle-switch">
+                            <button type="button" [class.active]="donation.locationScope === 'Global'"
+                                (click)="donation.locationScope = 'Global'">Global Impact</button>
+                            <button type="button" [class.active]="donation.locationScope === 'Local'"
+                                (click)="donation.locationScope = 'Local'">Specific Location</button>
+                        </div>
+                    </div>
+
+                    <div class="location-fields animated-fade-down" *ngIf="donation.locationScope === 'Local'">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" [(ngModel)]="donation.location!.state"
+                                    (ngModelChange)="donation.location = donation.location || {}; donation.location!.state = $event"
+                                    name="state" placeholder="e.g. Uttar Pradesh">
+                            </div>
+                            <div class="form-group">
+                                <label>District</label>
+                                <input type="text" [(ngModel)]="donation.location!.district"
+                                    (ngModelChange)="donation.location = donation.location || {}; donation.location!.district = $event"
+                                    name="district" placeholder="e.g. Gautam Buddh Nagar">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>City / Area</label>
+                            <input type="text" [(ngModel)]="donation.location!.city"
+                                (ngModelChange)="donation.location = donation.location || {}; donation.location!.city = $event"
+                                name="city" placeholder="e.g. Noida, Sector 62">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Amount & Payment -->
+                <div class="form-section">
+                    <h3>3. Contribution Details</h3>
+
+                    <div class="form-row">
+                        <div class="form-group col-currency">
+                            <label>Currency</label>
+                            <select [(ngModel)]="donation.currency" name="currency">
+                                <option *ngFor="let curr of currencies" [value]="curr">{{ curr }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-amount">
+                            <label>Amount <span class="required">*</span></label>
+                            <input type="number" [(ngModel)]="donation.amount" name="amount" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="presets">
+                        <button type="button" *ngFor="let amt of amountPresets" (click)="setAmount(amt)"
+                            [class.selected]="donation.amount === amt">
+                            {{ amt }}
+                        </button>
+                    </div>
+
+                    <div class="form-group payment-methods">
+                        <label>Payment Method</label>
+                        <div class="radio-grid">
+                            <div class="radio-card" *ngFor="let method of paymentMethods"
+                                (click)="donation.paymentMethod = method"
+                                [class.selected]="donation.paymentMethod === method">
+                                <span class="radio-circle"></span>
+                                <span>{{ method }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Review -->
+                <div class="form-section">
+                    <h3>4. Review & Confirm</h3>
+
+                    <div class="summary-box">
+                        <div class="summary-item">
+                            <span class="label">Amount</span>
+                            <span class="value big">{{ donation.currency }} {{ donation.amount }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Donor</span>
+                            <span class="value">{{ donation.isAnonymous ? 'Anonymous' : (donation.donorName || 'Not
+                                Provided') }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Cause</span>
+                            <span class="value">{{ donation.donationArea }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Scope</span>
+                            <span class="value">{{ donation.locationScope }} {{ donation.locationScope === 'Local' ? '('
+                                + (donation.location?.city || donation.location?.district) + ')' : '' }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Payment</span>
+                            <span class="value">{{ donation.paymentMethod }}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group consent">
+                        <input type="checkbox" id="consent" required [(ngModel)]="hasConsented" name="consent">
+                        <label for="consent">I understand how my donation will be used and authorize this
+                            transaction.</label>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary submit-btn" [disabled]="isSubmitting() || !hasConsented">
+                        <span *ngIf="!isSubmitting()">Complete Donation <i class="fas fa-heart"></i></span>
+                        <span *ngIf="isSubmitting()"><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</app-layout>

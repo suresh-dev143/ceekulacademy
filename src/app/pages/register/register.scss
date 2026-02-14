@@ -1,0 +1,431 @@
+.registration-page {
+    padding: 0 1rem 2rem;
+    background: #000000;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.registration-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.reg-info {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h2 {
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        max-width: 100%;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+}
+
+.reg-form-container {
+    background: #000000;
+    /* border removed */
+    padding: 2.5rem;
+    width: 100%;
+}
+
+/* Step Progress */
+.step-progress {
+    margin-bottom: 3rem;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    gap: 0.5rem;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    flex: 1;
+
+    .step-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 0;
+        background: #000000;
+        border: 1px solid var(--row-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-secondary);
+        transition: all 0.3s ease;
+    }
+
+    .step-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        text-align: center;
+    }
+
+    &.active {
+        .step-number {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .step-label {
+            color: var(--text-primary);
+        }
+    }
+
+    &.completed {
+        .step-number {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: #000000;
+        }
+    }
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--row-border);
+    margin-bottom: 1.5rem;
+    /* Aligned with circle */
+    position: relative;
+    top: -10px;
+    /* Adjusting for labels */
+
+    &.completed {
+        background: var(--accent-primary);
+    }
+
+    @media (max-width: 600px) {
+        display: none;
+    }
+}
+
+.progress-bar {
+    height: 4px;
+    background: var(--row-border);
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-primary);
+    transition: width 0.3s ease;
+}
+
+/* Form Styles */
+.step-content {
+    margin-bottom: 2.5rem;
+}
+
+.step-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.step-description {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    width: 100%;
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.6rem;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-primary);
+    }
+
+    .error-message {
+        color: #ff4d4d;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+        font-weight: 600;
+    }
+}
+
+.form-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+
+    .flex-1 {
+        flex: 1;
+        min-width: 250px;
+    }
+}
+
+/* Role Selection */
+.role-selection-container {
+    margin-bottom: 2rem;
+    background: #050505;
+    padding: 1.5rem;
+}
+
+.role-selection {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.role-option {
+    background: #000000;
+    /* border removed */
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: center;
+
+    &:hover {
+        border-color: var(--accent-primary);
+    }
+
+    &.selected {
+        background: rgba(240, 142, 56, 0.1);
+        border-color: var(--accent-primary);
+
+        .role-label {
+            color: var(--accent-primary);
+        }
+    }
+
+    .role-label {
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+
+    .role-check {
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: var(--accent-primary);
+    }
+}
+
+/* Activity Section (Vertical Flow) */
+.activity-section {
+    margin-top: 3rem;
+    width: 100%;
+
+    h4 {
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        color: var(--accent-primary);
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        border-bottom: 1px solid var(--accent-primary);
+        padding-bottom: 0.75rem;
+    }
+}
+
+.activity-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.activity-block {
+    background: #050505;
+    /* border removed */
+    padding: 1.5rem;
+    position: relative;
+    transition: all 0.2s ease;
+
+    .block-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(240, 142, 56, 0.2);
+        padding-bottom: 0.75rem;
+
+        h5 {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-remove-block {
+            background: transparent;
+            border: 1px solid #333;
+            color: #666;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                border-color: #ff4d4d;
+                color: #ff4d4d;
+                background: rgba(255, 77, 77, 0.1);
+            }
+        }
+    }
+
+    &:hover {
+        background: #080808;
+    }
+}
+
+.section-actions {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.btn-add-activity {
+    background: transparent;
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+    padding: 1rem 2rem;
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+
+    &:hover {
+        background: var(--accent-primary);
+        color: #000000;
+    }
+
+    i {
+        margin-right: 0.75rem;
+    }
+}
+
+/* Security Info */
+.security-info {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #050505;
+    /* border removed */
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+
+        i {
+            color: var(--accent-primary);
+            font-size: 1.2rem;
+        }
+    }
+}
+
+/* Navigation Buttons */
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+
+    button {
+        padding: 1rem 2.5rem;
+        font-weight: 800;
+        font-size: 0.9rem;
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .btn-prev {
+        background: transparent;
+        border: 1px solid var(--row-border);
+        color: var(--text-secondary);
+
+        &:hover {
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+    }
+
+    .submit-btn {
+        background: #000000;
+        color: var(--text-primary);
+        border: 1px solid var(--accent-primary);
+
+        &:hover {
+            background: var(--accent-primary);
+            color: #000000;
+        }
+    }
+}
+
+.form-footer {
+    text-align: center;
+    padding: 2rem 1rem 4rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+
+    a {
+        color: var(--accent-primary);
+        text-decoration: none;
+        font-weight: 700;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .reg-form-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .form-navigation button {
+        width: 100%;
+    }
+}

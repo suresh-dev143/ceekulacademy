@@ -1,0 +1,39 @@
+<div class="course-item-card" [class.archived]="course.status === 'Archived'">
+    <div class="course-info">
+        <div class="course-header">
+            <h3 class="course-title">{{ course.title }}</h3>
+            <span class="status-badge" [attr.data-status]="course.status">{{ course.status }}</span>
+        </div>
+        <div class="course-meta">
+            <span class="meta-tag"><i class="fas fa-tag"></i> {{ course.category }}</span>
+            <span class="meta-tag"><i class="fas fa-signal"></i> {{ course.level }}</span>
+            <span class="meta-tag"><i class="fas fa-laptop-house"></i> {{ course.mode }}</span>
+            <span class="meta-tag"><i class="fas fa-clock"></i> {{ course.duration }}</span>
+        </div>
+        <div class="course-stats">
+            <span class="stat-item"><i class="fas fa-users"></i> {{ course.enrolledCount }} Enrolled</span>
+            <span class="stat-item"><i class="fas fa-history"></i> Updated: {{ course.lastUpdated }}</span>
+        </div>
+    </div>
+
+    <div class="course-actions">
+        <button class="action-btn view" (click)="view.emit(course)" title="View Course Details">
+            <i class="fas fa-eye"></i> VIEW
+        </button>
+
+        @if (canEdit) {
+        <button class="action-btn edit" (click)="edit.emit(course)" title="Edit Course">
+            <i class="fas fa-edit"></i> EDIT
+        </button>
+        <button class="action-btn publish" (click)="togglePublish.emit(course)"
+            [title]="course.status === 'Published' ? 'Unpublish Course' : 'Publish Course'">
+            <i class="fas" [class.fa-eye-slash]="course.status === 'Published'"
+                [class.fa-paper-plane]="course.status !== 'Published'"></i>
+            {{ course.status === 'Published' ? 'UNPUBLISH' : 'PUBLISH' }}
+        </button>
+        <button class="action-btn delete" (click)="delete.emit(course)" title="Delete Course">
+            <i class="fas fa-trash-alt"></i> DELETE
+        </button>
+        }
+    </div>
+</div>

@@ -1,0 +1,72 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <a routerLink="/" class="navbar-brand" (click)="closeMenu()">
+      <div class="logo-text">
+        <div class="logo-main">CEEKUL MISSION</div>
+       
+      </div>
+    </a>
+
+    <button class="menu-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="navbar-menu" [class.active]="isMenuOpen">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link"
+        (click)="closeMenu()">
+        Home
+      </a>
+      <a routerLink="/about" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
+        About
+      </a>
+
+      <!-- Programs Dropdown (Hover-based/Click for mobile) -->
+      <div class="nav-dropdown" [class.active]="isProgramsOpen">
+        <a routerLink="/programs" routerLinkActive="active" class="nav-link dropdown-toggle"
+          (click)="togglePrograms($event)">
+          Programs
+        </a>
+        <div class="dropdown-menu">
+          <div class="dropdown-submenu">
+            <a class="dropdown-item" routerLink="/innovative" (click)="closeMenu()">
+              Innovative Courses
+            </a>
+          </div>
+          <a class="dropdown-item" (click)="closeMenu()">Futuristic Research</a>
+          <a class="dropdown-item" (click)="closeMenu()">Project Development</a>
+          <a class="dropdown-item" (click)="closeMenu()">Online Services</a>
+          <a class="dropdown-item" (click)="closeMenu()">Webinars &
+            Workshops</a>
+          <a routerLink="/transformation" class="dropdown-item" (click)="closeMenu()">
+            Socio-Economic Transformation
+          </a>
+          <a href="#" class="dropdown-item" (click)="closeMenu()">Global Harmony & Peace</a>
+        </div>
+      </div>
+
+      <a routerLink="/centers" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
+        Centers
+      </a>
+      <a routerLink="/register" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
+        Register
+      </a>
+      <!-- Search Bar -->
+      <div class="nav-search">
+        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search..."
+          class="search-input">
+        <button (click)="onSearch()" class="search-btn">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+
+      <a routerLink="/donate" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
+        Donate
+      </a>
+      <a routerLink="/invest" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
+        Invest
+      </a>
+    </div>
+  </div>
+</nav>

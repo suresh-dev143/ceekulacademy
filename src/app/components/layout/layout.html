@@ -1,0 +1,56 @@
+<div class="district-layout" [class.sidebar-active]="mobileSidebarOpen()">
+    <app-navbar></app-navbar>
+
+    <div class="layout-columns">
+        <!-- Mobile Sidebar Toggle Bar -->
+        <div class="mobile-sidebar-toggle">
+            <button class="btn-toggle" (click)="toggleMobileSidebar()">
+                MENU
+            </button>
+            <button class="btn-toggle" (click)="toggleMobileRightSidebar()">
+                CHAT
+            </button>
+        </div>
+
+        <!-- Left Column (Sidebar) -->
+        @if (showLeftSidebar) {
+        <aside class="col-left" [class.active]="mobileSidebarOpen()" [class.collapsed]="leftCollapsed()">
+            <button class="toggle-sidebar-btn left" (click)="toggleLeft()" *ngIf="!leftCollapsed()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="expand-sidebar-btn left" (click)="expandLeft()" *ngIf="leftCollapsed()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <div class="sidebar-content" [class.hidden]="leftCollapsed()">
+                <app-sidebar-left></app-sidebar-left>
+            </div>
+        </aside>
+        }
+
+        <!-- Center Column (Main Content) -->
+        <main class="col-center" [class.left-collapsed]="leftCollapsed()" [class.right-collapsed]="rightCollapsed()">
+            <ng-content></ng-content>
+        </main>
+
+        <!-- Right Column (Chat/Info) -->
+        @if (showRightSidebar) {
+        <aside class="col-right" [class.collapsed]="rightCollapsed()" [class.active]="mobileRightSidebarOpen()">
+            <button class="toggle-sidebar-btn right" (click)="toggleRight()" *ngIf="!rightCollapsed()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="expand-sidebar-btn right" (click)="expandRight()" *ngIf="rightCollapsed()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <div class="sidebar-content" [class.hidden]="rightCollapsed()">
+                <app-chat-panel (closeChat)="toggleMobileRightSidebar()"></app-chat-panel>
+            </div>
+        </aside>
+        }
+
+        <!-- Overlay for mobile sidebar -->
+        <div class="sidebar-overlay" *ngIf="mobileSidebarOpen()" (click)="toggleMobileSidebar()"></div>
+        <div class="sidebar-overlay" *ngIf="mobileRightSidebarOpen()" (click)="toggleMobileRightSidebar()"></div>
+    </div>
+</div>

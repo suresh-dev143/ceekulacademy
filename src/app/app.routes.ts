@@ -1,0 +1,45 @@
+import { Routes } from '@angular/router';
+import { LandingComponent } from './pages/landing/landing';
+import { AboutComponent } from './pages/about/about';
+import { LoginComponent } from './pages/login/login';
+import { RegisterComponent } from './pages/register/register';
+import { ProfileComponent } from './pages/profile/profile';
+import { DistrictComponent } from './pages/district/district';
+import { InnovativeComponent } from './pages/innovative/innovative';
+import { ProgramsComponent } from './pages/programs/programs';
+import { CentersComponent } from './pages/centers/centers';
+
+import { TransformationComponent } from './pages/transformation/transformation';
+import { HomeComponent } from './pages/home/home';
+import { CoursesComponent } from './pages/courses/courses';
+import { DirectorDashboardComponent } from './pages/director-dashboard/director-dashboard';
+import { PartnerDashboardComponent } from './pages/partner-dashboard/partner-dashboard';
+import { StudentNearbyComponent } from './pages/student-nearby/student-nearby';
+import { TeacherDashboardComponent } from './pages/teacher-dashboard/teacher-dashboard';
+import { IssuesPageComponent } from './pages/issues/issues';
+import { DonatePageComponent } from './pages/donate/donate';
+import { InvestPageComponent } from './pages/invest/invest';
+
+export const routes: Routes = [
+    { path: '', component: LandingComponent },
+    { path: 'home', component: HomeComponent },
+    { path: 'dashboard/courses', component: CoursesComponent },
+    { path: 'dashboard/director', component: DirectorDashboardComponent },
+    { path: 'dashboard/partner', component: PartnerDashboardComponent },
+    { path: 'dashboard/student/nearby', component: StudentNearbyComponent },
+    { path: 'dashboard/teacher', component: TeacherDashboardComponent },
+    { path: 'about', component: AboutComponent },
+    { path: 'login', component: LoginComponent },
+    { path: 'register', component: RegisterComponent },
+    { path: 'profile', component: ProfileComponent },
+    { path: 'district', component: DistrictComponent },
+    { path: 'issues', component: IssuesPageComponent },
+    { path: 'donate', component: DonatePageComponent },
+    { path: 'invest', component: InvestPageComponent },
+    { path: 'innovative', component: InnovativeComponent },
+    { path: 'courses', component: InnovativeComponent },
+    { path: 'programs', component: ProgramsComponent },
+    { path: 'transformation', component: TransformationComponent },
+    { path: 'centers', component: CentersComponent },
+    { path: '**', redirectTo: '' }
+];

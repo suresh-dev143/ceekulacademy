@@ -1,0 +1,79 @@
+<app-layout>
+    <div class="centers-container">
+        <section class="page-hero">
+            <h1 class="fade-in">FIND A CENTER</h1>
+            <p class="fade-in-delayed">Connect with a mission center in your district for hands-on learning and
+                community collaboration.</p>
+
+            <div class="search-container slide-up">
+                <form class="search-form" (submit)="handleSearchSubmit($event)">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search by District, City, or Name..."
+                            (input)="onSearch($event)" [value]="searchQuery()">
+                    </div>
+                    <button type="submit" class="search-btn">
+                        SEARCH
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Centers Grid -->
+        <section class="centers-section">
+            <div class="centers-grid">
+                @for (center of filteredCenters(); track center.id) {
+                <div class="center-card fade-in">
+                    @if (center.image) {
+                    <div class="center-image" [style.backgroundImage]="'url(' + center.image + ')'">
+                        @if (center.district) {
+                        <span class="district-badge">{{ center.district }}</span>
+                        }
+                    </div>
+                    } @else {
+                    <div class="center-image fallback">
+                        @if (center.district) {
+                        <span class="district-badge">{{ center.district }}</span>
+                        }
+                        <i class="fas fa-building center-placeholder-icon"></i>
+                    </div>
+                    }
+
+                    <div class="center-content">
+                        <h3>{{ center.title }}</h3>
+                        <div class="center-info">
+                            <p><i class="fas fa-map-marker-alt"></i> {{ center.address }}</p>
+                            <p><i class="fas fa-phone"></i> {{ center.phone }}</p>
+                            <p><i class="fas fa-users"></i> Capacity: {{ center.capacity }}</p>
+                        </div>
+                        <div class="center-actions">
+                            <button class="action-btn btn-outline" (click)="$event.preventDefault()">DETAILS</button>
+                            <button class="action-btn btn-filled" (click)="$event.preventDefault()">VISIT
+                                CENTER</button>
+                        </div>
+                    </div>
+                </div>
+                } @empty {
+                <div class="no-results fade-in">
+                    <i class="fas fa-search-minus"></i>
+                    <p>No centers found matching "{{ searchQuery() }}"</p>
+                    <button class="clear-btn" (click)="searchQuery.set(''); filteredCenters.set(centers)">CLEAR
+                        SEARCH</button>
+                </div>
+                }
+            </div>
+        </section>
+
+        <!-- Become a Center CTA -->
+        <section class="register-cta slide-up">
+            <div class="cta-inner">
+                <h2>START A CENTER IN YOUR DISTRICT</h2>
+                <p>Empower your local community by becoming an official CEEKUL MISSION partner. We provide the
+                    curriculum and support needed to scale impact.</p>
+                <div class="cta-actions">
+                    <button class="apply-btn">APPLY NOW <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </section>
+    </div>
+</app-layout>

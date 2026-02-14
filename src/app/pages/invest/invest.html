@@ -1,0 +1,305 @@
+<app-layout [showLeftSidebar]="true" [showRightSidebar]="true">
+    <div class="invest-container">
+        <!-- Success State -->
+        <div class="success-card animated-fade-in" *ngIf="submissionSuccess()">
+            <h2>Investment Proposal Received</h2>
+            <p>Thank you, <strong>{{ investment.investorName }}</strong>, for your generous intent to contribute.</p>
+            <div class="receipt-details">
+                <div class="detail-row">
+                    <span>Reference ID:</span>
+                    <span class="value">{{ refId() }}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Asset Type:</span>
+                    <span class="value">{{ investment.assetType }}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Target Area:</span>
+                    <span class="value">{{ investment.area }}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Status:</span>
+                    <span class="value status-submitted">Under Review</span>
+                </div>
+            </div>
+            <p class="next-steps">Our team will verify your proposal and contact you shortly.</p>
+            <button class="btn-primary" (click)="resetForm()">Submit Another Investment</button>
+        </div>
+
+        <!-- Investment Form -->
+        <div class="invest-form animated-fade-in" *ngIf="!submissionSuccess()">
+            <header class="form-header">
+                <h1>Invest Assets</h1>
+                <p>Drive change through financial, physical, or human capital.</p>
+            </header>
+
+            <form (ngSubmit)="submitInvestment()">
+
+                <!-- Section 1: Investor Info -->
+                <div class="form-section">
+                    <h3>1. Investor Profile</h3>
+
+                    <div class="form-group">
+                        <label>Full Name / Organization <span class="required">*</span></label>
+                        <input type="text" [(ngModel)]="investment.investorName" name="investorName"
+                            placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone (Recommended)</label>
+                            <input type="tel" [(ngModel)]="investment.contact!.phone" name="phone" placeholder="+91...">
+                        </div>
+                        <div class="form-group">
+                            <label>Email (Recommended)</label>
+                            <input type="email" [(ngModel)]="investment.contact!.email" name="email"
+                                placeholder="example@domain.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Purpose -->
+                <div class="form-section">
+                    <h3>2. Investment Purpose</h3>
+
+                    <div class="form-group">
+                        <label>Impact Area <span class="required">*</span></label>
+                        <select [(ngModel)]="investment.area" name="area" required>
+                            <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Purpose Statement</label>
+                        <textarea [(ngModel)]="investment.purposeStatement" name="purpose" rows="2"
+                            placeholder="Briefly describe how this asset should be utilized..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Section 3: Scope -->
+                <div class="form-section">
+                    <h3>3. Location </h3>
+
+                    <div class="scope-fields animated-fade-down" *ngIf="true">
+                        <div class="form-group">
+                            <label>District</label>
+                            <input type="text" [(ngModel)]="investment.location!.district" name="district"
+                                placeholder="District">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Village / Ward</label>
+                            <input type="text" [(ngModel)]="investment.location!.city" name="city">
+                        </div>
+                        <div class="form-group">
+                            <label>Pincode</label>
+                            <input type="text" [(ngModel)]="investment.location!.pincode" name="pincode">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Asset Type -->
+                <div class="form-section">
+                    <h3>4. Select Asset Type</h3>
+
+                    <div class="asset-grid">
+                        <div class="asset-card" *ngFor="let type of assetTypes" (click)="investment.assetType = type"
+                            [class.selected]="investment.assetType === type">
+                            <div class="radio-circle"></div>
+                            <span>{{ type }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: Asset Details (Dynamic) -->
+                <div class="form-section">
+                    <h3>5. {{ investment.assetType }} Details</h3>
+
+                    <!-- Money -->
+                    <div *ngIf="investment.assetType === 'Money'" class="animated-fade-in">
+                        <div class="form-row">
+                            <div class="form-group col-currency">
+                                <label>Currency</label>
+                                <select [(ngModel)]="investment.assetDetails.currency" name="currency">
+                                    <option *ngFor="let curr of currencies" [value]="curr">{{ curr }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-amount">
+                                <label>Amount <span class="required">*</span></label>
+                                <input type="number" [(ngModel)]="investment.assetDetails.amount" name="amount" min="1"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Mode</label>
+                            <select [(ngModel)]="investment.assetDetails.paymentMode" name="paymentMode">
+                                <option *ngFor="let mode of paymentModes" [value]="mode">{{ mode }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Land -->
+                    <div *ngIf="investment.assetType === 'Land'" class="animated-fade-in">
+                        <div class="form-group">
+                            <label>Full Land Address <span class="required">*</span></label>
+                            <textarea [(ngModel)]="investment.assetDetails.landAddress" name="landAddress" rows="2"
+                                required></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Area (sq.ft / acres)</label>
+                                <input type="text" [(ngModel)]="investment.assetDetails.landArea" name="landArea">
+                            </div>
+                            <div class="form-group">
+                                <label>Ownership Type</label>
+                                <input type="text" [(ngModel)]="investment.assetDetails.ownershipType"
+                                    name="ownershipType" placeholder="Individual / Joint / Trust">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Services / HR -->
+                    <div *ngIf="investment.assetType === 'Services / Human Resources'" class="animated-fade-in">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Service Type</label>
+                                <input type="text" [(ngModel)]="investment.assetDetails.serviceType" name="serviceType"
+                                    placeholder="E.g. Medical Camp, Teaching">
+                            </div>
+                            <div class="form-group">
+                                <label>Number of People</label>
+                                <input type="number" [(ngModel)]="investment.assetDetails.peopleCount"
+                                    name="peopleCount">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Work Mode</label>
+                            <select [(ngModel)]="investment.assetDetails.mode" name="workMode">
+                                <option *ngFor="let m of serviceModes" [value]="m">{{ m }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Other Types (Generic) -->
+                    <div *ngIf="investment.assetType !== 'Money' && investment.assetType !== 'Land' && investment.assetType !== 'Services / Human Resources'"
+                        class="animated-fade-in">
+                        <div class="form-group">
+                            <label>Description / Details <span class="required">*</span></label>
+                            <textarea [(ngModel)]="investment.assetDetails.description" name="desc" rows="3"
+                                required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Quantity</label>
+                            <input type="number" [(ngModel)]="investment.assetDetails.quantity" name="quantity">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>6. Project Analysis</h3>
+
+                    <div class="analysis-timeline">
+                        <!-- Step 1: Choose Project -->
+                        <div class="timeline-step">
+                            <div class="step-marker">1</div>
+                            <div class="step-content">
+                                <h4>Choose Project</h4>
+                                <p>Select a project you are interested in supporting.</p>
+                                <select [(ngModel)]="investment.projectAnalysis.projectId" name="project"
+                                    class="project-select">
+                                    <option value="" disabled selected>Select a Project...</option>
+                                    <option *ngFor="let p of projects" [value]="p">{{ p }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Discuss -->
+                        <div class="timeline-step">
+                            <div class="step-marker">2</div>
+                            <div class="step-content">
+                                <h4>Discuss Details</h4>
+                                <p>How would you like to discuss the project requirements?</p>
+                                <div class="radio-group">
+                                    <label *ngFor="let mode of discussionModes" class="radio-card"
+                                        [class.selected]="investment.projectAnalysis.discussionMode === mode">
+                                        <input type="radio" name="discussionMode" [value]="mode"
+                                            [(ngModel)]="investment.projectAnalysis.discussionMode">
+                                        {{ mode }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Finalize -->
+                        <div class="timeline-step">
+                            <div class="step-marker">3</div>
+                            <div class="step-content">
+                                <h4>Finalize Agreement</h4>
+                                <p class="info-text">
+                                    Once project details are agreed upon, a formal <strong>Memorandum of Understanding
+                                        (MoU)</strong> will be drafted and signed to finalize the collaboration.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Monitor -->
+                        <div class="timeline-step">
+                            <div class="step-marker">4</div>
+                            <div class="step-content">
+                                <h4>Monitor Progress</h4>
+                                <div class="checkbox-card"
+                                    [class.checked]="investment.projectAnalysis.monitoringParticipate">
+                                    <input type="checkbox" id="monitor" name="monitor"
+                                        [(ngModel)]="investment.projectAnalysis.monitoringParticipate">
+                                    <label for="monitor">
+                                        <strong>I want to actively participate in monitoring.</strong>
+                                        <span>Receive weekly updates and access to the live dashboard.</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 6: Review -->
+                <div class="form-section">
+                    <h3>7. Confirm Investment</h3>
+
+                    <div class="summary-box">
+                        <div class="summary-item">
+                            <span class="label">Investor</span>
+                            <span class="value">{{ investment.investorName }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Area & Scope</span>
+                            <span class="value">{{ investment.area }} ({{ investment.scopeType }})</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Asset Type</span>
+                            <span class="value big">{{ investment.assetType }}</span>
+                        </div>
+                        <div class="summary-item" *ngIf="investment.assetType === 'Money'">
+                            <span class="label">Amount</span>
+                            <span class="value">{{ investment.assetDetails.currency }} {{ investment.assetDetails.amount
+                                }}</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group checkbox-group consent">
+                        <input type="checkbox" id="consent" required [(ngModel)]="hasConsented" name="consent">
+                        <label for="consent">I confirm the accuracy of the above investment details and permit
+                            verification.</label>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary submit-btn" [disabled]="isSubmitting() || !hasConsented">
+                        <span *ngIf="!isSubmitting()">Submit Investment</span>
+                        <span *ngIf="isSubmitting()">Processing...</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</app-layout>

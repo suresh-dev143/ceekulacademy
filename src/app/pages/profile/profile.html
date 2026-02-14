@@ -1,0 +1,29 @@
+<app-layout>
+    <div class="profile-layout-container">
+        <!-- Center Content Hub -->
+        <div class="profile-hub animated-content">
+            <!-- Modular Profile Components -->
+            <app-profile-header [name]="userProfile().name" [avatar]="userProfile().avatar" [role]="userProfile().role"
+                [completeness]="completeness()">
+            </app-profile-header>
+
+            <app-profile-personal [userData]="userProfile()" (save)="handlePersonalSave($event)">
+            </app-profile-personal>
+
+            <app-profile-address [addressData]="userProfile().address" (save)="handleAddressSave($event)">
+            </app-profile-address>
+
+            <app-profile-professional [professionalData]="userProfile().professional"
+                (save)="handleProfessionalSave($event)">
+            </app-profile-professional>
+
+            <app-profile-availability [availability]="userProfile().availability">
+            </app-profile-availability>
+        </div>
+
+        <!-- Right Tool Panel (Projected into layout's right column if needed, or handled within hub) -->
+        <div slot="right-panel">
+            <app-profile-sidebar-right></app-profile-sidebar-right>
+        </div>
+    </div>
+</app-layout>

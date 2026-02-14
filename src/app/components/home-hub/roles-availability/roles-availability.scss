@@ -1,0 +1,95 @@
+.roles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.panel-subtitle {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    margin: 0 0 1.2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.roles-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+}
+
+.role-tag {
+    background: #000000;
+    color: var(--text-primary);
+    padding: 0.6rem 1.2rem;
+    border-radius: 0;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border: 1px solid var(--accent-primary);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    i {
+        color: var(--accent-primary);
+        font-size: 0.9rem;
+    }
+
+    &:hover {
+        background: var(--accent-primary);
+        color: #000000;
+
+        i {
+            color: #000000;
+        }
+    }
+}
+
+.availability-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+
+        i {
+            color: var(--accent-primary);
+            font-size: 0.9rem;
+            width: 16px;
+            text-align: center;
+        }
+    }
+
+    .info-value {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #fff;
+    }
+}
+
+@media (max-width: 900px) {
+    .roles-grid {
+        grid-template-columns: 1fr;
+    }
+}

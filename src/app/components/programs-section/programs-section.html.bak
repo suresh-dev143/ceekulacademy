@@ -1,0 +1,1099 @@
+<div class="programs-container">
+    @if (!selectedProgram()) {
+    <div class="default-view">
+        <div class="header">
+            <h1 class="page-title">Programs</h1>
+        </div>
+
+        <!-- Horizontal Tab Navigation (Subtitles) -->
+        <div class="subtitle-tabs-container">
+            <div class="scroll-track">
+                <!-- Original Set -->
+                <div class="subtitle-tabs">
+                    @for (program of programs; track program.id) {
+                    <button class="tab-btn" (click)="selectProgram(program)">
+                        <span>{{ program.title }}</span>
+                    </button>
+                    }
+                </div>
+                <!-- Duplicate Set for Seamless Scroll -->
+                <div class="subtitle-tabs">
+                    @for (program of programs; track program.id + '_dup') {
+                    <button class="tab-btn" (click)="selectProgram(program)">
+                        <span>{{ program.title }}</span>
+                    </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid of Programs -->
+        <div class="programs-grid">
+            @for (program of programs; track program.id) {
+            <div class="program-card" (click)="selectProgram(program)">
+
+                <h3>{{ program.title }}</h3>
+                <p>{{ program.description }}</p>
+                <span class="view-more">Explore <i class="fas fa-chevron-right"></i></span>
+            </div>
+            }
+        </div>
+    </div>
+    } @else {
+    <div class="drill-down-view">
+        <div class="view-header">
+            <button class="back-btn" (click)="goBack()" title="Back to Programs">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 class="page-title">{{ selectedProgram()?.title }}</h1>
+        </div>
+
+        <!-- Moving Sub-subtitles -->
+        <div class="sub-subtitle-tabs-container">
+            <div class="scroll-track">
+                <!-- Original Set -->
+                <div class="subtitle-tabs">
+                    @for (sub of selectedProgram()?.subSubtitles; track sub) {
+                    <button class="sub-tab" (click)="scrollToSection(sub)">
+                        <span>{{ sub }}</span>
+                    </button>
+                    }
+                </div>
+                <!-- Duplicate Set -->
+                <div class="subtitle-tabs">
+                    @for (sub of selectedProgram()?.subSubtitles; track sub + '_dup') {
+                    <button class="sub-tab" (click)="scrollToSection(sub)">
+                        <span>{{ sub }}</span>
+                    </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="program-content">
+            @if (showResearchForm()) {
+            <!-- Research Submission Form -->
+            <div class="research-form-container">
+                <form [formGroup]="researchForm" (ngSubmit)="onSubmitResearchForm()">
+                    <!-- Section 1: Describe Your Idea -->
+                    <div class="form-section">
+                        <h3>1. Describe Your Idea</h3>
+                        <div class="form-group">
+                            <label class="form-label">Idea Title *</label>
+                            <input type="text" class="form-control" formControlName="ideaTitle"
+                                placeholder="Enter your research idea title">
+                            @if (researchForm.get('ideaTitle')?.invalid && researchForm.get('ideaTitle')?.touched) {
+                            <div class="error-message">Idea title is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Idea Description *</label>
+                            <textarea class="form-control" formControlName="ideaDescription" rows="4"
+                                placeholder="Describe your research idea in detail"></textarea>
+                            @if (researchForm.get('ideaDescription')?.invalid &&
+                            researchForm.get('ideaDescription')?.touched) {
+                            <div class="error-message">Idea description is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Background Knowledge -->
+                    <div class="form-section">
+                        <h3>2. Identify the Background Knowledge</h3>
+                        <div class="form-group">
+                            <label class="form-label">Relevant Research or Context *</label>
+                            <textarea class="form-control" formControlName="relevantResearch" rows="3"
+                                placeholder="What existing research or context is relevant?"></textarea>
+                            @if (researchForm.get('relevantResearch')?.invalid &&
+                            researchForm.get('relevantResearch')?.touched) {
+                            <div class="error-message">This field is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Key Concepts or Technologies *</label>
+                            <textarea class="form-control" formControlName="keyConceptsTechnologies" rows="3"
+                                placeholder="List key concepts or technologies involved"></textarea>
+                            @if (researchForm.get('keyConceptsTechnologies')?.invalid &&
+                            researchForm.get('keyConceptsTechnologies')?.touched) {
+                            <div class="error-message">This field is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Review of Previous Research -->
+                    <div class="form-section">
+                        <h3>3. Review of Previous Research (Ceekul Academy Platform)</h3>
+                        <div class="form-group">
+                            <label class="form-label">Have you reviewed existing research on Ceekul Academy? *</label>
+                            <select class="form-control" formControlName="reviewedExisting">
+                                <option value="">-- Select --</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                            @if (researchForm.get('reviewedExisting')?.invalid &&
+                            researchForm.get('reviewedExisting')?.touched) {
+                            <div class="error-message">Please select an option</div>
+                            }
+                        </div>
+                        @if (researchForm.get('reviewedExisting')?.value === 'yes') {
+                        <div class="form-group">
+                            <label class="form-label">How does your idea build upon or differ from existing
+                                work?</label>
+                            <textarea class="form-control" formControlName="buildUponDifference" rows="3"
+                                placeholder="Explain how your research builds upon or differs"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">How can feedback from experts or the community improve your
+                                idea?</label>
+                            <textarea class="form-control" formControlName="feedbackImprovement" rows="3"
+                                placeholder="Describe how feedback can improve your research"></textarea>
+                        </div>
+                        }
+                    </div>
+
+                    <!-- Section 4: Research Plan -->
+                    <div class="form-section">
+                        <h3>4. Conceive the Research Plan</h3>
+                        <div class="form-group">
+                            <label class="form-label">Research Objectives *</label>
+                            <textarea class="form-control" formControlName="researchObjectives" rows="3"
+                                placeholder="What are your research objectives?"></textarea>
+                            @if (researchForm.get('researchObjectives')?.invalid &&
+                            researchForm.get('researchObjectives')?.touched) {
+                            <div class="error-message">Research objectives are required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Methodology or Approach *</label>
+                            <textarea class="form-control" formControlName="methodology" rows="3"
+                                placeholder="Describe your methodology or approach"></textarea>
+                            @if (researchForm.get('methodology')?.invalid && researchForm.get('methodology')?.touched) {
+                            <div class="error-message">Methodology is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Section 5: Expected Outcome -->
+                    <div class="form-section">
+                        <h3>5. Expected Outcome</h3>
+                        <div class="form-group">
+                            <label class="form-label">What do you hope to achieve with your research? *</label>
+                            <textarea class="form-control" formControlName="expectedOutcome" rows="3"
+                                placeholder="Describe your expected outcomes"></textarea>
+                            @if (researchForm.get('expectedOutcome')?.invalid &&
+                            researchForm.get('expectedOutcome')?.touched) {
+                            <div class="error-message">Expected outcome is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Section 6: Resources Needed -->
+                    <div class="form-section">
+                        <h3>6. Resources Needed</h3>
+                        <div class="form-group">
+                            <label class="form-label">What support or tools would you require? *</label>
+                            <textarea class="form-control" formControlName="resourcesNeeded" rows="3"
+                                placeholder="List the resources, tools, or support you need"></textarea>
+                            @if (researchForm.get('resourcesNeeded')?.invalid &&
+                            researchForm.get('resourcesNeeded')?.touched) {
+                            <div class="error-message">Resources needed is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Section 7: Collaboration -->
+                    <div class="form-section">
+                        <h3>7. Collaboration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Are you working on this: *</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="workingMode" value="alone"
+                                        (change)="onWorkingModeChange('alone')">
+                                    <span>Alone</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="workingMode" value="collaborators"
+                                        (change)="onWorkingModeChange('collaborators')">
+                                    <span>With Collaborators</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        @if (researchForm.get('workingMode')?.value === 'collaborators') {
+                        <div class="collaborators-section">
+                            <label class="form-label">Collaborators and Profit Share</label>
+                            <div formArrayName="collaborators">
+                                @for (collaborator of collaborators.controls; track $index) {
+                                <div [formGroupName]="$index" class="collaborator-item">
+                                    <div class="form-row">
+                                        <div class="form-group flex-1">
+                                            <input type="text" class="form-control" formControlName="name"
+                                                placeholder="Collaborator Name">
+                                        </div>
+                                        <div class="form-group" style="width: 150px;">
+                                            <input type="number" class="form-control" formControlName="profitShare"
+                                                placeholder="Share %" min="0" max="100">
+                                        </div>
+                                        <button type="button" class="btn-remove" (click)="removeCollaborator($index)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                }
+                            </div>
+                            <button type="button" class="btn-add-collaborator" (click)="addCollaborator()">
+                                <i class="fas fa-plus"></i> Add Collaborator
+                            </button>
+                        </div>
+                        }
+                    </div>
+
+                    <!-- Section 8: Expert Selection -->
+                    <div class="form-section">
+                        <h3>8. Select Experts or Submit to Open Forum</h3>
+                        <div class="form-group">
+                            <label class="form-label">Select Experts (optional)</label>
+                            <input type="text" class="form-control" formControlName="selectedExperts"
+                                placeholder="Enter expert names or IDs (comma-separated)">
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" formControlName="submitToForum">
+                                <span>Submit to Open Forum</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" [disabled]="researchForm.invalid">
+                            <i class="fas fa-paper-plane"></i> Submit Research Proposal
+                        </button>
+                    </div>
+                </form>
+            </div>
+            } @else if (showProjectForm()) {
+            <!-- Project Development Form -->
+            <div class="research-form-container">
+                <form [formGroup]="projectForm" (ngSubmit)="onSubmitProjectForm()">
+                    <!-- Section 1: Project Overview -->
+                    <div class="form-section">
+                        <h3>1. Project Overview</h3>
+                        <div class="form-group">
+                            <label class="form-label">Project Title *</label>
+                            <input type="text" class="form-control" formControlName="projectTitle"
+                                placeholder="Enter your project title">
+                            @if (projectForm.get('projectTitle')?.invalid && projectForm.get('projectTitle')?.touched) {
+                            <div class="error-message">Project title is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Project Description *</label>
+                            <textarea class="form-control" formControlName="projectDescription" rows="4"
+                                placeholder="Describe your project in detail"></textarea>
+                            @if (projectForm.get('projectDescription')?.invalid &&
+                            projectForm.get('projectDescription')?.touched) {
+                            <div class="error-message">Project description is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Background and Context -->
+                    <div class="form-section">
+                        <h3>2. Background and Context</h3>
+                        <div class="form-group">
+                            <label class="form-label">Relevant Experience or Research *</label>
+                            <textarea class="form-control" formControlName="relevantExperience" rows="3"
+                                placeholder="Describe your relevant experience or research background"></textarea>
+                            @if (projectForm.get('relevantExperience')?.invalid &&
+                            projectForm.get('relevantExperience')?.touched) {
+                            <div class="error-message">This field is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Key Technologies or Tools *</label>
+                            <textarea class="form-control" formControlName="keyTools" rows="3"
+                                placeholder="List the key technologies or tools you'll use"></textarea>
+                            @if (projectForm.get('keyTools')?.invalid && projectForm.get('keyTools')?.touched) {
+                            <div class="error-message">This field is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Project Goals and Objectives -->
+                    <div class="form-section">
+                        <h3>3. Project Goals and Objectives</h3>
+                        <div class="form-group">
+                            <label class="form-label">What do you aim to achieve with this project? *</label>
+                            <textarea class="form-control" formControlName="projectAims" rows="3"
+                                placeholder="Describe your project goals and what you aim to achieve"></textarea>
+                            @if (projectForm.get('projectAims')?.invalid && projectForm.get('projectAims')?.touched) {
+                            <div class="error-message">Project aims are required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Specific Outcomes or Deliverables *</label>
+                            <textarea class="form-control" formControlName="specificDeliverables" rows="3"
+                                placeholder="List specific outcomes or deliverables"></textarea>
+                            @if (projectForm.get('specificDeliverables')?.invalid &&
+                            projectForm.get('specificDeliverables')?.touched) {
+                            <div class="error-message">Deliverables are required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Methodology and Approach -->
+                    <div class="form-section">
+                        <h3>4. Methodology and Approach</h3>
+                        <div class="form-group">
+                            <label class="form-label">How will you tackle the project? *</label>
+                            <textarea class="form-control" formControlName="projectApproach" rows="3"
+                                placeholder="Describe your approach and methodology"></textarea>
+                            @if (projectForm.get('projectApproach')?.invalid &&
+                            projectForm.get('projectApproach')?.touched) {
+                            <div class="error-message">Project approach is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Timeline and Milestones *</label>
+                            <textarea class="form-control" formControlName="timelineMilestones" rows="3"
+                                placeholder="Outline your timeline and key milestones"></textarea>
+                            @if (projectForm.get('timelineMilestones')?.invalid &&
+                            projectForm.get('timelineMilestones')?.touched) {
+                            <div class="error-message">Timeline and milestones are required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Section 5: Collaboration and Expertise -->
+                    <div class="form-section">
+                        <h3>5. Collaboration and Expertise</h3>
+                        <div class="form-group">
+                            <label class="form-label">Are you developing this project: *</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="developmentMode" value="alone"
+                                        (change)="onProjectDevelopmentModeChange('alone')">
+                                    <span>Alone</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="developmentMode" value="collaborators"
+                                        (change)="onProjectDevelopmentModeChange('collaborators')">
+                                    <span>With Collaborators</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        @if (projectForm.get('developmentMode')?.value === 'collaborators') {
+                        <div class="collaborators-section">
+                            <label class="form-label">Collaborators and Profit Share</label>
+                            <div formArrayName="projectCollaborators">
+                                @for (collaborator of projectCollaborators.controls; track $index) {
+                                <div [formGroupName]="$index" class="collaborator-item">
+                                    <div class="form-row">
+                                        <div class="form-group flex-1">
+                                            <input type="text" class="form-control" formControlName="name"
+                                                placeholder="Collaborator Name">
+                                        </div>
+                                        <div class="form-group" style="width: 150px;">
+                                            <input type="number" class="form-control" formControlName="profitShare"
+                                                placeholder="Share %" min="0" max="100">
+                                        </div>
+                                        <button type="button" class="btn-remove"
+                                            (click)="removeProjectCollaborator($index)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                }
+                            </div>
+                            <button type="button" class="btn-add-collaborator" (click)="addProjectCollaborator()">
+                                <i class="fas fa-plus"></i> Add Collaborator
+                            </button>
+                        </div>
+                        }
+
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label class="form-label">Would you like to involve experts or advisors? *</label>
+                            <select class="form-control" formControlName="involveExperts">
+                                <option value="">-- Select --</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                            @if (projectForm.get('involveExperts')?.invalid &&
+                            projectForm.get('involveExperts')?.touched) {
+                            <div class="error-message">Please select an option</div>
+                            }
+                        </div>
+
+                        @if (projectForm.get('involveExperts')?.value === 'yes') {
+                        <div class="form-group">
+                            <label class="form-label">Select Experts (optional)</label>
+                            <input type="text" class="form-control" formControlName="selectedProjectExperts"
+                                placeholder="Enter expert names or IDs (comma-separated)">
+                        </div>
+                        }
+                    </div>
+
+                    <!-- Section 6: Resources and Support -->
+                    <div class="form-section">
+                        <h3>6. Resources and Support</h3>
+                        <div class="form-group">
+                            <label class="form-label">What resources or tools do you need? *</label>
+                            <textarea class="form-control" formControlName="requiredResources" rows="3"
+                                placeholder="List the resources or tools you'll need"></textarea>
+                            @if (projectForm.get('requiredResources')?.invalid &&
+                            projectForm.get('requiredResources')?.touched) {
+                            <div class="error-message">Required resources are required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Institutional or Organizational Support</label>
+                            <textarea class="form-control" formControlName="institutionalSupport" rows="3"
+                                placeholder="Describe any institutional or organizational support needed (optional)"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Section 7: Expected Outcome and Impact -->
+                    <div class="form-section">
+                        <h3>7. Expected Outcome and Impact</h3>
+                        <div class="form-group">
+                            <label class="form-label">What impact do you expect from this project? *</label>
+                            <textarea class="form-control" formControlName="expectedImpact" rows="3"
+                                placeholder="Describe the expected impact of your project"></textarea>
+                            @if (projectForm.get('expectedImpact')?.invalid &&
+                            projectForm.get('expectedImpact')?.touched) {
+                            <div class="error-message">Expected impact is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">How will you measure success? *</label>
+                            <textarea class="form-control" formControlName="successMeasurement" rows="3"
+                                placeholder="Describe how you will measure success"></textarea>
+                            @if (projectForm.get('successMeasurement')?.invalid &&
+                            projectForm.get('successMeasurement')?.touched) {
+                            <div class="error-message">Success measurement is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" [disabled]="projectForm.invalid">
+                            <i class="fas fa-paper-plane"></i> Submit Project Proposal
+                        </button>
+                    </div>
+                </form>
+            </div>
+            } @else if (showWebinarForm()) {
+            <!-- Webinar Registration Form -->
+            <div class="research-form-container">
+                <form [formGroup]="webinarForm" (ngSubmit)="onSubmitWebinarForm()">
+                    <!-- Webinar Details -->
+                    <div class="form-section">
+                        <h3>Webinar Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Webinar Title *</label>
+                            <input type="text" class="form-control" formControlName="webinarTitle"
+                                placeholder="Enter webinar title">
+                            @if (webinarForm.get('webinarTitle')?.invalid && webinarForm.get('webinarTitle')?.touched) {
+                            <div class="error-message">Webinar title is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Webinar Description *</label>
+                            <textarea class="form-control" formControlName="webinarDescription" rows="3"
+                                placeholder="Describe the webinar"></textarea>
+                            @if (webinarForm.get('webinarDescription')?.invalid &&
+                            webinarForm.get('webinarDescription')?.touched) {
+                            <div class="error-message">Description is required</div>
+                            }
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label class="form-label">Date and Time *</label>
+                                <input type="datetime-local" class="form-control" formControlName="dateTime">
+                                @if (webinarForm.get('dateTime')?.invalid && webinarForm.get('dateTime')?.touched) {
+                                <div class="error-message">Date and time are required</div>
+                                }
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">Duration *</label>
+                                <input type="text" class="form-control" formControlName="duration"
+                                    placeholder="e.g., 2 hours">
+                                @if (webinarForm.get('duration')?.invalid && webinarForm.get('duration')?.touched) {
+                                <div class="error-message">Duration is required</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expert Name *</label>
+                            <input type="text" class="form-control" formControlName="expertName"
+                                placeholder="Name of the expert/speaker">
+                            @if (webinarForm.get('expertName')?.invalid && webinarForm.get('expertName')?.touched) {
+                            <div class="error-message">Expert name is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expert Bio *</label>
+                            <textarea class="form-control" formControlName="expertBio" rows="3"
+                                placeholder="Brief biography of the expert"></textarea>
+                            @if (webinarForm.get('expertBio')?.invalid && webinarForm.get('expertBio')?.touched) {
+                            <div class="error-message">Expert bio is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Webinar Options -->
+                    <div class="form-section">
+                        <h3>Webinar Options</h3>
+                        <div class="form-group">
+                            <label class="form-label">Webinar Type *</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="webinarType" value="online">
+                                    <span>Online (Virtual Attendance)</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="webinarType" value="offline">
+                                    <span>Offline (Physical Attendance at Venue)</span>
+                                </label>
+                            </div>
+                        </div>
+                        @if (webinarForm.get('webinarType')?.value === 'offline') {
+                        <div class="form-group">
+                            <label class="form-label">Venue Address</label>
+                            <textarea class="form-control" formControlName="venueAddress" rows="2"
+                                placeholder="Enter the physical venue address"></textarea>
+                        </div>
+                        }
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label class="form-label">Online Registration Fee (₹) *</label>
+                                <input type="number" class="form-control" formControlName="onlineFee"
+                                    placeholder="Enter online fee" min="0">
+                                @if (webinarForm.get('onlineFee')?.invalid && webinarForm.get('onlineFee')?.touched) {
+                                <div class="error-message">Online fee is required</div>
+                                }
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">Offline Registration Fee (₹) *</label>
+                                <input type="number" class="form-control" formControlName="offlineFee"
+                                    placeholder="Enter offline fee" min="0">
+                                @if (webinarForm.get('offlineFee')?.invalid && webinarForm.get('offlineFee')?.touched) {
+                                <div class="error-message">Offline fee is required</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendee Registration -->
+                    <div class="form-section">
+                        <h3>Attendee Registration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Name *</label>
+                            <input type="text" class="form-control" formControlName="attendeeName"
+                                placeholder="Your full name">
+                            @if (webinarForm.get('attendeeName')?.invalid && webinarForm.get('attendeeName')?.touched) {
+                            <div class="error-message">Name is required</div>
+                            }
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" formControlName="attendeeEmail"
+                                    placeholder="your.email@example.com">
+                                @if (webinarForm.get('attendeeEmail')?.invalid &&
+                                webinarForm.get('attendeeEmail')?.touched) {
+                                <div class="error-message">Valid email is required</div>
+                                }
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" formControlName="attendeePhone"
+                                    placeholder="Your phone number">
+                                @if (webinarForm.get('attendeePhone')?.invalid &&
+                                webinarForm.get('attendeePhone')?.touched) {
+                                <div class="error-message">Phone number is required</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Organization</label>
+                            <input type="text" class="form-control" formControlName="attendeeOrganization"
+                                placeholder="Your organization or institution (optional)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Attendance Type *</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="attendanceType" value="online">
+                                    <span>Online</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="attendanceType" value="offline">
+                                    <span>Offline</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Facilities -->
+                    <div class="form-section" formGroupName="facilities">
+                        <h3>Additional Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Special Facilities Required</label>
+                            <div class="checkbox-list">
+                                <label class="checkbox-option">
+                                    <input type="checkbox" formControlName="lunch">
+                                    <span>Lunch</span>
+                                </label>
+                                <label class="checkbox-option">
+                                    <input type="checkbox" formControlName="refreshments">
+                                    <span>Refreshments</span>
+                                </label>
+                                <label class="checkbox-option">
+                                    <input type="checkbox" formControlName="certificate">
+                                    <span>Certificate of Attendance</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Paid Facilities -->
+                        <div class="form-group">
+                            <label class="form-label">Additional Paid Services</label>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="closedGroupDiscussion">
+                                    <span>Closed Group Discussion</span>
+                                </label>
+                                <input type="number" class="form-control" formControlName="closedGroupFee"
+                                    placeholder="Extra fee (₹)" min="0" style="width: 150px;">
+                            </div>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="recording">
+                                    <span>Recording of Webinar</span>
+                                </label>
+                                <input type="number" class="form-control" formControlName="recordingFee"
+                                    placeholder="Extra fee (₹)" min="0" style="width: 150px;">
+                            </div>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="oneOnOneConsultation">
+                                    <span>One-on-One Consultation with Expert</span>
+                                </label>
+                                <input type="number" class="form-control" formControlName="consultationFee"
+                                    placeholder="Extra fee (₹)" min="0" style="width: 150px;">
+                            </div>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="accessMaterials">
+                                    <span>Access to Webinar Materials</span>
+                                </label>
+                                <input type="number" class="form-control" formControlName="materialsFee"
+                                    placeholder="Extra fee (₹)" min="0" style="width: 150px;">
+                            </div>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="other">
+                                    <span>Other (please specify)</span>
+                                </label>
+                                <input type="text" class="form-control" formControlName="otherDetails"
+                                    placeholder="Specify other requirements" style="flex: 2;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Details -->
+                    <div class="form-section">
+                        <h3>Payment Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Total Amount</label>
+                            <div class="total-amount">₹ {{ webinarForm.get('totalAmount')?.value || 0 }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payment Method *</label>
+                            <select class="form-control" formControlName="paymentMethod">
+                                <option value="">-- Select Payment Method --</option>
+                                <option value="online">Online Payment (UPI, Card, etc.)</option>
+                                <option value="bank">Bank Transfer</option>
+                            </select>
+                            @if (webinarForm.get('paymentMethod')?.invalid && webinarForm.get('paymentMethod')?.touched)
+                            {
+                            <div class="error-message">Payment method is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Transaction ID/Reference Number *</label>
+                            <input type="text" class="form-control" formControlName="transactionId"
+                                placeholder="Enter transaction ID or reference number">
+                            @if (webinarForm.get('transactionId')?.invalid && webinarForm.get('transactionId')?.touched)
+                            {
+                            <div class="error-message">Transaction ID is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Booking Confirmation -->
+                    <div class="form-section">
+                        <h3>Booking Confirmation</h3>
+                        <div class="form-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" formControlName="confirmRegistration">
+                                <span>I confirm my registration for the webinar and agree to the terms.</span>
+                            </label>
+                            @if (webinarForm.get('confirmRegistration')?.invalid &&
+                            webinarForm.get('confirmRegistration')?.touched) {
+                            <div class="error-message">You must confirm your registration</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" formControlName="acceptNonRefundable">
+                                <span>I understand that payment is non-refundable in case of cancellation.</span>
+                            </label>
+                            @if (webinarForm.get('acceptNonRefundable')?.invalid &&
+                            webinarForm.get('acceptNonRefundable')?.touched) {
+                            <div class="error-message">You must accept the non-refundable policy</div>
+                            }
+                        </div>
+                        <p class="notice">By submitting this form, you confirm your registration and payment for the
+                            webinar. You will receive a confirmation email with further details.</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" [disabled]="webinarForm.invalid">
+                            <i class="fas fa-check-circle"></i> Complete Registration
+                        </button>
+                    </div>
+                </form>
+            </div>
+            } @else if (showWorkshopForm()) {
+            <!-- Workshop Registration Form -->
+            <div class="research-form-container">
+                <form [formGroup]="workshopForm" (ngSubmit)="onSubmitWorkshopForm()">
+                    <!-- Workshop Details -->
+                    <div class="form-section">
+                        <h3>Workshop Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Workshop Title *</label>
+                            <input type="text" class="form-control" formControlName="workshopTitle"
+                                placeholder="Enter workshop title">
+                            @if (workshopForm.get('workshopTitle')?.invalid &&
+                            workshopForm.get('workshopTitle')?.touched) {
+                            <div class="error-message">Workshop title is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Workshop Description *</label>
+                            <textarea class="form-control" formControlName="workshopDescription" rows="3"
+                                placeholder="Describe the workshop"></textarea>
+                            @if (workshopForm.get('workshopDescription')?.invalid &&
+                            workshopForm.get('workshopDescription')?.touched) {
+                            <div class="error-message">Description is required</div>
+                            }
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label class="form-label">Date and Time *</label>
+                                <input type="datetime-local" class="form-control" formControlName="dateTime">
+                                @if (workshopForm.get('dateTime')?.invalid && workshopForm.get('dateTime')?.touched) {
+                                <div class="error-message">Date and time are required</div>
+                                }
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">Duration *</label>
+                                <input type="text" class="form-control" formControlName="duration"
+                                    placeholder="e.g., 4 hours">
+                                @if (workshopForm.get('duration')?.invalid && workshopForm.get('duration')?.touched) {
+                                <div class="error-message">Duration is required</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expert Name *</label>
+                            <input type="text" class="form-control" formControlName="expertName"
+                                placeholder="Name of the expert/instructor">
+                            @if (workshopForm.get('expertName')?.invalid && workshopForm.get('expertName')?.touched) {
+                            <div class="error-message">Expert name is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expert Bio *</label>
+                            <textarea class="form-control" formControlName="expertBio" rows="3"
+                                placeholder="Brief biography of the expert"></textarea>
+                            @if (workshopForm.get('expertBio')?.invalid && workshopForm.get('expertBio')?.touched) {
+                            <div class="error-message">Expert bio is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Workshop Options -->
+                    <div class="form-section">
+                        <h3>Workshop Options</h3>
+                        <div class="form-group">
+                            <label class="form-label">Workshop Type *</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="workshopType" value="online">
+                                    <span>Online (Virtual Attendance)</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="workshopType" value="offline">
+                                    <span>Offline (Physical Attendance at Venue)</span>
+                                </label>
+                            </div>
+                        </div>
+                        @if (workshopForm.get('workshopType')?.value === 'offline') {
+                        <div class="form-group">
+                            <label class="form-label">Venue Address</label>
+                            <textarea class="form-control" formControlName="venueAddress" rows="2"
+                                placeholder="Enter the physical venue address"></textarea>
+                        </div>
+                        }
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label class="form-label">Online Registration Fee (₹) *</label>
+                                <input type="number" class="form-control" formControlName="onlineFee"
+                                    placeholder="Enter online fee" min="0">
+                                @if (workshopForm.get('onlineFee')?.invalid && workshopForm.get('onlineFee')?.touched) {
+                                <div class="error-message">Online fee is required</div>
+                                }
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">Offline Registration Fee (₹) *</label>
+                                <input type="number" class="form-control" formControlName="offlineFee"
+                                    placeholder="Enter offline fee" min="0">
+                                @if (workshopForm.get('offlineFee')?.invalid && workshopForm.get('offlineFee')?.touched)
+                                {
+                                <div class="error-message">Offline fee is required</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendee Registration -->
+                    <div class="form-section">
+                        <h3>Attendee Registration</h3>
+                        <div class="form-group">
+                            <label class="form-label">Name *</label>
+                            <input type="text" class="form-control" formControlName="attendeeName"
+                                placeholder="Your full name">
+                            @if (workshopForm.get('attendeeName')?.invalid && workshopForm.get('attendeeName')?.touched)
+                            {
+                            <div class="error-message">Name is required</div>
+                            }
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" formControlName="attendeeEmail"
+                                    placeholder="your.email@example.com">
+                                @if (workshopForm.get('attendeeEmail')?.invalid &&
+                                workshopForm.get('attendeeEmail')?.touched) {
+                                <div class="error-message">Valid email is required</div>
+                                }
+                            </div>
+                            <div class="form-group flex-1">
+                                <label class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" formControlName="attendeePhone"
+                                    placeholder="Your phone number">
+                                @if (workshopForm.get('attendeePhone')?.invalid &&
+                                workshopForm.get('attendeePhone')?.touched) {
+                                <div class="error-message">Phone number is required</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Organization</label>
+                            <input type="text" class="form-control" formControlName="attendeeOrganization"
+                                placeholder="Your organization or institution (optional)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Attendance Type *</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="attendanceType" value="online">
+                                    <span>Online</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" formControlName="attendanceType" value="offline">
+                                    <span>Offline</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Facilities -->
+                    <div class="form-section" formGroupName="facilities">
+                        <h3>Additional Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Special Facilities Required</label>
+                            <div class="checkbox-list">
+                                <label class="checkbox-option">
+                                    <input type="checkbox" formControlName="lunch">
+                                    <span>Lunch</span>
+                                </label>
+                                <label class="checkbox-option">
+                                    <input type="checkbox" formControlName="refreshments">
+                                    <span>Refreshments</span>
+                                </label>
+                                <label class="checkbox-option">
+                                    <input type="checkbox" formControlName="certificate">
+                                    <span>Certificate of Participation</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Paid Facilities -->
+                        <div class="form-group">
+                            <label class="form-label">Additional Paid Services</label>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="handsOnMaterials">
+                                    <span>Hands-on Training Materials</span>
+                                </label>
+                                <input type="number" class="form-control" formControlName="handsOnMaterialsFee"
+                                    placeholder="Extra fee (₹)" min="0" style="width: 150px;">
+                            </div>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="personalizedFeedback">
+                                    <span>Personalized Feedback Session</span>
+                                </label>
+                                <input type="number" class="form-control" formControlName="personalizedFeedbackFee"
+                                    placeholder="Extra fee (₹)" min="0" style="width: 150px;">
+                            </div>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="workshopResources">
+                                    <span>Access to Workshop Resources</span>
+                                </label>
+                                <input type="number" class="form-control" formControlName="workshopResourcesFee"
+                                    placeholder="Extra fee (₹)" min="0" style="width: 150px;">
+                            </div>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="postWorkshopSupport">
+                                    <span>Post-Workshop Support</span>
+                                </label>
+                                <input type="number" class="form-control" formControlName="postWorkshopSupportFee"
+                                    placeholder="Extra fee (₹)" min="0" style="width: 150px;">
+                            </div>
+
+                            <div class="facility-row">
+                                <label class="checkbox-option flex-1">
+                                    <input type="checkbox" formControlName="other">
+                                    <span>Other (please specify)</span>
+                                </label>
+                                <input type="text" class="form-control" formControlName="otherDetails"
+                                    placeholder="Specify other requirements" style="flex: 2;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Details -->
+                    <div class="form-section">
+                        <h3>Payment Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Total Amount</label>
+                            <div class="total-amount">₹ {{ workshopForm.get('totalAmount')?.value || 0 }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payment Method *</label>
+                            <select class="form-control" formControlName="paymentMethod">
+                                <option value="">-- Select Payment Method --</option>
+                                <option value="online">Online Payment (UPI, Card, etc.)</option>
+                                <option value="bank">Bank Transfer</option>
+                            </select>
+                            @if (workshopForm.get('paymentMethod')?.invalid &&
+                            workshopForm.get('paymentMethod')?.touched) {
+                            <div class="error-message">Payment method is required</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Transaction ID/Reference Number *</label>
+                            <input type="text" class="form-control" formControlName="transactionId"
+                                placeholder="Enter transaction ID or reference number">
+                            @if (workshopForm.get('transactionId')?.invalid &&
+                            workshopForm.get('transactionId')?.touched) {
+                            <div class="error-message">Transaction ID is required</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Booking Confirmation -->
+                    <div class="form-section">
+                        <h3>Booking Confirmation</h3>
+                        <div class="form-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" formControlName="confirmRegistration">
+                                <span>I confirm my registration for the workshop and agree to the terms.</span>
+                            </label>
+                            @if (workshopForm.get('confirmRegistration')?.invalid &&
+                            workshopForm.get('confirmRegistration')?.touched) {
+                            <div class="error-message">You must confirm your registration</div>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-option">
+                                <input type="checkbox" formControlName="acceptNonRefundable">
+                                <span>I understand that payment is non-refundable in case of cancellation.</span>
+                            </label>
+                            @if (workshopForm.get('acceptNonRefundable')?.invalid &&
+                            workshopForm.get('acceptNonRefundable')?.touched) {
+                            <div class="error-message">You must accept the non-refundable policy</div>
+                            }
+                        </div>
+                        <p class="notice">By submitting this form, you confirm your registration and payment for the
+                            workshop. You will receive a confirmation email with further details.</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" [disabled]="workshopForm.invalid">
+                            <i class="fas fa-check-circle"></i> Complete Registration
+                        </button>
+                    </div>
+                </form>
+            </div>
+            } @else {
+            <!-- Regular Content Display for Other Programs -->
+            <div class="glass-card">
+                <p class="description">{{ selectedProgram()?.content.description }}</p>
+
+                <div class="content-sections">
+                    @for (section of selectedProgram()?.content.sections; track section.title) {
+                    <div class="content-section" [id]="section.title">
+                        <h2>{{ section.title }}</h2>
+                        @if (section.text) {
+                        <p>{{ section.text }}</p>
+                        }
+                        @if (section.items) {
+                        <ul class="items-list">
+                            @for (item of section.items; track item) {
+                            <li><i class="fas fa-check-circle"></i> {{ item }}</li>
+                            }
+                        </ul>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+    }
+</div>

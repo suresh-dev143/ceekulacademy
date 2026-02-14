@@ -1,0 +1,51 @@
+<div class="issues-ticker-container" *ngIf="tickerIssues().length > 0">
+    <div class="ticker-header">
+        <span class="pulse-dot"></span> Live Issues
+    </div>
+
+    <div class="ticker-window">
+        <div class="ticker-track">
+            <!-- First set of items -->
+            <div class="ticker-item" *ngFor="let issue of tickerIssues()" (click)="onIssueClick(issue)">
+                <div class="issue-card glass-panel">
+                    <div class="issue-header">
+                        <span class="badge" [ngClass]="issue.category.toLowerCase().replace(' ', '-')">{{ issue.category
+                            | slice:0:10 }}</span>
+                        <span class="urgency" *ngIf="issue.urgency === 'High' || issue.urgency === 'Critical'">
+                            <i class="fas fa-exclamation-circle text-red-400"></i>
+                        </span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-title">{{ issue.description | slice:0:50 }}{{ issue.description.length > 50 ?
+                            '...' : '' }}</p>
+                    </div>
+                    <div class="issue-footer">
+                        <span class="location"><i class="fas fa-map-marker-alt"></i> {{ issue.location.area }}</span>
+                        <span class="status-indicator" [ngClass]="issue.status.toLowerCase().replace(' ', '-')"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Duplicate set for seamless loop (CSS animation trick) -->
+            <div class="ticker-item" *ngFor="let issue of tickerIssues()" (click)="onIssueClick(issue)">
+                <div class="issue-card glass-panel">
+                    <div class="issue-header">
+                        <span class="badge" [ngClass]="issue.category.toLowerCase().replace(' ', '-')">{{ issue.category
+                            | slice:0:10 }}</span>
+                        <span class="urgency" *ngIf="issue.urgency === 'High' || issue.urgency === 'Critical'">
+                            <i class="fas fa-exclamation-circle text-red-400"></i>
+                        </span>
+                    </div>
+                    <div class="issue-body">
+                        <p class="issue-title">{{ issue.description | slice:0:50 }}{{ issue.description.length > 50 ?
+                            '...' : '' }}</p>
+                    </div>
+                    <div class="issue-footer">
+                        <span class="location"><i class="fas fa-map-marker-alt"></i> {{ issue.location.area }}</span>
+                        <span class="status-indicator" [ngClass]="issue.status.toLowerCase().replace(' ', '-')"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

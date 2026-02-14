@@ -1,0 +1,35 @@
+@for (menu of menuItems; track menu.title) {
+<ng-container *ngIf="!menu.role || menu.role === userRole()">
+    <!-- <ng-container> -->
+    @if (menu.type === 'location') {
+    <div class="left-menu-item location-item">{{ menu.title }}</div>
+    }
+
+    @if (menu.type === 'menu') {
+    <div class="left-menu-group">
+        <div class="left-menu-title" [class.active-link]="menu.link" [routerLink]="menu.link" routerLinkActive="active">
+            {{ menu.title }}
+        </div>
+        <ul class="left-submenu">
+            @for (item of menu.items; track item.title) {
+            <li class="left-menu-item" [class.active]="item.active">
+                @if (item.link) {
+                <a [routerLink]="item.link">{{ item.title }}</a>
+                } @else {
+                {{ item.title }}
+                }
+            </li>
+            }
+            @if (menu.subItems) {
+            @for (subItem of menu.subItems; track subItem.title) {
+            <li class="left-menu-item">
+                <a [routerLink]="subItem.link">{{ subItem.title }}</a>
+            </li>
+            }
+            }
+        </ul>
+    </div>
+    }
+</ng-container>
+}
+<app-issues-sidebar-ticker></app-issues-sidebar-ticker>

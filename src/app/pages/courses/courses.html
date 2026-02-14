@@ -1,0 +1,63 @@
+<app-layout>
+    <div class="courses-mgmt-container">
+        <!-- Dashboard Header -->
+        <header class="mgmt-header">
+            <div class="header-content">
+                <h1 class="page-title">Course Management</h1>
+                <p class="page-subtitle">Create, monitor, and scale your educational curriculum</p>
+            </div>
+
+            <div class="header-actions" *ngIf="isAuthorized()">
+                <button class="btn-create" (click)="openCreateForm()">
+                    <i class="fas fa-plus"></i> Create New Course
+                </button>
+            </div>
+        </header>
+
+        <!-- Filters & Search Toolbar -->
+        <div class="toolbar">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="searchQuery.set($event)"
+                    placeholder="Search by course name or category...">
+            </div>
+
+            <div class="filter-group">
+                <label>Status:</label>
+                <div class="filter-chips">
+                    <button *ngFor="let status of filterOptions" [class.active]="filterStatus() === status"
+                        (click)="filterStatus.set(status)">
+                        {{ status }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course List Content -->
+        <div class="mgmt-content">
+            <div class="courses-list" *ngIf="filteredCourses().length > 0">
+                <app-course-list-item *ngFor="let course of filteredCourses()" [course]="course"
+                    [canEdit]="isAuthorized()" (edit)="openEditForm($event)" (delete)="handleDelete($event)"
+                    (togglePublish)="handleTogglePublish($event)">
+                </app-course-list-item>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" *ngIf="filteredCourses().length === 0">
+                <h3>No courses found</h3>
+                <p>Try adjusting your search or filters, or create a new course to get started.</p>
+                <button class="btn-primary" (click)="openCreateForm()" *ngIf="isAuthorized()">
+                    Create Your First Course
+                </button>
+            </div>
+        </div>
+
+        <!-- Course Form Modal Overlay -->
+        <div class="modal-overlay" *ngIf="isFormOpen" (click)="isFormOpen = false">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+                <app-course-form [course]="selectedCourse" (save)="handleSave($event)" (cancel)="isFormOpen = false">
+                </app-course-form>
+            </div>
+        </div>
+    </div>
+</app-layout>

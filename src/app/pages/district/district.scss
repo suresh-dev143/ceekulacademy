@@ -1,0 +1,133 @@
+.district-page {
+    padding: 1rem 1.5rem;
+}
+
+.center-heading {
+    text-align: center;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    margin-bottom: 3.5rem;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--accent-primary);
+    display: block;
+}
+
+.goal-box {
+    background: #000000;
+    border: 1px solid var(--accent-primary);
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.goal-title {
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.goal-item {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+
+    p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+}
+
+.goal-number {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    flex-shrink: 0;
+    color: #000000;
+}
+
+.director-types {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+    padding: 2rem;
+    border-left: 1px solid var(--accent-primary);
+    background: #050505;
+}
+
+.disciplines-heading {
+    margin-bottom: 2.5rem;
+    color: var(--accent-primary);
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.directors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 4rem;
+}
+
+.director-role {
+    padding: 1.25rem 1.5rem;
+    background: #000000;
+    border: 1px solid var(--row-border);
+    transition: all 0.2s ease;
+    cursor: default;
+    font-size: 1rem;
+    color: var(--text-primary);
+
+    &:hover {
+        border-color: var(--accent-primary);
+        background: #050505;
+    }
+
+    &.highlighted {
+        background: rgba(240, 142, 56, 0.05);
+        border-color: var(--accent-primary);
+    }
+}
+
+.btn-create-position {
+    width: 100%;
+    padding: 1.25rem;
+    background: #000000;
+    color: var(--text-primary);
+    border: 1px solid var(--accent-primary);
+    font-weight: 800;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    &:hover {
+        background: var(--accent-primary);
+        color: #000000;
+    }
+}
+
+@media (max-width: 768px) {
+    .center-heading {
+        font-size: 1.5rem;
+    }
+
+    .goal-box {
+        padding: 1.5rem;
+    }
+
+    .director-role {
+        font-size: 0.9rem;
+    }
+}

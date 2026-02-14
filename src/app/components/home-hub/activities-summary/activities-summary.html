@@ -1,0 +1,33 @@
+<div class="hub-section">
+    <div class="section-header">
+        <h3 class="section-title">Programs & Activities</h3>
+        <button class="view-all-btn">Schedule <i class="fas fa-calendar-alt"></i></button>
+    </div>
+
+    <div class="activities-list">
+        <div class="activity-item" *ngFor="let activity of activities">
+            <div class="activity-type-icon" [attr.data-type]="activity.type">
+                <i class="fas" [ngClass]="getTypeIcon(activity.type)"></i>
+            </div>
+
+            <div class="activity-details">
+                <div class="activity-main">
+                    <h4 class="activity-title">{{ activity.title }}</h4>
+                    <div class="activity-meta">
+                        <span class="meta-item"><i class="far fa-calendar"></i> {{ activity.date }}</span>
+                        <span class="meta-item"><i class="far fa-clock"></i> {{ activity.time }}</span>
+                    </div>
+                </div>
+
+                <div class="activity-status">
+                    <span class="status-badge" [attr.data-status]="activity.status">{{ activity.status }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-state" *ngIf="activities.length === 0">
+            <p>No active programs found. Start exploring!</p>
+            <button class="cta-btn">Join a Program</button>
+        </div>
+    </div>
+</div>

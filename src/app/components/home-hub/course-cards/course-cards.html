@@ -1,0 +1,49 @@
+<div class="hub-section">
+    <div class="section-header">
+        <h3 class="section-title">My Courses</h3>
+        <button class="view-all-btn">View All <i class="fas fa-arrow-right"></i></button>
+    </div>
+
+    <div class="courses-grid">
+        <div class="course-card" *ngFor="let course of courses" [class.completed]="course.status === 'Completed'">
+            <div class="course-header">
+                <div class="course-icon">{{ course.thumbnail }}</div>
+                <div class="course-status-badge" [class.in-progress]="course.status === 'In progress'"
+                    [class.done]="course.status === 'Completed'">
+                    {{ course.status }}
+                </div>
+            </div>
+
+            <div class="course-body">
+                <h4 class="course-title">{{ course.title }}</h4>
+                <p class="instructor"><i class="fas fa-user-tie"></i> {{ course.instructor }}</p>
+
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Progress</span>
+                        <span class="progress-percent">{{ course.progress }}%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" [style.width.%]="course.progress"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="course-footer">
+                <button class="footer-btn secondary" (click)="onViewDetails(course)" title="View Details">
+                    <i class="fas fa-info-circle"></i>
+                </button>
+                <button class="footer-btn primary" (click)="onContinue(course)" *ngIf="course.status !== 'Completed'">
+                    Continue <i class="fas fa-play"></i>
+                </button>
+                <button class="footer-btn success" *ngIf="course.status === 'Completed'"
+                    (click)="onViewDetails(course)">
+                    Review <i class="fas fa-check-circle"></i>
+                </button>
+                <button class="footer-btn manage" (click)="onManage(course)" title="Manage">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

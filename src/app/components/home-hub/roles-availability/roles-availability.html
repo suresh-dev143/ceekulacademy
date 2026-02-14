@@ -1,0 +1,36 @@
+<div class="hub-section">
+    <div class="section-header">
+        <h3 class="section-title">Roles & Availability</h3>
+        <button class="view-all-btn">Manage <i class="fas fa-edit"></i></button>
+    </div>
+
+    <div class="roles-grid">
+        <div class="roles-panel glass-card">
+            <h4 class="panel-subtitle">My Active Roles</h4>
+            <div class="roles-tags">
+                <div class="role-tag" *ngFor="let role of roles">
+                    <i class="fas" [ngClass]="getRoleIcon(role)"></i>
+                    {{ role }}
+                </div>
+            </div>
+        </div>
+
+        <div class="availability-panel glass-card">
+            <h4 class="panel-subtitle">Current Availability</h4>
+            <div class="availability-content">
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-broadcast-tower"></i> Mode</span>
+                    <span class="info-value">{{ availability.mode }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-map-marker-alt"></i> Location</span>
+                    <span class="info-value">{{ availability.location }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label"><i class="fas fa-clock"></i> Timing</span>
+                    <span class="info-value">{{ availability.timing }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

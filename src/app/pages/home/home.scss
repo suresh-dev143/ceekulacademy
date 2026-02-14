@@ -1,0 +1,48 @@
+.home-hub-container {
+    padding: 0 1.5rem 1.5rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.hub-content-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.hub-main-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    width: 100%;
+}
+
+:host ::ng-deep {
+    .glass-card {
+        background: #000000;
+        border: 1px solid var(--accent-primary);
+        border-radius: 0;
+        backdrop-filter: none;
+        box-shadow: none;
+        padding: 2.5rem 1.5rem;
+    }
+
+    .section-title {
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--accent-primary);
+        border-bottom: 1px solid var(--accent-primary);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .home-hub-container {
+        padding: 0 2rem 2rem;
+        max-width: 1200px;
+    }
+}

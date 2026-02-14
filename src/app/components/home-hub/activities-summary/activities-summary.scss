@@ -1,0 +1,132 @@
+.activities-list {
+    background: #000000;
+    border: 1px solid var(--accent-primary);
+    padding: 1.5rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+    border: 1px solid var(--row-border);
+    background: #000000;
+
+    &:hover {
+        background: #050505;
+        border-color: var(--accent-primary);
+    }
+
+    &:not(:last-child) {
+        margin-bottom: 1rem;
+    }
+}
+
+.activity-type-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: #000000;
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+    flex-shrink: 0;
+}
+
+.activity-details {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.activity-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.activity-meta {
+    display: flex;
+    gap: 1.2rem;
+
+    .meta-item {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        i {
+            color: var(--accent-primary);
+            font-size: 0.8rem;
+        }
+    }
+}
+
+.status-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 0;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid transparent;
+
+    &[data-status="Upcoming"] {
+        border-color: var(--accent-primary);
+        color: var(--accent-primary);
+    }
+
+    &[data-status="Scheduled"] {
+        border-color: #10b981;
+        color: #10b981;
+    }
+
+    &[data-status="In Review"] {
+        border-color: #fbbf24;
+        color: #fbbf24;
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+
+    p {
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 1.5rem;
+    }
+}
+
+.cta-btn {
+    padding: 0.8rem 2rem;
+    background: #000000;
+    color: var(--text-primary);
+    border: 1px solid var(--accent-primary);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--accent-primary);
+        color: #000000;
+    }
+}
+
+@media (max-width: 600px) {
+    .activity-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}

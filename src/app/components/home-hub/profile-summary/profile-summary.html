@@ -1,0 +1,28 @@
+<div class="profile-card glass-card">
+    <div class="profile-left">
+        <div class="avatar-container">
+            <span class="avatar">{{ user.avatar }}</span>
+            <div class="status-indicator online"></div>
+        </div>
+        <div class="user-info">
+            <h2 class="welcome-text">Welcome back, <span class="user-name">{{ user.name }}</span></h2>
+            <p class="user-role">
+                <i class="fas fa-id-badge"></i> {{ user.role }}
+            </p>
+        </div>
+    </div>
+
+    <div class="profile-actions">
+        <button class="action-btn secondary" (click)="onViewProfile()" title="View Profile">
+            <i class="fas fa-user-circle"></i>
+            <span>View Profile</span>
+        </button>
+        <button class="action-btn primary" (click)="onEditProfile()" title="Edit Profile">
+            <i class="fas fa-user-edit"></i>
+            <span>Edit Profile</span>
+        </button>
+        <button class="action-btn logout" (click)="onLogout()" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+    </div>
+</div>

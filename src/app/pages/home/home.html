@@ -1,0 +1,26 @@
+<app-layout>
+    <div class="home-hub-container">
+        <!-- Header Section -->
+        <app-profile-summary [user]="userData" (viewProfile)="handleViewProfile()" (editProfile)="handleEditProfile()"
+            (logout)="handleLogout()">
+        </app-profile-summary>
+
+        <div class="hub-content-grid">
+            <!-- Main Content Column (Integrated in Center) -->
+            <div class="hub-main-column">
+                <!-- Courses Section -->
+                <app-course-cards [courses]="userCourses"></app-course-cards>
+
+                <!-- Activities Section -->
+                <app-activities-summary [activities]="userActivities"></app-activities-summary>
+
+                <!-- Roles & Availability Section -->
+                <app-roles-availability [roles]="userRoles" [availability]="availabilityInfo">
+                </app-roles-availability>
+
+                <!-- Notifications Section -->
+                <app-notifications-list [notifications]="userNotifications"></app-notifications-list>
+            </div>
+        </div>
+    </div>
+</app-layout>

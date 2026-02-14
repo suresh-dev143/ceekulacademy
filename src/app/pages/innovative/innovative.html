@@ -1,0 +1,80 @@
+<app-layout>
+    <div class="innovative-container">
+        @if (!selectedCategory()) {
+        <div class="default-view">
+            <div class="header">
+                <h1 class="page-title">Innovative Courses</h1>
+            </div>
+
+            <!-- Horizontal Tab Navigation (Subtitles) -->
+            <div class="subtitle-tabs-container animation-active">
+                <div class="subtitle-tabs">
+                    @for (category of categories; track category.id) {
+                    <button class="tab-btn" (click)="selectCategory(category)">
+                        <span>{{ category.title }}</span>
+                    </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Dashboard Grid of Categories -->
+            <div class="categories-grid">
+                @for (category of categories; track category.id) {
+                <div class="category-card" (click)="selectCategory(category)">
+                    <div class="category-icon">
+                        <i [class]="category.icon"></i>
+                    </div>
+                    <h3>{{ category.title }}</h3>
+                    <p>{{ category.description }}</p>
+                    <span class="view-more">Explore <i class="fas fa-chevron-right"></i></span>
+                </div>
+                }
+            </div>
+        </div>
+        } @else {
+        <div class="drill-down-view">
+            <div class="view-header">
+                <button class="back-btn" (click)="goBack()" title="Back to Innovative Courses">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="page-title">{{ selectedCategory()?.title }}</h1>
+            </div>
+
+            <!-- Moving Sub-subtitles -->
+            <div class="sub-subtitle-tabs-container animation-active">
+                <div class="subtitle-tabs">
+                    @for (sub of selectedCategory()?.subSubtitles; track sub) {
+                    <button class="sub-tab" (click)="scrollToSection(sub)">
+                        <span>{{ sub }}</span>
+                    </button>
+                    }
+                </div>
+            </div>
+
+            <div class="category-content">
+                <div class="glass-card">
+                    <p class="description">{{ selectedCategory()?.content.description }}</p>
+
+                    <div class="content-sections">
+                        @for (section of selectedCategory()?.content.sections; track section.title) {
+                        <div class="content-section" [id]="section.title">
+                            <h2>{{ section.title }}</h2>
+                            @if (section.text) {
+                            <p>{{ section.text }}</p>
+                            }
+                            @if (section.items) {
+                            <ul class="items-list">
+                                @for (item of section.items; track item) {
+                                <li><i class="fas fa-check-circle"></i> {{ item }}</li>
+                                }
+                            </ul>
+                            }
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</app-layout>
