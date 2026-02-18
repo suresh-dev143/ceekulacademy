@@ -64,8 +64,7 @@ import { TeacherDashboardService, ScheduleItem } from '../../../services/teacher
     .schedule-content {
       padding: 2.5rem;
       border-radius: 0;
-      background: #000000;
-      border: 1px solid var(--accent-primary);
+      background: #010102;
       max-width: 900px;
       margin: 0 auto;
     }

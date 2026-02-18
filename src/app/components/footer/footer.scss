@@ -1,7 +1,7 @@
 .footer {
-    background: var(--bg-primary);
-    border-top: 1px solid var(--accent-primary);
-    padding: 4rem 0 2rem;
+    background: #050505;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 6rem 0 3rem;
     color: var(--text-primary);
 }
 
@@ -21,14 +21,25 @@
 }
 
 .footer-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
     color: var(--text-primary);
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    border-bottom: 2px solid var(--accent-primary);
     display: inline-block;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 30px;
+        height: 2px;
+        background: var(--accent-primary);
+        opacity: 0.6;
+    }
 }
 
 .footer-description {
@@ -85,9 +96,9 @@
 }
 
 .footer-bottom {
-    margin-top: 4rem;
+    margin-top: 6rem;
     padding-top: 2rem;
-    border-top: 1px solid var(--row-border);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
     text-align: center;
 }
 

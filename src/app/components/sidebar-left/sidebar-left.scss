@@ -25,8 +25,8 @@
     &.active,
     .active-link {
         color: var(--text-primary) !important;
-        border-left: 4px solid var(--accent-primary) !important;
-        background: #050505;
+        border-left: 3px solid var(--accent-primary) !important;
+        background: rgba(255, 255, 255, 0.02);
     }
 
     &.location-item {
@@ -49,9 +49,8 @@
 }
 
 .left-menu-group {
-    /* border-bottom removed */
-    padding-bottom: 0;
-    background: #020202;
+    padding-bottom: 0.5rem;
+    background: transparent;
 }
 
 .left-menu-title {
@@ -62,6 +61,7 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     opacity: 0.8;
+    cursor: pointer;
 }
 
 .left-submenu {

@@ -17,6 +17,18 @@ import { FormsModule } from '@angular/forms';
           </div>
         </div>
 
+        <div class="navigation-tabs">
+          <button class="nav-tab" [class.active]="activeTab === 'overview'" (click)="tabChange.emit('overview')">
+            <i class="fas fa-th-large"></i> Overview
+          </button>
+          <button class="nav-tab" [class.active]="activeTab === 'workshops'" (click)="tabChange.emit('workshops')">
+            <i class="fas fa-tools"></i> Workshops
+          </button>
+          <button class="nav-tab" [class.active]="activeTab === 'schedule'" (click)="tabChange.emit('schedule')">
+            <i class="fas fa-calendar-alt"></i> Schedule
+          </button>
+        </div>
+
         <div class="radius-selector">
           <label>Discovery Radius</label>
           <div class="button-group">
@@ -62,7 +74,7 @@ import { FormsModule } from '@angular/forms';
     </div>
   `,
   styles: [`
-    .teacher-overview-card { padding: 2.5rem; background: #000000; border: 1px solid var(--accent-primary); border-radius: 0; margin-bottom: 2rem; }
+    .teacher-overview-card { padding: 2.5rem; background: #010102;  border-radius: 0; margin-bottom: 2rem; }
     
     .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; gap: 2rem; }
     
@@ -80,6 +92,42 @@ import { FormsModule } from '@angular/forms';
       button { padding: 0.6rem 1rem; border-radius: 0; border: 1px solid var(--row-border); background: #000000; color: var(--text-secondary); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: 0.2s;
         &.active { background: var(--accent-primary); color: #000000; border-color: var(--accent-primary); }
         &:hover:not(.active) { border-color: var(--accent-primary); color: var(--text-primary); }
+      }
+    }
+
+    .navigation-tabs {
+      display: flex;
+      gap: 1.5rem;
+      background: #050505;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--row-border);
+      
+      .nav-tab {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 1rem 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        transition: 0.3s;
+        border-bottom: 2px solid transparent;
+
+        i { font-size: 0.9rem; }
+        
+        &.active {
+          color: var(--accent-primary);
+          border-bottom-color: var(--accent-primary);
+        }
+
+        &:hover:not(.active) {
+          color: var(--text-primary);
+        }
       }
     }
 
@@ -106,5 +154,7 @@ export class TeacherOverviewComponent {
   @Input() location: string = '';
   @Input() radius: number = 10;
   @Input() stats: any = {};
+  @Input() activeTab: string = 'overview';
   @Output() radiusChange = new EventEmitter<number>();
+  @Output() tabChange = new EventEmitter<string>();
 }

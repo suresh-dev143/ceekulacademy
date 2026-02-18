@@ -1,0 +1,156 @@
+.workshop-manager-container {
+    width: 100%;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    color: #888;
+    margin: 0.5rem 0 0;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.research-form-container {
+    background: #010102;
+    padding: 3rem;
+    border: 1px solid #111;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+
+    .form-label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #ef9d57;
+        text-transform: uppercase;
+        margin-bottom: 0.8rem;
+        letter-spacing: 1px;
+    }
+
+    .form-control {
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #222;
+        color: #fff;
+        padding: 0.8rem 0;
+        font-size: 1.1rem;
+        outline: none;
+        transition: border-color 0.3s ease;
+
+        &:focus {
+            border-color: #ef9d57;
+        }
+    }
+}
+
+.form-row {
+    display: flex;
+    gap: 2rem;
+
+    .flex-1 {
+        flex: 1;
+    }
+}
+
+.btn-submit {
+    background: #ef9d57;
+    color: #000;
+    border: none;
+    padding: 1rem 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+        background: #fff;
+        transform: translateY(-2px);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.course-card {
+    background: #010102;
+    padding: 2.5rem;
+    border: 1px solid #111;
+    transition: all 0.3s ease;
+
+    &:hover {
+        border-color: #ef9d57;
+        transform: translateY(-5px);
+    }
+
+    .course-icon {
+        font-size: 2.5rem;
+        color: #ef9d57;
+        margin-bottom: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .course-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .course-desc {
+        font-size: 0.95rem;
+        color: #888;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+    }
+}

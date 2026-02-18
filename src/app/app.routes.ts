@@ -16,6 +16,8 @@ import { DirectorDashboardComponent } from './pages/director-dashboard/director-
 import { PartnerDashboardComponent } from './pages/partner-dashboard/partner-dashboard';
 import { StudentNearbyComponent } from './pages/student-nearby/student-nearby';
 import { TeacherDashboardComponent } from './pages/teacher-dashboard/teacher-dashboard';
+import { WorkshopsPageComponent } from './pages/teacher-workshops/teacher-workshops';
+import { ContactPageComponent } from './pages/contact/contact';
 import { IssuesPageComponent } from './pages/issues/issues';
 import { DonatePageComponent } from './pages/donate/donate';
 import { InvestPageComponent } from './pages/invest/invest';
@@ -28,10 +30,12 @@ export const routes: Routes = [
     { path: 'dashboard/partner', component: PartnerDashboardComponent },
     { path: 'dashboard/student/nearby', component: StudentNearbyComponent },
     { path: 'dashboard/teacher', component: TeacherDashboardComponent },
+    { path: 'dashboard/teacher/workshops', component: WorkshopsPageComponent },
     { path: 'about', component: AboutComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'profile', component: ProfileComponent },
+    { path: 'contact', component: ContactPageComponent },
     { path: 'district', component: DistrictComponent },
     { path: 'issues', component: IssuesPageComponent },
     { path: 'donate', component: DonatePageComponent },

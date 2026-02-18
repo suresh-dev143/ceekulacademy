@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, signal, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,14 +13,25 @@ export class NavbarComponent {
     isMenuOpen = false;
     isProgramsOpen = false;
     searchQuery = '';
+    mobileSidebarOpen = signal(false);
+    @Input() showLeftSidebar = true;
 
     constructor(private router: Router) { }
-
+    leftCollapsed = signal(false);
+    toggleLeft() {
+        this.leftCollapsed.set(!this.leftCollapsed());
+    }
+    expandLeft() {
+        this.leftCollapsed.set(false);
+    }
     toggleMenu() {
         this.isMenuOpen = !this.isMenuOpen;
         if (!this.isMenuOpen) {
             this.isProgramsOpen = false;
         }
+    }
+    toggleMobileSidebar() {
+        this.mobileSidebarOpen.set(!this.mobileSidebarOpen());
     }
 
     togglePrograms(event: Event) {

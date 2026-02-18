@@ -1,16 +1,8 @@
 <div class="district-layout" [class.sidebar-active]="mobileSidebarOpen()">
-    <app-navbar></app-navbar>
+    <app-navbar #navbar></app-navbar>
 
     <div class="layout-columns">
-        <!-- Mobile Sidebar Toggle Bar -->
-        <div class="mobile-sidebar-toggle">
-            <button class="btn-toggle" (click)="toggleMobileSidebar()">
-                MENU
-            </button>
-            <button class="btn-toggle" (click)="toggleMobileRightSidebar()">
-                CHAT
-            </button>
-        </div>
+
 
         <!-- Left Column (Sidebar) -->
         @if (showLeftSidebar) {
@@ -44,6 +36,7 @@
             </button>
 
             <div class="sidebar-content" [class.hidden]="rightCollapsed()">
+                <ng-content select="[slot=right-panel]"></ng-content>
                 <app-chat-panel (closeChat)="toggleMobileRightSidebar()"></app-chat-panel>
             </div>
         </aside>
@@ -52,5 +45,25 @@
         <!-- Overlay for mobile sidebar -->
         <div class="sidebar-overlay" *ngIf="mobileSidebarOpen()" (click)="toggleMobileSidebar()"></div>
         <div class="sidebar-overlay" *ngIf="mobileRightSidebarOpen()" (click)="toggleMobileRightSidebar()"></div>
+
+        <!-- Mobile Bottom Navigation -->
+        <div class="mobile-bottom-nav">
+            <!-- <button class="nav-item" (click)="toggleMobileSidebar()">
+                
+                 <span>&#x2B24;</span>
+            </button> -->
+            <button class="nav-item" (click)="navbar.toggleMenu()">
+
+                <span>&#x2B24;</span>
+            </button>
+            <button class="nav-item">
+
+                <span>&#x2B24;</span>
+            </button>
+            <button class="nav-item" (click)="toggleMobileRightSidebar()">
+
+                <span>&#x2B24;</span>
+            </button>
+        </div>
     </div>
 </div>

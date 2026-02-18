@@ -163,7 +163,7 @@ import { AdvisorService } from '../../services/advisor.service';
     .management-grid { display: flex; flex-direction: column; gap: 2rem; }
 
     .district-insights {
-      padding: 1.5rem; border-radius: 20px;
+      padding: 1.5rem; border-radius: 0; background: #010102;
       h3 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; }
       .insight-item { 
         margin-bottom: 1.2rem;

@@ -8,12 +8,17 @@
     </a>
 
     <button class="menu-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span>nav</span>
+
     </button>
 
     <div class="navbar-menu" [class.active]="isMenuOpen">
+      <div class="close-btn">
+        <button class="close-menu-btn" (click)="closeMenu()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link"
         (click)="closeMenu()">
         Home
@@ -66,6 +71,9 @@
       </a>
       <a routerLink="/invest" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
         Invest
+      </a>
+      <a routerLink="/contact" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
+        Contact
       </a>
     </div>
   </div>

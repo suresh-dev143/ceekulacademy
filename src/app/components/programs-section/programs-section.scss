@@ -10,8 +10,8 @@
 
     .search-bar {
         width: 100%;
-        max-width: 600px;
-        margin: 0 0 0.5rem;
+
+        margin: auto;
 
         input {
             width: 100%;
@@ -41,7 +41,7 @@
         }
 
         .page-title {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-size: 2.1rem;
 
             margin: 0;
             margin-top: 0.5rem;
@@ -120,19 +120,21 @@
 }
 
 .program-card {
-    background: #010101;
-    padding: 2rem 1rem;
+    background: var(--bg-card);
+    padding: 2.5rem;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 150px;
+    min-height: 180px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border: none;
 
     &:hover {
-        background: #010101;
-        transform: translateY(-10px);
-        box-shadow: 0 20px 40px #010101;
+        background: #0c0c0c;
+        transform: translateY(-8px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
 
         .view-more i {
             transform: translateX(5px);
@@ -294,9 +296,10 @@
 .research-form-container {
     width: 100%;
     max-width: 900px;
-    background: #010101;
-    padding: 0rem 4rem;
-    border: 1px solid rgba(255, 102, 0, 0.1);
+    background: var(--bg-card);
+    padding: 3rem 4rem;
+    border: none;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
 }
 
 .form-section {
@@ -304,14 +307,24 @@
 
     h3 {
         color: #ef9d57;
-        ;
-        font-size: 1.4rem;
+        font-size: 1.2rem;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 2px;
         margin-bottom: 2rem;
-        border-bottom: 1px solid rgba(255, 102, 0, 0.2);
+        position: relative;
         padding-bottom: 1rem;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--accent-primary);
+            opacity: 0.6;
+        }
     }
 }
 
@@ -415,6 +428,36 @@
     font-weight: 600;
 }
 
+.schedule-item {
+    margin-bottom: 1.5rem;
+    padding: 1rem 0rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 102, 0, 0.05);
+
+    .hour-tag {
+        background: rgba(255, 102, 0, 0.1);
+        color: #ef9d57;
+        padding: 0.5rem 1rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.8rem;
+        min-width: 100px;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .align-center {
+        align-items: center;
+    }
+}
+
+.section-help {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
 // Level 2: Course Detailed View Styles
 .course-details-view {
     width: 100%;
@@ -493,6 +536,153 @@
             font-weight: 700;
             border: 1px solid rgba(255, 102, 0, 0.2);
         }
+    }
+}
+
+// Workshops Specific Styles
+.workshops-container {
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.workshop-preview-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid var(--accent-primary);
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+
+    .workshop-title {
+        font-size: 2rem;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .workshop-desc {
+        font-size: 1.1rem;
+        color: #ccc;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .workshop-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+
+        i {
+            color: var(--accent-primary);
+            margin-right: 0.5rem;
+        }
+    }
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.course-card {
+    background: #080808;
+    padding: 2.5rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    border: none;
+
+    &:hover {
+        background: #010102;
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+
+        .course-action {
+            color: #fff;
+
+            i {
+                transform: translateX(5px);
+            }
+        }
+    }
+
+    .course-icon {
+        font-size: 2.5rem;
+        color: var(--accent-primary);
+        margin-bottom: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .course-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .course-desc {
+        font-size: 0.95rem;
+        color: #888;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        flex: 1;
+    }
+
+    .course-meta {
+        display: flex;
+        justify-content: space-between;
+        color: #666;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .course-action {
+        color: var(--accent-primary);
+        font-size: 0.9rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+            transition: transform 0.3s ease;
+        }
+    }
+}
+
+.btn-back {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0;
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: #fff;
     }
 }
 

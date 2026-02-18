@@ -55,7 +55,7 @@ import { FormsModule } from '@angular/forms';
   `,
   styles: [`
     .partner-header-card {
-      padding: 3.5rem; background: #000000; border: 1px solid var(--accent-primary); border-radius: 0; margin-bottom: 2rem;
+      padding: 3.5rem; background: #010102; border-radius: 0; margin-bottom: 2rem;
     }
 
     .header-main {

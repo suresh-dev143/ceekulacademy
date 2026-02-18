@@ -49,11 +49,11 @@ import { CommonModule } from '@angular/common';
       display: flex;
       align-items: center;
       padding: 1.5rem;
-      background: #111111;
-      border-left: 4px solid var(--accent-primary);
+      background: #010102;
+      border-left: 2px solid var(--accent-primary);
       transition: all 0.2s ease;
 
-      &:hover { background: #151515; }
+      &:hover { background: #080808; }
       
       &.partners { border-left-color: var(--accent-primary); }
       &.managers { border-left-color: #fbbf24; }

@@ -2,6 +2,7 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-programs-section',
@@ -14,30 +15,63 @@ export class ProgramsSectionComponent implements OnInit {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private fb = inject(FormBuilder);
+    public authService = inject(AuthService);
+
+    currentUser = this.authService.currentUserProfile;
 
     selectedProgram = signal<any | null>(null);
     researchForm!: FormGroup;
     projectForm!: FormGroup;
     webinarForm!: FormGroup;
     workshopForm!: FormGroup;
+    enrollWorkshopForm!: FormGroup;
     userCentricAIForm!: FormGroup;
     showResearchForm = signal<boolean>(false);
     showProjectForm = signal<boolean>(false);
     showWebinarForm = signal<boolean>(false);
     showWorkshopForm = signal<boolean>(false);
+    showWorkshopEnrollment = signal<boolean>(false);
     showCourseSyllabus = signal<boolean>(false);
     selectedCourse = signal<any>(null);
+    selectedWorkshop = signal<any>(null);
+    selectedSubSubtitle = signal<string | null>(null);
+    selectedContent = signal<any | null>(null);
+
+    workshopsList = signal<any[]>([
+        {
+            id: 'ws-001',
+            title: 'AI Product Design',
+            description: 'Learn to design AI-driven products from scratch.',
+            instructor: 'Amit Verma',
+            date: '2026-03-15',
+            duration: '4 Hours',
+            type: 'Online',
+            fee: 500
+        },
+        {
+            id: 'ws-002',
+            title: 'Industrial Robotics',
+            description: 'Hands-on session with industrial automation tools.',
+            instructor: 'Dr. Rajesh',
+            date: '2026-03-20',
+            duration: '6 Hours',
+            type: 'Offline',
+            fee: 1500
+        }
+    ]);
 
     ngOnInit() {
         this.initializeResearchForm();
         this.initializeProjectForm();
         this.initializeWebinarForm();
         this.initializeWorkshopForm();
+        this.initializeEnrollWorkshopForm();
         this.initializeUserCentricAIForm();
 
         this.route.queryParamMap.subscribe(params => {
             const categoryId = params.get('category');
             const courseId = params.get('course');
+            const workshopId = params.get('workshop');
 
             if (categoryId) {
                 const program = this.programs.find(p => p.id === categoryId);
@@ -59,26 +93,41 @@ export class ProgramsSectionComponent implements OnInit {
                             this.selectedCourse.set(null);
                             this.showCourseSyllabus.set(false);
                         }
+                    } else if (workshopId && program.id === 'workshops') {
+                        const workshop = this.workshopsList().find(w => w.id === workshopId);
+                        if (workshop) {
+                            this.selectedWorkshop.set(workshop);
+                            this.showWorkshopEnrollment.set(true);
+                        } else {
+                            this.selectedWorkshop.set(null);
+                            this.showWorkshopEnrollment.set(false);
+                        }
                     } else {
                         this.selectedCourse.set(null);
                         this.showCourseSyllabus.set(false);
+                        this.selectedWorkshop.set(null);
+                        this.showWorkshopEnrollment.set(false);
                     }
                 } else {
                     this.selectedProgram.set(null);
                     this.selectedCourse.set(null);
+                    this.selectedWorkshop.set(null);
                     this.showResearchForm.set(false);
                     this.showProjectForm.set(false);
                     this.showWebinarForm.set(false);
                     this.showWorkshopForm.set(false);
+                    this.showWorkshopEnrollment.set(false);
                     this.showCourseSyllabus.set(false);
                 }
             } else {
                 this.selectedProgram.set(null);
                 this.selectedCourse.set(null);
+                this.selectedWorkshop.set(null);
                 this.showResearchForm.set(false);
                 this.showProjectForm.set(false);
                 this.showWebinarForm.set(false);
                 this.showWorkshopForm.set(false);
+                this.showWorkshopEnrollment.set(false);
                 this.showCourseSyllabus.set(false);
             }
         });
@@ -231,9 +280,6 @@ export class ProgramsSectionComponent implements OnInit {
                         ]
                     },
 
-
-
-
                     {
                         id: 'AI for Film Education',
                         title: 'AI for Film Education',
@@ -287,7 +333,7 @@ export class ProgramsSectionComponent implements OnInit {
                                 ]
                             },
                             {
-                                section: 'Section 6: Identify Your Projec',
+                                section: 'Section 6: Identify Your Project',
                                 items: [
                                     '6.1 Project Ideation',
                                     '6.2 Research & Analysis',
@@ -363,7 +409,7 @@ export class ProgramsSectionComponent implements OnInit {
         },
         {
             id: 'webinars',
-            title: 'Webinars & Workshops',
+            title: 'Webinars',
 
             description: '',
             subSubtitles: ['Blockchain', 'Leadership', 'Well-being', 'Global Experts'],
@@ -377,39 +423,54 @@ export class ProgramsSectionComponent implements OnInit {
                 ]
             }
         },
-        // {
-        //     id: 'workshops',
-        //     title: 'Workshops',
+        {
+            id: 'workshops',
+            title: 'Workshops',
 
-        //     description: 'Hands-on practical workshops for skill development and interactive learning experiences.',
-        //     subSubtitles: ['Technical Skills', 'Creative Skills', 'Professional Development', 'Specialized Training'],
-        //     content: {
-        //         description: 'Engage in immersive hands-on workshops designed to build practical skills. Learn by doing with expert guidance and personalized feedback.',
-        //         sections: [
-        //             {
-        //                 title: 'Workshop Categories',
-        //                 text: 'Our workshops cover technical skills, creative disciplines, professional development, and specialized training tailored to your growth.'
-        //             }
-        //         ]
-        //     }
-        // },
+            description: 'Hands-on practical workshops for skill development and interactive learning experiences.',
+            subSubtitles: ['Technical Skills', 'Creative Skills', 'Professional Development', 'Specialized Training'],
+            content: {
+                description: 'Engage in immersive hands-on workshops designed to build practical skills. Learn by doing with expert guidance and personalized feedback.',
+                sections: [
+                    {
+                        title: 'Workshop Categories',
+                        text: 'Our workshops cover technical skills, creative disciplines, professional development, and specialized training tailored to your growth.'
+                    }
+                ]
+            }
+        },
         {
             id: 'services',
             title: 'Community Services',
 
-            description: '',
-            subSubtitles: ['Counseling', 'Certification', 'Digital Library', 'Mentorship'],
+            description: 'Dedicated support systems designed to empower individuals and strengthen our community through accessible care and professional guidance.',
+            subSubtitles: ['Health Camp', 'Legal Aid', 'Counselling', 'Livelihood Support', 'Community Care', 'Emergency Care'],
             content: {
                 description: '',
                 sections: [
                     {
-                        title: 'Available Services',
-                        items: [
-                            'Career Counseling & Placement Support',
-                            'Technical Skill Certification',
-                            'Digital Resource Library',
-                            'One-on-One Mentorship'
-                        ]
+                        title: 'Health Camp',
+                        description: 'Provides free medical check-ups, basic treatment, and health awareness to underserved communities.'
+                    },
+                    {
+                        title: 'Legal Aid',
+                        description: 'Offers free or low-cost legal advice and representation to individuals who cannot afford legal services.'
+                    },
+                    {
+                        title: 'Counselling',
+                        description: 'Provides psychological support and guidance for mental health, personal challenges, or crisis intervention.'
+                    },
+                    {
+                        title: 'Livelihood Support',
+                        description: 'Helps individuals or families gain skills, find employment, or start small businesses to improve their economic well-being.'
+                    },
+                    {
+                        title: 'Community Care',
+                        description: 'Offers support services like after-school programs, daycare, or assistance for seniors and those with special needs within the community (e.g., Child & Elderly Care).'
+                    },
+                    {
+                        title: 'Emergency Care',
+                        description: 'Provides immediate response and aid during crises, disasters, or urgent medical situations, often including first aid, rescue, and temporary relief.'
                     }
                 ]
             }
@@ -434,20 +495,26 @@ export class ProgramsSectionComponent implements OnInit {
     ];
 
     selectProgram(program: any) {
-        this.router.navigate([], {
-            relativeTo: this.route,
-            queryParams: { category: program.id },
-            queryParamsHandling: 'merge'
-        });
+        this.selectedProgram.set(program);
+        this.selectedSubSubtitle.set(null);
+        this.selectedContent.set(null);
+
+        if (program.id === 'workshops') {
+            this.showWorkshopForm.set(true);
+        } else {
+            this.showWorkshopForm.set(false);
+        }
     }
 
     goBack() {
         if (this.selectedCourse()) {
             this.closeCourseView();
+        } else if (this.selectedWorkshop()) {
+            this.closeWorkshopEnrollment();
         } else if (this.selectedProgram()) {
             this.router.navigate([], {
                 relativeTo: this.route,
-                queryParams: { category: null, course: null },
+                queryParams: { category: null, course: null, workshop: null },
                 queryParamsHandling: 'merge'
             });
             this.selectedProgram.set(null);
@@ -810,9 +877,10 @@ export class ProgramsSectionComponent implements OnInit {
             workshopTitle: ['', Validators.required],
             workshopDescription: ['', Validators.required],
             dateTime: ['', Validators.required],
-            duration: ['', Validators.required],
+            duration: [0, [Validators.required, Validators.min(1)]],
             expertName: ['', Validators.required],
             expertBio: ['', Validators.required],
+            schedule: this.fb.array([]),
 
             // Workshop Options
             workshopType: ['online', Validators.required],
@@ -858,7 +926,16 @@ export class ProgramsSectionComponent implements OnInit {
         this.setupWorkshopPricingCalculation();
     }
 
+    get schedule(): FormArray {
+        return this.workshopForm.get('schedule') as FormArray;
+    }
+
     setupWorkshopPricingCalculation() {
+        // Handle duration changes for schedule
+        this.workshopForm.get('duration')?.valueChanges.subscribe(duration => {
+            this.generateScheduleRows(duration);
+        });
+
         // Base fee based on attendance type
         this.workshopForm.get('attendanceType')?.valueChanges.subscribe(() => {
             this.calculateWorkshopTotal();
@@ -943,6 +1020,22 @@ export class ProgramsSectionComponent implements OnInit {
 
         const total = baseFee + extraFees;
         this.workshopForm.get('totalAmount')?.setValue(total);
+    }
+
+    generateScheduleRows(duration: number) {
+        const currentCount = this.schedule.length;
+        if (duration > currentCount) {
+            for (let i = currentCount; i < duration; i++) {
+                this.schedule.push(this.fb.group({
+                    hour: [i + 1],
+                    activity: ['', Validators.required]
+                }));
+            }
+        } else if (duration < currentCount) {
+            for (let i = currentCount - 1; i >= duration; i--) {
+                this.schedule.removeAt(i);
+            }
+        }
     }
 
     onSubmitWorkshopForm() {
@@ -1072,6 +1165,71 @@ export class ProgramsSectionComponent implements OnInit {
             alert('Please fill in all required fields.');
             Object.keys(this.userCentricAIForm.controls).forEach(key => {
                 const control = this.userCentricAIForm.get(key);
+                if (control?.invalid) {
+                    control.markAsTouched();
+                }
+            });
+        }
+    }
+
+    initializeEnrollWorkshopForm() {
+        this.enrollWorkshopForm = this.fb.group({
+            name: ['', Validators.required],
+            email: ['', [Validators.required, Validators.email]],
+            phone: ['', Validators.required],
+            organization: [''],
+            enrollmentType: ['learning', Validators.required], // 'learning' for Student, 'support' for Instructor
+            acceptTerms: [false, Validators.requiredTrue]
+        });
+    }
+
+    selectWorkshop(workshop: any) {
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { workshop: workshop.id },
+            queryParamsHandling: 'merge'
+        });
+        this.selectedWorkshop.set(workshop);
+        this.showWorkshopEnrollment.set(true);
+
+        // Pre-fill enrollment type based on role
+        if (this.currentUser().role === 'Instructor') {
+            this.enrollWorkshopForm.get('enrollmentType')?.setValue('support');
+        } else {
+            this.enrollWorkshopForm.get('enrollmentType')?.setValue('learning');
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    closeWorkshopEnrollment() {
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { workshop: null },
+            queryParamsHandling: 'merge'
+        });
+        this.showWorkshopEnrollment.set(false);
+        this.selectedWorkshop.set(null);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    onSubmitWorkshopEnrollment() {
+        if (this.enrollWorkshopForm.valid) {
+            console.log('Workshop Enrollment Submitted:', {
+                workshop: this.selectedWorkshop(),
+                details: this.enrollWorkshopForm.value
+            });
+            const typeLabel = this.enrollWorkshopForm.get('enrollmentType')?.value === 'support' ? 'Support' : 'Learning';
+            alert(`Enrollment request for ${typeLabel} submitted successfully!`);
+            this.closeWorkshopEnrollment();
+            this.enrollWorkshopForm.reset({
+                enrollmentType: 'learning',
+                acceptTerms: false
+            });
+        } else {
+            alert('Please fill in all required fields.');
+            Object.keys(this.enrollWorkshopForm.controls).forEach(key => {
+                const control = this.enrollWorkshopForm.get(key);
                 if (control?.invalid) {
                     control.markAsTouched();
                 }

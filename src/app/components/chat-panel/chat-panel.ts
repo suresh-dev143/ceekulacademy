@@ -15,7 +15,7 @@ interface ChatMessage {
 export class ChatPanelComponent {
     @Output() closeChat = new EventEmitter<void>();
     messages = signal<ChatMessage[]>([
-        { text: 'Welcome to HS Academy! How can I assist you today?', type: 'bot' }
+        { text: 'Welcome to Ceekul Mission! How can I assist you today?', type: 'bot' }
     ]);
 
     currentMessage = signal('');

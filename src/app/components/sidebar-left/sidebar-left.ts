@@ -31,8 +31,35 @@ export class SidebarLeftComponent {
 
     menuItems: MenuGroup[] = [
         {
+            title: 'Home Hub',
+            type: 'menu',
+            link: '/home',
+            items: []
+        },
+        {
             title: 'Raebareli',
-            type: 'location'
+            type: 'location',
+            role: 'Director',
+        },
+        {
+            title: 'Teacher Dashboard',
+            type: 'menu',
+            link: '/dashboard/teacher',
+            items: [],
+            role: 'Teacher'
+        },
+        {
+            title: 'Workshops',
+            type: 'menu',
+            link: '/dashboard/teacher/workshops',
+            items: []
+        },
+        {
+            title: 'Courses',
+            type: 'menu',
+            link: '/dashboard/courses',
+            items: [],
+            role: 'Teacher'
         },
         {
             title: 'Leadership',
@@ -44,40 +71,6 @@ export class SidebarLeftComponent {
                 { title: 'Volunteer', link: '#' }
             ]
         },
-        // {
-        //     title: 'Home Hub',
-        //     type: 'menu',
-        //     link: '/home',
-        //     items: []
-        // },
-        {
-            title: 'Courses',
-            type: 'menu',
-            link: '/dashboard/courses',
-            items: [],
-            role: 'Teacher'
-        },
-        {
-            title: 'Teacher Dashboard',
-            type: 'menu',
-            link: '/dashboard/teacher',
-            items: [],
-            role: 'Teacher'
-        },
-        // {
-        //     title: 'Local Issues',
-        //     type: 'menu',
-        //     link: '/issues',
-        //     items: [],
-
-        // },
-        // {
-        //     title: 'Director Stats',
-        //     type: 'menu',
-        //     link: '/dashboard/director',
-        //     items: [],
-        //     role: 'Director'
-        // },
         {
             title: 'Partner Dashboard',
             type: 'menu',
@@ -92,15 +85,18 @@ export class SidebarLeftComponent {
             items: [],
             role: 'Student'
         },
+        {
+            title: 'Local Issues',
+            type: 'menu',
+            link: '/issues',
+            items: []
+        },
 
-        // {
-        //     title: 'My Profile',
-        //     type: 'menu',
-        //     link: '/profile',
-        //     items: []
-        // },
-
-
-
+        {
+            title: 'My Profile',
+            type: 'menu',
+            link: '/profile',
+            items: []
+        }
     ];
 }

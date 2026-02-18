@@ -38,7 +38,7 @@ import { Course } from '../../../services/course.service';
     </div>
   `,
   styles: [`
-    .course-mgmt-section { padding: 2.5rem; background: #000000; border: 1px solid var(--accent-primary); border-radius: 0; margin-bottom: 2rem; }
+    .course-mgmt-section { padding: 2.5rem; background: #010102;  border-radius: 0; margin-bottom: 2rem; }
     
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
     .title-group { display: flex; align-items: center; gap: 1rem; }

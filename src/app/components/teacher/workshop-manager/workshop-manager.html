@@ -1,0 +1,122 @@
+<div class="workshop-manager-container animate-fade-in">
+    <div class="view-header"
+        style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+        <div>
+            <h2 class="section-title">Workshop Management</h2>
+            <p class="section-subtitle">Create and manage your technical training sessions.</p>
+        </div>
+        @if (!isCreatingWorkshop()) {
+        <button class="btn-submit" (click)="toggleWorkshopCreation()" style="padding: 0.8rem 2rem; font-size: 0.9rem;">
+            <i class="fas fa-plus"></i> Create New Workshop
+        </button>
+        }
+    </div>
+
+    @if (isCreatingWorkshop()) {
+    <div class="research-form-container animate-fade-in">
+        <div class="form-header"
+            style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+            <div>
+                <h3 style="color: #fff; margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">
+                    New Workshop Details</h3>
+                <p style="color: #888; margin: 0.5rem 0 0; font-size: 0.9rem;">Fill in the information below to announce
+                    your workshop.</p>
+            </div>
+            <button class="btn-outline" (click)="toggleWorkshopCreation()"
+                style="padding: 0.5rem 1rem; font-size: 0.8rem; background: transparent; border: 1px solid #333; color: #888; cursor: pointer;">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+        </div>
+
+        <form [formGroup]="workshopForm" (ngSubmit)="onSubmitWorkshopForm()">
+            <div class="form-section">
+                <div class="form-group">
+                    <label class="form-label">Workshop Title *</label>
+                    <input type="text" class="form-control" formControlName="workshopTitle"
+                        placeholder="e.g., Advanced AI Patterns">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description *</label>
+                    <textarea class="form-control" formControlName="workshopDescription" rows="3"
+                        placeholder="Describe what participants will learn..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label class="form-label">Date and Time *</label>
+                        <input type="datetime-local" class="form-control" formControlName="dateTime">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label class="form-label">Duration (Hours) *</label>
+                        <input type="number" class="form-control" formControlName="duration" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label class="form-label">Hourly Schedule</label>
+                <div formArrayName="schedule" class="schedule-list">
+                    @for (item of schedule.controls; track $index) {
+                    <div [formGroupName]="$index" class="schedule-item"
+                        style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; background: #080808; padding: 1rem;">
+                        <span style="color: #ef9d57; font-weight: 800; min-width: 80px;">Hour {{ item.get('hour')?.value
+                            }}</span>
+                        <input type="text" class="form-control" formControlName="activity"
+                            placeholder="Activity description..." style="padding: 0.5rem 0;">
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label class="form-label">Workshop Type & Fees</label>
+                <div class="radio-group" style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
+                    <label class="radio-option"
+                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #eee;">
+                        <input type="radio" formControlName="workshopType" value="online"> Online
+                    </label>
+                    <label class="radio-option"
+                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #eee;">
+                        <input type="radio" formControlName="workshopType" value="offline"> Offline
+                    </label>
+                </div>
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label class="form-label">Online Fee (₹)</label>
+                        <input type="number" class="form-control" formControlName="onlineFee">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label class="form-label">Offline Fee (₹)</label>
+                        <input type="number" class="form-control" formControlName="offlineFee">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" [disabled]="workshopForm.invalid"
+                style="width: 100%; margin-top: 2rem;">
+                Publish Workshop
+            </button>
+        </form>
+    </div>
+    } @else {
+    <div class="course-grid animate-fade-in">
+        @for (workshop of workshopsList(); track workshop.id) {
+        <div class="course-card">
+            <div class="course-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <h3 class="course-title">{{ workshop.title }}</h3>
+            <p class="course-desc">{{ workshop.description }}</p>
+            <div class="course-meta"
+                style="display: flex; justify-content: space-between; border-top: 1px solid #111; padding-top: 1rem; color: #666; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">
+                <span><i class="fas fa-calendar-alt"></i> {{ workshop.date }}</span>
+                <span><i class="fas fa-clock"></i> {{ workshop.duration }}</span>
+            </div>
+            <div class="course-action"
+                style="margin-top: 1.5rem; color: #ef9d57; font-weight: 800; text-transform: uppercase; font-size: 0.8rem; cursor: pointer;">
+                Manage Participants <i class="fas fa-chevron-right" style="margin-left: 0.5rem;"></i>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

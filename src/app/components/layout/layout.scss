@@ -33,7 +33,7 @@
     position: fixed;
     top: 64px;
     bottom: 0;
-    width: 280px;
+    width: 100%;
     background: #000000;
     z-index: 1000;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -80,6 +80,10 @@
 
     &::-webkit-scrollbar-thumb {
         background: var(--row-border);
+    }
+
+    @media (max-width: 991px) {
+        padding-bottom: 70px;
     }
 }
 
@@ -133,7 +137,7 @@
 
     .col-center {
         grid-area: center;
-        padding: 3rem;
+        padding: 2.5rem;
         border-right: none;
         border-left: none;
         height: 100%;
@@ -181,11 +185,13 @@
 }
 
 .toggle-sidebar-btn.left {
-    right: -16px;
+    left: 21rem;
+    top: 5.5rem;
 }
 
 .toggle-sidebar-btn.right {
-    left: -16px;
+    right: 0.5rem;
+    top: 5.5rem;
 }
 
 .expand-sidebar-btn.left {
@@ -200,6 +206,12 @@
 
 .sidebar-content.hidden {
     display: none;
+}
+
+.sidebar-content:has([slot="right-panel"]) {
+    app-chat-panel {
+        display: none;
+    }
 }
 
 @media (max-width: 991px) {
@@ -223,45 +235,68 @@
     }
 }
 
-/* Sidebar Toggle functionality (Handled by .active class) */
-.mobile-sidebar-toggle {
+/* Mobile Bottom Navigation */
+.mobile-bottom-nav {
     display: none;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    /* Relative to layout-columns, so it sticks under navbar */
-    background: #000000;
-    /* border-bottom removed */
-    padding: 0.75rem 1rem;
-    z-index: 50;
-    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: #050505;
+    border-top: 1px solid rgba(255, 255, 255, 0.05); // Subtle separator
+    z-index: 2000;
+    padding: 0 1rem;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+
+    @media (max-width: 991px) {
+        display: flex;
+    }
 }
 
-.btn-toggle {
+.nav-item {
     background: transparent;
-
-    /* Keeping button border for visibility/hit area in body */
-    color: var(--text-primary);
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    cursor: pointer;
-    font-weight: 700;
+    border: none;
+    color: var(--text-secondary);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    border-radius: 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 10px;
+    flex: 1;
+    max-width: 100px;
 
-    &:hover {
-        background: var(--accent-primary);
-        color: #000000;
+    i {
+        font-size: 1.4rem;
+        transition: transform 0.3s ease;
+    }
+
+    span {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+
+    &:hover,
+    &.active {
+        color: var(--accent-primary);
+
+        i {
+            transform: translateY(-2px);
+        }
+    }
+
+    &:active {
+        transform: scale(0.95);
     }
 }
 
 @media (min-width: 992px) {
-
-    .mobile-sidebar-toggle,
     .sidebar-overlay {
         display: none;
     }

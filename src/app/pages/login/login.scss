@@ -13,12 +13,12 @@
 }
 
 .login-card {
-    background: #000000;
-    border: 1px solid var(--accent-primary);
+    background: #080808;
+    border: none;
     border-radius: 0;
-    padding: 3.5rem 2.5rem;
+    padding: 4rem 3rem;
     width: 100%;
-    box-shadow: none;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
 }
 
 .login-title {
@@ -28,10 +28,22 @@
     margin: 0 0 1rem 0;
     text-align: center;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     display: block;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--accent-primary);
+    padding-bottom: 1rem;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 2px;
+        background: var(--accent-primary);
+        opacity: 0.6;
+    }
 }
 
 .login-subtitle {

@@ -30,8 +30,8 @@ export class RegisterComponent implements OnInit {
     ];
 
     // Activity Table Dropdown Options
-    activityTypes = ['Learning', 'Research', 'Any Other'];
-    expertTypes = ['Teacher', 'Researcher', 'Entrepreneur', 'Any Other'];
+    activityTypes = ['Learning', 'Research', 'Project Development', 'Webinar', 'Workshop', 'Social Work', 'Any Other'];
+    expertTypes = ['Teacher', 'Researcher', 'Entrepreneur', 'Expert', 'Instructor', 'Any Other'];
     modeOptions = ['Online', 'Offline', 'Hybrid', 'Home Tuition'];
 
     // Partner specific data

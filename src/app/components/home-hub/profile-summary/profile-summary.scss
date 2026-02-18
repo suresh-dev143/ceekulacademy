@@ -2,10 +2,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem;
-    background: #000000;
-    border: 1px solid var(--accent-primary);
-    margin-bottom: 2rem;
+    padding: 2.5rem;
+    background: #080808;
+    border: none;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
 .profile-left {
@@ -18,8 +19,8 @@
     position: relative;
     width: 80px;
     height: 80px;
-    background: #000000;
-    border: 1px solid var(--accent-primary);
+    background: #111111;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -92,8 +93,8 @@
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    border: 1px solid var(--accent-primary);
-    background: #000000;
+    border: none;
+    background: #111111;
     color: var(--text-primary);
 
     &:hover {

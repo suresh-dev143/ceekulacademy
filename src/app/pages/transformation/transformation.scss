@@ -9,9 +9,8 @@
     margin-bottom: 2.5rem;
     color: var(--text-primary);
     text-transform: uppercase;
-    letter-spacing: 2px;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--accent-primary);
+    letter-spacing: 3px;
+    padding-bottom: 1rem;
     display: inline-block;
 }
 
@@ -72,18 +71,21 @@
 }
 
 .category-card {
-    background: #000000;
-    border: 1px solid var(--accent-primary);
+    background: #080808;
+    border: none;
     padding: 2.5rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
     height: 100%;
     border-radius: 0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 
     &:hover {
-        background: #050505;
+        background: #0c0c0c;
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 
         .category-icon i {
             color: var(--accent-primary);

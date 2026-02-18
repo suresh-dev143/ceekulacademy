@@ -40,7 +40,7 @@ import { NearbyProvider } from '../../../services/teacher-dashboard.service';
     </div>
   `,
   styles: [`
-    .discovery-section { padding: 2.5rem; background: #000000; border: 1px solid var(--accent-primary); border-radius: 0; }
+    .discovery-section { padding: 2.5rem; background: #010102;  border-radius: 0; }
     .section-header { margin-bottom: 2.5rem; }
     .section-title { font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; i { color: var(--accent-primary); } }
 

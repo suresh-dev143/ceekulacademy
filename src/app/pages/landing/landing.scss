@@ -9,9 +9,8 @@
     margin-bottom: 2.5rem;
     color: var(--text-primary);
     text-transform: uppercase;
-    letter-spacing: 2px;
-    padding-bottom: 1.5rem;
-    border-bottom: 4px solid var(--accent-primary);
+    letter-spacing: 3px;
+    padding-bottom: 1rem;
     display: inline-block;
 }
 
@@ -42,20 +41,21 @@
 }
 
 .tab-btn {
-    background: transparent;
-    border: 1px solid var(--row-border);
+    background: #080808;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
-    padding: 0.8rem 1.5rem;
+    padding: 0.8rem 2rem;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     border-radius: 0;
 
     &:hover {
-        border-color: var(--accent-primary);
+        background: #111;
+        border-color: rgba(255, 255, 255, 0.1);
         color: var(--text-primary);
     }
 
@@ -63,6 +63,7 @@
         background: var(--accent-primary);
         color: #000000;
         border-color: var(--accent-primary);
+        box-shadow: 0 4px 12px rgba(239, 157, 87, 0.3);
     }
 }
 
@@ -111,18 +112,21 @@
 }
 
 .program-card {
-    background: #000000;
-    border: 1px solid var(--accent-primary);
+    background: #080808;
+    border: none;
     padding: 2.5rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
     height: 100%;
     border-radius: 0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 
     &:hover {
-        background: #050505;
+        background: #0c0c0c;
+        transform: translateY(-5px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 
         .program-icon i {
             color: var(--accent-primary);

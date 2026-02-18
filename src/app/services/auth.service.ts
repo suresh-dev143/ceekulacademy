@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type UserRole = 'Student' | 'Teacher' | 'Researcher' | 'Entrepreneur' | 'Admin' | 'Director' | 'Partner' | 'Volunteer' | 'Manager';
+export type UserRole = 'Student' | 'Teacher' | 'Researcher' | 'Entrepreneur' | 'Admin' | 'Director' | 'Partner' | 'Volunteer' | 'Manager' | 'Instructor';
 
 export interface UserProfile {
     id: string;
@@ -21,7 +21,7 @@ export class AuthService {
             id: 'DIR-001',
             name: 'Rajesh Kumar',
             email: 'rajesh.kumar@ceekulmisson.org',
-            role: 'Director',
+            role: 'Student',
             assignedState: 'Uttar Pradesh',
             assignedDistrict: 'Bulandshahr'
         },
@@ -37,7 +37,47 @@ export class AuthService {
             id: 'DIR-003',
             name: 'Amit Verma',
             email: 'amit.verma@ceekulmisson.org',
-            role: 'Director',
+            role: 'Teacher',
+            assignedState: 'Maharashtra',
+            assignedDistrict: 'Pune'
+        },
+        {
+            id: 'DIR-003',
+            name: 'Amit Verma',
+            email: 'amit.verma@ceekulmisson.org',
+            role: 'Researcher',
+            assignedState: 'Maharashtra',
+            assignedDistrict: 'Pune'
+        },
+        {
+            id: 'DIR-003',
+            name: 'Amit Verma',
+            email: 'amit.verma@ceekulmisson.org',
+            role: 'Entrepreneur',
+            assignedState: 'Maharashtra',
+            assignedDistrict: 'Pune'
+        },
+        {
+            id: 'DIR-003',
+            name: 'Suresh chand',
+            email: 'amit.verma@ceekulmisson.org',
+            role: 'Admin',
+            assignedState: 'Maharashtra',
+            assignedDistrict: 'Pune'
+        },
+        {
+            id: 'DIR-003',
+            name: 'Amit Verma',
+            email: 'amit.verma@ceekulmisson.org',
+            role: 'Volunteer',
+            assignedState: 'Maharashtra',
+            assignedDistrict: 'Pune'
+        },
+        {
+            id: 'DIR-003',
+            name: 'Amit Verma',
+            email: 'amit.verma@ceekulmisson.org',
+            role: 'Manager',
             assignedState: 'Maharashtra',
             assignedDistrict: 'Pune'
         }
@@ -47,7 +87,7 @@ export class AuthService {
     private currentUser = signal<UserProfile>(this.directorProfiles[0]);
 
     currentUserProfile = this.currentUser.asReadonly();
-    currentUserRole = signal<UserRole>(this.directorProfiles[0].role).asReadonly();
+    currentUserRole = signal<UserRole>(this.directorProfiles[1].role).asReadonly();
 
     // Login with specific director profile
     loginAsDirector(directorId: string) {
