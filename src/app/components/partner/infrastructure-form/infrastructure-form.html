@@ -1,0 +1,297 @@
+<div class="form-container animate-fade-in">
+    <div class="form-header">
+        <h3 class="section-title" style="margin: 0; color: #fff;">Add Infrastructure Details</h3>
+        <button class="btn-outline" (click)="close.emit()" style="border: none; color: #888;">
+            <i class="fas fa-times"></i> Cancel
+        </button>
+    </div>
+
+    <form [formGroup]="infraForm" (ngSubmit)="onSubmit()">
+
+        <!-- SECTION 1: GENERAL INFO -->
+        <h4 class="section-title">General Information</h4>
+        <div class="form-group" formGroupName="generalInfo">
+            <label class="form-label">School / Institution Name *</label>
+            <input type="text" class="form-control" formControlName="schoolName" placeholder="e.g. XYZ Public School">
+
+            <label class="form-label" style="margin-top: 1rem;">Address *</label>
+            <textarea class="form-control" formControlName="address" rows="2"></textarea>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <label class="form-label">Contact Person Name *</label>
+                    <input type="text" class="form-control" formControlName="contactName">
+                </div>
+                <div>
+                    <label class="form-label">Contact Email *</label>
+                    <input type="email" class="form-control" formControlName="contactEmail">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div>
+                    <label class="form-label">Contact Phone *</label>
+                    <input type="tel" class="form-control" formControlName="contactPhone">
+                </div>
+                <div>
+                    <label class="form-label">Time Zone</label>
+                    <select class="form-control" formControlName="timeZone">
+                        <option value="Asia/Kolkata">Asia/Kolkata</option>
+                        <option value="America/New_York">America/New_York</option>
+                        <!-- Add more as needed or make dynamic -->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <hr style="border-color: #333; margin: 2rem 0;">
+
+        <!-- SECTION 2: CLASSROOMS -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 class="section-title" style="margin:0;">Classrooms</h4>
+            <button type="button" class="btn-outline" (click)="addClassroom()">+ Add Classroom</button>
+        </div>
+
+        <div formArrayName="classrooms">
+            @for (classroom of classrooms.controls; track $index) {
+            <div [formGroupName]="$index" class="nested-section animate-fade-in">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <h5 style="margin: 0; color: #ef9d57;">Classroom #{{ $index + 1 }}</h5>
+                    <button type="button" class="btn-danger" (click)="removeClassroom($index)">Remove</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label class="form-label">Classroom ID (e.g. C101) *</label>
+                        <input type="text" class="form-control" formControlName="id">
+                    </div>
+                    <div>
+                        <label class="form-label">Capacity (Max Students) *</label>
+                        <input type="number" class="form-control" formControlName="capacity">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div>
+                        <label class="form-label">Length (m)</label>
+                        <input type="number" class="form-control" formControlName="length">
+                    </div>
+                    <div>
+                        <label class="form-label">Width (m)</label>
+                        <input type="number" class="form-control" formControlName="width">
+                    </div>
+                    <div>
+                        <label class="form-label">Type</label>
+                        <select class="form-control" formControlName="type">
+                            <option>Standard Classroom</option>
+                            <option>Smart Classroom</option>
+                            <option>Lecture Hall</option>
+                            <option>Activity Room</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Availability Schedule Block -->
+                <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
+                    <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
+
+                    <div formArrayName="availabilitySchedule">
+                        @for (slot of getSchedule(classroom).controls; track $index) {
+                        <div [formGroupName]="$index" class="schedule-grid">
+                            <select class="form-control" formControlName="day" style="padding: 0.4rem;">
+                                <option>Monday</option>
+                                <option>Tuesday</option>
+                                <option>Wednesday</option>
+                                <option>Thursday</option>
+                                <option>Friday</option>
+                                <option>Saturday</option>
+                                <option>Sunday</option>
+                            </select>
+                            <input type="time" class="form-control" formControlName="startTime"
+                                style="padding: 0.4rem;">
+                            <input type="time" class="form-control" formControlName="endTime" style="padding: 0.4rem;">
+                            <select class="form-control" formControlName="status" style="padding: 0.4rem;">
+                                <option>Available</option>
+                                <option>Booked</option>
+                                <option>Maintenance</option>
+                            </select>
+                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..."
+                                style="padding: 0.4rem;">
+
+                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;"
+                                (click)="removeScheduleSlot(getSchedule(classroom), $index)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;"
+                        (click)="addScheduleSlot(getSchedule(classroom))">
+                        + Add Time Slot
+                    </button>
+                </div>
+
+            </div>
+            }
+        </div>
+
+        <hr style="border-color: #333; margin: 2rem 0;">
+
+        <!-- SECTION 3: COMPUTER LABS -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 class="section-title" style="margin:0;">Computer Labs</h4>
+            <button type="button" class="btn-outline" (click)="addComputerLab()">+ Add Lab</button>
+        </div>
+
+        <div formArrayName="computerLabs">
+            @for (lab of computerLabs.controls; track $index) {
+            <div [formGroupName]="$index" class="nested-section animate-fade-in">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <h5 style="margin: 0; color: #ef9d57;">Lab #{{ $index + 1 }}</h5>
+                    <button type="button" class="btn-danger" (click)="removeComputerLab($index)">Remove</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label class="form-label">Lab ID *</label>
+                        <input type="text" class="form-control" formControlName="id">
+                    </div>
+                    <div>
+                        <label class="form-label">Workstations (Count) *</label>
+                        <input type="number" class="form-control" formControlName="workstations">
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <label class="form-label">Software Available</label>
+                    <textarea class="form-control" formControlName="software" rows="2"
+                        placeholder="e.g. Python, Adobe Suite"></textarea>
+                </div>
+
+                <!-- Availability Schedule Block (Reused logic) -->
+                <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
+                    <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
+                    <div formArrayName="availabilitySchedule">
+                        @for (slot of getSchedule(lab).controls; track $index) {
+                        <div [formGroupName]="$index" class="schedule-grid">
+                            <select class="form-control" formControlName="day" style="padding: 0.4rem;">
+                                <option>Monday</option>
+                                <option>Tuesday</option>
+                                <option>Wednesday</option>
+                                <option>Thursday</option>
+                                <option>Friday</option>
+                                <option>Saturday</option>
+                                <option>Sunday</option>
+                            </select>
+                            <input type="time" class="form-control" formControlName="startTime"
+                                style="padding: 0.4rem;">
+                            <input type="time" class="form-control" formControlName="endTime" style="padding: 0.4rem;">
+                            <select class="form-control" formControlName="status" style="padding: 0.4rem;">
+                                <option>Available</option>
+                                <option>Booked</option>
+                                <option>Maintenance</option>
+                            </select>
+                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..."
+                                style="padding: 0.4rem;">
+                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;"
+                                (click)="removeScheduleSlot(getSchedule(lab), $index)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;"
+                        (click)="addScheduleSlot(getSchedule(lab))">
+                        + Add Time Slot
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+
+        <hr style="border-color: #333; margin: 2rem 0;">
+
+        <!-- SECTION 4: OTHER FACILITIES -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4 class="section-title" style="margin:0;">Other Facilities</h4>
+            <button type="button" class="btn-outline" (click)="addFacility()">+ Add Facility</button>
+        </div>
+
+        <div formArrayName="otherFacilities">
+            @for (fac of otherFacilities.controls; track $index) {
+            <div [formGroupName]="$index" class="nested-section animate-fade-in">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <h5 style="margin: 0; color: #ef9d57;">Facility #{{ $index + 1 }}</h5>
+                    <button type="button" class="btn-danger" (click)="removeFacility($index)">Remove</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label class="form-label">Facility ID *</label>
+                        <input type="text" class="form-control" formControlName="id">
+                    </div>
+                    <div>
+                        <label class="form-label">Type *</label>
+                        <select class="form-control" formControlName="type">
+                            <option>Auditorium</option>
+                            <option>Conference Hall</option>
+                            <option>Sports Ground</option>
+                            <option>Cafeteria</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: 2rem;">
+                    <label class="checkbox-item"><input type="checkbox" formControlName="soundSystem"> Sound
+                        System</label>
+                    <label class="checkbox-item"><input type="checkbox" formControlName="lightingSystem">
+                        Lighting</label>
+                    <label class="checkbox-item"><input type="checkbox" formControlName="projectorScreen">
+                        Projector</label>
+                </div>
+
+                <!-- Availability Schedule Block (Reused logic) -->
+                <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
+                    <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
+                    <div formArrayName="availabilitySchedule">
+                        @for (slot of getSchedule(fac).controls; track $index) {
+                        <div [formGroupName]="$index" class="schedule-grid">
+                            <select class="form-control" formControlName="day" style="padding: 0.4rem;">
+                                <option>Monday</option>
+                                <option>Tuesday</option>
+                                <option>Wednesday</option>
+                                <option>Thursday</option>
+                                <option>Friday</option>
+                                <option>Saturday</option>
+                                <option>Sunday</option>
+                            </select>
+                            <input type="time" class="form-control" formControlName="startTime"
+                                style="padding: 0.4rem;">
+                            <input type="time" class="form-control" formControlName="endTime" style="padding: 0.4rem;">
+                            <select class="form-control" formControlName="status" style="padding: 0.4rem;">
+                                <option>Available</option>
+                                <option>Booked</option>
+                                <option>Maintenance</option>
+                            </select>
+                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..."
+                                style="padding: 0.4rem;">
+                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;"
+                                (click)="removeScheduleSlot(getSchedule(fac), $index)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;"
+                        (click)="addScheduleSlot(getSchedule(fac))">
+                        + Add Time Slot
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+
+        <div style="margin-top: 2rem; border-top: 1px solid #333; padding-top: 1rem;">
+            <button type="submit" class="btn-primary" [disabled]="infraForm.invalid">Save Details</button>
+        </div>
+
+    </form>
+</div>

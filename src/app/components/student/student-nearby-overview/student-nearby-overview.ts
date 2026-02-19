@@ -54,7 +54,7 @@ import { FormsModule } from '@angular/forms';
   `,
   styles: [`
     .discovery-header {
-      padding: 3.5rem; background: #000000; border: 1px solid var(--accent-primary); border-radius: 0; margin-bottom: 2rem;
+      padding: 3.5rem; background: #010101;  margin-bottom: 2rem;
     }
 
     .header-content {

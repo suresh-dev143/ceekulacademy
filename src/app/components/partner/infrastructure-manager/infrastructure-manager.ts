@@ -1,39 +1,46 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Infrastructure } from '../../../services/partner.service';
+import { InfrastructureFormComponent } from '../infrastructure-form/infrastructure-form';
 
 @Component({
   selector: 'app-infrastructure-manager',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, InfrastructureFormComponent],
   template: `
     <div class="mgmt-section">
       <div class="section-header">
         <h3 class="section-title"><i class="fas fa-building"></i> Infrastructure & Venues</h3>
-        <button class="btn-outline-sm">Add Resource</button>
+        @if (!isAddingResource()) {
+            <button class="btn-outline-sm" (click)="toggleAddResource()">Add Resource</button>
+        }
       </div>
 
-      <div class="infra-list">
-        <div class="infra-item" *ngFor="let item of infrastructure">
-          <div class="infra-main">
-            <div class="infra-type-icon">{{ item.type === 'Lab' ? '🧪' : '🏫' }}</div>
-            <div class="infra-info">
-              <h4 class="infra-name">{{ item.name }}</h4>
-              <div class="infra-tags">
-                <span class="tag" *ngFor="let tag of item.tags">{{ tag }}</span>
-              </div>
+      @if (isAddingResource()) {
+        <app-infrastructure-form (close)="toggleAddResource()"></app-infrastructure-form>
+      } @else {
+        <div class="infra-list">
+            <div class="infra-item" *ngFor="let item of infrastructure">
+            <div class="infra-main">
+                <div class="infra-type-icon">{{ item.type === 'Lab' ? '🧪' : '🏫' }}</div>
+                <div class="infra-info">
+                <h4 class="infra-name">{{ item.name }}</h4>
+                <div class="infra-tags">
+                    <span class="tag" *ngFor="let tag of item.tags">{{ tag }}</span>
+                </div>
+                </div>
             </div>
-          </div>
-          <div class="infra-capacity">
-            <span class="cap-val">{{ item.capacity }}</span>
-            <span class="cap-label">Capacity</span>
-          </div>
-          <div class="infra-actions">
-            <button class="icon-btn"><i class="fas fa-edit"></i></button>
-            <button class="icon-btn"><i class="fas fa-calendar-check"></i></button>
-          </div>
+            <div class="infra-capacity">
+                <span class="cap-val">{{ item.capacity }}</span>
+                <span class="cap-label">Capacity</span>
+            </div>
+            <div class="infra-actions">
+                <button class="icon-btn"><i class="fas fa-edit"></i></button>
+                <button class="icon-btn"><i class="fas fa-calendar-check"></i></button>
+            </div>
+            </div>
         </div>
-      </div>
+      }
     </div>
   `,
   styles: [`
@@ -65,4 +72,9 @@ import { Infrastructure } from '../../../services/partner.service';
 })
 export class InfrastructureManagerComponent {
   @Input() infrastructure: Infrastructure[] = [];
+  isAddingResource = signal(false);
+
+  toggleAddResource() {
+    this.isAddingResource.update(v => !v);
+  }
 }

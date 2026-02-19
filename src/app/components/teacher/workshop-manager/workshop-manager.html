@@ -30,6 +30,7 @@
 
         <form [formGroup]="workshopForm" (ngSubmit)="onSubmitWorkshopForm()">
             <div class="form-section">
+                <!-- 1. Basic Details -->
                 <div class="form-group">
                     <label class="form-label">Workshop Title *</label>
                     <input type="text" class="form-control" formControlName="workshopTitle"
@@ -40,54 +41,101 @@
                     <textarea class="form-control" formControlName="workshopDescription" rows="3"
                         placeholder="Describe what participants will learn..."></textarea>
                 </div>
-                <div class="form-row">
-                    <div class="form-group flex-1">
-                        <label class="form-label">Date and Time *</label>
-                        <input type="datetime-local" class="form-control" formControlName="dateTime">
+                <div class="form-group">
+                    <label class="form-label">Mode *</label>
+                    <div class="radio-group" style="display: flex; gap: 1rem; margin-top: 0.5rem;">
+                        <label class="radio-option"
+                            style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #eee;">
+                            <input type="radio" formControlName="workshopMode" value="online"> Online
+                        </label>
+                        <label class="radio-option"
+                            style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #eee;">
+                            <input type="radio" formControlName="workshopMode" value="hybrid"> Hybrid
+                        </label>
                     </div>
-                    <div class="form-group flex-1">
-                        <label class="form-label">Duration (Hours) *</label>
-                        <input type="number" class="form-control" formControlName="duration" min="1">
-                    </div>
+                </div>
+                <div class="form-group flex-1">
+                    <label class="form-label">Instructor *</label>
+                    <!-- <label for="myself"> Self ({{ currentUser().name }})</label>
+                    <input type="checkbox" id="myself"> -->
+                    <label for="open">Allow others to become instructor</label>
+                    <input type="checkbox" id="open">
+
                 </div>
             </div>
 
             <div class="form-section">
-                <label class="form-label">Hourly Schedule</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <label class="form-label" style="margin-bottom: 0;">Schedule & Itinerary</label>
+                    <button type="button" class="btn-outline" (click)="addScheduleRow()"
+                        style="padding: 0.2rem 0.8rem; font-size: 0.75rem;">
+                        <i class="fas fa-plus"></i> Add Session
+                    </button>
+                </div>
+
                 <div formArrayName="schedule" class="schedule-list">
                     @for (item of schedule.controls; track $index) {
-                    <div [formGroupName]="$index" class="schedule-item"
-                        style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; background: #080808; padding: 1rem;">
-                        <span style="color: #ef9d57; font-weight: 800; min-width: 80px;">Hour {{ item.get('hour')?.value
-                            }}</span>
-                        <input type="text" class="form-control" formControlName="activity"
-                            placeholder="Activity description..." style="padding: 0.5rem 0;">
+                    <div [formGroupName]="$index" class="schedule-item animate-fade-in"
+                        style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #333;">
+
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                            <!-- Date -->
+                            <div>
+                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.3rem;">Date</label>
+                                <input type="date" class="form-control" formControlName="date">
+                            </div>
+
+                            <!-- Time -->
+                            <div>
+                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.3rem;">Time</label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <input type="time" class="form-control" formControlName="startTime">
+                                    <span style="color: #666;">-</span>
+                                    <input type="time" class="form-control" formControlName="endTime">
+                                </div>
+                            </div>
+
+                            <!-- Fee -->
+                            <div>
+                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.3rem;">Fee
+                                    (₹)</label>
+                                <input type="number" class="form-control" formControlName="fee" min="0">
+                            </div>
+
+                            <!-- Location (Only if Hybrid) -->
+                            @if (workshopForm.get('workshopMode')?.value === 'hybrid') {
+                            <div>
+                                <label class="form-label"
+                                    style="font-size: 0.8rem; margin-bottom: 0.3rem;">Location</label>
+                                <select class="form-control" formControlName="location">
+                                    <option value="">-- Select --</option>
+                                    @for (loc of registeredLocations(); track loc) {
+                                    <option [value]="loc">{{ loc }}</option>
+                                    }
+                                </select>
+                            </div>
+                            }
+                        </div>
+
+                        <!-- Activity -->
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <div style="flex: 1;">
+                                <label class="form-label"
+                                    style="font-size: 0.8rem; margin-bottom: 0.3rem;">Activity</label>
+                                <input type="text" class="form-control" formControlName="activity"
+                                    placeholder="Activity description...">
+                            </div>
+
+                            <button type="button" (click)="removeScheduleRow($index)"
+                                style="background: transparent; border: none; color: #ef4444; cursor: pointer; margin-top: 1.5rem;"
+                                title="Remove Session">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+
                     </div>
                     }
-                </div>
-            </div>
-
-            <div class="form-section">
-                <label class="form-label">Workshop Type & Fees</label>
-                <div class="radio-group" style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
-                    <label class="radio-option"
-                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #eee;">
-                        <input type="radio" formControlName="workshopType" value="online"> Online
-                    </label>
-                    <label class="radio-option"
-                        style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #eee;">
-                        <input type="radio" formControlName="workshopType" value="offline"> Offline
-                    </label>
-                </div>
-                <div class="form-row">
-                    <div class="form-group flex-1">
-                        <label class="form-label">Online Fee (₹)</label>
-                        <input type="number" class="form-control" formControlName="onlineFee">
-                    </div>
-                    <div class="form-group flex-1">
-                        <label class="form-label">Offline Fee (₹)</label>
-                        <input type="number" class="form-control" formControlName="offlineFee">
-                    </div>
                 </div>
             </div>
 

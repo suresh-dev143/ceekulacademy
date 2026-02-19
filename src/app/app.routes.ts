@@ -18,6 +18,7 @@ import { StudentNearbyComponent } from './pages/student-nearby/student-nearby';
 import { TeacherDashboardComponent } from './pages/teacher-dashboard/teacher-dashboard';
 import { WorkshopsPageComponent } from './pages/teacher-workshops/teacher-workshops';
 import { ContactPageComponent } from './pages/contact/contact';
+import { PublicWorkshopsPageComponent } from './pages/workshops/workshops';
 import { IssuesPageComponent } from './pages/issues/issues';
 import { DonatePageComponent } from './pages/donate/donate';
 import { InvestPageComponent } from './pages/invest/invest';
@@ -43,6 +44,7 @@ export const routes: Routes = [
     { path: 'innovative', component: InnovativeComponent },
     { path: 'courses', component: InnovativeComponent },
     { path: 'programs', component: ProgramsComponent },
+    { path: 'workshops', component: PublicWorkshopsPageComponent },
     { path: 'transformation', component: TransformationComponent },
     { path: 'centers', component: CentersComponent },
     { path: '**', redirectTo: '' }

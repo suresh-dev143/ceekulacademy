@@ -57,7 +57,7 @@ import { NearbyTeacher } from '../../../services/student-discovery.service';
     </div>
   `,
   styles: [`
-    .discovery-section { padding: 2.5rem; background: #000000; border: 1px solid var(--accent-primary); border-radius: 0; margin-bottom: 2rem; }
+    .discovery-section { padding: 2.5rem; background: #010101; margin-bottom: 2rem; }
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
     .section-title { font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; i { color: var(--accent-primary); } }
     .active-radius { font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
