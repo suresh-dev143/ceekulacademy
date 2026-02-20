@@ -10,7 +10,7 @@
 
     .search-bar {
         width: 100%;
-
+        display:flex;
         margin: auto;
 
         input {
@@ -150,10 +150,17 @@
         letter-spacing: 1px;
     }
 
+    .program-desc {
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.45);
+        margin: 0.6rem 0 0;
+        line-height: 1.4;
+        font-weight: 500;
+    }
+
     .view-more {
         margin-top: 2rem;
         color: #ef9d57;
-        ;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 2px;
@@ -165,6 +172,10 @@
         i {
             transition: transform 0.3s ease;
         }
+    }
+
+    &.has-link {
+        border-left: 2px solid #ef9d57;
     }
 }
 

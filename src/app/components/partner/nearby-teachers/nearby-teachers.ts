@@ -80,6 +80,18 @@ import { NearbyUser } from '../../../services/partner.service';
     .btn-ghost-sm { background: transparent; border: 1px solid var(--row-border); color: var(--text-secondary); padding: 0.7rem; border-radius: 0; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; &:hover { border-color: var(--accent-primary); color: var(--text-primary); } }
 
     .empty-state { text-align: center; padding: 3rem; .empty-icon { font-size: 3rem; margin-bottom: 1rem; } p { color: rgba(255, 255, 255, 0.4); font-weight: 500; } }
+
+    @media (max-width: 768px) {
+      .discovery-section { padding: 1.5rem; }
+      .section-header { flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+      .user-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .discovery-section { padding: 1rem; }
+      .section-title { font-size: 1rem; letter-spacing: 1px; }
+      .user-card { padding: 1.25rem; }
+    }
   `]
 })
 export class NearbyTeachersComponent {

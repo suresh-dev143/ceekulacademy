@@ -86,6 +86,8 @@ import { PartnerService } from '../../services/partner.service';
   `,
     styles: [`
     .partner-dashboard-container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+    @media (max-width: 768px) { .partner-dashboard-container { padding: 1rem; } }
+    @media (max-width: 480px) { .partner-dashboard-container { padding: 0.75rem; } }
     
     .dashboard-grid { display: flex; flex-direction: column; gap: 2rem; }
 

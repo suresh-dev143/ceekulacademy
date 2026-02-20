@@ -81,8 +81,7 @@
             <div class="search-row">
                 <div class="search-input-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" class="search-input" [ngModel]="searchQuery()"
-                        (ngModelChange)="searchQuery.set($event)" placeholder="Search workshops, instructors, types...">
+                    <input type="text" class="search-input" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Search workshops, instructors, types...">
                     @if (searchQuery()) {
                     <button class="clear-btn" (click)="searchQuery.set('')" title="Clear search">
                         <i class="fas fa-times"></i>
@@ -103,9 +102,8 @@
                 <div class="filter-group">
                     <div class="filter-label"><i class="fas fa-wifi"></i> Mode</div>
                     <div class="toggle-group">
-                        @for (mode of modeOptions; track mode) {
-                        <button class="toggle-btn" [class.active]="modeFilter() === mode"
-                            (click)="modeFilter.set(mode)">
+                        @for (mode of ['All', 'Online', 'Offline']; track mode) {
+                        <button class="toggle-btn" [class.active]="modeFilter() === mode" (click)="modeFilter.set(mode)">
                             {{ mode }}
                         </button>
                         }
@@ -116,9 +114,8 @@
                 <div class="filter-group">
                     <div class="filter-label"><i class="fas fa-calendar"></i> Date</div>
                     <div class="toggle-group">
-                        @for (date of dateOptions; track date) {
-                        <button class="toggle-btn" [class.active]="dateFilter() === date"
-                            (click)="dateFilter.set(date)">
+                        @for (date of ['Any', 'Today', 'This Week', 'This Month']; track date) {
+                        <button class="toggle-btn" [class.active]="dateFilter() === date" (click)="dateFilter.set(date)">
                             {{ date }}
                         </button>
                         }
@@ -131,11 +128,9 @@
                     <div class="location-row">
                         <div class="location-input-wrap">
                             <i class="fas fa-city"></i>
-                            <input type="text" class="location-input" [ngModel]="locationQuery()"
-                                (ngModelChange)="locationQuery.set($event)" placeholder="City or location">
+                            <input type="text" class="location-input" [ngModel]="locationQuery()" (ngModelChange)="locationQuery.set($event)" placeholder="City or location">
                         </div>
-                        <select class="dist-select" [ngModel]="maxDistance()"
-                            (ngModelChange)="maxDistance.set(+$event)">
+                        <select class="dist-select" [ngModel]="maxDistance()" (ngModelChange)="maxDistance.set($event)">
                             <option value="0">All Distances</option>
                             <option value="10">Within 10km</option>
                             <option value="20">Within 20km</option>
@@ -155,10 +150,8 @@
                     <div class="course-icon">
                         <i class="fas fa-tools"></i>
                     </div>
-                    <div class="mode-tag" [class.online]="workshop.type === 'Online'"
-                        [class.offline]="workshop.type === 'Offline'">
-                        <i class="fas" [class.fa-globe]="workshop.type === 'Online'"
-                            [class.fa-map-pin]="workshop.type === 'Offline'"></i>
+                    <div class="mode-tag" [class.online]="workshop.type === 'Online'" [class.offline]="workshop.type === 'Offline'">
+                        <i class="fas" [class.fa-globe]="workshop.type === 'Online'" [class.fa-map-pin]="workshop.type === 'Offline'"></i>
                         {{ workshop.type }}
                     </div>
                 </div>
@@ -184,7 +177,6 @@
             <p><strong>No workshops found</strong> matching your filters.</p>
             <p style="font-size: 0.85rem; margin-top: 0.5rem;">Try adjusting your search criteria.</p>
         </div>
-        }
         }
     </div>
 </app-layout>

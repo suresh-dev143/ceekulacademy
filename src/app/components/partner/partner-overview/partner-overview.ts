@@ -98,8 +98,30 @@ import { FormsModule } from '@angular/forms';
     .animate-fade-in { animation: fadeIn 0.6s ease-out; }
 
     @media (max-width: 992px) {
+      .partner-header-card { padding: 2rem; }
       .header-main { flex-direction: column; align-items: flex-start; }
       .mini-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .partner-header-card { padding: 1.25rem; }
+      .org-brand { flex-direction: column; align-items: flex-start; gap: 1rem;
+        .org-logo { width: 48px; height: 48px; font-size: 1.4rem; }
+        .org-name { font-size: 1.25rem; letter-spacing: 1px; flex-wrap: wrap; gap: 0.5rem; }
+      }
+      .radius-control { width: 100%;
+        .radio-group { flex-wrap: wrap; gap: 0.4rem; }
+        .radio-label { padding: 0.5rem 0.9rem; font-size: 0.75rem; }
+      }
+      .mini-stats { grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
+        .stat-item { padding: 1rem; }
+        .stat-val { font-size: 1.75rem; }
+      }
+    }
+
+    @media (max-width: 380px) {
+      .mini-stats { grid-template-columns: 1fr 1fr; }
+      .org-brand .org-name { font-size: 1rem; }
     }
   `]
 })

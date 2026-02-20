@@ -48,12 +48,12 @@ export class SidebarLeftComponent {
             items: [],
             role: 'Teacher'
         },
-        {
-            title: 'Workshops',
-            type: 'menu',
-            link: '/dashboard/teacher/workshops',
-            items: []
-        },
+        // {
+        //     title: 'Workshops',
+        //     type: 'menu',
+        //     link: '/dashboard/teacher/workshops',
+        //     items: []
+        // },
         {
             title: 'Courses',
             type: 'menu',
@@ -91,7 +91,12 @@ export class SidebarLeftComponent {
             link: '/issues',
             items: []
         },
-
+        // {
+        //     title: 'Health Connect',
+        //     type: 'menu',
+        //     link: '/health-connect',
+        //     items: []
+        // },
         {
             title: 'My Profile',
             type: 'menu',

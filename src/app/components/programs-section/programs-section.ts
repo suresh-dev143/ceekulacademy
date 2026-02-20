@@ -1,19 +1,19 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router,RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-programs-section',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule,RouterLink, ReactiveFormsModule],
     templateUrl: './programs-section.html',
     styleUrl: './programs-section.scss'
 })
 export class ProgramsSectionComponent implements OnInit {
     private route = inject(ActivatedRoute);
-    private router = inject(Router);
+    router = inject(Router);
     private fb = inject(FormBuilder);
     public authService = inject(AuthService);
 
@@ -47,6 +47,10 @@ export class ProgramsSectionComponent implements OnInit {
             if (categoryId) {
                 const program = this.programs.find(p => p.id === categoryId);
                 if (program) {
+                    if ((program as any).link) {
+                        this.router.navigate([(program as any).link]);
+                        return;
+                    }
                     this.selectedProgram.set(program);
                     // Show form for research, project, webinar, or workshop programs
                     this.showResearchForm.set(program.id === 'research');
@@ -375,6 +379,14 @@ export class ProgramsSectionComponent implements OnInit {
                 ]
             }
         },
+        {
+            id: 'workshops',
+            title: 'Workshops',
+            link: '/workshops',
+            description: 'Hands-on practical learning sessions led by industry experts.',
+            subSubtitles: ['Online', 'Offline', 'AI', 'Robotics'],
+            content: { description: '', sections: [] }
+        },
 
         {
             id: 'services',
@@ -385,7 +397,7 @@ export class ProgramsSectionComponent implements OnInit {
             content: {
                 description: '',
                 sections: [
-                    {
+                    {link: '/health-connect',
                         title: 'Health Camp',
                         description: 'Provides free medical check-ups, basic treatment, and health awareness to underserved communities.'
                     },
@@ -432,6 +444,10 @@ export class ProgramsSectionComponent implements OnInit {
     ];
 
     selectProgram(program: any) {
+        if (program.link) {
+            this.router.navigate([program.link]);
+            return;
+        }
         this.selectedProgram.set(program);
         this.selectedSubSubtitle.set(null);
         this.selectedContent.set(null);
@@ -859,6 +875,14 @@ export class ProgramsSectionComponent implements OnInit {
             }
             customControl?.updateValueAndValidity();
         });
+    }
+
+    openSectionOrNavigate(section: any) {
+        if (section.link) {
+            this.router.navigate([section.link]);
+        } else {
+            this.openCourseSyllabus(section);
+        }
     }
 
     openCourseSyllabus(course: any) {

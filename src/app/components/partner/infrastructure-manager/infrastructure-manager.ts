@@ -68,6 +68,23 @@ import { InfrastructureFormComponent } from '../infrastructure-form/infrastructu
     .infra-actions { display: flex; gap: 0.8rem; }
     .icon-btn { background: none; border: 1px solid var(--row-border); color: var(--text-secondary); width: 34px; height: 34px; border-radius: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; transition: 0.2s; &:hover { color: var(--accent-primary); border-color: var(--accent-primary); } }
     .btn-outline-sm { background: #000000; border: 1px solid var(--accent-primary); color: var(--text-primary); padding: 0.6rem 1.25rem; border-radius: 0; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; &:hover { background: var(--accent-primary); color: #000000; } }
+
+    @media (max-width: 768px) {
+      .mgmt-section { padding: 1.5rem; }
+      .section-header { flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
+      .infra-item { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .infra-main { flex: unset; width: 100%; }
+      .infra-capacity { display: flex; align-items: center; gap: 0.75rem; text-align: left;
+        .cap-val { font-size: 1.2rem; }
+        .cap-label { margin: 0; }
+      }
+      .infra-actions { align-self: flex-end; }
+    }
+
+    @media (max-width: 480px) {
+      .mgmt-section { padding: 1rem; }
+      .section-title { font-size: 1rem; letter-spacing: 1px; }
+    }
   `]
 })
 export class InfrastructureManagerComponent {

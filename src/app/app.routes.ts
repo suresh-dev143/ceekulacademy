@@ -22,6 +22,8 @@ import { PublicWorkshopsPageComponent } from './pages/workshops/workshops';
 import { IssuesPageComponent } from './pages/issues/issues';
 import { DonatePageComponent } from './pages/donate/donate';
 import { InvestPageComponent } from './pages/invest/invest';
+import { StudentDashboardComponent } from './pages/student-dashboard/student-dashboard';
+import { HealthConnectComponent } from './pages/health-connect/health-connect';
 
 export const routes: Routes = [
     { path: '', component: LandingComponent },
@@ -29,6 +31,7 @@ export const routes: Routes = [
     { path: 'dashboard/courses', component: CoursesComponent },
     { path: 'dashboard/director', component: DirectorDashboardComponent },
     { path: 'dashboard/partner', component: PartnerDashboardComponent },
+    { path: 'dashboard/student', component: StudentDashboardComponent },
     { path: 'dashboard/student/nearby', component: StudentNearbyComponent },
     { path: 'dashboard/teacher', component: TeacherDashboardComponent },
     { path: 'dashboard/teacher/workshops', component: WorkshopsPageComponent },
@@ -47,5 +50,6 @@ export const routes: Routes = [
     { path: 'workshops', component: PublicWorkshopsPageComponent },
     { path: 'transformation', component: TransformationComponent },
     { path: 'centers', component: CentersComponent },
+    { path: 'health-connect', component: HealthConnectComponent },
     { path: '**', redirectTo: '' }
 ];

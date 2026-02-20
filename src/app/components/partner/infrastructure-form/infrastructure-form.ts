@@ -23,6 +23,20 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators, Abs
     .checkbox-item { background: #111; padding: 0.3rem 0.6rem; border: 1px solid #333; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; cursor: pointer;}
     .schedule-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1.5fr 1.5fr auto; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
     .grid-header { font-size: 0.7rem; color: #666; text-transform: uppercase; }
+
+    @media (max-width: 768px) {
+      .form-container { padding: 1.25rem; max-height: 90vh; }
+      .form-header { flex-wrap: wrap; gap: 0.5rem; }
+      .schedule-grid { grid-template-columns: 1fr 1fr; gap: 0.4rem;
+        .grid-header:nth-child(n+3) { display: none; }
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-container { padding: 1rem; }
+      .schedule-grid { grid-template-columns: 1fr 1fr; }
+      .checkbox-group { gap: 0.3rem; }
+    }
   `]
 })
 export class InfrastructureFormComponent {

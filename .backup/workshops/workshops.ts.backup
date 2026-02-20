@@ -21,10 +21,6 @@ export class PublicWorkshopsPageComponent {
     selectedWorkshop = signal<any>(null);
     showWorkshopEnrollment = signal<boolean>(false);
 
-    // --- Filter options ---
-    dateOptions = ['Any', 'Today', 'This Week', 'This Month'] as const;
-    modeOptions = ['All', 'Online', 'Offline'] as const;
-
     // --- Filter signals ---
     searchQuery   = signal<string>('');
     modeFilter    = signal<'All' | 'Online' | 'Offline'>('All');

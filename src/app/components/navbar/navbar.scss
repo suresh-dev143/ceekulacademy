@@ -125,6 +125,7 @@
 }
 
 .menu-toggle {
+
   display: none;
   flex-direction: column;
   /* ... rest of menu-toggle styles ... */
@@ -136,10 +137,10 @@
   z-index: 1001;
 
   span {
-    width: 24px;
-    height: 2px;
-    background: var(--accent-primary);
-    transition: all 0.3s ease;
+   font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
   }
 
   &.active {
@@ -329,6 +330,9 @@
 @media (max-width: 768px) {
   .menu-toggle {
     display: none !important;
+    position: absolute;
+    top: 7rem;
+    right: 15px;
   }
 
   .navbar-menu {

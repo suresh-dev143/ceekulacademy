@@ -1,6 +1,8 @@
 <div class="programs-container">
     <div class="search-bar">
         <input type="text" placeholder="Search here..." />
+        <button class="search-btn">
+            <i class="fas fa-search"></i></button>
     </div>
 
     <div class="view-header centered">
@@ -25,15 +27,19 @@
         </button>
     </div>
     }
-
     <div class="hierarchical-content left-aligned">
         <!-- Level 0: Programs Grid -->
         @if (!selectedProgram()) {
         <div class="programs-grid">
             @for (program of programs; track program.id) {
-            <div class="program-card" (click)="selectProgram(program)">
+            <div class="program-card" [class.has-link]="program.link" (click)="selectProgram(program)">
                 <h3>{{ program.title }}</h3>
-                <span class="view-more">Explore <i class="fas fa-chevron-right"></i></span>
+                @if (program.description) {
+                <p class="program-desc">{{ program.description }}</p>
+                }
+                <span class="view-more">
+                    {{ program.link ? 'View All' : 'Explore' }} <i class="fas fa-chevron-right"></i>
+                </span>
             </div>
             }
         </div>
@@ -229,13 +235,14 @@
         } @else {
         <!-- Level 1: Category View -->
         @if (selectedProgram()?.subSubtitles) {
-        <!-- <div class="sub-subtitle-tabs-container">
+        <div class="sub-subtitle-tabs-container">
             <div class="scroll-track">
                 <div class="subtitle-tabs">
                     @for (sub of selectedProgram()?.subSubtitles; track sub) {
                     <button class="sub-tab" (click)="scrollToSection(sub)">
                         <span>{{ sub }}</span>
                     </button>
+                sections: [
                     }
                 </div>
                 <div class="subtitle-tabs">
@@ -246,7 +253,7 @@
                     }
                 </div>
             </div>
-        </div> -->
+        </div>
         }
         <div class="program-content">
             @if (showResearchForm()) {
@@ -427,7 +434,7 @@
 
                 <div class="sections-grid">
                     @for (section of selectedProgram()?.content.sections; track section.title) {
-                    <div class="content-section clickable" (click)="openCourseSyllabus(section)">
+                    <div class="content-section clickable" (click)="openSectionOrNavigate(section)">
                         <h3>{{ section.title }}</h3>
                         @if (section.instructor) {
                         <p class="instructor"><strong>Instructor:</strong> {{ section.instructor }}</p>
@@ -435,7 +442,9 @@
                         @if (section.description) {
                         <p class="section-desc">{{ section.description }}</p>
                         }
-                        <span class="view-more-link">View Details <i class="fas fa-arrow-right"></i></span>
+                        @if (section.link) {
+                        <a class="view-more-link" [routerLink]="section.link" (click)="$event.stopPropagation()">View Details <i class="fas fa-arrow-right"></i></a>
+                        }
                     </div>
                     }
                 </div>
