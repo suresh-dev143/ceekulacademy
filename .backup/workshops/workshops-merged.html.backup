@@ -1,0 +1,317 @@
+<app-layout>
+    <div class="workshops-container animate-fade-in">
+        <!-- Main Content: Enrollment Form or Workshop View -->
+        @if (showWorkshopEnrollment() && selectedWorkshop()) {
+        <div class="research-form-container animate-fade-in">
+            <button class="btn-back" (click)="closeWorkshopEnrollment()" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-arrow-left"></i> Back to Workshops
+            </button>
+
+            <div class="workshop-preview-card">
+                <h2 class="workshop-title">{{ selectedWorkshop().title }}</h2>
+                <p class="workshop-desc">{{ selectedWorkshop().description }}</p>
+                <div class="workshop-meta">
+                    <span><i class="fas fa-user-tie"></i> {{ selectedWorkshop().instructor }}</span>
+                    <span><i class="fas fa-calendar-day"></i> {{ selectedWorkshop().date }}</span>
+                    <span><i class="fas fa-clock"></i> {{ selectedWorkshop().duration }}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> {{ selectedWorkshop().type }}</span>
+                </div>
+            </div>
+
+            <form [formGroup]="enrollWorkshopForm" (ngSubmit)="onSubmitWorkshopEnrollment()">
+                <div class="form-section">
+                    <h3>Enrollment Information</h3>
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" formControlName="name">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" class="form-control" formControlName="email">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" class="form-control" formControlName="phone">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Organization/School (Optional)</label>
+                        <input type="text" class="form-control" formControlName="organization">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Enrollment Type</h3>
+                    <div class="radio-group">
+                        @if (currentUser().role === 'Instructor' || currentUser().role === 'Teacher' ||
+                        currentUser().role === 'Researcher' || currentUser().role === 'Admin') {
+                        <label class="radio-option">
+                            <input type="radio" formControlName="enrollmentType" value="support">
+                            <span>Practical Hands-on Support (Instructor)</span>
+                        </label>
+                        }
+                        <label class="radio-option">
+                            <input type="radio" formControlName="enrollmentType" value="learning">
+                            <span>Learn (Student)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 2rem;">
+                    <label class="checkbox-option">
+                        <input type="checkbox" formControlName="acceptTerms">
+                        <span>I agree to the workshop terms and conditions.</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-submit" [disabled]="enrollWorkshopForm.invalid">
+                    Confirm Enrollment
+                </button>
+            </form>
+        </div>
+        } @else {
+        <!-- Header Section -->
+        <div class="view-header centered">
+            <h1 class="page-title">Workshops</h1>
+            <p class="section-subtitle">Explore, enroll, create, and manage practical learning sessions.</p>
+        </div>
+
+        <!-- Role-Based Tabs -->
+        @if (currentUser().role === 'Teacher' || currentUser().role === 'Instructor' || currentUser().role === 'Admin') {
+        <div class="workshop-tabs">
+            <button class="tab-btn" [class.active]="activeTab() === 'browse'" (click)="activeTab.set('browse')">
+                <i class="fas fa-eye"></i> Browse Workshops
+            </button>
+            <button class="tab-btn" [class.active]="activeTab() === 'create'" (click)="activeTab.set('create')">
+                <i class="fas fa-plus-circle"></i> Create Workshop
+            </button>
+        </div>
+        }
+
+        <!-- Browse Tab / Student View -->
+        @if (activeTab() === 'browse') {
+        <!-- Filter Panel -->
+        <div class="filter-panel">
+            <!-- Search Row -->
+            <div class="search-row">
+                <div class="search-input-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Search workshops, instructors, types...">
+                    @if (searchQuery()) {
+                    <button class="clear-btn" (click)="searchQuery.set('')" title="Clear search">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    }
+                </div>
+                @if (activeFilterCount() > 0) {
+                <button class="clear-all-btn" (click)="clearFilters()">
+                    <span><i class="fas fa-filter-circle-xmark"></i> Clear Filters</span>
+                    <span class="badge">{{ activeFilterCount() }}</span>
+                </button>
+                }
+            </div>
+
+            <!-- Filters Row -->
+            <div class="filters-row">
+                <!-- Mode Filter -->
+                <div class="filter-group">
+                    <div class="filter-label"><i class="fas fa-wifi"></i> Mode</div>
+                    <div class="toggle-group">
+                        @for (mode of modeOptions; track mode) {
+                        <button class="toggle-btn" [class.active]="modeFilter() === mode" (click)="modeFilter.set(mode)">
+                            {{ mode }}
+                        </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Date Filter -->
+                <div class="filter-group">
+                    <div class="filter-label"><i class="fas fa-calendar"></i> Date</div>
+                    <div class="toggle-group">
+                        @for (date of dateOptions; track date) {
+                        <button class="toggle-btn" [class.active]="dateFilter() === date" (click)="dateFilter.set(date)">
+                            {{ date }}
+                        </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Location Filter -->
+                <div class="filter-group location-group">
+                    <div class="filter-label"><i class="fas fa-map-marker-alt"></i> Location</div>
+                    <div class="location-row">
+                        <div class="location-input-wrap">
+                            <i class="fas fa-city"></i>
+                            <input type="text" class="location-input" [ngModel]="locationQuery()" (ngModelChange)="locationQuery.set($event)" placeholder="City or location">
+                        </div>
+                        <select class="dist-select" [ngModel]="maxDistance()" (ngModelChange)="maxDistance.set(+$event)">
+                            <option value="0">All Distances</option>
+                            <option value="10">Within 10km</option>
+                            <option value="20">Within 20km</option>
+                            <option value="50">Within 50km</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workshop Grid -->
+        @if (filteredWorkshops().length > 0) {
+        <div class="course-grid">
+            @for (workshop of filteredWorkshops(); track workshop.id) {
+            <div class="course-card" (click)="selectWorkshop(workshop)">
+                <div class="card-top">
+                    <div class="course-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="mode-tag" [class.online]="workshop.type === 'Online'" [class.offline]="workshop.type === 'Offline'">
+                        <i class="fas" [class.fa-globe]="workshop.type === 'Online'" [class.fa-map-pin]="workshop.type === 'Offline'"></i>
+                        {{ workshop.type }}
+                    </div>
+                </div>
+                <h3 class="course-title">{{ workshop.title }}</h3>
+                <p class="course-desc">{{ workshop.description }}</p>
+                <div class="course-meta">
+                    <span><i class="fas fa-calendar-alt"></i> {{ workshop.date }}</span>
+                    <span><i class="fas fa-hourglass-half"></i> {{ workshop.duration }}</span>
+                    <span><i class="fas fa-map-marker-alt"></i> {{ workshop.city }}</span>
+                    @if (workshop.type === 'Offline' && workshop.distance > 0) {
+                    <span><i class="fas fa-ruler-horizontal"></i> {{ workshop.distance }}km away</span>
+                    }
+                </div>
+                <div class="course-action">
+                    <span>Enroll Now <i class="fas fa-chevron-right"></i></span>
+                </div>
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="empty-search">
+            <i class="fas fa-search"></i>
+            <p><strong>No workshops found</strong> matching your filters.</p>
+            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Try adjusting your search criteria.</p>
+        </div>
+        }
+        }
+
+        <!-- Create Tab / Teacher View -->
+        @if (activeTab() === 'create') {
+        <div class="create-workshop-section">
+            @if (!isCreatingWorkshop()) {
+            <button class="btn-create-workshop" (click)="toggleWorkshopCreation()">
+                <i class="fas fa-plus"></i> Create New Workshop
+            </button>
+            } @else {
+            <div class="workshop-form-container">
+                <button class="btn-cancel" (click)="toggleWorkshopCreation()" style="margin-bottom: 1.5rem;">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+
+                <form [formGroup]="workshopForm" (ngSubmit)="onSubmitWorkshopForm()">
+                    <div class="form-section">
+                        <h3>Workshop Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Workshop Title *</label>
+                            <input type="text" class="form-control" formControlName="workshopTitle" placeholder="e.g., Advanced AI Development">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description *</label>
+                            <textarea class="form-control" formControlName="workshopDescription" rows="4" placeholder="Describe your workshop..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Workshop Mode</h3>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" formControlName="workshopMode" value="online">
+                                <span>Online</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" formControlName="workshopMode" value="hybrid">
+                                <span>Hybrid (Online + In-Person)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Instructor</h3>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" formControlName="instructorType" value="myself">
+                                <span>Myself ({{ currentUser().name }})</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" formControlName="instructorType" value="open">
+                                <span>Open to Other Instructors</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-header">
+                            <h3>Schedule <span class="subtitle">(Sessions)</span></h3>
+                            <button type="button" class="btn-add-schedule" (click)="addScheduleRow()" [disabled]="schedule.length >= 5">
+                                <i class="fas fa-plus"></i> Add Session
+                            </button>
+                        </div>
+
+                        @for (row of schedule.controls; track $index) {
+                        <div class="schedule-row">
+                            <div class="schedule-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Date *</label>
+                                    <input type="date" class="form-control" [formControl]="row.get('date')!">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Start Time *</label>
+                                    <input type="time" class="form-control" [formControl]="row.get('startTime')!">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">End Time *</label>
+                                    <input type="time" class="form-control" [formControl]="row.get('endTime')!">
+                                </div>
+                            </div>
+
+                            <div class="schedule-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Activity *</label>
+                                    <input type="text" class="form-control" [formControl]="row.get('activity')!" placeholder="e.g., Lecture, Hands-on">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Fee (₹) *</label>
+                                    <input type="number" class="form-control" [formControl]="row.get('fee')!" min="0">
+                                </div>
+                                @if (workshopForm.get('workshopMode')?.value === 'hybrid') {
+                                <div class="form-group">
+                                    <label class="form-label">Location *</label>
+                                    <select class="form-control" [formControl]="row.get('location')!">
+                                        <option value="">Select Location</option>
+                                        @for (loc of registeredLocations(); track loc) {
+                                        <option [value]="loc">{{ loc }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                }
+                            </div>
+
+                            <button type="button" class="btn-remove-schedule" (click)="removeScheduleRow($index)" [disabled]="schedule.length === 1">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                        }
+                    </div>
+
+                    <button type="submit" class="btn-submit" [disabled]="workshopForm.invalid">
+                        <i class="fas fa-check-circle"></i> Create Workshop
+                    </button>
+                </form>
+            </div>
+            }
+        </div>
+        }
+        }
+    </div>
+</app-layout>

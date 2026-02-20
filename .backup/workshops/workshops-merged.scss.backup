@@ -1,16 +1,12 @@
-.form-header{
-    text-align: right;
-}
-
 .workshops-container {
-            padding: 0rem 2rem;
+            padding: 2rem;
             max-width: 1200px;
             margin: 0 auto;
         }
         
         .view-header {
             text-align: center;
-            
+            margin-bottom: 2rem;
         }
 
         .page-title {
@@ -257,34 +253,6 @@
             option { background: #1a1a1a; }
         }
 
-        .date-input, .time-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: var(--text-primary);
-            padding: 0.5rem 0.75rem;
-            font-size: 0.85rem;
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.2s;
-            width: 100%;
-
-            &:focus {
-                border-color: #FF6B00;
-                background: rgba(255, 255, 255, 0.08);
-            }
-
-            &::placeholder {
-                color: rgba(255, 255, 255, 0.25);
-            }
-
-            // For date/time picker calendar and dropdown
-            &::-webkit-calendar-picker-indicator {
-                filter: invert(1) brightness(0.8);
-                cursor: pointer;
-            }
-        }
-
         // ── Card top row (icon + mode badge) ────────────────────────────
         .card-top {
             display: flex;
@@ -293,13 +261,6 @@
             margin-bottom: 1rem;
 
             .course-icon { margin-bottom: 0; }
-        }
-
-        .card-badges {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 0.5rem;
         }
 
         .mode-tag {
@@ -323,31 +284,6 @@
                 background: rgba(255, 107, 0, 0.12);
                 border: 1px solid rgba(255, 107, 0, 0.3);
                 color: #FF8800;
-            }
-        }
-
-        .availability-tag {
-            font-size: 0.65rem;
-            font-weight: 700;
-            padding: 0.25rem 0.55rem;
-            border-radius: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-
-            &.available {
-                background: rgba(34, 197, 94, 0.12);
-                border: 1px solid rgba(34, 197, 94, 0.3);
-                color: #4ade80;
-            }
-
-            &.not-available {
-                background: rgba(239, 68, 68, 0.12);
-                border: 1px solid rgba(239, 68, 68, 0.3);
-                color: #ef4444;
             }
         }
 
@@ -401,15 +337,14 @@
 
         // ── Create Workshop Section ──────────────────────────────────────
         .create-workshop-section {
-            padding: 1rem 0rem;
-            text-align:right;
+            padding: 2rem;
         }
 
         .btn-create-workshop {
-            // background: linear-gradient(135deg, #FF6B00 0%, #FF8800 100%);
-            color: #FF6B00;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8800 100%);
+            color: white;
             border: none;
-            padding: 0.5rem 0rem;
+            padding: 1.2rem 2rem;
             border-radius: 12px;
             font-size: 1.1rem;
             font-weight: 700;
@@ -418,7 +353,7 @@
             align-items: center;
             gap: 0.8rem;
             transition: all 0.3s ease;
-            margin-left: auto;
+
             &:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 8px 24px rgba(255, 107, 0, 0.3);
@@ -592,6 +527,7 @@
                 line-height: 1.5;
                 margin-bottom: 1rem;
                 display: -webkit-box;
+                -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
             }
@@ -696,7 +632,6 @@
 
         .form-section {
             margin-bottom: 2.5rem;
-            text-align: left;
             
             h3 {
                 font-size: 1.25rem;
@@ -856,7 +791,7 @@
 
         @media (max-width: 480px) {
             .workshops-container {
-                padding: 0rem 1rem;
+                padding: 1rem;
             }
 
             .page-title {

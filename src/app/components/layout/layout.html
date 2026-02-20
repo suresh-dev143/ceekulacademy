@@ -8,10 +8,10 @@
         @if (showLeftSidebar) {
         <aside class="col-left" [class.active]="mobileSidebarOpen()" [class.collapsed]="leftCollapsed()">
             <button class="toggle-sidebar-btn left" (click)="toggleLeft()" *ngIf="!leftCollapsed()">
-                <i class="fas fa-chevron-left"></i>
+                ◀
             </button>
             <button class="expand-sidebar-btn left" (click)="expandLeft()" *ngIf="leftCollapsed()">
-                <i class="fas fa-chevron-right"></i>
+                ▶
             </button>
 
             <div class="sidebar-content" [class.hidden]="leftCollapsed()">
@@ -29,10 +29,10 @@
         @if (showRightSidebar) {
         <aside class="col-right" [class.collapsed]="rightCollapsed()" [class.active]="mobileRightSidebarOpen()">
             <button class="toggle-sidebar-btn right" (click)="toggleRight()" *ngIf="!rightCollapsed()">
-                <i class="fas fa-chevron-right"></i>
+                ▶
             </button>
             <button class="expand-sidebar-btn right" (click)="expandRight()" *ngIf="rightCollapsed()">
-                <i class="fas fa-chevron-left"></i>
+                ◀
             </button>
 
             <div class="sidebar-content" [class.hidden]="rightCollapsed()">

@@ -8,6 +8,7 @@ import { DistrictComponent } from './pages/district/district';
 import { InnovativeComponent } from './pages/innovative/innovative';
 import { ProgramsComponent } from './pages/programs/programs';
 import { CentersComponent } from './pages/centers/centers';
+
 import { TransformationComponent } from './pages/transformation/transformation';
 import { HomeComponent } from './pages/home/home';
 import { CoursesComponent } from './pages/courses/courses';
@@ -22,7 +23,6 @@ import { DonatePageComponent } from './pages/donate/donate';
 import { InvestPageComponent } from './pages/invest/invest';
 import { StudentDashboardComponent } from './pages/student-dashboard/student-dashboard';
 import { HealthConnectComponent } from './pages/health-connect/health-connect';
-import { WorkshopsPageComponent } from './pages/teacher-workshops/teacher-workshops';
 
 export const routes: Routes = [
     { path: '', component: LandingComponent },
@@ -33,8 +33,7 @@ export const routes: Routes = [
     { path: 'dashboard/student', component: StudentDashboardComponent },
     { path: 'dashboard/student/nearby', component: StudentNearbyComponent },
     { path: 'dashboard/teacher', component: TeacherDashboardComponent },
-    // { path: 'dashboard/teacher/workshops', redirectTo: 'workshops', pathMatch: 'full' },
-    { path: 'dashboard/teacher/workshops', component:WorkshopsPageComponent },
+    { path: 'dashboard/teacher/workshops', redirectTo: 'workshops', pathMatch: 'full' },
     { path: 'about', component: AboutComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },

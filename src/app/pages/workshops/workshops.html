@@ -1,39 +1,162 @@
 <app-layout>
     <div class="workshops-container animate-fade-in">
+         <!-- Header Section -->
+        <div class="view-header centered">
+            <h1 class="page-title">Workshops</h1>
+            <p class="section-subtitle">Explore, enroll, create, and manage practical learning sessions.</p>
+        </div>
+           <!-- Create Tab / Teacher View -->
+        @if (currentUser().role === 'Teacher' || currentUser().role === 'Instructor' || currentUser().role === 'Admin')
+        {
+        <div class="create-workshop-section">
+            @if (!isCreatingWorkshop()) {
+            <button class="btn-create-workshop" (click)="toggleWorkshopCreation()">
+                Create New Workshop
+            </button>
+            } @else {
+            <div class="workshop-form-container">
+      <div class="form-header">
+        <button class="btn-cancel" (click)="toggleWorkshopCreation()" style="margin-bottom: 1.5rem;">
+                    Cancel
+                </button>
+      </div>
+
+                <form [formGroup]="workshopForm" (ngSubmit)="onSubmitWorkshopForm()">
+                    <div class="form-section">
+                        <h3>Workshop Details</h3>
+                        <div class="form-group">
+                            <label class="form-label">Workshop Title *</label>
+                            <input type="text" class="form-control" formControlName="workshopTitle"
+                                placeholder="e.g., Advanced AI Development">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description *</label>
+                            <textarea class="form-control" formControlName="workshopDescription" rows="4"
+                                placeholder="Describe your workshop..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Your Description *</label>
+                            <textarea class="form-control" formControlName="expertDescription" rows="4"
+                                placeholder="Describe your workshop..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Workshop Mode</h3>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" formControlName="workshopMode" value="online">
+                                <span>Online</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" formControlName="workshopMode" value="hybrid">
+                                <span>Hybrid (Online + In-Person)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Instructor</h3>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" formControlName="instructorType" value="myself">
+                                <span>Myself ({{ currentUser().name }})</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" formControlName="instructorType" value="open">
+                                <span>Open to Other Instructors</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-header">
+                            <h3>Schedule <span class="subtitle">(Sessions)</span></h3>
+                            <button type="button" class="btn-add-schedule" (click)="addScheduleRow()"
+                                [disabled]="schedule.length >= 5">
+                                Add Session
+                            </button>
+                        </div>
+
+                        @for (row of schedule.controls; track $index) {
+                        <div class="schedule-row">
+                            <div class="schedule-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Date *</label>
+                                    <input type="date" class="form-control" [formControl]="$any(row.get('date'))">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Start Time *</label>
+                                    <input type="time" class="form-control" [formControl]="$any(row.get('startTime'))">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">End Time *</label>
+                                    <input type="time" class="form-control" [formControl]="$any(row.get('endTime'))">
+                                </div>
+                            </div>
+
+                            <div class="schedule-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Activity *</label>
+                                    <input type="text" class="form-control" [formControl]="$any(row.get('activity'))"
+                                        placeholder="e.g., Lecture, Hands-on">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Fee (₹) *</label>
+                                    <input type="number" class="form-control" [formControl]="$any(row.get('fee'))"
+                                        min="0">
+                                </div>
+                                @if (workshopForm.get('workshopMode')?.value === 'hybrid') {
+                                <div class="form-group">
+                                    <label class="form-label">Location *</label>
+                                    <select class="form-control" [formControl]="$any(row.get('location'))">
+                                        <option value="">Select Location</option>
+                                        @for (loc of registeredLocations(); track loc) {
+                                        <option [value]="loc">{{ loc }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                }
+                            </div>
+
+                            <button type="button" class="btn-remove-schedule" (click)="removeScheduleRow($index)"
+                                [disabled]="schedule.length === 1">
+                                Remove
+                            </button>
+                        </div>
+                        }
+                    </div>
+
+                    <button type="submit" class="btn-submit" [disabled]="workshopForm.invalid">
+                        Create Workshop
+                    </button>
+                </form>
+            </div>
+            }
+        </div>
+        }
+        <!-- Main Content: Enrollment Form or Workshop View -->
         @if (showWorkshopEnrollment() && selectedWorkshop()) {
+
         <div class="research-form-container animate-fade-in">
             <button class="btn-back" (click)="closeWorkshopEnrollment()" style="margin-bottom: 1.5rem;">
-                <i class="fas fa-arrow-left"></i> Back to Workshops
+                Back to Workshops
             </button>
 
             <div class="workshop-preview-card">
-                <h2 class="workshop-title">{{ selectedWorkshop().title }}</h2>
-                <p class="workshop-desc">{{ selectedWorkshop().description }}</p>
+                <!-- <h2 class="workshop-title">{{ selectedWorkshop().title }}</h2>
+                <p class="workshop-desc">{{ selectedWorkshop().description }}</p> -->
                 <div class="workshop-meta">
-                    <span><i class="fas fa-user-tie"></i> {{ selectedWorkshop().instructor }}</span>
-                    <span><i class="fas fa-calendar-day"></i> {{ selectedWorkshop().date }}</span>
-                    <span><i class="fas fa-clock"></i> {{ selectedWorkshop().duration }}</span>
-                    <span><i class="fas fa-map-marker-alt"></i> {{ selectedWorkshop().type }}</span>
+                    <span>{{ selectedWorkshop().instructor }}</span>
+                    <span>{{ selectedWorkshop().date }}</span>
+                    <span>{{ selectedWorkshop().duration }}</span>
+                    <span>{{ selectedWorkshop().type }}</span>
                 </div>
             </div>
 
             <form [formGroup]="enrollWorkshopForm" (ngSubmit)="onSubmitWorkshopEnrollment()">
                 <div class="form-section">
                     <h3>Enrollment Information</h3>
-                    <div class="form-group">
-                        <label class="form-label">Full Name *</label>
-                        <input type="text" class="form-control" formControlName="name">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group flex-1">
-                            <label class="form-label">Email Address *</label>
-                            <input type="email" class="form-control" formControlName="email">
-                        </div>
-                        <div class="form-group flex-1">
-                            <label class="form-label">Phone Number *</label>
-                            <input type="tel" class="form-control" formControlName="phone">
-                        </div>
-                    </div>
                     <div class="form-group">
                         <label class="form-label">Organization/School (Optional)</label>
                         <input type="text" class="form-control" formControlName="organization">
@@ -70,28 +193,25 @@
             </form>
         </div>
         } @else {
-        <div class="view-header centered">
-            <h1 class="page-title">Workshops</h1>
-            <p class="section-subtitle">Explore and enroll in upcoming practical learning sessions.</p>
-        </div>
+       
 
+        <!-- Browse Tab / Student View -->
         <!-- Filter Panel -->
         <div class="filter-panel">
             <!-- Search Row -->
             <div class="search-row">
                 <div class="search-input-box">
-                    <i class="fas fa-search"></i>
                     <input type="text" class="search-input" [ngModel]="searchQuery()"
                         (ngModelChange)="searchQuery.set($event)" placeholder="Search workshops, instructors, types...">
                     @if (searchQuery()) {
                     <button class="clear-btn" (click)="searchQuery.set('')" title="Clear search">
-                        <i class="fas fa-times"></i>
+                        ×
                     </button>
                     }
                 </div>
                 @if (activeFilterCount() > 0) {
                 <button class="clear-all-btn" (click)="clearFilters()">
-                    <span><i class="fas fa-filter-circle-xmark"></i> Clear Filters</span>
+                    <span>Clear Filters</span>
                     <span class="badge">{{ activeFilterCount() }}</span>
                 </button>
                 }
@@ -101,7 +221,7 @@
             <div class="filters-row">
                 <!-- Mode Filter -->
                 <div class="filter-group">
-                    <div class="filter-label"><i class="fas fa-wifi"></i> Mode</div>
+                    <div class="filter-label">Mode</div>
                     <div class="toggle-group">
                         @for (mode of modeOptions; track mode) {
                         <button class="toggle-btn" [class.active]="modeFilter() === mode"
@@ -114,7 +234,7 @@
 
                 <!-- Date Filter -->
                 <div class="filter-group">
-                    <div class="filter-label"><i class="fas fa-calendar"></i> Date</div>
+                    <div class="filter-label">Timeframe</div>
                     <div class="toggle-group">
                         @for (date of dateOptions; track date) {
                         <button class="toggle-btn" [class.active]="dateFilter() === date"
@@ -125,12 +245,48 @@
                     </div>
                 </div>
 
+                <!-- Instructor Availability Filter -->
+                <div class="filter-group">
+                    <div class="filter-label">Instructor</div>
+                    <div class="toggle-group">
+                        @for (availability of availabilityOptions; track availability) {
+                        <button class="toggle-btn" [class.active]="availabilityFilter() === availability"
+                            (click)="availabilityFilter.set(availability)">
+                            {{ availability }}
+                        </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Date & Time Filters Row -->
+                <div class="filters-row">
+                    <!-- Calendar Date Filter -->
+                    <div class="filter-group">
+                        <div class="filter-label">Specific Date</div>
+                        <input type="date" class="date-input" [ngModel]="selectedDate()"
+                            (ngModelChange)="selectedDate.set($event)" title="Select a specific workshop date">
+                    </div>
+
+                    <!-- Start Time Filter -->
+                    <div class="filter-group">
+                        <div class="filter-label">Start Time</div>
+                        <input type="time" class="time-input" [ngModel]="startTime()"
+                            (ngModelChange)="startTime.set($event)" title="Filter by workshop start time">
+                    </div>
+
+                    <!-- End Time Filter -->
+                    <div class="filter-group">
+                        <div class="filter-label">End Time</div>
+                        <input type="time" class="time-input" [ngModel]="endTime()"
+                            (ngModelChange)="endTime.set($event)" title="Filter by workshop end time">
+                    </div>
+                </div>
+
                 <!-- Location Filter -->
                 <div class="filter-group location-group">
-                    <div class="filter-label"><i class="fas fa-map-marker-alt"></i> Location</div>
+                    <div class="filter-label">Location</div>
                     <div class="location-row">
                         <div class="location-input-wrap">
-                            <i class="fas fa-city"></i>
                             <input type="text" class="location-input" [ngModel]="locationQuery()"
                                 (ngModelChange)="locationQuery.set($event)" placeholder="City or location">
                         </div>
@@ -152,39 +308,41 @@
             @for (workshop of filteredWorkshops(); track workshop.id) {
             <div class="course-card" (click)="selectWorkshop(workshop)">
                 <div class="card-top">
-                    <div class="course-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <div class="mode-tag" [class.online]="workshop.type === 'Online'"
-                        [class.offline]="workshop.type === 'Offline'">
-                        <i class="fas" [class.fa-globe]="workshop.type === 'Online'"
-                            [class.fa-map-pin]="workshop.type === 'Offline'"></i>
-                        {{ workshop.type }}
+                    <div class="card-badges">
+                        <div class="mode-tag" [class.online]="workshop.type === 'Online'"
+                            [class.offline]="workshop.type === 'Offline'">
+                            {{ workshop.type }}
+                        </div>
+                        <div class="availability-tag" [class.available]="workshop.instructorAvailable"
+                            [class.not-available]="!workshop.instructorAvailable">
+                            {{ workshop.instructorAvailable ? 'Available' : 'Unavailable' }}
+                        </div>
                     </div>
                 </div>
                 <h3 class="course-title">{{ workshop.title }}</h3>
                 <p class="course-desc">{{ workshop.description }}</p>
                 <div class="course-meta">
-                    <span><i class="fas fa-calendar-alt"></i> {{ workshop.date }}</span>
-                    <span><i class="fas fa-hourglass-half"></i> {{ workshop.duration }}</span>
-                    <span><i class="fas fa-map-marker-alt"></i> {{ workshop.city }}</span>
+                    <span>{{ workshop.date }}</span>
+                    <span>{{ workshop.duration }}</span>
+                    <span>{{ workshop.city }}</span>
                     @if (workshop.type === 'Offline' && workshop.distance > 0) {
-                    <span><i class="fas fa-ruler-horizontal"></i> {{ workshop.distance }}km away</span>
+                    <span>{{ workshop.distance }}km away</span>
                     }
                 </div>
                 <div class="course-action">
-                    <span>Enroll Now <i class="fas fa-chevron-right"></i></span>
+                    <span>Enroll Now</span>
                 </div>
             </div>
             }
         </div>
         } @else {
         <div class="empty-search">
-            <i class="fas fa-search"></i>
             <p><strong>No workshops found</strong> matching your filters.</p>
             <p style="font-size: 0.85rem; margin-top: 0.5rem;">Try adjusting your search criteria.</p>
         </div>
         }
-        }
+
+     
+    }
     </div>
 </app-layout>
