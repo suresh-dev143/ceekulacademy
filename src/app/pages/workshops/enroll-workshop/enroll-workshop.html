@@ -1,0 +1,52 @@
+<div class="research-form-container animate-fade-in">
+    <button class="btn-back" (click)="onCancel()" style="margin-bottom: 1.5rem;">
+        Back to Workshops
+    </button>
+
+    <div class="workshop-preview-card">
+        <div class="workshop-meta">
+            <span>{{ workshop().instructor }}</span>
+            <span>{{ workshop().date }}</span>
+            <span>{{ workshop().duration }}</span>
+            <span>{{ workshop().type }}</span>
+        </div>
+    </div>
+
+    <form [formGroup]="enrollWorkshopForm" (ngSubmit)="onSubmit()">
+        <div class="form-section">
+            <h3>Enrollment Information</h3>
+            <div class="form-group">
+                <label class="form-label">Organization/School (Optional)</label>
+                <input type="text" class="form-control" formControlName="organization">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Enrollment Type</h3>
+            <div class="radio-group">
+                @if (userRole() === 'Instructor' || userRole() === 'Teacher' ||
+                userRole() === 'Researcher' || userRole() === 'Admin') {
+                <label class="radio-option">
+                    <input type="radio" formControlName="enrollmentType" value="support">
+                    <span>Practical Hands-on Support (Instructor)</span>
+                </label>
+                }
+                <label class="radio-option">
+                    <input type="radio" formControlName="enrollmentType" value="learning">
+                    <span>Learn (Student)</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 2rem;">
+            <label class="checkbox-option">
+                <input type="checkbox" formControlName="acceptTerms">
+                <span>I agree to the workshop terms and conditions.</span>
+            </label>
+        </div>
+
+        <button type="submit" class="btn-submit" [disabled]="enrollWorkshopForm.invalid">
+            Confirm Enrollment
+        </button>
+    </form>
+</div>

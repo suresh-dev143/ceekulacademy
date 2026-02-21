@@ -1,0 +1,150 @@
+<div class="workshop-form-container">
+    <div class="form-header">
+        <button class="btn-cancel" (click)="onCancel()" style="margin-bottom: 1.5rem;">
+            Cancel
+        </button>
+    </div>
+
+    <form [formGroup]="workshopForm" (ngSubmit)="onSubmit()">
+        <div class="form-section">
+            <h3>Workshop Details</h3>
+            <div class="form-group">
+                <label class="form-label">Workshop Title *</label>
+                <input type="text" class="form-control" formControlName="workshopTitle"
+                    placeholder="e.g., Advanced AI Development">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description *</label>
+                <textarea class="form-control" formControlName="workshopDescription" rows="4"
+                    placeholder="Describe your workshop..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Your Description *</label>
+                <textarea class="form-control" formControlName="expertDescription" rows="4"
+                    placeholder="Describe yourself..."></textarea>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Workshop Mode</h3>
+            <div class="radio-group">
+                <label class="radio-option">
+                    <input type="radio" formControlName="workshopMode" value="online">
+                    <span>Online</span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" formControlName="workshopMode" value="hybrid">
+                    <span>Hybrid (Online + In-Person)</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Timezone</h3>
+            <div class="form-group">
+                <label class="form-label">Select Timezone *</label>
+                <select class="form-control" formControlName="timezone">
+                    <option value="">Choose a timezone</option>
+                    <option value="UTC">UTC (Coordinated Universal Time)</option>
+                    <option value="IST">IST (Indian Standard Time, UTC+5:30)</option>
+                    <option value="EST">EST (Eastern Standard Time, UTC-5)</option>
+                    <option value="CST">CST (Central Standard Time, UTC-6)</option>
+                    <option value="PST">PST (Pacific Standard Time, UTC-8)</option>
+                    <option value="GMT">GMT (Greenwich Mean Time, UTC+0)</option>
+                    <option value="CET">CET (Central European Time, UTC+1)</option>
+                    <option value="JST">JST (Japan Standard Time, UTC+9)</option>
+                    <option value="AEST">AEST (Australian Eastern Standard Time, UTC+10)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Instructor</h3>
+            <div class="radio-group">
+                <label class="radio-option">
+                    <input type="radio" formControlName="instructorType" value="myself">
+                    <span>Myself</span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" formControlName="instructorType" value="open">
+                    <span>Open to Other Instructors</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-header">
+                <h3>Schedule <span class="subtitle">(Sessions)</span></h3>
+                <button type="button" class="btn-add-schedule" (click)="addScheduleRow()"
+                    [disabled]="schedule.length >= 5">
+                    Add Session
+                </button>
+            </div>
+
+            @for (row of schedule.controls; track $index) {
+            <div class="schedule-row">
+                <div class="schedule-grid">
+                    <div class="form-group">
+                        <label class="form-label">Date *</label>
+                        <input type="date" class="form-control" [formControl]="$any(row.get('date'))">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Time *</label>
+                        <input type="time" class="form-control" [formControl]="$any(row.get('startTime'))">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time *</label>
+                        <input type="time" class="form-control" [formControl]="$any(row.get('endTime'))">
+                    </div>
+                </div>
+
+                <div class="schedule-grid">
+                    <div class="form-group">
+                        <label class="form-label">Activity *</label>
+                        <input type="text" class="form-control" [formControl]="$any(row.get('activity'))"
+                            placeholder="e.g., Lecture, Hands-on">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fee (₹) *</label>
+                        <input type="number" class="form-control" [formControl]="$any(row.get('fee'))"
+                            min="0">
+                    </div>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" [formControl]="$any(row.get('mode'))" value="online">
+                            <span>Online</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" [formControl]="$any(row.get('mode'))" value="hybrid">
+                            <span>Hybrid (Online + In-Person)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="schedule-grid">
+                    @if (row.get('mode')?.value === 'hybrid') {
+                    <div class="form-group">
+                        <label class="form-label">Location *</label>
+                        <select class="form-control" [formControl]="$any(row.get('location'))">
+                            <option value="">Select Location</option>
+                            @for (loc of registeredLocations; track loc) {
+                            <option [value]="loc">{{ loc }}</option>
+                            }
+                        </select>
+                    </div>
+                    }
+                </div>
+
+                <button type="button" class="btn-remove-schedule" (click)="removeScheduleRow($index)"
+                    [disabled]="schedule.length === 1">
+                    Remove
+                </button>
+            </div>
+            }
+        </div>
+
+        <button type="submit" class="btn-submit" [disabled]="workshopForm.invalid">
+            Create Workshop
+        </button>
+    </form>
+</div>

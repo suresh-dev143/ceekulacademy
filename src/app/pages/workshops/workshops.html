@@ -14,197 +14,21 @@
                 Create New Workshop
             </button>
             } @else {
-            <div class="workshop-form-container">
-                <div class="form-header">
-                    <button class="btn-cancel" (click)="toggleWorkshopCreation()" style="margin-bottom: 1.5rem;">
-                        Cancel
-                    </button>
-                </div>
-
-                <form [formGroup]="workshopForm" (ngSubmit)="onSubmitWorkshopForm()">
-                    <div class="form-section">
-                        <h3>Workshop Details</h3>
-                        <div class="form-group">
-                            <label class="form-label">Workshop Title *</label>
-                            <input type="text" class="form-control" formControlName="workshopTitle"
-                                placeholder="e.g., Advanced AI Development">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Description *</label>
-                            <textarea class="form-control" formControlName="workshopDescription" rows="4"
-                                placeholder="Describe your workshop..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Your Description *</label>
-                            <textarea class="form-control" formControlName="expertDescription" rows="4"
-                                placeholder="Describe yourself..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Workshop Mode</h3>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" formControlName="workshopMode" value="online">
-                                <span>Online</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" formControlName="workshopMode" value="hybrid">
-                                <span>Hybrid (Online + In-Person)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Instructor</h3>
-                        <div class="radio-group">
-                            <label class="radio-option">
-                                <input type="radio" formControlName="instructorType" value="myself">
-                                <span>Myself ({{ currentUser().name }})</span>
-                            </label>
-                            <label class="radio-option">
-                                <input type="radio" formControlName="instructorType" value="open">
-                                <span>Open to Other Instructors</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <div class="section-header">
-                            <h3>Schedule <span class="subtitle">(Sessions)</span></h3>
-                            <button type="button" class="btn-add-schedule" (click)="addScheduleRow()"
-                                [disabled]="schedule.length >= 5">
-                                Add Session
-                            </button>
-                        </div>
-
-                        @for (row of schedule.controls; track $index) {
-                        <div class="schedule-row">
-                            <div class="schedule-grid">
-                                <div class="form-group">
-                                    <label class="form-label">Date *</label>
-                                    <input type="date" class="form-control" [formControl]="$any(row.get('date'))">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Start Time *</label>
-                                    <input type="time" class="form-control" [formControl]="$any(row.get('startTime'))">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">End Time *</label>
-                                    <input type="time" class="form-control" [formControl]="$any(row.get('endTime'))">
-                                </div>
-                            </div>
-
-                            <div class="schedule-grid">
-                                <div class="form-group">
-                                    <label class="form-label">Activity *</label>
-                                    <input type="text" class="form-control" [formControl]="$any(row.get('activity'))"
-                                        placeholder="e.g., Lecture, Hands-on">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Fee (₹) *</label>
-                                    <input type="number" class="form-control" [formControl]="$any(row.get('fee'))"
-                                        min="0">
-                                </div>
-                                 <div class="radio-group">
-                                    <label class="radio-option">
-                                        <input type="radio" [formControl]="$any(row.get('mode'))" value="online">
-                                        <span>Online</span>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio"  [formControl]="$any(row.get('mode'))" value="hybrid">
-                                        <span>Hybrid (Online + In-Person)</span>
-                                    </label>
-                                </div>
-                              
-                            </div>
-                            <div class="schedule-grid">
-                                 @if (workshopForm.get('workshopMode')?.value === 'hybrid') {
-                                <div class="form-group">
-                                    <label class="form-label">Location *</label>
-                                    <select class="form-control" [formControl]="$any(row.get('location'))">
-                                        <option value="">Select Location</option>
-                                        @for (loc of registeredLocations(); track loc) {
-                                        <option [value]="loc">{{ loc }}</option>
-                                        }
-                                    </select>
-                                </div>
-                                }
-                            </div>
-
-                            <button type="button" class="btn-remove-schedule" (click)="removeScheduleRow($index)"
-                                [disabled]="schedule.length === 1">
-                                Remove
-                            </button>
-                        </div>
-                        }
-                    </div>
-
-                    <button type="submit" class="btn-submit" [disabled]="workshopForm.invalid">
-                        Create Workshop
-                    </button>
-                </form>
-            </div>
+            <app-create-workshop
+                (workshopCreated)="onWorkshopCreated($event)"
+                (cancel)="cancelCreateWorkshop()">
+            </app-create-workshop>
             }
         </div>
         }
         <!-- Main Content: Enrollment Form or Workshop View -->
         @if (showWorkshopEnrollment() && selectedWorkshop()) {
-
-        <div class="research-form-container animate-fade-in">
-            <button class="btn-back" (click)="closeWorkshopEnrollment()" style="margin-bottom: 1.5rem;">
-                Back to Workshops
-            </button>
-
-            <div class="workshop-preview-card">
-                <!-- <h2 class="workshop-title">{{ selectedWorkshop().title }}</h2>
-                <p class="workshop-desc">{{ selectedWorkshop().description }}</p> -->
-                <div class="workshop-meta">
-                    <span>{{ selectedWorkshop().instructor }}</span>
-                    <span>{{ selectedWorkshop().date }}</span>
-                    <span>{{ selectedWorkshop().duration }}</span>
-                    <span>{{ selectedWorkshop().type }}</span>
-                </div>
-            </div>
-
-            <form [formGroup]="enrollWorkshopForm" (ngSubmit)="onSubmitWorkshopEnrollment()">
-                <div class="form-section">
-                    <h3>Enrollment Information</h3>
-                    <div class="form-group">
-                        <label class="form-label">Organization/School (Optional)</label>
-                        <input type="text" class="form-control" formControlName="organization">
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <h3>Enrollment Type</h3>
-                    <div class="radio-group">
-                        @if (currentUser().role === 'Instructor' || currentUser().role === 'Teacher' ||
-                        currentUser().role === 'Researcher' || currentUser().role === 'Admin') {
-                        <label class="radio-option">
-                            <input type="radio" formControlName="enrollmentType" value="support">
-                            <span>Practical Hands-on Support (Instructor)</span>
-                        </label>
-                        }
-                        <label class="radio-option">
-                            <input type="radio" formControlName="enrollmentType" value="learning">
-                            <span>Learn (Student)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-top: 2rem;">
-                    <label class="checkbox-option">
-                        <input type="checkbox" formControlName="acceptTerms">
-                        <span>I agree to the workshop terms and conditions.</span>
-                    </label>
-                </div>
-
-                <button type="submit" class="btn-submit" [disabled]="enrollWorkshopForm.invalid">
-                    Confirm Enrollment
-                </button>
-            </form>
-        </div>
+        <app-enroll-workshop
+            [workshop]="selectedWorkshop()"
+            [userRole]="currentUser().role"
+            (enrolled)="onEnrollmentSubmitted($event)"
+            (cancel)="closeWorkshopEnrollment()">
+        </app-enroll-workshop>
         } @else {
 
 

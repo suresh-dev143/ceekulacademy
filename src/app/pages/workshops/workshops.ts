@@ -1,22 +1,21 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { LayoutComponent } from '../../components/layout/layout';
+import { CreateWorkshop } from './create-workshop/create-workshop';
+import { EnrollWorkshop } from './enroll-workshop/enroll-workshop';
 
 @Component({
     selector: 'app-public-workshops-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, LayoutComponent],
+    imports: [CommonModule, FormsModule, LayoutComponent, CreateWorkshop, EnrollWorkshop],
     templateUrl: './workshops.html',
     styleUrl: './workshops.scss',
 })
 export class PublicWorkshopsPageComponent {
-    private fb = inject(FormBuilder);
     public authService = inject(AuthService);
     currentUser = this.authService.currentUserProfile;
-    enrollWorkshopForm!: FormGroup;
-    workshopForm!: FormGroup;
     selectedWorkshop = signal<any>(null);
     showWorkshopEnrollment = signal<boolean>(false);
     isCreatingWorkshop = signal<boolean>(false);
@@ -36,9 +35,6 @@ export class PublicWorkshopsPageComponent {
     endTime       = signal<string>('');  // End time (HH:mm)
     locationQuery = signal<string>('');
     maxDistance   = signal<number>(0);   // 0 = any distance
-
-    // Mock locations for hybrid mode
-    registeredLocations = signal<string[]>(['Central Library', 'Innovation Hub', 'Community Center', 'Tech Park']);
 
     workshopsList = signal<any[]>([
         {
@@ -101,8 +97,6 @@ export class PublicWorkshopsPageComponent {
             distance: 0,
             instructorAvailable: true
         },
-
-
     ]);
 
     filteredWorkshops = computed(() => {
@@ -144,7 +138,6 @@ export class PublicWorkshopsPageComponent {
 
             // Specific date selection (calendar picker)
             if (selectedDate) {
-                // Format workshop date to YYYY-MM-DD for comparison
                 const workshopDateStr = w.date ? new Date(w.date).toISOString().split('T')[0] : '';
                 if (workshopDateStr !== selectedDate) return false;
             }
@@ -189,132 +182,36 @@ export class PublicWorkshopsPageComponent {
         return count;
     });
 
-    constructor() {
-        this.initializeEnrollWorkshopForm();
-        this.initializeWorkshopForm();
-    }
-
-    ngOnInit() {
-        // Any additional initialization if needed
-    }
-
-    initializeEnrollWorkshopForm() {
-        this.enrollWorkshopForm = this.fb.group({
-            name: ['', Validators.required],
-            email: ['', [Validators.required, Validators.email]],
-            phone: ['', Validators.required],
-            organization: [''],
-            enrollmentType: ['learning', Validators.required],
-            acceptTerms: [false, Validators.requiredTrue]
-        });
-    }
-
-    initializeWorkshopForm() {
-        this.workshopForm = this.fb.group({
-            workshopTitle: ['', Validators.required],
-            workshopDescription: ['', Validators.required],
-            expertDescription: ['', Validators.required],
-            schedule: this.fb.array([]),
-            workshopMode: ['online', Validators.required],
-            instructorType: ['myself', Validators.required],
-        });
-
-        // Initialize with one schedule row
-        this.addScheduleRow();
-
-        // Handle mode changes to toggle location validator
-        this.workshopForm.get('workshopMode')?.valueChanges.subscribe(mode => {
-            this.updateScheduleValidators(mode);
-        });
-    }
-
-    get schedule(): FormArray {
-        return this.workshopForm.get('schedule') as FormArray;
-    }
-
-    addScheduleRow() {
-        const currentMode = this.workshopForm?.get('workshopMode')?.value || 'online';
-        const isHybrid = currentMode === 'hybrid';
-
-        const row = this.fb.group({
-            date: ['', Validators.required],
-            startTime: ['', Validators.required],
-            endTime: ['', Validators.required],
-            activity: ['', Validators.required],
-            fee: [0, [Validators.required, Validators.min(0)]],
-            mode: ['online', Validators.required],
-            location: ['', isHybrid ? Validators.required : []]
-        });
-        this.schedule.push(row);
-    }
-
-    removeScheduleRow(index: number) {
-        if (this.schedule.length > 1) {
-            this.schedule.removeAt(index);
-        }
-    }
-
-    updateScheduleValidators(mode: string) {
-        const controls = this.schedule.controls;
-        controls.forEach(control => {
-            const locControl = control.get('location');
-            if (mode === 'hybrid') {
-                locControl?.setValidators(Validators.required);
-            } else {
-                locControl?.clearValidators();
-                locControl?.setValue('');
-            }
-            locControl?.updateValueAndValidity();
-        });
-    }
-
     toggleWorkshopCreation() {
         this.isCreatingWorkshop.set(!this.isCreatingWorkshop());
     }
 
-    onSubmitWorkshopForm() {
-        if (this.workshopForm.valid) {
-            const formValue = this.workshopForm.getRawValue();
-            console.log('Workshop Created:', formValue);
-            alert('Workshop created successfully!');
+    cancelCreateWorkshop() {
+        this.isCreatingWorkshop.set(false);
+    }
 
-            // Calculate duration from schedule
-            const duration = `${this.schedule.length} Sessions`;
+    onWorkshopCreated(formValue: any) {
+        const duration = `${formValue.schedule.length} Sessions`;
+        const totalFee = formValue.schedule.reduce((acc: number, curr: any) => acc + (curr.fee || 0), 0);
+        const startDate = formValue.schedule.length > 0 ? formValue.schedule[0].date : new Date().toISOString().split('T')[0];
 
-            // Calculate total fee
-            const totalFee = formValue.schedule.reduce((acc: number, curr: any) => acc + (curr.fee || 0), 0);
+        const newWorkshop = {
+            id: `ws-00${this.workshopsList().length + 1}`,
+            title: formValue.workshopTitle,
+            description: formValue.workshopDescription,
+            expertDescription: formValue.expertDescription,
+            instructor: formValue.instructorType === 'myself' ? this.currentUser().name : 'Open to All',
+            date: startDate,
+            duration: duration,
+            type: formValue.workshopMode === 'online' ? 'Online' : 'Hybrid',
+            fee: totalFee,
+            city: formValue.workshopMode === 'online' ? 'Online' : 'In-person',
+            distance: 0
+        };
 
-            // Get start date from first session
-            const startDate = formValue.schedule.length > 0 ? formValue.schedule[0].date : new Date().toISOString().split('T')[0];
-
-            // Add to list (mock)
-            const newWorkshop = {
-                id: `ws-00${this.workshopsList().length + 1}`,
-                title: formValue.workshopTitle,
-                description: formValue.workshopDescription,
-                expertDescription: formValue.expertDescription,
-                instructor: formValue.instructorType === 'myself' ? this.currentUser().name : 'Open to All',
-                date: startDate,
-                duration: duration,
-                type: formValue.workshopMode === 'online' ? 'Online' : 'Hybrid',
-                fee: totalFee,
-                city: formValue.workshopMode === 'online' ? 'Online' : 'In-person',
-                distance: 0
-            };
-
-            this.workshopsList.update(list => [newWorkshop, ...list]);
-            this.isCreatingWorkshop.set(false);
-            
-            this.workshopForm.reset({
-                workshopMode: 'online',
-                instructorType: 'myself'
-            });
-            this.schedule.clear();
-            this.addScheduleRow();
-        } else {
-            alert('Please fill in all required fields.');
-            this.workshopForm.markAllAsTouched();
-        }
+        this.workshopsList.update(list => [newWorkshop, ...list]);
+        this.isCreatingWorkshop.set(false);
+        alert('Workshop created successfully!');
     }
 
     clearFilters() {
@@ -338,19 +235,14 @@ export class PublicWorkshopsPageComponent {
     closeWorkshopEnrollment() {
         this.selectedWorkshop.set(null);
         this.showWorkshopEnrollment.set(false);
-        this.enrollWorkshopForm.reset({ enrollmentType: 'learning' });
     }
 
-    onSubmitWorkshopEnrollment() {
-        if (this.enrollWorkshopForm.valid) {
-            console.log('Workshop Enrollment:', {
-                workshop: this.selectedWorkshop(),
-                ...this.enrollWorkshopForm.value
-            });
-            alert('Enrollment submitted successfully!');
-            this.closeWorkshopEnrollment();
-        } else {
-            this.enrollWorkshopForm.markAllAsTouched();
-        }
+    onEnrollmentSubmitted(formValue: any) {
+        console.log('Workshop Enrollment:', {
+            workshop: this.selectedWorkshop(),
+            ...formValue
+        });
+        alert('Enrollment submitted successfully!');
+        this.closeWorkshopEnrollment();
     }
 }
