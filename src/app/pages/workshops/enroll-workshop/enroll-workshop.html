@@ -38,6 +38,168 @@
             </div>
         </div>
 
+        <!-- Instructor schedule: shown when enrollmentType is 'support' -->
+        @if (enrollWorkshopForm.get('enrollmentType')?.value === 'support') {
+        <div class="form-section">
+            <div class="section-header">
+                <h3>Schedule <span class="subtitle">(Sessions)</span></h3>
+                <button type="button" class="btn-add-schedule" (click)="addScheduleRow()"
+                    [disabled]="schedule.length >= 5">
+                    Add Session
+                </button>
+            </div>
+
+            @for (row of schedule.controls; track $index) {
+            <div class="schedule-row">
+                <div class="schedule-grid">
+                    <div class="form-group">
+                        <label class="form-label">Date *</label>
+                        <input type="date" class="form-control" [formControl]="$any(row.get('date'))">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Time *</label>
+                        <input type="time" class="form-control" [formControl]="$any(row.get('startTime'))">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time *</label>
+                        <input type="time" class="form-control" [formControl]="$any(row.get('endTime'))">
+                    </div>
+                </div>
+
+                <div class="schedule-grid">
+                    <div class="form-group">
+                        <label class="form-label">Activity *</label>
+                        <input type="text" class="form-control" [formControl]="$any(row.get('activity'))"
+                            placeholder="e.g., Lecture, Hands-on">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fee (₹) *</label>
+                        <input type="number" class="form-control" [formControl]="$any(row.get('fee'))"
+                            min="0">
+                    </div>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" [formControl]="$any(row.get('mode'))" value="online">
+                            <span>Online</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" [formControl]="$any(row.get('mode'))" value="hybrid">
+                            <span>Hybrid (Online + In-Person)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="schedule-grid">
+                    @if (row.get('mode')?.value === 'hybrid') {
+                    <div class="form-group">
+                        <label class="form-label">Location *</label>
+                        <select class="form-control" [formControl]="$any(row.get('location'))">
+                            <option value="">Select Location</option>
+                            @for (loc of registeredLocations; track loc) {
+                            <option [value]="loc">{{ loc }}</option>
+                            }
+                        </select>
+                    </div>
+                    }
+                </div>
+
+                <button type="button" class="btn-remove-schedule" (click)="removeScheduleRow($index)"
+                    [disabled]="schedule.length === 1">
+                    Remove
+                </button>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Student schedule: shown when enrollmentType is 'learning' -->
+        @if (enrollWorkshopForm.get('enrollmentType')?.value === 'learning') {
+        <div class="form-section">
+            <div class="section-header">
+                <h3>Schedule <span class="subtitle">(Sessions)</span></h3>
+                <button type="button" class="btn-add-schedule" (click)="addStudentScheduleRow()"
+                    [disabled]="studentSchedule.length >= 5">
+                    Add Session
+                </button>
+            </div>
+
+            @for (row of studentSchedule.controls; track $index) {
+                <div class="schedule-grid">
+                <div class="form-group">
+                <label class="form-label">Activity Type *</label>
+                <select class="form-control" [formControl]="$any(row.get('activity'))">
+                    <option value="">Choose Activity</option>
+                    <option value="theory">Theory</option>
+                    <option value="practical">Practical</option>
+                    <option value="discussion">Open Discussion</option>
+                </select>
+            </div>
+                    <div class="form-group">
+                        <label class="form-label">Choose Instructor *</label>
+                        <select class="form-control" [formControl]="$any(row.get('instructor'))">
+                            <option value="">Choose</option>
+                            @for (inst of enrolledInstructors; track inst) {
+                            <option [value]="inst">{{ inst }}</option>
+                            }
+                        </select>
+                    </div>
+                   
+                   <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" [formControl]="$any(row.get('mode'))" value="online">
+                            <span>Online</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" [formControl]="$any(row.get('mode'))" value="hybrid">
+                            <span>Hybrid (Online + In-Person)</span>
+                        </label>
+                    </div>
+                </div>
+                <div >
+                     @if (row.get('mode')?.value === 'hybrid') {
+                    <div class="form-group">
+                        <label class="form-label">Location *</label>
+                        <select class="form-control" [formControl]="$any(row.get('location'))">
+                            <option value="">Choose Location</option>
+                            @for (loc of registeredLocations; track loc) {
+                            <option [value]="loc">{{ loc }}</option>
+                            }
+                        </select>
+                    </div>
+                    }
+                </div>
+            <div class="schedule-row">
+                <div class="schedule-grid">
+                    <div class="form-group">
+                        <label class="form-label">Date *</label>
+                        <input type="date" class="form-control" [formControl]="$any(row.get('date'))">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Time *</label>
+                        <input type="time" class="form-control" [formControl]="$any(row.get('startTime'))">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time *</label>
+                        <input type="time" class="form-control" [formControl]="$any(row.get('endTime'))">
+                    </div>
+                </div>
+
+                <div class="schedule-grid">
+                        
+                     
+                </div>
+
+                
+
+                <button type="button" class="btn-remove-schedule" (click)="removeStudentScheduleRow($index)"
+                    [disabled]="studentSchedule.length === 1">
+                    Remove
+                </button>
+            </div>
+            }
+        </div>
+        }
+
         <div class="form-group" style="margin-top: 2rem;">
             <label class="checkbox-option">
                 <input type="checkbox" formControlName="acceptTerms">
