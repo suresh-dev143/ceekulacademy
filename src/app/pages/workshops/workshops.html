@@ -1,11 +1,11 @@
 <app-layout>
     <div class="workshops-container animate-fade-in">
-         <!-- Header Section -->
+        <!-- Header Section -->
         <div class="view-header centered">
             <h1 class="page-title">Workshops</h1>
             <p class="section-subtitle">Explore, enroll, create, and manage practical learning sessions.</p>
         </div>
-           <!-- Create Tab / Teacher View -->
+        <!-- Create Tab / Teacher View -->
         @if (currentUser().role === 'Teacher' || currentUser().role === 'Instructor' || currentUser().role === 'Admin')
         {
         <div class="create-workshop-section">
@@ -15,11 +15,11 @@
             </button>
             } @else {
             <div class="workshop-form-container">
-      <div class="form-header">
-        <button class="btn-cancel" (click)="toggleWorkshopCreation()" style="margin-bottom: 1.5rem;">
-                    Cancel
-                </button>
-      </div>
+                <div class="form-header">
+                    <button class="btn-cancel" (click)="toggleWorkshopCreation()" style="margin-bottom: 1.5rem;">
+                        Cancel
+                    </button>
+                </div>
 
                 <form [formGroup]="workshopForm" (ngSubmit)="onSubmitWorkshopForm()">
                     <div class="form-section">
@@ -37,7 +37,7 @@
                         <div class="form-group">
                             <label class="form-label">Your Description *</label>
                             <textarea class="form-control" formControlName="expertDescription" rows="4"
-                                placeholder="Describe your workshop..."></textarea>
+                                placeholder="Describe yourself..."></textarea>
                         </div>
                     </div>
 
@@ -106,7 +106,20 @@
                                     <input type="number" class="form-control" [formControl]="$any(row.get('fee'))"
                                         min="0">
                                 </div>
-                                @if (workshopForm.get('workshopMode')?.value === 'hybrid') {
+                                 <div class="radio-group">
+                                    <label class="radio-option">
+                                        <input type="radio" [formControl]="$any(row.get('mode'))" value="online">
+                                        <span>Online</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio"  [formControl]="$any(row.get('mode'))" value="hybrid">
+                                        <span>Hybrid (Online + In-Person)</span>
+                                    </label>
+                                </div>
+                              
+                            </div>
+                            <div class="schedule-grid">
+                                 @if (workshopForm.get('workshopMode')?.value === 'hybrid') {
                                 <div class="form-group">
                                     <label class="form-label">Location *</label>
                                     <select class="form-control" [formControl]="$any(row.get('location'))">
@@ -193,7 +206,7 @@
             </form>
         </div>
         } @else {
-       
+
 
         <!-- Browse Tab / Student View -->
         <!-- Filter Panel -->
@@ -342,7 +355,7 @@
         </div>
         }
 
-     
-    }
+
+        }
     </div>
 </app-layout>

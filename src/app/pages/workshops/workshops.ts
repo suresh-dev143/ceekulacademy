@@ -242,6 +242,7 @@ export class PublicWorkshopsPageComponent {
             endTime: ['', Validators.required],
             activity: ['', Validators.required],
             fee: [0, [Validators.required, Validators.min(0)]],
+            mode: ['online', Validators.required],
             location: ['', isHybrid ? Validators.required : []]
         });
         this.schedule.push(row);
