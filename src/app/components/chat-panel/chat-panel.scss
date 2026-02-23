@@ -1,23 +1,24 @@
 /* Right Column (Chat) Styles */
 .chat-header {
-    padding: 1rem 1.25rem;
-    /* border-bottom removed */
-    margin-bottom: 0;
+
+    margin: 15px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: #000000;
+    padding:1.282rem 0.5rem;
 
     h3 {
-        font-size: 0.9rem;
-        font-weight: 800;
+        background: #000000 !important;
         color: var(--text-primary);
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
+        font-weight: 800;
+        font-size: 1.5rem;
+        height: 75px;
+        padding: 1rem;
+        border-radius: 0;
+        margin-bottom: 0;
 
         i {
             color: var(--accent-primary);
@@ -47,7 +48,7 @@
 .chat-messages {
     flex-grow: 1;
     overflow-y: auto;
-    padding: 1.5rem 0.25rem;
+    // padding: 1.5rem 0.25rem;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
@@ -148,4 +149,36 @@
         background: var(--accent-primary);
         color: #000000;
     }
+}
+
+.platform-icons {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.platform-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    &.whatsapp-btn:hover    { color: #25D366; }
+    &.chatgpt-btn:hover     { color: #10a37f; }
+    &.gemini-btn:hover      { color: #4285f4; }
+    &.perplexity-btn:hover  { color: #20b2aa; }
+    &.twitter-btn:hover     { color: #1d9bf0; }
 }

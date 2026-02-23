@@ -255,7 +255,7 @@ export class RegisterComponent implements OnInit {
 
 
     onSubmit() {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/dashboard/partner']);
         if (this.registerForm.valid) {
             console.log('Registration submitted:', this.registerForm.value);
             alert('Registration submitted! Welcome to CEEKUL MISSION.');

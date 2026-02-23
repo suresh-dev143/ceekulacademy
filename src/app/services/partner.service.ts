@@ -20,6 +20,23 @@ export interface Infrastructure {
     tags: string[];
 }
 
+export interface Activity {
+    sessionId: number;
+    courseName: string;
+    batchName: string;
+    teacherName: string;
+    teacherId: number;
+    roomId: number;
+    roomName: string;
+    startTime: string;
+    endTime: string;
+    status: 'Live' | 'Starting Soon' | 'In Break' | 'Scheduled' | 'Completed';
+    studentCount: number;
+    attendanceCount?: number;
+    resourceType: 'Lab' | 'Classroom' | 'Online';
+    partnerId: number;
+}
+
 @Injectable({
     providedIn: 'root'
 })

@@ -31,16 +31,17 @@ export class SidebarLeftComponent {
 
     menuItems: MenuGroup[] = [
         {
-            title: 'Home Hub',
-            type: 'menu',
-            link: '/home',
-            items: []
-        },
-        {
             title: 'Raebareli',
             type: 'location',
             role: 'Director',
         },
+        // {
+        //     title: 'Home',
+        //     type: 'menu',
+        //     link: '/home',
+        //     items: []
+        // },
+        
         {
             title: 'Teacher Dashboard',
             type: 'menu',
@@ -85,23 +86,23 @@ export class SidebarLeftComponent {
             items: [],
             role: 'Student'
         },
-        {
-            title: 'Local Issues',
-            type: 'menu',
-            link: '/issues',
-            items: []
-        },
+        // {
+        //     title: 'Local Issues',
+        //     type: 'menu',
+        //     link: '/issues',
+        //     items: []
+        // },
         // {
         //     title: 'Health Connect',
         //     type: 'menu',
         //     link: '/health-connect',
         //     items: []
         // },
-        {
-            title: 'My Profile',
-            type: 'menu',
-            link: '/profile',
-            items: []
-        }
+        // {
+        //     title: 'My Profile',
+        //     type: 'menu',
+        //     link: '/profile',
+        //     items: []
+        // }
     ];
 }

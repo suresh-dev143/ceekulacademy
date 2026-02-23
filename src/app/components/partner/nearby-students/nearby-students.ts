@@ -49,7 +49,7 @@ import { NearbyUser } from '../../../services/partner.service';
     </div>
   `,
   styles: [`
-    .discovery-section { padding: 2.5rem; background: #000000; border: 1px solid var(--accent-primary); border-radius: 0; margin-bottom: 2rem; }
+    .discovery-section { padding: 2.5rem; background: #010101;  border-radius: 0; margin-bottom: 2rem; }
     .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
     .section-title { font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; i { color: var(--accent-primary); } }
     .count-badge { font-size: 0.7rem; font-weight: 900; padding: 0.2rem 0.6rem; background: #050505; border: 1px solid var(--row-border); color: var(--text-secondary); border-radius: 0; text-transform: uppercase; letter-spacing: 0.5px; }

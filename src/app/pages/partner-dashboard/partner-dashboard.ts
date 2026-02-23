@@ -34,6 +34,10 @@ import { PartnerService } from '../../services/partner.service';
         <div class="dashboard-grid">
           <div class="main-content">
             <!-- Discovery Tabs/Toggle could go here, currently vertical sections -->
+              <app-infrastructure-manager 
+              [infrastructure]="infrastructure()">
+            </app-infrastructure-manager>
+          </div>
             <app-nearby-teachers 
               [teachers]="teachers()" 
               (invite)="handleInvite($event)">
@@ -43,11 +47,6 @@ import { PartnerService } from '../../services/partner.service';
               [students]="students()" 
               (invite)="handleInvite($event)">
             </app-nearby-students>
-            
-            <app-infrastructure-manager 
-              [infrastructure]="infrastructure()">
-            </app-infrastructure-manager>
-          </div>
         </div>
 
         <!-- Right Side Panel Content (Projected via app-dashboard-layout or similar mechanism) -->
