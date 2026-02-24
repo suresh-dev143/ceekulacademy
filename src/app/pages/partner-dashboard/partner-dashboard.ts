@@ -5,6 +5,7 @@ import { PartnerOverviewComponent } from '../../components/partner/partner-overv
 import { NearbyTeachersComponent } from '../../components/partner/nearby-teachers/nearby-teachers';
 import { NearbyStudentsComponent } from '../../components/partner/nearby-students/nearby-students';
 import { InfrastructureManagerComponent } from '../../components/partner/infrastructure-manager/infrastructure-manager';
+import { PartnerActivityComponent } from '../../components/partner/partner-activity/partner-activity';
 import { PartnerService } from '../../services/partner.service';
 
 @Component({
@@ -16,7 +17,8 @@ import { PartnerService } from '../../services/partner.service';
         PartnerOverviewComponent,
         NearbyTeachersComponent,
         NearbyStudentsComponent,
-        InfrastructureManagerComponent
+        InfrastructureManagerComponent,
+        PartnerActivityComponent
     ],
     template: `
     <app-layout>
@@ -31,10 +33,13 @@ import { PartnerService } from '../../services/partner.service';
           (radiusChange)="handleRadiusChange($event)">
         </app-partner-overview>
 
+        <!-- Activity Command Center -->
+        <app-partner-activity></app-partner-activity>
+
         <div class="dashboard-grid">
           <div class="main-content">
             <!-- Discovery Tabs/Toggle could go here, currently vertical sections -->
-              <app-infrastructure-manager 
+              <app-infrastructure-manager
               [infrastructure]="infrastructure()">
             </app-infrastructure-manager>
           </div>
