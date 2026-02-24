@@ -1,0 +1,158 @@
+<!-- ════════════════════════════ DESKTOP INLINE SEARCH ══ -->
+<div class="gs-wrap" [class.gs-wrap--open]="isOpen()">
+
+    <div class="gs-bar">
+        <i class="fas fa-search gs-icon"></i>
+        <input
+            class="gs-input"
+            type="text"
+            [value]="query()"
+            (input)="onInput($any($event.target).value)"
+            (keydown)="onKeydown($event)"
+            (focus)="isOpen.set(true)"
+            placeholder="Search courses, sessions, people..."
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Global search">
+        @if (query()) {
+        <button class="gs-clear-btn" (click)="clearQuery()" aria-label="Clear search">
+            <i class="fas fa-times"></i>
+        </button>
+        }
+    </div>
+
+    <!-- ── Dropdown ── -->
+    @if (isOpen()) {
+
+    <!-- Recent searches (when query is empty) -->
+    @if (!query() && searchService.recentSearches().length > 0) {
+    <div class="gs-dropdown">
+        <div class="gs-section-lbl">Recent</div>
+        @for (r of searchService.recentSearches(); track r) {
+        <div class="gs-recent" (click)="onInput(r)">
+            <i class="fas fa-history"></i>
+            <span>{{ r }}</span>
+        </div>
+        }
+        <button class="gs-clear-recent" (click)="searchService.clearRecentSearches()">
+            Clear recent searches
+        </button>
+    </div>
+    }
+
+    <!-- Results -->
+    @if (query() && results().length > 0) {
+    <div class="gs-dropdown">
+        @for (group of groupedResults(); track group.category) {
+        <div class="gs-section-lbl">{{ group.category }}</div>
+        @for (result of group.items; track result.id) {
+        <div class="gs-result"
+             [class.gs-result--active]="activeIndex() === flatIndex(result)"
+             (mouseenter)="activeIndex.set(flatIndex(result))"
+             (click)="selectResult(result)">
+            <i class="fas {{ result.icon }} gs-ri"></i>
+            <div class="gs-rt">
+                <span class="gs-rt-title" [innerHTML]="highlight(result.title)"></span>
+                <span class="gs-rt-sub">{{ result.subtitle }}</span>
+            </div>
+            <span class="gs-rc">{{ result.category }}</span>
+        </div>
+        }
+        }
+    </div>
+    }
+
+    <!-- No results -->
+    @if (query() && results().length === 0) {
+    <div class="gs-dropdown">
+        <div class="gs-empty">
+            <i class="fas fa-search-minus"></i>
+            <span>No results for "{{ query() }}"</span>
+        </div>
+    </div>
+    }
+
+    } <!-- /isOpen() -->
+</div>
+
+<!-- ════════════════════════════ MOBILE ICON TRIGGER ══ -->
+<button class="gs-mob-btn" (click)="openMobile()" aria-label="Open search">
+    <i class="fas fa-search"></i>
+</button>
+
+<!-- ════════════════════════════ MOBILE FULL-SCREEN OVERLAY ══ -->
+@if (isMobileExpanded()) {
+<div class="gs-mob-overlay">
+
+    <div class="gs-mob-header">
+        <div class="gs-mob-bar">
+            <i class="fas fa-search gs-icon"></i>
+            <input
+                class="gs-input"
+                type="text"
+                [value]="query()"
+                (input)="onInput($any($event.target).value)"
+                (keydown)="onKeydown($event)"
+                placeholder="Search anything..."
+                autocomplete="off"
+                autofocus
+                aria-label="Mobile search">
+            @if (query()) {
+            <button class="gs-clear-btn" (click)="clearQuery()" aria-label="Clear">
+                <i class="fas fa-times"></i>
+            </button>
+            }
+        </div>
+        <button class="gs-mob-close" (click)="closeMobile()">
+            <i class="fas fa-times"></i> Close
+        </button>
+    </div>
+
+    <!-- Mobile dropdown content (same structure) -->
+    @if (!query() && searchService.recentSearches().length > 0) {
+    <div class="gs-mob-results">
+        <div class="gs-section-lbl">Recent</div>
+        @for (r of searchService.recentSearches(); track r) {
+        <div class="gs-recent" (click)="onInput(r)">
+            <i class="fas fa-history"></i>
+            <span>{{ r }}</span>
+        </div>
+        }
+        <button class="gs-clear-recent" (click)="searchService.clearRecentSearches()">
+            Clear recent searches
+        </button>
+    </div>
+    }
+
+    @if (query() && results().length > 0) {
+    <div class="gs-mob-results">
+        @for (group of groupedResults(); track group.category) {
+        <div class="gs-section-lbl">{{ group.category }}</div>
+        @for (result of group.items; track result.id) {
+        <div class="gs-result"
+             [class.gs-result--active]="activeIndex() === flatIndex(result)"
+             (mouseenter)="activeIndex.set(flatIndex(result))"
+             (click)="selectResult(result)">
+            <i class="fas {{ result.icon }} gs-ri"></i>
+            <div class="gs-rt">
+                <span class="gs-rt-title" [innerHTML]="highlight(result.title)"></span>
+                <span class="gs-rt-sub">{{ result.subtitle }}</span>
+            </div>
+            <span class="gs-rc">{{ result.category }}</span>
+        </div>
+        }
+        }
+    </div>
+    }
+
+    @if (query() && results().length === 0) {
+    <div class="gs-mob-results">
+        <div class="gs-empty">
+            <i class="fas fa-search-minus"></i>
+            <span>No results for "{{ query() }}"</span>
+        </div>
+    </div>
+    }
+
+</div>
+}

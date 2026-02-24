@@ -15,10 +15,10 @@
 
 .reg-info {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 1.5rem;
 
     h2 {
-        font-size: clamp(2rem, 5vw, 3rem);
+        font-size: clamp(1rem, 5vw, 1.5rem);
         font-weight: 800;
         color: var(--text-primary);
         text-transform: uppercase;
@@ -32,6 +32,38 @@
         max-width: 100%;
         margin: 0 auto;
         line-height: 1.6;
+    }
+
+    .reg-info-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+
+        span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .btn-login {
+            display: inline-block;
+            padding: 0.45rem 1.4rem;
+            border: 1px solid var(--accent-primary);
+            border-radius: 4px;
+            color: var(--accent-primary);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+
+            &:hover {
+                background: var(--accent-primary);
+                color: #000;
+            }
+        }
     }
 }
 

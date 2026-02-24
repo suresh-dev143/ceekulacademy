@@ -77,7 +77,7 @@
 .logo-main {
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  font-size: 3rem;
+  font-size: 2.5rem;
   color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -251,81 +251,7 @@
   }
 }
 
-/* Search Bar Styles */
-/* Search Bar Styles */
-.nav-search {
-  display: flex;
-  align-items: center;
-  position: relative;
-  margin-left: 1rem;
-
-  @media (max-width: 768px) {
-    margin: 1rem 0;
-    width: 100%;
-    border-bottom: 1px solid var(--row-border);
-  }
-}
-
-.search-input {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
-  width: 140px;
-  /* Open by default */
-  padding: 0.5rem 0;
-  font-size: 0.9rem;
-  outline: none;
-  transition: all 0.3s ease;
-  opacity: 1;
-  /* Visible by default */
-  padding-right: 2rem;
-  cursor: text;
-
-  &:focus {
-    width: 220px;
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  &::placeholder {
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 0.75rem 0;
-    border-bottom: none;
-
-    &:focus {
-      width: 100%;
-    }
-  }
-}
-
-.search-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0.5rem;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  position: absolute;
-  right: 0;
-  pointer-events: none;
-  /* Let clicks pass through to input */
-
-  .nav-search:hover & {
-    color: var(--accent-primary);
-  }
-}
-
-/* Hover effect only changes border color now, not width/opacity */
-.nav-search:hover .search-input {
-  border-bottom-color: var(--row-border);
-}
+/* Global search is handled by app-global-search component */
 
 @media (max-width: 768px) {
   .menu-toggle {

@@ -1,108 +1,141 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input, computed, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, UserRole } from '../../services/auth.service';
 import { IssuesSidebarTickerComponent } from '../issues-sidebar-ticker/issues-sidebar-ticker';
 
-interface MenuItem {
-    title: string;
-    link?: string;
-    active?: boolean;
+export interface NavItem {
+    label: string;
+    icon: string;
+    route: string;
+    exact?: boolean;
+    badge?: number;
+    disabled?: boolean;
 }
 
-interface MenuGroup {
-    title: string;
-    type: 'location' | 'menu';
-    link?: string;
-    items?: MenuItem[];
-    subItems?: MenuItem[];
-    role?: string;
+export interface NavSection {
+    label: string;
+    roles?: UserRole[];   // undefined = all roles
+    items: NavItem[];
 }
 
 @Component({
     selector: 'app-sidebar-left',
+    standalone: true,
     imports: [CommonModule, RouterLink, RouterLinkActive, IssuesSidebarTickerComponent],
     templateUrl: './sidebar-left.html',
     styleUrl: './sidebar-left.scss'
 })
 export class SidebarLeftComponent {
-    private authService = inject(AuthService);
-    userRole = this.authService.currentUserRole;
 
-    menuItems: MenuGroup[] = [
+    private authService = inject(AuthService);
+
+    @Input() collapsed = false;
+
+    userProfile = this.authService.currentUserProfile;
+    userRole    = this.authService.currentUserRole;
+
+    // ── Core sections (all roles) ──────────────────────────────────────
+    private readonly coreSections: NavSection[] = [
         {
-            title: 'Raebareli',
-            type: 'location',
-            role: 'Director',
-        },
-        // {
-        //     title: 'Home',
-        //     type: 'menu',
-        //     link: '/home',
-        //     items: []
-        // },
-        
-        {
-            title: 'Teacher Dashboard',
-            type: 'menu',
-            link: '/dashboard/teacher',
-            items: [],
-            role: 'Teacher'
-        },
-        // {
-        //     title: 'Workshops',
-        //     type: 'menu',
-        //     link: '/dashboard/teacher/workshops',
-        //     items: []
-        // },
-        {
-            title: 'Courses',
-            type: 'menu',
-            link: '/dashboard/courses',
-            items: [],
-            role: 'Teacher'
-        },
-        {
-            title: 'Leadership',
-            type: 'menu',
+            label: 'Core',
             items: [
-                { title: 'Advisor', link: '#', },
-                { title: 'Director', link: '/dashboard/director', active: true },
-                { title: 'Manager', link: '#' },
-                { title: 'Volunteer', link: '#' }
+                { label: 'Dashboard',   icon: 'fa-th-large',     route: '/home',              exact: true  },
+                { label: 'My Schedule', icon: 'fa-calendar-alt', route: '/my-schedule' },
+                { label: 'My Courses',  icon: 'fa-book-open',    route: '/dashboard/courses' },
             ]
         },
         {
-            title: 'Partner Dashboard',
-            type: 'menu',
-            link: '/dashboard/partner',
-            items: [],
-            role: 'Partner'
+            label: 'Personal',
+            items: [
+                { label: 'My Profile', icon: 'fa-user-circle', route: '/my-profile' },
+                { label: 'Settings',   icon: 'fa-cog',         route: '#', disabled: true },
+            ]
         },
-        {
-            title: 'Nearby Learning',
-            type: 'menu',
-            link: '/dashboard/student/nearby',
-            items: [],
-            role: 'Student'
-        },
-        // {
-        //     title: 'Local Issues',
-        //     type: 'menu',
-        //     link: '/issues',
-        //     items: []
-        // },
-        // {
-        //     title: 'Health Connect',
-        //     type: 'menu',
-        //     link: '/health-connect',
-        //     items: []
-        // },
-        // {
-        //     title: 'My Profile',
-        //     type: 'menu',
-        //     link: '/profile',
-        //     items: []
-        // }
     ];
+
+    // ── Institutional sections (role-specific) ─────────────────────────
+    private readonly institutionalMap: Partial<Record<UserRole, NavSection>> = {
+        Student: {
+            label: 'Academic',
+            items: [
+                { label: 'Student Hub',     icon: 'fa-tachometer-alt',  route: '/dashboard/student' },
+                { label: 'Nearby Learning', icon: 'fa-map-marker-alt',  route: '/dashboard/student/nearby' },
+                { label: 'Assignments',     icon: 'fa-tasks',           route: '#', disabled: true },
+                { label: 'Results',         icon: 'fa-chart-bar',       route: '#', disabled: true },
+            ]
+        },
+        Teacher: {
+            label: 'Teaching',
+            items: [
+                { label: 'Teacher Hub',      icon: 'fa-chalkboard-teacher', route: '/dashboard/teacher' },
+                { label: 'Workshops',        icon: 'fa-tools',              route: '/dashboard/teacher/workshops' },
+                { label: 'My Batches',       icon: 'fa-users',              route: '#', disabled: true },
+                { label: 'Attendance',       icon: 'fa-clipboard-check',    route: '#', disabled: true },
+                { label: 'Content Manager',  icon: 'fa-folder-open',        route: '#', disabled: true },
+            ]
+        },
+        Instructor: {
+            label: 'Teaching',
+            items: [
+                { label: 'Teacher Hub',      icon: 'fa-chalkboard-teacher', route: '/dashboard/teacher' },
+                { label: 'Workshops',        icon: 'fa-tools',              route: '/dashboard/teacher/workshops' },
+                { label: 'My Batches',       icon: 'fa-users',              route: '#', disabled: true },
+                { label: 'Attendance',       icon: 'fa-clipboard-check',    route: '#', disabled: true },
+            ]
+        },
+        Partner: {
+            label: 'Partner',
+            items: [
+                { label: 'Partner Hub',         icon: 'fa-building',      route: '/dashboard/partner' },
+                { label: 'Current Activity',    icon: 'fa-bolt',          route: '#', disabled: true },
+                { label: 'Room Bookings',       icon: 'fa-door-open',     route: '#', disabled: true },
+                { label: 'Resource Mgmt',       icon: 'fa-boxes',         route: '#', disabled: true },
+            ]
+        },
+        Director: {
+            label: 'Leadership',
+            items: [
+                { label: 'Director Hub', icon: 'fa-crown',          route: '/dashboard/director' },
+                { label: 'District',     icon: 'fa-map',            route: '/district' },
+                { label: 'Issues',       icon: 'fa-exclamation-circle', route: '/issues' },
+            ]
+        },
+        Admin: {
+            label: 'Administration',
+            items: [
+                { label: 'Users',       icon: 'fa-users-cog',  route: '#', disabled: true },
+                { label: 'Institutions',icon: 'fa-university',  route: '#', disabled: true },
+                { label: 'Reports',     icon: 'fa-chart-pie',   route: '#', disabled: true },
+            ]
+        },
+        Manager: {
+            label: 'Management',
+            items: [
+                { label: 'Director Hub', icon: 'fa-crown', route: '/dashboard/director' },
+                { label: 'District',     icon: 'fa-map',   route: '/district' },
+            ]
+        },
+    };
+
+    // ── Community section (all roles) ──────────────────────────────────
+    private readonly communitySection: NavSection = {
+        label: 'Community',
+        items: [
+            { label: 'Issues',         icon: 'fa-exclamation-circle', route: '/issues' },
+            { label: 'Health Connect', icon: 'fa-heartbeat',          route: '/health-connect' },
+            { label: 'Donate',         icon: 'fa-heart',              route: '/donate' },
+        ]
+    };
+
+    // ── All sections computed from current role ────────────────────────
+    allSections = computed((): NavSection[] => {
+        const role = this.userRole();
+        const institutional = this.institutionalMap[role] ?? null;
+        return [
+            ...this.coreSections,
+            ...(institutional ? [institutional] : []),
+            this.communitySection,
+        ];
+    });
 }

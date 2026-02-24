@@ -23,6 +23,8 @@ import { InvestPageComponent } from './pages/invest/invest';
 import { StudentDashboardComponent } from './pages/student-dashboard/student-dashboard';
 import { HealthConnectComponent } from './pages/health-connect/health-connect';
 import { WorkshopsPageComponent } from './pages/teacher-workshops/teacher-workshops';
+import { MyScheduleComponent } from './pages/my-schedule/my-schedule';
+import { MyProfileComponent } from './pages/my-profile/my-profile';
 
 export const routes: Routes = [
     { path: '', component: LandingComponent },
@@ -51,5 +53,7 @@ export const routes: Routes = [
     { path: 'transformation', component: TransformationComponent },
     { path: 'centers', component: CentersComponent },
     { path: 'health-connect', component: HealthConnectComponent },
+    { path: 'my-schedule', component: MyScheduleComponent },
+    { path: 'my-profile', component: MyProfileComponent },
     { path: '**', redirectTo: '' }
 ];

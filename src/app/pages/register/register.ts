@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -9,7 +9,7 @@ import { LayoutComponent } from '../../components/layout/layout';
     templateUrl: './register.html',
     styleUrl: './register.scss'
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent {
     registerForm: FormGroup;
     currentStep: number = 1;
     totalSteps: number = 3;
@@ -28,11 +28,6 @@ export class RegisterComponent implements OnInit {
         'Beneficiary',
         'Any Other'
     ];
-
-    // Activity Table Dropdown Options
-    activityTypes = ['Learning', 'Research', 'Project Development', 'Webinar', 'Workshop', 'Social Work', 'Any Other'];
-    expertTypes = ['Teacher', 'Researcher', 'Entrepreneur', 'Expert', 'Instructor', 'Any Other'];
-    modeOptions = ['Online', 'Offline', 'Hybrid', 'Home Tuition'];
 
     // Partner specific data
     partnerTypes = [
@@ -67,20 +62,14 @@ export class RegisterComponent implements OnInit {
             gender: ['', Validators.required],
             dob: ['', Validators.required],
 
-            // Step 2: Role Selection & Activities
+            // Step 2: Role Selection
             selectedRoles: this.fb.array([], Validators.required),
             partnerType: [''],
-            activities: this.fb.array([]),
 
             // Step 3: Account Security
             password: ['', [Validators.required, Validators.minLength(6)]],
             confirmPassword: ['', Validators.required]
         }, { validators: this.passwordMatchValidator });
-    }
-
-    ngOnInit() {
-        // Add one initial activity row
-        this.addActivityRow();
     }
 
     // Role Selection Logic
@@ -109,69 +98,6 @@ export class RegisterComponent implements OnInit {
 
     isRoleSelected(role: string): boolean {
         return this.selectedRoles.value.includes(role);
-    }
-
-    // Activity Table Logic
-    get activities() {
-        return this.registerForm.get('activities') as FormArray;
-    }
-
-    createActivityGroup(): FormGroup {
-        return this.fb.group({
-            activityType: ['', Validators.required],
-            startDate: ['', Validators.required],
-            endDate: ['', Validators.required],
-            startTime: ['', Validators.required],
-            endTime: ['', Validators.required],
-            expertType: ['', Validators.required],
-            specialization: ['', Validators.required],
-            mode: ['', Validators.required],
-            location: [''],
-            description: ['']
-        });
-    }
-
-    addActivityRow() {
-        this.activities.push(this.createActivityGroup());
-    }
-
-    removeActivityRow(index: number) {
-        if (this.activities.length > 1) {
-            this.activities.removeAt(index);
-        }
-    }
-
-    duplicateActivityRow(index: number) {
-        const rowData = this.activities.at(index).value;
-        const newGroup = this.fb.group({
-            activityType: [rowData.activityType, Validators.required],
-            startDate: [rowData.startDate, Validators.required],
-            endDate: [rowData.endDate, Validators.required],
-            startTime: [rowData.startTime, Validators.required],
-            endTime: [rowData.endTime, Validators.required],
-            expertType: [rowData.expertType, Validators.required],
-            specialization: [rowData.specialization, Validators.required],
-            mode: [rowData.mode, Validators.required],
-            location: [rowData.location],
-            description: [rowData.description]
-        });
-        this.activities.insert(index + 1, newGroup);
-    }
-
-    onModeChange(index: number) {
-        const row = this.activities.at(index);
-        const mode = row.get('mode')?.value;
-        const locationControl = row.get('location');
-
-        if (mode === 'Online') {
-            locationControl?.setValue('N/A');
-            locationControl?.disable();
-        } else {
-            if (locationControl?.value === 'N/A') {
-                locationControl?.setValue('');
-            }
-            locationControl?.enable();
-        }
     }
 
     passwordMatchValidator(form: FormGroup) {
@@ -208,9 +134,8 @@ export class RegisterComponent implements OnInit {
 
             case 2:
                 this.selectedRoles.markAllAsTouched();
-                this.activities.markAllAsTouched();
                 const partnerTypeValid = this.isRoleSelected('Partner') ? (this.registerForm.get('partnerType')?.valid ?? false) : true;
-                return this.selectedRoles.valid && this.activities.valid && partnerTypeValid;
+                return this.selectedRoles.valid && partnerTypeValid;
 
             case 3:
                 const password = this.registerForm.get('password');
@@ -230,32 +155,8 @@ export class RegisterComponent implements OnInit {
         return (this.currentStep / this.totalSteps) * 100;
     }
 
-    getToday(): string {
-        return new Date().toISOString().split('T')[0];
-    }
-
-    getActivityTheme(type: string): string {
-        if (!type) return 'theme-neutral';
-        const typeLower = type.toLowerCase();
-
-        if (typeLower.includes('learning') || typeLower.includes('teaching') || typeLower.includes('workshop')) {
-            return 'theme-learning';
-        }
-        if (typeLower.includes('research') || typeLower.includes('entrepreneurship') || typeLower.includes('innovation')) {
-            return 'theme-research';
-        }
-        if (typeLower.includes('health')) {
-            return 'theme-health';
-        }
-        if (typeLower.includes('social') || typeLower.includes('election') || typeLower.includes('transformation')) {
-            return 'theme-social';
-        }
-        return 'theme-default';
-    }
-
-
     onSubmit() {
-        this.router.navigate(['/dashboard/partner']);
+        
         if (this.registerForm.valid) {
             console.log('Registration submitted:', this.registerForm.value);
             alert('Registration submitted! Welcome to CEEKUL MISSION.');
@@ -263,5 +164,8 @@ export class RegisterComponent implements OnInit {
             console.log('Form invalid', this.registerForm.errors);
             this.registerForm.markAllAsTouched();
         }
+        // this.router.navigate(['/dashboard/partner']);
+        
+        
     }
 }

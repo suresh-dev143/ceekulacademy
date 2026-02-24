@@ -1,0 +1,360 @@
+<app-layout>
+    <div class="schedule-page">
+
+        <!-- ═══════════════════════════════════════════ HEADER ══ -->
+        <div class="sch-header">
+            <div class="sch-title-block">
+                <div class="sch-label">PERSONAL COMMAND CENTER</div>
+                <h1 class="sch-title">My Daily Schedule</h1>
+                <div class="sch-date">{{ selectedDateObj() | date:'EEEE, MMMM d, yyyy' }}</div>
+            </div>
+            <div class="sch-header-right">
+                <div class="live-clock">
+                    <i class="fas fa-clock"></i>
+                    {{ currentTime() | date:'HH:mm:ss' }}
+                </div>
+                <div class="date-filter-bar">
+                    <button class="dfl-btn" [class.active]="dateFilter() === 'today'"
+                        (click)="setDateFilter('today')">Today</button>
+                    <button class="dfl-btn" [class.active]="dateFilter() === 'tomorrow'"
+                        (click)="setDateFilter('tomorrow')">Tomorrow</button>
+                    <input type="date" class="dfl-date-input" [value]="customDate()"
+                        [class.active]="dateFilter() === 'custom'"
+                        (change)="onCustomDateChange($any($event.target).value)">
+                </div>
+                <button class="add-task-btn" (click)="openAddModal()">
+                    <i class="fas fa-plus"></i> Add Task
+                </button>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════ STATS STRIP ══ -->
+        <div class="stats-strip">
+            <div class="stat-cell">
+                <div class="stat-num">{{ todayItems().length }}</div>
+                <div class="stat-lbl">Total Sessions</div>
+            </div>
+            <div class="stat-cell accent-live">
+                <div class="stat-num">{{ liveItem() ? 1 : 0 }}</div>
+                <div class="stat-lbl">Live Now</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-num">{{ upcomingItems().length }}</div>
+                <div class="stat-lbl">Upcoming</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-num">{{ completedItems().length }}</div>
+                <div class="stat-lbl">Completed</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════ A: CURRENT ACTIVITY ══ -->
+        <div class="section-block">
+            <div class="section-head">
+                <span class="sh-dot live-dot"></span> CURRENT ACTIVITY
+            </div>
+
+            @if (liveItem()) {
+            @let live = liveItem()!;
+            <div class="live-card type-{{ live.type }}">
+                <div class="lc-left">
+                    <div class="live-badge">
+                        <span class="pulse-ring"></span>
+                        {{ getLiveStatusLabel(live) }}
+                    </div>
+                    <h2 class="lc-title">{{ live.title }}</h2>
+                    <div class="lc-meta">
+                        <span><i class="fas fa-clock"></i> {{ formatTime(live.startTime) }} –
+                            {{ formatTime(live.endTime) }}</span>
+                        <span><i class="fas fa-map-marker-alt"></i> {{ live.location }}</span>
+                        @if (live.teacher) {
+                        <span><i class="fas fa-user"></i> {{ live.teacher }}</span>
+                        }
+                        @if (live.batch) {
+                        <span><i class="fas fa-users"></i> {{ live.batch }}</span>
+                        }
+                    </div>
+                    @if (live.notes) {
+                    <div class="lc-notes">{{ live.notes }}</div>
+                    }
+                </div>
+                <div class="lc-right">
+                    <div class="type-badge type-{{ live.type }}">{{ getTypeBadgeLabel(live.type) }}</div>
+                    @if (live.type === 'class' || live.type === 'meeting') {
+                    <button class="join-btn">
+                        <i class="fas fa-video"></i> Join Session
+                    </button>
+                    }
+                    <button class="complete-btn" (click)="markCompleted(live.scheduleId)">
+                        <i class="fas fa-check"></i> Mark Complete
+                    </button>
+                </div>
+            </div>
+            } @else {
+            <div class="no-activity">
+                <i class="fas fa-calendar-check"></i>
+                <span>No active session right now. Your next session starts soon.</span>
+            </div>
+            }
+        </div>
+
+        <!-- ═══════════════════════════════ B: TIMELINE VIEW ══ -->
+        <div class="section-block">
+            <div class="section-head">
+                <span class="sh-dot"></span> TIMELINE — {{ selectedDateObj() | date:'MMM d' }}
+            </div>
+
+            <div class="tl-grid">
+                <!-- Time labels -->
+                <div class="tl-labels">
+                    @for (slot of timeSlots; track slot) {
+                    <div class="tl-hour-label" [style.height.px]="HOUR_HEIGHT">
+                        {{ hourLabel(slot) }}
+                    </div>
+                    }
+                </div>
+
+                <!-- Canvas -->
+                <div class="tl-canvas" [style.height.px]="totalCanvasHeight">
+                    <!-- Grid lines -->
+                    @for (slot of timeSlots; track slot) {
+                    <div class="tl-grid-line"
+                        [class.tl-grid-line--half]="false"
+                        [style.top.px]="slot * HOUR_HEIGHT">
+                    </div>
+                    }
+
+                    <!-- Current time indicator -->
+                    @if (nowIndicatorTop() >= 0) {
+                    <div class="now-indicator" [style.top.px]="nowIndicatorTop()">
+                        <div class="now-dot"></div>
+                        <div class="now-line"></div>
+                    </div>
+                    }
+
+                    <!-- Schedule items -->
+                    @for (item of todayItems(); track item.scheduleId) {
+                    <div class="tl-item type-{{ item.type }} status-{{ item.status }}"
+                        [style.top.px]="timeToY(item.startTime)"
+                        [style.height.px]="durationToHeight(item.startTime, item.endTime)"
+                        [class.tl-item--live]="item.status === 'live'">
+                        <div class="tli-color-bar"></div>
+                        <div class="tli-content">
+                            <div class="tli-title">{{ item.title }}</div>
+                            <div class="tli-time">{{ formatTime(item.startTime) }} – {{ formatTime(item.endTime) }}</div>
+                            @if (durationToHeight(item.startTime, item.endTime) > 48) {
+                            <div class="tli-loc">
+                                <i class="fas fa-map-marker-alt"></i> {{ item.location }}
+                            </div>
+                            }
+                        </div>
+                        <div class="tli-actions">
+                            @if (item.status !== 'completed') {
+                            <button class="tli-check" title="Mark complete"
+                                (click)="$event.stopPropagation(); markCompleted(item.scheduleId)">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            }
+                            @if (item.isEditable) {
+                            <button class="tli-edit" title="Edit"
+                                (click)="$event.stopPropagation(); openEditModal(item)">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="tli-del" title="Delete"
+                                (click)="$event.stopPropagation(); deleteTask(item.scheduleId)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════ C: UPCOMING TODAY ══ -->
+        <div class="section-block">
+            <div class="section-head">
+                <span class="sh-dot"></span> UPCOMING TODAY
+                <span class="sh-count">{{ upcomingItems().length }}</span>
+            </div>
+
+            @if (upcomingItems().length === 0) {
+            <div class="empty-state">
+                <i class="fas fa-coffee"></i>
+                <span>All sessions for today are complete.</span>
+            </div>
+            }
+
+            @for (item of upcomingItems(); track item.scheduleId) {
+            <div class="upcoming-row">
+                <div class="up-time">
+                    <div class="up-start">{{ formatTime(item.startTime) }}</div>
+                    <div class="up-end">{{ formatTime(item.endTime) }}</div>
+                </div>
+                <div class="up-bar type-{{ item.type }}"></div>
+                <div class="up-body">
+                    <div class="up-title">{{ item.title }}</div>
+                    <div class="up-meta">
+                        @if (item.teacher) {
+                        <span><i class="fas fa-user-tie"></i> {{ item.teacher }}</span>
+                        }
+                        @if (item.batch) {
+                        <span><i class="fas fa-users"></i> {{ item.batch }}</span>
+                        }
+                        <span><i class="fas fa-map-marker-alt"></i> {{ item.location }}</span>
+                        @if (item.notes) {
+                        <span class="up-notes">{{ item.notes }}</span>
+                        }
+                    </div>
+                </div>
+                <div class="up-right">
+                    <div class="up-badge type-{{ item.type }}">{{ getTypeBadgeLabel(item.type) }}</div>
+                    <div class="up-actions">
+                        <button class="ua-complete" title="Mark complete"
+                            (click)="markCompleted(item.scheduleId)">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        @if (item.isEditable) {
+                        <button class="ua-edit" title="Edit" (click)="openEditModal(item)">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="ua-del" title="Delete" (click)="deleteTask(item.scheduleId)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        }
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- ══════════════════════════ COMPLETED SESSIONS ══ -->
+        @if (completedItems().length > 0) {
+        <div class="section-block section-block--dim">
+            <div class="section-head">
+                <span class="sh-dot sh-dot--completed"></span> COMPLETED
+                <span class="sh-count">{{ completedItems().length }}</span>
+            </div>
+            @for (item of completedItems(); track item.scheduleId) {
+            <div class="completed-row">
+                <div class="cr-check"><i class="fas fa-check-circle"></i></div>
+                <div class="cr-body">
+                    <div class="cr-title">{{ item.title }}</div>
+                    <div class="cr-meta">{{ formatTime(item.startTime) }} – {{ formatTime(item.endTime) }} ·
+                        {{ item.location }}</div>
+                </div>
+                <div class="cr-badge type-{{ item.type }}">{{ getTypeBadgeLabel(item.type) }}</div>
+            </div>
+            }
+        </div>
+        }
+
+    </div><!-- /.schedule-page -->
+</app-layout>
+
+<!-- ════════════════════════════════ D: ADD / EDIT MODAL ══ -->
+@if (showAddModal()) {
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-{{ editingItem() ? 'pen' : 'plus-circle' }}"></i>
+                {{ editingItem() ? 'Edit Task' : 'Add New Task' }}
+            </div>
+            <button class="modal-close" (click)="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Conflict Warning -->
+        @if (conflictItem()) {
+        @let c = conflictItem()!;
+        <div class="conflict-banner">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div class="conflict-body">
+                <strong>Time Conflict Detected</strong>
+                <p>Overlaps with <em>{{ c.title }}</em> ({{ formatTime(c.startTime) }} – {{ formatTime(c.endTime) }})
+                </p>
+            </div>
+            <label class="override-label">
+                <input type="checkbox" [checked]="forceOverride()"
+                    (change)="forceOverride.set(!forceOverride())">
+                Override anyway
+            </label>
+        </div>
+        }
+
+        <form [formGroup]="taskForm" (ngSubmit)="onSaveTask()" class="modal-form">
+
+            <div class="mf-group">
+                <label class="mf-label">Task Title *</label>
+                <input type="text" class="mf-input" formControlName="title" placeholder="e.g. Study Block">
+                @if (taskForm.get('title')?.invalid && taskForm.get('title')?.touched) {
+                <div class="mf-error">Title is required (min 2 characters)</div>
+                }
+            </div>
+
+            <div class="mf-row">
+                <div class="mf-group">
+                    <label class="mf-label">Type *</label>
+                    <select class="mf-input" formControlName="type">
+                        @for (opt of typeOptions; track opt.value) {
+                        <option [value]="opt.value">{{ opt.label }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="mf-group">
+                    <label class="mf-label">Date *</label>
+                    <input type="date" class="mf-input" formControlName="date">
+                </div>
+            </div>
+
+            <div class="mf-row">
+                <div class="mf-group">
+                    <label class="mf-label">Start Time *</label>
+                    <input type="time" class="mf-input" formControlName="startTime">
+                    @if (taskForm.get('startTime')?.invalid && taskForm.get('startTime')?.touched) {
+                    <div class="mf-error">Required</div>
+                    }
+                </div>
+                <div class="mf-group">
+                    <label class="mf-label">End Time *</label>
+                    <input type="time" class="mf-input" formControlName="endTime">
+                    @if (taskForm.get('endTime')?.errors?.['endBeforeStart']) {
+                    <div class="mf-error">End must be after start</div>
+                    }
+                    @if (taskForm.get('endTime')?.invalid && taskForm.get('endTime')?.touched && !taskForm.get('endTime')?.errors?.['endBeforeStart']) {
+                    <div class="mf-error">Required</div>
+                    }
+                </div>
+            </div>
+
+            <div class="mf-group">
+                <label class="mf-label">Location *</label>
+                <input type="text" class="mf-input" formControlName="location"
+                    placeholder="Room / Online / Address">
+                @if (taskForm.get('location')?.invalid && taskForm.get('location')?.touched) {
+                <div class="mf-error">Location is required</div>
+                }
+            </div>
+
+            <div class="mf-group">
+                <label class="mf-label">Notes (optional)</label>
+                <textarea class="mf-input mf-textarea" formControlName="notes" rows="3"
+                    placeholder="Any additional notes..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="mfa-cancel" (click)="closeModal()">Cancel</button>
+                <button type="submit" class="mfa-save"
+                    [class.mfa-override]="conflictItem() && forceOverride()">
+                    <i class="fas fa-{{ editingItem() ? 'save' : 'plus' }}"></i>
+                    {{ conflictItem() && !forceOverride() ? 'Resolve Conflict First' : (editingItem() ? 'Update Task' : 'Save Task') }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+}

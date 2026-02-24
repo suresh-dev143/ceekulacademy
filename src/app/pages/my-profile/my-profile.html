@@ -1,0 +1,715 @@
+<app-layout>
+    <div class="mpr-page">
+
+        <!-- ══════════════════════════════════════ PAGE HEADER ══ -->
+        <div class="mpr-header">
+            <div class="mpr-title-block">
+                <div class="mpr-eyebrow">IDENTITY & ACCOUNT GOVERNANCE</div>
+                <h1 class="mpr-title">My Profile</h1>
+                <div class="mpr-uid">
+                    User ID: <span class="uid-value">USR-{{ profile().userId }}</span>
+                    <span class="account-status-badge status-{{ profile().accountInfo.accountStatus === 'Active' ? 'active' : 'warn' }}">
+                        {{ profile().accountInfo.accountStatus }}
+                    </span>
+                </div>
+            </div>
+            <div class="mpr-completion-block">
+                <div class="comp-ring">
+                    <svg viewBox="0 0 80 80" class="comp-svg">
+                        <circle cx="40" cy="40" r="34" class="comp-track" />
+                        <circle cx="40" cy="40" r="34" class="comp-fill"
+                            [attr.stroke-dasharray]="213.6"
+                            [attr.stroke-dashoffset]="213.6 - (213.6 * completion() / 100)"
+                            [attr.stroke]="getCompletionColor(completion())" />
+                    </svg>
+                    <div class="comp-pct">{{ completion() }}<span>%</span></div>
+                </div>
+                <div class="comp-label">Profile<br>Complete</div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════ SECTION NAV ══ -->
+        <div class="section-nav">
+            @for (nav of navItems; track nav.key) {
+            <button class="snav-btn" [class.active]="activeSection() === nav.key" (click)="setSection(nav.key)">
+                <i class="fas {{ nav.icon }}"></i>
+                <span>{{ nav.label }}</span>
+            </button>
+            }
+        </div>
+
+        <!-- ══════════════════════════════ A: PERSONAL INFO ══ -->
+        @if (activeSection() === 'personal') {
+        <div class="mpr-section">
+            <div class="section-head">
+                <span class="sh-dot"></span> PERSONAL INFORMATION
+                <span class="sh-updated">Updated: {{ profile().personalInfo.lastUpdated }}</span>
+                @if (!editingPersonal()) {
+                <button class="edit-btn" (click)="startEditPersonal()">
+                    <i class="fas fa-pen"></i> Edit
+                </button>
+                }
+            </div>
+
+            @if (otpSuccess()) {
+            <div class="otp-success-banner">
+                <i class="fas fa-check-circle"></i> Verification successful! Status updated.
+            </div>
+            }
+
+            <form [formGroup]="personalForm">
+                <div class="fields-grid">
+
+                    <!-- Full Name -->
+                    <div class="field-group">
+                        <label class="field-label">Full Name *</label>
+                        @if (editingPersonal()) {
+                        <input class="field-input" type="text" formControlName="fullName" placeholder="Enter full name">
+                        @if (personalForm.get('fullName')?.invalid && personalForm.get('fullName')?.touched) {
+                        <div class="field-error">Full name is required</div>
+                        }
+                        } @else {
+                        <div class="field-value">{{ profile().personalInfo.fullName }}</div>
+                        }
+                    </div>
+
+                    <!-- Email -->
+                    <div class="field-group">
+                        <label class="field-label">Email Address *</label>
+                        <div class="field-with-badge">
+                            <div class="field-value">{{ profile().personalInfo.email }}</div>
+                            @if (profile().personalInfo.emailVerified) {
+                            <span class="verify-badge verified"><i class="fas fa-check-circle"></i> Verified</span>
+                            } @else {
+                            <span class="verify-badge unverified"><i class="fas fa-exclamation-circle"></i> Unverified</span>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Mobile -->
+                    <div class="field-group">
+                        <label class="field-label">Mobile Number *</label>
+                        @if (editingPersonal()) {
+                        <input class="field-input" type="tel" formControlName="mobile" placeholder="+91 XXXXX XXXXX">
+                        @if (personalForm.get('mobile')?.invalid && personalForm.get('mobile')?.touched) {
+                        <div class="field-error">Valid mobile number required</div>
+                        }
+                        } @else {
+                        <div class="field-with-badge">
+                            <div class="field-value">{{ profile().personalInfo.mobile }}</div>
+                            @if (profile().personalInfo.mobileVerified) {
+                            <span class="verify-badge verified"><i class="fas fa-check-circle"></i> Verified</span>
+                            } @else {
+                            <span class="verify-badge unverified"><i class="fas fa-exclamation-circle"></i> Unverified</span>
+                            @if (otpFlow() === 'none') {
+                            <button class="reverify-btn" (click)="initiateOtp('mobile')">Re-verify</button>
+                            }
+                            }
+                        </div>
+                        }
+                    </div>
+
+                    <!-- DOB -->
+                    <div class="field-group">
+                        <label class="field-label">Date of Birth *</label>
+                        @if (editingPersonal()) {
+                        <input class="field-input" type="date" formControlName="dob">
+                        } @else {
+                        <div class="field-value">{{ profile().personalInfo.dob }}</div>
+                        }
+                    </div>
+
+                    <!-- Place of Birth -->
+                    <div class="field-group">
+                        <label class="field-label">Place of Birth</label>
+                        @if (editingPersonal()) {
+                        <input class="field-input" type="text" formControlName="placeOfBirth"
+                            placeholder="City, State">
+                        } @else {
+                        <div class="field-value">{{ profile().personalInfo.placeOfBirth || '—' }}</div>
+                        }
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="field-group">
+                        <label class="field-label">Gender *</label>
+                        @if (editingPersonal()) {
+                        <select class="field-input" formControlName="gender">
+                            <option value="">— Select —</option>
+                            @for (g of genderOptions; track g) {
+                            <option [value]="g">{{ g }}</option>
+                            }
+                        </select>
+                        } @else {
+                        <div class="field-value">{{ profile().personalInfo.gender }}</div>
+                        }
+                    </div>
+
+                    <!-- Address (full width) -->
+                    <div class="field-group field-group--full">
+                        <label class="field-label">Full Address *</label>
+                        @if (editingPersonal()) {
+                        <textarea class="field-input field-textarea" formControlName="address" rows="3"
+                            placeholder="Village/Ward, District, State, PIN"></textarea>
+                        @if (personalForm.get('address')?.invalid && personalForm.get('address')?.touched) {
+                        <div class="field-error">Address is required</div>
+                        }
+                        } @else {
+                        <div class="field-value">{{ profile().personalInfo.address }}</div>
+                        }
+                    </div>
+
+                </div>
+
+                @if (editingPersonal()) {
+                <div class="form-actions">
+                    <button type="button" class="fa-cancel" (click)="cancelEditPersonal()">Cancel</button>
+                    <button type="button" class="fa-save" (click)="savePersonal()"
+                        [disabled]="personalForm.invalid">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+                }
+            </form>
+
+            <!-- OTP Panel -->
+            @if (otpFlow() !== 'none') {
+            <div class="otp-panel">
+                <div class="otp-title">
+                    <i class="fas fa-mobile-alt"></i>
+                    Verify {{ otpFlow() === 'mobile' ? 'Mobile Number' : 'Email Address' }}
+                </div>
+                @if (!otpSent()) {
+                <p class="otp-desc">We will send a one-time password to your {{ otpFlow() === 'mobile' ? 'mobile number' : 'email address' }}.</p>
+                <div class="otp-actions">
+                    <button class="otp-send-btn" (click)="sendOtp()">
+                        <i class="fas fa-paper-plane"></i> Send OTP
+                    </button>
+                    <button class="otp-cancel-btn" (click)="cancelOtp()">Cancel</button>
+                </div>
+                } @else {
+                <p class="otp-desc">OTP sent. Enter the 6-digit code below.</p>
+                <form [formGroup]="otpForm" class="otp-form">
+                    <input class="otp-input" type="text" formControlName="otpCode" placeholder="0 0 0 0 0 0"
+                        maxlength="6">
+                    @if (otpError()) {
+                    <div class="field-error">{{ otpError() }}</div>
+                    }
+                    <div class="otp-actions">
+                        <button type="button" class="otp-send-btn" (click)="verifyOtp()">
+                            <i class="fas fa-check"></i> Verify OTP
+                        </button>
+                        <button type="button" class="otp-cancel-btn" (click)="cancelOtp()">Cancel</button>
+                    </div>
+                </form>
+                }
+            </div>
+            }
+        </div>
+        }
+
+        <!-- ══════════════════════════════ B: IDENTITY ══ -->
+        @if (activeSection() === 'identity') {
+        <div class="mpr-section">
+            <div class="section-head">
+                <span class="sh-dot"></span> IDENTITY & CATEGORY
+                <span class="vstatus-badge"
+                    [style.color]="getVerificationColor(profile().identityInfo.verificationStatus)"
+                    [style.borderColor]="getVerificationColor(profile().identityInfo.verificationStatus)">
+                    <span class="vbadge-dot"></span>
+                    {{ profile().identityInfo.verificationStatus }}
+                </span>
+                @if (!editingIdentity()) {
+                <button class="edit-btn" (click)="startEditIdentity()">
+                    <i class="fas fa-pen"></i> Edit
+                </button>
+                }
+            </div>
+
+            @if (profile().identityInfo.rejectionReason) {
+            <div class="rejection-banner">
+                <i class="fas fa-times-circle"></i>
+                Rejected: {{ profile().identityInfo.rejectionReason }}
+            </div>
+            }
+
+            <form [formGroup]="identityForm">
+                <div class="fields-grid">
+
+                    <div class="field-group">
+                        <label class="field-label">Identity Type *</label>
+                        @if (editingIdentity()) {
+                        <select class="field-input" formControlName="identityType">
+                            <option value="">— Select —</option>
+                            @for (t of identityTypes; track t) {
+                            <option [value]="t">{{ t }}</option>
+                            }
+                        </select>
+                        } @else {
+                        <div class="field-value">{{ profile().identityInfo.identityType || '—' }}</div>
+                        }
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label">ID Number *</label>
+                        @if (editingIdentity()) {
+                        <input class="field-input" type="text" formControlName="identityNumber"
+                            placeholder="Enter ID number">
+                        } @else {
+                        <div class="field-value mono">{{ profile().identityInfo.identityNumber || '—' }}</div>
+                        }
+                    </div>
+
+                    <!-- BPL & Underprivileged toggles -->
+                    <div class="field-group">
+                        <label class="field-label">Below Poverty Line (BPL)</label>
+                        @if (editingIdentity()) {
+                        <div class="toggle-row">
+                            <label class="check-label">
+                                <input type="checkbox" formControlName="bpl">
+                                <span>Yes, I hold a BPL certificate</span>
+                            </label>
+                        </div>
+                        } @else {
+                        <div class="field-value">
+                            <span class="bool-badge" [class.bool-yes]="profile().identityInfo.bpl">
+                                {{ profile().identityInfo.bpl ? 'Yes' : 'No' }}
+                            </span>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label">Underprivileged Category</label>
+                        @if (editingIdentity()) {
+                        <div class="toggle-row">
+                            <label class="check-label">
+                                <input type="checkbox" formControlName="underprivileged">
+                                <span>Yes, I belong to an underprivileged category</span>
+                            </label>
+                        </div>
+                        } @else {
+                        <div class="field-value">
+                            <span class="bool-badge" [class.bool-yes]="profile().identityInfo.underprivileged">
+                                {{ profile().identityInfo.underprivileged ? 'Yes' : 'No' }}
+                            </span>
+                        </div>
+                        }
+                    </div>
+
+                </div>
+
+                @if (editingIdentity()) {
+                <div class="form-actions">
+                    <button type="button" class="fa-cancel" (click)="cancelEditIdentity()">Cancel</button>
+                    <button type="button" class="fa-save" (click)="saveIdentity()"
+                        [disabled]="identityForm.invalid">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
+                }
+            </form>
+
+            <!-- Documents -->
+            <div class="doc-section">
+                <div class="doc-section-head">
+                    <span>DOCUMENTS</span>
+                    <div class="doc-upload-row">
+                        <select class="doc-type-select" [value]="uploadDocType()"
+                            (change)="uploadDocType.set($any($event.target).value)">
+                            @for (t of docTypes; track t) {
+                            <option [value]="t">{{ t }}</option>
+                            }
+                        </select>
+                        <label class="upload-btn">
+                            @if (uploadingDoc()) {
+                            <i class="fas fa-spinner fa-spin"></i> Uploading...
+                            } @else {
+                            <i class="fas fa-upload"></i> Upload File
+                            }
+                            <input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none"
+                                (change)="onFileSelect($event)">
+                        </label>
+                    </div>
+                </div>
+
+                @if (profile().documents.length === 0) {
+                <div class="doc-empty">No documents uploaded yet.</div>
+                }
+
+                @for (doc of profile().documents; track doc.docId) {
+                <div class="doc-row">
+                    <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
+                    <div class="doc-info">
+                        <div class="doc-name">{{ doc.fileName }}</div>
+                        <div class="doc-meta">{{ doc.type }} · Uploaded {{ doc.uploadedAt }}</div>
+                    </div>
+                    <span class="doc-status"
+                        [style.color]="getDocStatusColor(doc.status)"
+                        [style.borderColor]="getDocStatusColor(doc.status)">
+                        {{ doc.status }}
+                    </span>
+                    <button class="doc-del" title="Remove" (click)="removeDocument(doc.docId)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                }
+
+                <!-- Video Verification -->
+                <div class="video-verify-row">
+                    <div class="vv-info">
+                        <div class="vv-label">Video Verification</div>
+                        <div class="vv-status" [class.vv-done]="profile().identityInfo.videoVerified">
+                            {{ profile().identityInfo.videoVerified ? 'Completed' : 'Not Completed' }}
+                        </div>
+                    </div>
+                    @if (!profile().identityInfo.videoVerified) {
+                    <button class="vv-btn">
+                        <i class="fas fa-video"></i> Start Video Verification
+                    </button>
+                    }
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- ══════════════════════════════ C: SECURITY ══ -->
+        @if (activeSection() === 'security') {
+        <div class="mpr-section">
+            <div class="section-head">
+                <span class="sh-dot"></span> ACCOUNT & SECURITY SETTINGS
+            </div>
+
+            <!-- Change Password -->
+            <div class="security-card">
+                <div class="sc-head">
+                    <div class="sc-label">
+                        <i class="fas fa-key"></i> Password
+                    </div>
+                    <div class="sc-meta">Last changed: {{ profile().accountInfo.lastPasswordChange }}</div>
+                    <button class="sc-action" (click)="showPasswordModal.set(true)">Change Password</button>
+                </div>
+            </div>
+
+            <!-- 2FA -->
+            <div class="security-card">
+                <div class="sc-head">
+                    <div class="sc-label">
+                        <i class="fas fa-shield-alt"></i> Two-Factor Authentication
+                    </div>
+                    <div class="sc-meta">
+                        {{ profile().accountInfo.twoFAEnabled ? 'Adds an extra layer of login security' : 'Disabled — recommended to enable' }}
+                    </div>
+                    <div class="tfa-toggle" [class.on]="profile().accountInfo.twoFAEnabled" (click)="toggleTwoFA()">
+                        <div class="tfa-knob"></div>
+                    </div>
+                </div>
+                <div class="sc-status" [class.sc-status--on]="profile().accountInfo.twoFAEnabled">
+                    {{ profile().accountInfo.twoFAEnabled ? 'ENABLED' : 'DISABLED' }}
+                </div>
+            </div>
+
+            <!-- Active Sessions -->
+            <div class="security-card">
+                <div class="sc-head">
+                    <div class="sc-label">
+                        <i class="fas fa-desktop"></i> Active Sessions
+                    </div>
+                    <div class="sc-meta">{{ profile().accountInfo.activeSessions.length }} active device(s)</div>
+                    <button class="sc-action sc-action--danger" (click)="logoutAll()">Logout All Others</button>
+                </div>
+
+                <div class="sessions-list">
+                    @for (session of profile().accountInfo.activeSessions; track session.sessionId) {
+                    <div class="session-row" [class.session-current]="session.isCurrent">
+                        <div class="sess-icon">
+                            <i class="fas {{ session.device.toLowerCase().includes('phone') || session.device.toLowerCase().includes('android') || session.device.toLowerCase().includes('iphone') ? 'fa-mobile-alt' : 'fa-laptop' }}"></i>
+                        </div>
+                        <div class="sess-info">
+                            <div class="sess-device">{{ session.device }} · {{ session.browser }}</div>
+                            <div class="sess-meta">
+                                <i class="fas fa-map-marker-alt"></i> {{ session.location }} ·
+                                <i class="fas fa-clock"></i> {{ session.lastActive }}
+                            </div>
+                        </div>
+                        @if (session.isCurrent) {
+                        <span class="current-badge">This Device</span>
+                        } @else {
+                        <button class="sess-logout" (click)="logoutSession(session.sessionId)">Logout</button>
+                        }
+                    </div>
+                    }
+                    @if (profile().accountInfo.activeSessions.length === 0) {
+                    <div class="sessions-empty">No other active sessions.</div>
+                    }
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="security-card danger-card">
+                <div class="sc-head">
+                    <div class="sc-label danger-label">
+                        <i class="fas fa-exclamation-triangle"></i> Account Deactivation
+                    </div>
+                    <button class="sc-action sc-action--danger" (click)="showDeactivateConfirm.set(true)">
+                        Request Deactivation
+                    </button>
+                </div>
+                <p class="danger-desc">Initiates the account deactivation process. Your data will be securely retained for 30 days, after which it will be permanently erased per our data governance policy.</p>
+                @if (profile().accountInfo.accountStatus === 'Deactivation Requested') {
+                <div class="deactivation-pending">
+                    <i class="fas fa-hourglass-half"></i> Deactivation request is under review.
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- ══════════════════════════════ D: ROLE DETAILS ══ -->
+        @if (activeSection() === 'role') {
+        <div class="mpr-section">
+            <div class="section-head">
+                <span class="sh-dot"></span> ROLE-SPECIFIC INFORMATION
+                <span class="role-pill">{{ profile().role }}</span>
+                <span class="readonly-note"><i class="fas fa-lock"></i> Read-only</span>
+            </div>
+
+            @if (isStudent() && studentInfo()) {
+            @let si = studentInfo()!;
+            <div class="role-grid">
+                <div class="role-card">
+                    <div class="rc-label">Academic Level</div>
+                    <div class="rc-value">{{ si.academicLevel }}</div>
+                </div>
+                <div class="role-card">
+                    <div class="rc-label">Institution</div>
+                    <div class="rc-value">{{ si.institution }}</div>
+                </div>
+                <div class="role-card role-card--full">
+                    <div class="rc-label">Enrolled Courses ({{ si.enrolledCourses.length }})</div>
+                    <div class="courses-list">
+                        @for (course of si.enrolledCourses; track course) {
+                        <span class="course-tag">{{ course }}</span>
+                        }
+                    </div>
+                </div>
+            </div>
+            }
+
+            @if (isTeacher() && teacherInfo()) {
+            @let ti = teacherInfo()!;
+            <div class="role-grid">
+                <div class="role-card">
+                    <div class="rc-label">Qualification</div>
+                    <div class="rc-value">{{ ti.qualification }}</div>
+                </div>
+                <div class="role-card">
+                    <div class="rc-label">Experience</div>
+                    <div class="rc-value">{{ ti.experience }}</div>
+                </div>
+                <div class="role-card role-card--full">
+                    <div class="rc-label">Assigned Subjects</div>
+                    <div class="courses-list">
+                        @for (subj of ti.subjects; track subj) {
+                        <span class="course-tag">{{ subj }}</span>
+                        }
+                    </div>
+                </div>
+            </div>
+            }
+
+            @if (isPartner() && partnerInfo()) {
+            @let pi = partnerInfo()!;
+            <div class="role-grid">
+                <div class="role-card">
+                    <div class="rc-label">Institution Name</div>
+                    <div class="rc-value">{{ pi.institutionName }}</div>
+                </div>
+                <div class="role-card">
+                    <div class="rc-label">Institution Address</div>
+                    <div class="rc-value">{{ pi.institutionAddress }}</div>
+                </div>
+                <div class="role-card">
+                    <div class="rc-label">Approved Facilities</div>
+                    <div class="courses-list">
+                        @for (f of pi.approvedFacilities; track f) {
+                        <span class="course-tag">{{ f }}</span>
+                        }
+                    </div>
+                </div>
+                <div class="role-card">
+                    <div class="rc-label">Assigned Teachers</div>
+                    <div class="courses-list">
+                        @for (t of pi.assignedTeachers; track t) {
+                        <span class="course-tag">{{ t }}</span>
+                        }
+                    </div>
+                </div>
+            </div>
+            }
+
+            @if (!isStudent() && !isTeacher() && !isPartner()) {
+            <div class="role-generic">
+                <i class="fas fa-user-circle"></i>
+                <p>Role-specific details are managed by your program administrator.</p>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- ══════════════════════════════ E: COMPLETION ══ -->
+        @if (activeSection() === 'completion') {
+        <div class="mpr-section">
+            <div class="section-head">
+                <span class="sh-dot"></span> PROFILE COMPLETION TRACKER
+            </div>
+
+            <!-- Large bar -->
+            <div class="comp-bar-block">
+                <div class="comp-bar-header">
+                    <span>Overall Completion</span>
+                    <span class="comp-bar-pct" [style.color]="getCompletionColor(completion())">{{ completion() }}%</span>
+                </div>
+                <div class="comp-bar-track">
+                    <div class="comp-bar-fill" [style.width.%]="completion()"
+                        [style.background]="getCompletionColor(completion())"></div>
+                </div>
+                <div class="comp-bar-meta">
+                    {{ completedItems().length }} of {{ missingItems().length }} items complete
+                </div>
+            </div>
+
+            <!-- Items grid -->
+            <div class="comp-items-grid">
+                @for (item of missingItems(); track item.label) {
+                <div class="comp-item" [class.comp-item--done]="item.done">
+                    <div class="ci-icon">
+                        <i class="fas {{ item.done ? 'fa-check-circle' : 'fa-exclamation-circle' }}"></i>
+                    </div>
+                    <div class="ci-body">
+                        <div class="ci-label">{{ item.label }}</div>
+                        @if (!item.done) {
+                        <div class="ci-action" (click)="setSection($any(item.section))">
+                            {{ item.action }} →
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- Audit Log -->
+            <div class="audit-section">
+                <div class="audit-head">
+                    <i class="fas fa-history"></i> AUDIT TRAIL
+                </div>
+                @if (profile().auditLog.length === 0) {
+                <div class="audit-empty">No changes recorded yet.</div>
+                }
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Old Value</th>
+                            <th>New Value</th>
+                            <th>Timestamp</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (entry of profile().auditLog; track entry.entryId) {
+                        <tr>
+                            <td>{{ entry.field }}</td>
+                            <td class="mono dim">{{ entry.oldValue }}</td>
+                            <td class="mono">{{ entry.newValue }}</td>
+                            <td class="dim">{{ entry.timestamp }}</td>
+                            <td>
+                                <span class="audit-status" [class.audit-ok]="entry.status === 'Success'">
+                                    {{ entry.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        }
+
+    </div><!-- /.mpr-page -->
+</app-layout>
+
+<!-- ════════════════════════════════ PASSWORD MODAL ══ -->
+@if (showPasswordModal()) {
+<div class="modal-overlay" (click)="closePasswordModal()">
+    <div class="modal-panel" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title"><i class="fas fa-key"></i> Change Password</div>
+            <button class="modal-close" (click)="closePasswordModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <form [formGroup]="passwordForm" (ngSubmit)="savePassword()" class="modal-form">
+            <div class="mf-group">
+                <label class="mf-label">Current Password *</label>
+                <input type="password" class="mf-input" formControlName="oldPassword"
+                    placeholder="Enter current password">
+            </div>
+            <div class="mf-group">
+                <label class="mf-label">New Password * (min 8 characters)</label>
+                <input type="password" class="mf-input" formControlName="newPassword"
+                    placeholder="Create new password">
+                @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+                <div class="mf-error">Minimum 8 characters required</div>
+                }
+            </div>
+            <div class="mf-group">
+                <label class="mf-label">Confirm New Password *</label>
+                <input type="password" class="mf-input" formControlName="confirmPassword"
+                    placeholder="Re-enter new password">
+                @if (passwordForm.get('confirmPassword')?.hasError('mismatch')) {
+                <div class="mf-error">Passwords do not match</div>
+                }
+            </div>
+            @if (passwordError()) {
+            <div class="mf-error-banner">{{ passwordError() }}</div>
+            }
+            @if (passwordSuccess()) {
+            <div class="mf-success-banner"><i class="fas fa-check-circle"></i> Password changed successfully!</div>
+            }
+            <div class="modal-actions">
+                <button type="button" class="mfa-cancel" (click)="closePasswordModal()">Cancel</button>
+                <button type="submit" class="mfa-save" [disabled]="passwordForm.invalid">
+                    <i class="fas fa-lock"></i> Update Password
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+}
+
+<!-- ════════════════════════════════ DEACTIVATE MODAL ══ -->
+@if (showDeactivateConfirm()) {
+<div class="modal-overlay" (click)="showDeactivateConfirm.set(false)">
+    <div class="modal-panel modal-panel--danger" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title danger-title"><i class="fas fa-exclamation-triangle"></i> Confirm Deactivation</div>
+            <button class="modal-close" (click)="showDeactivateConfirm.set(false)"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to request account deactivation?</p>
+            <ul class="deact-list">
+                <li>Your account will be suspended after admin review</li>
+                <li>All data will be retained for 30 days</li>
+                <li>After 30 days, data will be permanently deleted</li>
+                <li>This action can be cancelled by contacting support within 7 days</li>
+            </ul>
+        </div>
+        <div class="modal-actions">
+            <button class="mfa-cancel" (click)="showDeactivateConfirm.set(false)">Cancel</button>
+            <button class="mfa-danger" (click)="confirmDeactivation()">
+                <i class="fas fa-trash-alt"></i> Confirm Deactivation
+            </button>
+        </div>
+    </div>
+</div>
+}

@@ -14,14 +14,17 @@
                 ▶
             </button>
 
-            <div class="sidebar-content" [class.hidden]="leftCollapsed()">
-                <app-sidebar-left></app-sidebar-left>
+            <div class="sidebar-content">
+                <app-sidebar-left [collapsed]="leftCollapsed()"></app-sidebar-left>
             </div>
         </aside>
         }
 
         <!-- Center Column (Main Content) -->
         <main class="col-center" [class.left-collapsed]="leftCollapsed()" [class.right-collapsed]="rightCollapsed()">
+            <div class="center-search-bar">
+                <app-global-search></app-global-search>
+            </div>
             <ng-content></ng-content>
         </main>
 

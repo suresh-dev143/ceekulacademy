@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { SidebarLeftComponent } from '../sidebar-left/sidebar-left';
 import { ChatPanelComponent } from '../chat-panel/chat-panel';
 import { NavbarComponent } from '../navbar/navbar';
+import { GlobalSearchComponent } from '../global-search/global-search';
 
 @Component({
     selector: 'app-layout',
-    imports: [CommonModule, SidebarLeftComponent, ChatPanelComponent, NavbarComponent],
+    imports: [CommonModule, SidebarLeftComponent, ChatPanelComponent, NavbarComponent, GlobalSearchComponent],
     templateUrl: './layout.html',
     styleUrl: './layout.scss'
 })

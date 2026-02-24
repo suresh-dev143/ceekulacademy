@@ -5,7 +5,10 @@
                 <h2>Join the Mission</h2>
                 <p>Become a candidate for our global initiatives. Whether you're a student, researcher, or volunteer,
                     there's a place for you in our cosmic community.</p>
-
+                <div class="reg-info-actions">
+                    <span>Already have an account?</span>
+                    <a routerLink="/login" class="btn-login">Login</a>
+                </div>
             </div>
 
             <div class="reg-form-container">
@@ -161,103 +164,6 @@
                         </div>
                         }
 
-                        <!-- Activity & Availability Capture -->
-                        <div class="activity-section">
-                            <div class="section-header">
-                                <h4>ACTIVITY & AVAILABILITY CAPTURE</h4>
-                            </div>
-
-                            <div class="activity-blocks" formArrayName="activities">
-                                @for (activity of activities.controls; track activity; let i = $index) {
-                                <div class="activity-block" [formGroupName]="i">
-                                    <div class="block-header">
-                                        <h5>Activity #{{ i + 1 }}</h5>
-                                        <button type="button" class="btn-remove-block" (click)="removeActivityRow(i)"
-                                            *ngIf="activities.length > 1">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">Activity Type</label>
-                                        <select class="form-control" formControlName="activityType">
-                                            <option value="">-- Select Activity --</option>
-                                            @for (type of activityTypes; track type) {
-                                            <option [value]="type">{{type}}</option>
-                                            }
-                                        </select>
-                                    </div>
-
-                                    <div class="form-row">
-                                        <div class="form-group flex-1">
-                                            <label class="form-label">Start Date</label>
-                                            <input type="date" class="form-control" formControlName="startDate"
-                                                [min]="getToday()">
-                                        </div>
-                                        <div class="form-group flex-1">
-                                            <label class="form-label">End Date</label>
-                                            <input type="date" class="form-control" formControlName="endDate"
-                                                [min]="activities.at(i).get('startDate')?.value || getToday()">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-row">
-                                        <div class="form-group flex-1">
-                                            <label class="form-label">Start Time</label>
-                                            <input type="time" class="form-control" formControlName="startTime">
-                                        </div>
-                                        <div class="form-group flex-1">
-                                            <label class="form-label">End Time</label>
-                                            <input type="time" class="form-control" formControlName="endTime">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">X</label>
-                                        <select class="form-control" formControlName="expertType">
-                                            <option value="">-- Select Expert Type --</option>
-                                            @for (type of expertTypes; track type) {
-                                            <option [value]="type">{{type}}</option>
-                                            }
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">Specialization</label>
-                                        <input type="text" class="form-control" formControlName="specialization"
-                                            placeholder="e.g. Quantum Physics, Vedic Mathematics">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">Mode</label>
-                                        <select class="form-control" formControlName="mode" (change)="onModeChange(i)">
-                                            <option value="">-- Select Mode --</option>
-                                            @for (mode of modeOptions; track mode) {
-                                            <option [value]="mode">{{mode}}</option>
-                                            }
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label class="form-label">Location</label>
-                                        <input type="text" class="form-control" formControlName="location"
-                                            [placeholder]="activities.at(i).get('mode')?.value === 'Online' ? 'N/A' : 'Enter specific address or center name'"
-                                            [readonly]="activities.at(i).get('mode')?.value === 'Online'">
-                                    </div>
-                                </div>
-                                }
-                            </div>
-
-                            <div class="section-actions">
-                                <button type="button" class="btn-add-activity" (click)="addActivityRow()">
-                                    <i class="fas fa-plus"></i> ADD ANOTHER ACTIVITY
-                                </button>
-                            </div>
-
-                            @if (activities.invalid && activities.touched) {
-                            <div class="error-message">Please complete all activity details</div>
-                            }
-                        </div>
                     </div>
                     }
 

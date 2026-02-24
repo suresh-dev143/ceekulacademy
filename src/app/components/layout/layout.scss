@@ -1,3 +1,19 @@
+/* ── Center Column Search Bar ── */
+.center-search-bar {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: #000;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--row-border);
+    margin-bottom: 0.5rem;
+
+    app-global-search {
+        display: block;
+        width: 100%;
+    }
+}
+
 /* Mobile-First 3-Column Layout */
 .district-layout {
     display: flex;

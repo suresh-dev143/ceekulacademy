@@ -1,35 +1,59 @@
-@for (menu of menuItems; track menu.title) {
-<ng-container *ngIf="!menu.role || menu.role === userRole()">
-    <!-- <ng-container> -->
-    @if (menu.type === 'location') {
-    <div class="left-menu-item location-item">{{ menu.title }}</div>
-    }
+<nav class="snav" [class.snav--collapsed]="collapsed">
 
-    @if (menu.type === 'menu') {
-    <div class="left-menu-group">
-        <div class="left-menu-title" [class.active-link]="menu.link" [routerLink]="menu.link" routerLinkActive="active">
-            {{ menu.title }}
+    <!-- ── Identity Strip ── -->
+    <div class="snav-identity">
+        @if (!collapsed) {
+        <div class="snav-user-info">
+            <div class="snav-username">{{ userProfile().name }}</div>
+            <div class="snav-role">{{ userRole() }}</div>
         </div>
-        <ul class="left-submenu">
-            @for (item of menu.items; track item.title) {
-            <li class="left-menu-item" [class.active]="item.active">
-                @if (item.link) {
-                <a [routerLink]="item.link">{{ item.title }}</a>
-                } @else {
-                {{ item.title }}
+        }
+    </div>
+
+    <!-- ── Navigation Sections ── -->
+    <div class="snav-body">
+        @for (section of allSections(); track section.label) {
+        <div class="snav-section">
+
+            @if (!collapsed) {
+            <div class="snav-section-lbl">{{ section.label }}</div>
+            }
+
+            @for (item of section.items; track item.label) {
+            @if (!item.disabled) {
+            <a class="snav-item"
+               [routerLink]="item.route"
+               routerLinkActive="snav-item--active"
+               [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+               [title]="collapsed ? item.label : ''">
+                <i class="fas {{ item.icon }} snav-item-icon"></i>
+                @if (!collapsed) {
+                <span class="snav-item-label">{{ item.label }}</span>
+                @if (item.badge) {
+                <span class="snav-item-badge">{{ item.badge }}</span>
                 }
-            </li>
+                }
+            </a>
+            } @else {
+            <div class="snav-item snav-item--disabled" [title]="collapsed ? item.label + ' (coming soon)' : ''">
+                <i class="fas {{ item.icon }} snav-item-icon"></i>
+                @if (!collapsed) {
+                <span class="snav-item-label">{{ item.label }}</span>
+                <span class="snav-item-soon">Soon</span>
+                }
+            </div>
             }
-            @if (menu.subItems) {
-            @for (subItem of menu.subItems; track subItem.title) {
-            <li class="left-menu-item">
-                <a [routerLink]="subItem.link">{{ subItem.title }}</a>
-            </li>
             }
-            }
-        </ul>
+
+        </div>
+        }
+    </div>
+
+    <!-- ── Footer: Issues Ticker ── -->
+    @if (!collapsed) {
+    <div class="snav-footer">
+        <app-issues-sidebar-ticker></app-issues-sidebar-ticker>
     </div>
     }
-</ng-container>
-}
-<app-issues-sidebar-ticker></app-issues-sidebar-ticker>
+
+</nav>
