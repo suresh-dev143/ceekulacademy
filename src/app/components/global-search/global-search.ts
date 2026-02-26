@@ -5,7 +5,71 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { SearchService, SearchResult, SearchCategory } from '../../services/search.service';
+import { AuthService, UserRole } from '../../services/auth.service';
+import {
+    SearchService, SearchResult, SearchCategory,
+    FilterCategory, SearchStatus, DateRange, SearchFilters
+} from '../../services/search.service';
+
+// ── Static option tables (UI-only constants) ────────────────────────────────────
+export const CATEGORY_OPTIONS: { label: string; value: FilterCategory }[] = [
+    { label: 'All',          value: 'all' },
+    { label: 'Programs',     value: 'programs' },
+    { label: 'Courses',      value: 'courses' },
+    { label: 'Sessions',     value: 'sessions' },
+    { label: 'Users',        value: 'users' },
+    { label: 'Institutions', value: 'institutions' },
+    { label: 'Documents',    value: 'documents' },
+    { label: 'Reports',      value: 'reports' },
+];
+
+export const STATUS_OPTIONS: { label: string; value: SearchStatus }[] = [
+    { label: 'Active',      value: 'active' },
+    { label: 'Completed',   value: 'completed' },
+    { label: 'Pending',     value: 'pending' },
+    { label: 'Cancelled',   value: 'cancelled' },
+    { label: 'Verified',    value: 'verified' },
+    { label: 'Unverified',  value: 'unverified' },
+];
+
+export const DATE_OPTIONS: { label: string; value: DateRange }[] = [
+    { label: 'Today',       value: 'today' },
+    { label: 'This Week',   value: 'this-week' },
+    { label: 'This Month',  value: 'this-month' },
+];
+
+// ── Role-based quick-filter shortcuts ──────────────────────────────────────────
+const ROLE_QUICK_FILTERS: Partial<Record<UserRole, { label: string; value: FilterCategory; icon: string }[]>> = {
+    Student: [
+        { label: 'My Courses',  value: 'courses',   icon: 'fa-book' },
+        { label: 'My Schedule', value: 'sessions',  icon: 'fa-calendar-alt' },
+        { label: 'Assignments', value: 'documents', icon: 'fa-tasks' },
+    ],
+    Teacher: [
+        { label: 'My Batches',  value: 'users',     icon: 'fa-users' },
+        { label: 'Sessions',    value: 'sessions',  icon: 'fa-chalkboard' },
+        { label: 'Materials',   value: 'documents', icon: 'fa-folder-open' },
+    ],
+    Instructor: [
+        { label: 'My Batches',  value: 'users',     icon: 'fa-users' },
+        { label: 'Sessions',    value: 'sessions',  icon: 'fa-chalkboard' },
+    ],
+    Partner: [
+        { label: 'Bookings',    value: 'sessions',  icon: 'fa-door-open' },
+        { label: 'Rooms',       value: 'institutions', icon: 'fa-building' },
+        { label: 'Teachers',    value: 'users',     icon: 'fa-user-tie' },
+    ],
+    Director: [
+        { label: 'District Programs', value: 'programs',     icon: 'fa-project-diagram' },
+        { label: 'Partners',          value: 'institutions', icon: 'fa-university' },
+        { label: 'Reports',           value: 'reports',      icon: 'fa-chart-pie' },
+        { label: 'Documents',         value: 'documents',    icon: 'fa-clipboard-list' },
+    ],
+    Manager: [
+        { label: 'Programs',    value: 'programs',  icon: 'fa-project-diagram' },
+        { label: 'Reports',     value: 'reports',   icon: 'fa-chart-pie' },
+    ],
+};
 
 @Component({
     selector: 'app-global-search',
@@ -17,59 +81,125 @@ import { SearchService, SearchResult, SearchCategory } from '../../services/sear
 export class GlobalSearchComponent {
 
     readonly searchService = inject(SearchService);
-    private router     = inject(Router);
-    private sanitizer  = inject(DomSanitizer);
-    private destroyRef = inject(DestroyRef);
-    private elRef      = inject(ElementRef);
+    private authService    = inject(AuthService);
+    private router         = inject(Router);
+    private sanitizer      = inject(DomSanitizer);
+    private destroyRef     = inject(DestroyRef);
+    private elRef          = inject(ElementRef);
 
-    // ── State ─────────────────────────────────────────────────────────
+    // ── Expose static option tables to template ────────────────────────────────
+    readonly categoryOptions = CATEGORY_OPTIONS;
+    readonly statusOptions   = STATUS_OPTIONS;
+    readonly dateOptions     = DATE_OPTIONS;
+
+    // ── Core search state ──────────────────────────────────────────────────────
     query            = signal<string>('');
-    results          = signal<SearchResult[]>([]);
+    rawResults       = signal<SearchResult[]>([]);   // all text-matched results
     isOpen           = signal<boolean>(false);
     activeIndex      = signal<number>(-1);
     isMobileExpanded = signal<boolean>(false);
 
+    // ── Filter state ───────────────────────────────────────────────────────────
+    activeCategory  = signal<FilterCategory>('all');
+    activeStatuses  = signal<SearchStatus[]>([]);
+    activeDateRange = signal<DateRange>('');
+    filtersOpen     = signal<boolean>(false);
+
     private searchSubject = new Subject<string>();
 
-    // ── Grouped results for display ───────────────────────────────────
+    // ── Role-based quick filters ───────────────────────────────────────────────
+    roleFilterOptions = computed(() =>
+        ROLE_QUICK_FILTERS[this.authService.currentUserRole()] ?? []
+    );
+
+    // ── Filtered results (text results → apply category + status) ─────────────
+    filteredResults = computed((): SearchResult[] =>
+        this.searchService.applyFilters(this.rawResults(), {
+            category:  this.activeCategory(),
+            status:    this.activeStatuses(),
+            dateRange: this.activeDateRange(),
+        })
+    );
+
+    // ── Grouped for dropdown display ───────────────────────────────────────────
     groupedResults = computed(() => {
         const map = new Map<SearchCategory, SearchResult[]>();
-        for (const r of this.results()) {
+        for (const r of this.filteredResults()) {
             if (!map.has(r.category)) map.set(r.category, []);
             map.get(r.category)!.push(r);
         }
         return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
     });
 
+    // ── Category result counts (from raw, for filter badge hints) ─────────────
+    categoryCounts = computed(() =>
+        this.searchService.countsByFilterCategory(this.rawResults())
+    );
+
+    // ── Active filter count (for badge on toggle button) ───────────────────────
+    activeFilterCount = computed(() => {
+        let n = 0;
+        if (this.activeCategory() !== 'all') n++;
+        n += this.activeStatuses().length;
+        if (this.activeDateRange()) n++;
+        return n;
+    });
+
+    // ── Chips shown inside the search bar ─────────────────────────────────────
+    activeFilterChips = computed((): { label: string; type: 'category' | 'status' | 'date' }[] => {
+        const chips: { label: string; type: 'category' | 'status' | 'date' }[] = [];
+        if (this.activeCategory() !== 'all') {
+            const opt = CATEGORY_OPTIONS.find(c => c.value === this.activeCategory());
+            chips.push({ label: opt?.label ?? this.activeCategory(), type: 'category' });
+        }
+        this.activeStatuses().forEach(s => {
+            const opt = STATUS_OPTIONS.find(o => o.value === s);
+            chips.push({ label: opt?.label ?? s, type: 'status' });
+        });
+        if (this.activeDateRange()) {
+            const opt = DATE_OPTIONS.find(d => d.value === this.activeDateRange());
+            chips.push({ label: opt?.label ?? this.activeDateRange(), type: 'date' });
+        }
+        return chips;
+    });
+
     constructor() {
+        // ── Restore persisted filters ──────────────────────────────────────────
+        const saved = this.searchService.loadSavedFilters();
+        if (saved.category)  this.activeCategory.set(saved.category);
+        if (saved.status?.length) this.activeStatuses.set(saved.status);
+        if (saved.dateRange) this.activeDateRange.set(saved.dateRange);
+
+        // ── Search pipeline (debounced) ────────────────────────────────────────
         this.searchSubject.pipe(
             debounceTime(300),
             distinctUntilChanged(),
             takeUntilDestroyed(this.destroyRef)
         ).subscribe(q => {
-            this.results.set(q.trim() ? this.searchService.search(q) : []);
+            this.rawResults.set(q.trim() ? this.searchService.search(q) : []);
             this.activeIndex.set(-1);
             this.isOpen.set(true);
         });
     }
 
-    // ── Click outside → close dropdown ────────────────────────────────
+    // ── Click outside → close ─────────────────────────────────────────────────
     @HostListener('document:click', ['$event'])
     onDocClick(event: Event) {
         if (!this.elRef.nativeElement.contains(event.target)) {
             this.isOpen.set(false);
+            this.filtersOpen.set(false);
         }
     }
 
-    // ── Input handling ─────────────────────────────────────────────────
+    // ── Input ─────────────────────────────────────────────────────────────────
     onInput(value: string) {
         this.query.set(value);
         this.searchSubject.next(value);
     }
 
-    // ── Keyboard navigation ────────────────────────────────────────────
+    // ── Keyboard navigation ────────────────────────────────────────────────────
     onKeydown(event: KeyboardEvent) {
-        const len = this.results().length;
+        const len = this.filteredResults().length;
         switch (event.key) {
             case 'ArrowDown':
                 event.preventDefault();
@@ -81,39 +211,89 @@ export class GlobalSearchComponent {
                 break;
             case 'Enter': {
                 const idx = this.activeIndex();
-                const res = this.results();
-                if (idx >= 0 && res[idx]) {
-                    this.selectResult(res[idx]);
-                } else if (res[0]) {
-                    this.selectResult(res[0]);
-                }
+                const res = this.filteredResults();
+                if (idx >= 0 && res[idx]) this.selectResult(res[idx]);
+                else if (res[0])           this.selectResult(res[0]);
                 break;
             }
             case 'Escape':
                 this.clearQuery();
+                this.filtersOpen.set(false);
                 this.isMobileExpanded.set(false);
                 break;
         }
     }
 
-    // ── Select a result ────────────────────────────────────────────────
+    // ── Select a result ────────────────────────────────────────────────────────
     selectResult(result: SearchResult) {
         const q = this.query();
         if (q.trim()) this.searchService.addRecentSearch(q);
         this.router.navigate([result.route]);
         this.clearQuery();
+        this.filtersOpen.set(false);
         this.isMobileExpanded.set(false);
     }
 
-    // ── Clear ──────────────────────────────────────────────────────────
+    // ── Clear query (keep filters) ─────────────────────────────────────────────
     clearQuery() {
         this.query.set('');
-        this.results.set([]);
+        this.rawResults.set([]);
         this.isOpen.set(false);
         this.activeIndex.set(-1);
     }
 
-    // ── Mobile overlay ─────────────────────────────────────────────────
+    // ── Filter panel toggle ────────────────────────────────────────────────────
+    toggleFilters() {
+        this.filtersOpen.update(v => !v);
+        if (this.filtersOpen()) this.isOpen.set(true);
+    }
+
+    // ── Filter mutations ───────────────────────────────────────────────────────
+    setCategory(cat: FilterCategory) {
+        this.activeCategory.set(cat);
+        this.persistFilters();
+    }
+
+    toggleStatus(status: SearchStatus) {
+        this.activeStatuses.update(list =>
+            list.includes(status) ? list.filter(s => s !== status) : [...list, status]
+        );
+        this.persistFilters();
+    }
+
+    setDateRange(range: DateRange) {
+        this.activeDateRange.update(v => v === range ? '' : range);  // toggle
+        this.persistFilters();
+    }
+
+    clearAllFilters() {
+        this.activeCategory.set('all');
+        this.activeStatuses.set([]);
+        this.activeDateRange.set('');
+        this.persistFilters();
+    }
+
+    removeChip(chip: { label: string; type: 'category' | 'status' | 'date' }) {
+        if (chip.type === 'category') {
+            this.activeCategory.set('all');
+        } else if (chip.type === 'status') {
+            const val = STATUS_OPTIONS.find(o => o.label === chip.label)?.value;
+            if (val) this.activeStatuses.update(list => list.filter(s => s !== val));
+        } else {
+            this.activeDateRange.set('');
+        }
+        this.persistFilters();
+    }
+
+    private persistFilters() {
+        this.searchService.saveFilters({
+            category:  this.activeCategory(),
+            status:    this.activeStatuses(),
+            dateRange: this.activeDateRange(),
+        });
+    }
+
+    // ── Mobile overlay ─────────────────────────────────────────────────────────
     openMobile() {
         this.isMobileExpanded.set(true);
     }
@@ -123,12 +303,12 @@ export class GlobalSearchComponent {
         this.clearQuery();
     }
 
-    // ── Helper: position in flat results array ─────────────────────────
+    // ── Flat index in filtered array (for keyboard nav highlight) ─────────────
     flatIndex(result: SearchResult): number {
-        return this.results().indexOf(result);
+        return this.filteredResults().indexOf(result);
     }
 
-    // ── Keyword highlight ──────────────────────────────────────────────
+    // ── Keyword highlight ──────────────────────────────────────────────────────
     highlight(text: string): SafeHtml {
         const q = this.query();
         if (!q.trim()) return this.sanitizer.bypassSecurityTrustHtml(text);

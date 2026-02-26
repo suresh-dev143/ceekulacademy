@@ -1,8 +1,10 @@
 <!-- ════════════════════════════ DESKTOP INLINE SEARCH ══ -->
-<div class="gs-wrap" [class.gs-wrap--open]="isOpen()">
+<div class="gs-wrap" [class.gs-wrap--open]="isOpen() || filtersOpen()">
 
-    <div class="gs-bar">
+    <!-- ── Search bar row ── -->
+    <div class="gs-bar" [class.gs-bar--filters-active]="activeFilterCount() > 0">
         <i class="fas fa-search gs-icon"></i>
+
         <input
             class="gs-input"
             type="text"
@@ -10,21 +12,122 @@
             (input)="onInput($any($event.target).value)"
             (keydown)="onKeydown($event)"
             (focus)="isOpen.set(true)"
-            placeholder="Search courses, sessions, people..."
+            placeholder="Search programs, courses, people..."
             autocomplete="off"
             spellcheck="false"
             aria-label="Global search">
+
+        <!-- Active filter chips (inline) -->
+        @for (chip of activeFilterChips(); track chip.label) {
+        <span class="gs-chip" (click)="removeChip(chip)">
+            {{ chip.label }}
+            <i class="fas fa-times gs-chip-x"></i>
+        </span>
+        }
+
+        <!-- Clear query -->
         @if (query()) {
         <button class="gs-clear-btn" (click)="clearQuery()" aria-label="Clear search">
             <i class="fas fa-times"></i>
         </button>
         }
+
+        <!-- Filter toggle -->
+        <button class="gs-filter-btn"
+                [class.gs-filter-btn--open]="filtersOpen()"
+                [class.gs-filter-btn--active]="activeFilterCount() > 0"
+                (click)="toggleFilters()"
+                aria-label="Toggle filters">
+            <i class="fas fa-sliders-h"></i>
+            @if (activeFilterCount() > 0) {
+            <span class="gs-filter-badge">{{ activeFilterCount() }}</span>
+            }
+        </button>
     </div>
+
+    <!-- ── Filter Panel (slide-down) ── -->
+    @if (filtersOpen()) {
+    <div class="gs-filter-panel">
+
+        <!-- Category row -->
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Category</span>
+            <div class="gs-fp-pills">
+                @for (cat of categoryOptions; track cat.value) {
+                <button class="gs-fp-pill"
+                        [class.gs-fp-pill--active]="activeCategory() === cat.value"
+                        (click)="setCategory(cat.value)">
+                    {{ cat.label }}
+                    @if (cat.value !== 'all' && categoryCounts().get(cat.value)) {
+                    <span class="gs-fp-count">{{ categoryCounts().get(cat.value) }}</span>
+                    }
+                </button>
+                }
+            </div>
+        </div>
+
+        <!-- Status row (multi-select) -->
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Status</span>
+            <div class="gs-fp-pills">
+                @for (s of statusOptions; track s.value) {
+                <button class="gs-fp-pill gs-fp-pill--status"
+                        [class.gs-fp-pill--active]="activeStatuses().includes(s.value)"
+                        (click)="toggleStatus(s.value)">
+                    {{ s.label }}
+                </button>
+                }
+            </div>
+        </div>
+
+        <!-- Date row (single-select toggle) -->
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Date</span>
+            <div class="gs-fp-pills">
+                @for (d of dateOptions; track d.value) {
+                <button class="gs-fp-pill"
+                        [class.gs-fp-pill--active]="activeDateRange() === d.value"
+                        (click)="setDateRange(d.value)">
+                    {{ d.label }}
+                </button>
+                }
+            </div>
+        </div>
+
+        <!-- Role-based quick filters -->
+        @if (roleFilterOptions().length > 0) {
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Quick</span>
+            <div class="gs-fp-pills">
+                @for (opt of roleFilterOptions(); track opt.value) {
+                <button class="gs-fp-pill gs-fp-pill--role"
+                        [class.gs-fp-pill--active]="activeCategory() === opt.value"
+                        (click)="setCategory(opt.value)">
+                    <i class="fas {{ opt.icon }}"></i>
+                    {{ opt.label }}
+                </button>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Clear all -->
+        @if (activeFilterCount() > 0) {
+        <div class="gs-fp-clear-row">
+            <button class="gs-fp-clear" (click)="clearAllFilters()">
+                <i class="fas fa-times-circle"></i>
+                Clear all filters
+            </button>
+        </div>
+        }
+
+    </div>
+    }
 
     <!-- ── Dropdown ── -->
     @if (isOpen()) {
 
-    <!-- Recent searches (when query is empty) -->
+    <!-- Recent searches -->
     @if (!query() && searchService.recentSearches().length > 0) {
     <div class="gs-dropdown">
         <div class="gs-section-lbl">Recent</div>
@@ -41,8 +144,15 @@
     }
 
     <!-- Results -->
-    @if (query() && results().length > 0) {
+    @if (query() && filteredResults().length > 0) {
     <div class="gs-dropdown">
+        <!-- Active filter summary bar -->
+        @if (activeFilterCount() > 0) {
+        <div class="gs-filter-summary">
+            <i class="fas fa-filter"></i>
+            Filtered · {{ filteredResults().length }} of {{ rawResults().length }} results
+        </div>
+        }
         @for (group of groupedResults(); track group.category) {
         <div class="gs-section-lbl">{{ group.category }}</div>
         @for (result of group.items; track result.id) {
@@ -55,7 +165,12 @@
                 <span class="gs-rt-title" [innerHTML]="highlight(result.title)"></span>
                 <span class="gs-rt-sub">{{ result.subtitle }}</span>
             </div>
-            <span class="gs-rc">{{ result.category }}</span>
+            <div class="gs-result-meta">
+                @if (result.status) {
+                <span class="gs-status gs-status--{{ result.status }}">{{ result.status }}</span>
+                }
+                <span class="gs-rc">{{ result.category }}</span>
+            </div>
         </div>
         }
         }
@@ -63,11 +178,17 @@
     }
 
     <!-- No results -->
-    @if (query() && results().length === 0) {
+    @if (query() && filteredResults().length === 0) {
     <div class="gs-dropdown">
         <div class="gs-empty">
             <i class="fas fa-search-minus"></i>
-            <span>No results for "{{ query() }}"</span>
+            <span>
+                @if (rawResults().length > 0) {
+                No matches for active filters — <button class="gs-empty-clear" (click)="clearAllFilters()">clear filters</button>
+                } @else {
+                No results for "{{ query() }}"
+                }
+            </span>
         </div>
     </div>
     }
@@ -108,7 +229,43 @@
         </button>
     </div>
 
-    <!-- Mobile dropdown content (same structure) -->
+    <!-- Mobile filter panel -->
+    <div class="gs-mob-filters">
+        <!-- Category -->
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Category</span>
+            <div class="gs-fp-pills">
+                @for (cat of categoryOptions; track cat.value) {
+                <button class="gs-fp-pill"
+                        [class.gs-fp-pill--active]="activeCategory() === cat.value"
+                        (click)="setCategory(cat.value)">
+                    {{ cat.label }}
+                </button>
+                }
+            </div>
+        </div>
+        <!-- Status -->
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Status</span>
+            <div class="gs-fp-pills">
+                @for (s of statusOptions; track s.value) {
+                <button class="gs-fp-pill gs-fp-pill--status"
+                        [class.gs-fp-pill--active]="activeStatuses().includes(s.value)"
+                        (click)="toggleStatus(s.value)">
+                    {{ s.label }}
+                </button>
+                }
+            </div>
+        </div>
+        <!-- Clear -->
+        @if (activeFilterCount() > 0) {
+        <button class="gs-fp-clear" (click)="clearAllFilters()">
+            <i class="fas fa-times-circle"></i> Clear all filters
+        </button>
+        }
+    </div>
+
+    <!-- Mobile results -->
     @if (!query() && searchService.recentSearches().length > 0) {
     <div class="gs-mob-results">
         <div class="gs-section-lbl">Recent</div>
@@ -124,7 +281,7 @@
     </div>
     }
 
-    @if (query() && results().length > 0) {
+    @if (query() && filteredResults().length > 0) {
     <div class="gs-mob-results">
         @for (group of groupedResults(); track group.category) {
         <div class="gs-section-lbl">{{ group.category }}</div>
@@ -138,14 +295,19 @@
                 <span class="gs-rt-title" [innerHTML]="highlight(result.title)"></span>
                 <span class="gs-rt-sub">{{ result.subtitle }}</span>
             </div>
-            <span class="gs-rc">{{ result.category }}</span>
+            <div class="gs-result-meta">
+                @if (result.status) {
+                <span class="gs-status gs-status--{{ result.status }}">{{ result.status }}</span>
+                }
+                <span class="gs-rc">{{ result.category }}</span>
+            </div>
         </div>
         }
         }
     </div>
     }
 
-    @if (query() && results().length === 0) {
+    @if (query() && filteredResults().length === 0) {
     <div class="gs-mob-results">
         <div class="gs-empty">
             <i class="fas fa-search-minus"></i>

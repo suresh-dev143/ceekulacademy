@@ -1,0 +1,263 @@
+<div class="pd-page">
+
+    <!-- ── Top Navbar ────────────────────────────────────────────────────── -->
+    <app-navbar></app-navbar>
+
+    <!-- ── 3-Column Grid ─────────────────────────────────────────────────── -->
+    <div class="pd-grid">
+
+        <!-- LEFT 21% — Program Tree Sidebar ─────────────────────────────── -->
+        <aside class="pd-col pd-col-left">
+            <app-program-sidebar></app-program-sidebar>
+        </aside>
+
+        <!-- CENTER 55% — Content Area ──────────────────────────────────── -->
+        <main class="pd-col pd-col-center">
+
+            <!-- Search Bar ───────────────────────────────────────────────── -->
+            <div class="pd-search-wrap">
+                <div class="pd-search-bar">
+                    <svg class="pd-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                    <input class="pd-search-input"
+                           type="text"
+                           [value]="searchQuery()"
+                           (input)="searchQuery.set($any($event.target).value)"
+                           placeholder="Search courses, topics, sections…"
+                           autocomplete="off"
+                           spellcheck="false">
+                    @if (searchQuery()) {
+                    <button class="pd-search-clear" (click)="searchQuery.set('')">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                    }
+                </div>
+            </div>
+
+            @let c = content();
+
+            @if (c) {
+
+            <!-- Breadcrumb ───────────────────────────────────────────────── -->
+            <nav class="pd-breadcrumb" aria-label="breadcrumb">
+                @for (crumb of breadcrumbs(); track crumb.label; let last = $last) {
+                @if (!last) {
+                <button class="pd-bc-link" (click)="navigate(crumb)">{{ crumb.label }}</button>
+                <span class="pd-bc-sep">/</span>
+                } @else {
+                <span class="pd-bc-current">{{ crumb.label }}</span>
+                }
+                }
+            </nav>
+
+            <!-- ╔════════════════════════════════════════════════════════╗ -->
+            <!-- ║  PROGRAM OVERVIEW  (type = 'program')                 ║ -->
+            <!-- ╚════════════════════════════════════════════════════════╝ -->
+            @if (c.type === 'program') {
+
+            <div class="pd-content">
+                <header class="pd-heading">
+                    <h1 class="pd-title">{{ c.program.title }}</h1>
+                    @if (c.program.description) {
+                    <p class="pd-subtitle">{{ c.program.description }}</p>
+                    }
+                </header>
+
+                <div class="pd-section-grid">
+                    @for (node of c.program.children; track node.id) {
+                    <div class="pd-course-card" (click)="navigate({ label: node.label, commands: ['/programs', c.program.id, node.id] })">
+                        <div class="pcc-index">{{ $index + 1 }}</div>
+                        <div class="pcc-body">
+                            <div class="pcc-title">{{ node.label }}</div>
+                            @if (node.data?.instructor) {
+                            <div class="pcc-meta">{{ node.data.instructor }}</div>
+                            }
+                            @if (node.data?.description) {
+                            <div class="pcc-desc">{{ node.data.description }}</div>
+                            }
+                            <div class="pcc-modules">
+                                <span>{{ node.children.length }} sections</span>
+                            </div>
+                        </div>
+                        <span class="pcc-arrow">›</span>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            }
+
+            <!-- ╔════════════════════════════════════════════════════════╗ -->
+            <!-- ║  COURSE / SECTION OVERVIEW  (type = 'section')        ║ -->
+            <!-- ╚════════════════════════════════════════════════════════╝ -->
+            @if (c.type === 'section') {
+
+            <div class="pd-content">
+                <header class="pd-heading">
+                    <div class="pd-badge">Course</div>
+                    <h1 class="pd-title">{{ c.section.label }}</h1>
+                    @if (c.section.data?.instructor) {
+                    <p class="pd-instructor">
+                        <span class="pd-instructor-lbl">Instructor</span>
+                        {{ c.section.data.instructor }}
+                    </p>
+                    }
+                    @if (c.section.data?.description) {
+                    <p class="pd-subtitle">{{ c.section.data.description }}</p>
+                    }
+                </header>
+
+                <section class="pd-modules-section">
+                    <h2 class="pd-section-title">Curriculum</h2>
+                    <div class="pd-module-list">
+                        @for (sub of c.section.children; track sub.id; let i = $index) {
+                        <div class="pd-module-row"
+                             (click)="navigate({ label: sub.label, commands: ['/programs', c.program.id, c.section.id, sub.id] })">
+                            <div class="pmr-num">{{ i + 1 }}</div>
+                            <div class="pmr-body">
+                                <div class="pmr-title">{{ sub.label }}</div>
+                                <div class="pmr-count">{{ sub.children.length }} topics</div>
+                            </div>
+                            <div class="pmr-items-preview">
+                                @for (item of sub.children | slice:0:3; track item.id) {
+                                <span class="pmr-chip">{{ item.label }}</span>
+                                }
+                                @if (sub.children.length > 3) {
+                                <span class="pmr-chip pmr-chip--more">+{{ sub.children.length - 3 }} more</span>
+                                }
+                            </div>
+                            <span class="pmr-arrow">›</span>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </div>
+
+            }
+
+            <!-- ╔════════════════════════════════════════════════════════╗ -->
+            <!-- ║  SYLLABUS SECTION  (type = 'subsection')              ║ -->
+            <!-- ╚════════════════════════════════════════════════════════╝ -->
+            @if (c.type === 'subsection') {
+
+            <div class="pd-content">
+                <header class="pd-heading">
+                    <div class="pd-badge">Syllabus Section</div>
+                    <h1 class="pd-title">{{ c.sub.label }}</h1>
+                    <p class="pd-subtitle-small">{{ c.section.label }}</p>
+                </header>
+
+                <section class="pd-topics-section">
+                    <h2 class="pd-section-title">Topics in this section</h2>
+                    <ol class="pd-topic-list">
+                        @for (item of c.sub.children; track item.id) {
+                        <li class="pd-topic-item"
+                            (click)="navigate({ label: item.label, commands: ['/programs', c.program.id, c.section.id, c.sub.id] })">
+                            <span class="pti-num">{{ $index + 1 }}</span>
+                            <span class="pti-label">{{ item.label }}</span>
+                            <span class="pti-arrow">›</span>
+                        </li>
+                        }
+                    </ol>
+                </section>
+
+                @if (c.sub.data?.electiveInterests) {
+                <section class="pd-extra-section">
+                    <h2 class="pd-section-title">Elective Interests</h2>
+                    <div class="pd-tag-cloud">
+                        @for (tag of c.sub.data.electiveInterests; track tag) {
+                        <span class="pd-tag">{{ tag }}</span>
+                        }
+                    </div>
+                </section>
+                }
+
+                @if (c.sub.data?.specializedFocus) {
+                <section class="pd-extra-section">
+                    <h2 class="pd-section-title">Specialized Focus Areas</h2>
+                    <div class="pd-tag-cloud">
+                        @for (tag of c.sub.data.specializedFocus; track tag) {
+                        <span class="pd-tag">{{ tag }}</span>
+                        }
+                    </div>
+                </section>
+                }
+
+                @if (c.sub.data?.applicationAreas) {
+                <section class="pd-extra-section">
+                    <h2 class="pd-section-title">Application Areas</h2>
+                    <div class="pd-tag-cloud">
+                        @for (area of c.sub.data.applicationAreas; track area) {
+                        <span class="pd-tag pd-tag--accent">{{ area }}</span>
+                        }
+                    </div>
+                </section>
+                }
+
+                @if (c.sub.data?.footerNotes) {
+                <div class="pd-footnote">
+                    <span class="pd-footnote-icon">✦</span>
+                    <p>{{ c.sub.data.footerNotes }}</p>
+                </div>
+                }
+            </div>
+
+            }
+
+            <!-- ╔════════════════════════════════════════════════════════╗ -->
+            <!-- ║  ITEM DETAIL  (type = 'item')                         ║ -->
+            <!-- ╚════════════════════════════════════════════════════════╝ -->
+            @if (c.type === 'item') {
+
+            <div class="pd-content">
+                <header class="pd-heading">
+                    <div class="pd-badge">Topic</div>
+                    <h1 class="pd-title">{{ c.item.label }}</h1>
+                    <p class="pd-subtitle-small">
+                        {{ c.section.label }} &rsaquo; {{ c.sub.label }}
+                    </p>
+                </header>
+
+                <div class="pd-item-body">
+                    <div class="pd-item-context">
+                        <h3>Context</h3>
+                        <p>This topic is part of <strong>{{ c.sub.label }}</strong> in the
+                            <strong>{{ c.section.label }}</strong> course.</p>
+                    </div>
+
+                    <div class="pd-item-nav">
+                        <h3>All topics in this section</h3>
+                        <div class="pd-adjacent-list">
+                            @for (item of c.sub.children; track item.id) {
+                            <div class="pal-item" [class.pal-item--active]="item.id === c.item.id"
+                                 (click)="navigate({ label: item.label, commands: ['/programs', c.program.id, c.section.id, c.sub.id] })">
+                                <span class="pal-num">{{ $index + 1 }}</span>
+                                <span class="pal-label">{{ item.label }}</span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            }
+
+            } @else {
+            <div class="pd-loading">Loading program…</div>
+            }
+
+        </main>
+
+        <!-- RIGHT 24% — Chat Panel ──────────────────────────────────────── -->
+        <div class="pd-col pd-col-right">
+            <app-chat-panel></app-chat-panel>
+        </div>
+
+    </div>
+
+</div>
+ 

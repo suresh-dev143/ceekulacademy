@@ -184,7 +184,6 @@
 .expand-sidebar-btn {
     position: absolute;
     top: 1rem;
-    background: #000000;
     color: var(--accent-primary);
     width: 32px;
     height: 32px;
@@ -203,8 +202,8 @@
 }
 
 .toggle-sidebar-btn.left {
-    left: 21rem;
-    top: 7.9rem;
+    left: 20rem;
+    top: 8rem;
 }
 
 .toggle-sidebar-btn.right {

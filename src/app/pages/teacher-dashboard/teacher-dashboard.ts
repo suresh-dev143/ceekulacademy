@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LayoutComponent } from '../../components/layout/layout';
 import { TeacherOverviewComponent } from '../../components/teacher/teacher-overview/teacher-overview';
 import { TeacherCourseManagerComponent } from '../../components/teacher/teacher-course-manager/teacher-course-manager';
-import { TeacherMyScheduleComponent } from '../../components/teacher/teacher-my-schedule/teacher-my-schedule';
+
 import { TeacherNearbyStudentsComponent } from '../../components/teacher/teacher-nearby-students/teacher-nearby-students';
 import { TeacherNearbyInfrastructureComponent } from '../../components/teacher/teacher-nearby-infrastructure/teacher-nearby-infrastructure';
 import { WorkshopManagerComponent } from '../../components/teacher/workshop-manager/workshop-manager';
@@ -18,7 +18,6 @@ import { CourseService, Course } from '../../services/course.service';
     CommonModule,
     LayoutComponent,
     TeacherOverviewComponent,
-    TeacherMyScheduleComponent,
     TeacherCourseManagerComponent,
     TeacherNearbyStudentsComponent,
     TeacherNearbyInfrastructureComponent,
@@ -65,9 +64,7 @@ import { CourseService, Course } from '../../services/course.service';
             </app-teacher-nearby-infrastructure>
           } @else if (activeTab() === 'workshops') {
             <app-workshop-manager></app-workshop-manager>
-          } @else if (activeTab() === 'schedule') {
-            <app-teacher-my-schedule></app-teacher-my-schedule>
-          }
+          } 
         </div>
 
         <!-- Right Side Panel Content -->

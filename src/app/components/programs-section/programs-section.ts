@@ -448,9 +448,8 @@ export class ProgramsSectionComponent implements OnInit {
             this.router.navigate([program.link]);
             return;
         }
-        this.selectedProgram.set(program);
-        this.selectedSubSubtitle.set(null);
-        this.selectedContent.set(null);
+        // Navigate to the hierarchical program detail view
+        this.router.navigate(['/programs', program.id]);
     }
 
     goBack() {

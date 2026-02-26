@@ -5,19 +5,25 @@
     width: 100%;
 }
 
+// ── Search bar ──────────────────────────────────────────────────────────────────
+
 .gs-bar {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
     background: #0a0a0a;
     border: 1px solid rgba(255, 255, 255, 0.07);
     height: 40px;
-    padding: 0 0.9rem;
+    padding: 0 0.5rem 0 0.9rem;
     transition: border-color 0.2s, box-shadow 0.2s;
 
     &:focus-within {
         border-color: var(--accent-primary);
         box-shadow: 0 0 0 2px rgba(239, 157, 87, 0.08);
+    }
+
+    &--filters-active {
+        border-color: rgba(239, 157, 87, 0.25);
     }
 }
 
@@ -63,11 +69,225 @@
     }
 }
 
+// ── Active filter chips (inside bar) ───────────────────────────────────────────
+
+.gs-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.45rem;
+    background: rgba(239, 157, 87, 0.1);
+    border: 1px solid rgba(239, 157, 87, 0.3);
+    color: var(--accent-primary);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s;
+
+    &:hover {
+        background: rgba(239, 157, 87, 0.18);
+        border-color: rgba(239, 157, 87, 0.5);
+    }
+}
+
+.gs-chip-x {
+    font-size: 0.5rem;
+    opacity: 0.7;
+}
+
+// ── Filter toggle button ────────────────────────────────────────────────────────
+
+.gs-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: 1px solid transparent;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    font-family: inherit;
+    position: relative;
+    border-radius: 2px;
+
+    &:hover {
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &--open {
+        color: var(--accent-primary);
+        border-color: rgba(239, 157, 87, 0.3);
+        background: rgba(239, 157, 87, 0.05);
+    }
+
+    &--active {
+        color: var(--accent-primary);
+    }
+}
+
+.gs-filter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-primary);
+    color: #000;
+    font-size: 0.5rem;
+    font-weight: 800;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    line-height: 1;
+}
+
+// ── Filter Panel ────────────────────────────────────────────────────────────────
+
+.gs-filter-panel {
+    background: #070707;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-top: none;
+    padding: 0.6rem 0;
+    animation: gs-panel-in 0.15s ease;
+}
+
+@keyframes gs-panel-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.gs-fp-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.35rem 0.9rem;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+}
+
+.gs-fp-lbl {
+    font-size: 0.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.2);
+    white-space: nowrap;
+    padding-top: 0.35rem;
+    min-width: 46px;
+}
+
+.gs-fp-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    flex: 1;
+}
+
+.gs-fp-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.22rem 0.6rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: color 0.12s, border-color 0.12s, background 0.12s;
+    white-space: nowrap;
+
+    i { font-size: 0.6rem; }
+
+    &:hover {
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    &--active {
+        color: var(--accent-primary);
+        border-color: rgba(239, 157, 87, 0.5);
+        background: rgba(239, 157, 87, 0.07);
+
+        &:hover {
+            background: rgba(239, 157, 87, 0.12);
+            border-color: rgba(239, 157, 87, 0.7);
+        }
+    }
+}
+
+.gs-fp-count {
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.06);
+    padding: 0 4px;
+    border-radius: 6px;
+
+    .gs-fp-pill--active & {
+        color: rgba(239, 157, 87, 0.8);
+        background: rgba(239, 157, 87, 0.12);
+    }
+}
+
+.gs-fp-clear-row {
+    padding: 0.4rem 0.9rem 0.2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 0.1rem;
+}
+
+.gs-fp-clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.62rem;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 0;
+    letter-spacing: 0.3px;
+    transition: color 0.15s;
+
+    i { font-size: 0.65rem; }
+
+    &:hover {
+        color: #e05555;
+    }
+}
+
+// ── Filter summary bar (inside dropdown) ───────────────────────────────────────
+
+.gs-filter-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    letter-spacing: 0.5px;
+
+    i { color: var(--accent-primary); font-size: 0.55rem; }
+}
+
 // ═══════════════════════════════════ DROPDOWN ══
 
 .gs-dropdown {
     position: absolute;
-    top: calc(100% + 4px);
+    top: calc(100% + 2px);
     left: 0;
     right: 0;
     background: #080808;
@@ -79,13 +299,8 @@
     scrollbar-width: thin;
     scrollbar-color: var(--row-border) transparent;
 
-    &::-webkit-scrollbar {
-        width: 3px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: var(--row-border);
-    }
+    &::-webkit-scrollbar { width: 3px; }
+    &::-webkit-scrollbar-thumb { background: var(--row-border); }
 }
 
 .gs-section-lbl {
@@ -97,9 +312,7 @@
     padding: 0.55rem 0.75rem 0.2rem;
     border-top: 1px solid var(--row-border);
 
-    &:first-child {
-        border-top: none;
-    }
+    &:first-child { border-top: none; }
 }
 
 .gs-result {
@@ -111,9 +324,7 @@
     transition: background 0.12s;
 
     &:hover,
-    &.gs-result--active {
-        background: rgba(239, 157, 87, 0.05);
-    }
+    &.gs-result--active { background: rgba(239, 157, 87, 0.05); }
 }
 
 .gs-ri {
@@ -138,7 +349,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
-    // Highlighted matched text
     :host ::ng-deep .gs-mark {
         background: rgba(239, 157, 87, 0.2);
         color: var(--accent-primary);
@@ -156,16 +366,70 @@
     text-overflow: ellipsis;
 }
 
+.gs-result-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+// ── Status badge ───────────────────────────────────────────────────────────────
+
+.gs-status {
+    font-size: 0.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 2px 5px;
+    border-radius: 2px;
+    white-space: nowrap;
+
+    &--active    { background: rgba(80, 200, 120, 0.1);  color: #50c878; }
+    &--completed { background: rgba(100, 150, 220, 0.1); color: #6496dc; }
+    &--pending   { background: rgba(239, 157, 87, 0.12); color: var(--accent-primary); }
+    &--cancelled { background: rgba(220, 80, 80, 0.1);   color: #dc5050; }
+    &--verified  { background: rgba(80, 200, 120, 0.1);  color: #50c878; }
+    &--unverified{ background: rgba(160, 160, 160, 0.1); color: rgba(255,255,255,0.35); }
+}
+
 .gs-rc {
     font-size: 0.55rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: rgba(255, 255, 255, 0.2);
     white-space: nowrap;
-    margin-left: auto;
-    padding-left: 0.5rem;
-    flex-shrink: 0;
 }
+
+// ── Empty state ────────────────────────────────────────────────────────────────
+
+.gs-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 1.1rem 0.75rem;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    text-align: center;
+
+    i { font-size: 0.8rem; opacity: 0.4; }
+}
+
+.gs-empty-clear {
+    background: none;
+    border: none;
+    color: var(--accent-primary);
+    font-size: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    opacity: 0.85;
+
+    &:hover { opacity: 1; }
+}
+
+// ── Recent searches ────────────────────────────────────────────────────────────
 
 .gs-recent {
     display: flex;
@@ -177,17 +441,8 @@
     cursor: pointer;
     transition: background 0.12s, color 0.12s;
 
-    i {
-        font-size: 0.6rem;
-        opacity: 0.45;
-        flex-shrink: 0;
-    }
-
-    span {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+    i { font-size: 0.6rem; opacity: 0.45; flex-shrink: 0; }
+    span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     &:hover {
         color: var(--text-primary);
@@ -210,29 +465,11 @@
     transition: color 0.15s;
     font-family: inherit;
 
-    &:hover {
-        color: var(--accent-primary);
-    }
-}
-
-.gs-empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    padding: 1.1rem 0.75rem;
-    font-size: 0.72rem;
-    color: var(--text-secondary);
-
-    i {
-        font-size: 0.8rem;
-        opacity: 0.4;
-    }
+    &:hover { color: var(--accent-primary); }
 }
 
 // ═══════════════════════════════════ MOBILE ══
 
-// Mobile icon button no longer needed (search bar is always visible in center column)
 .gs-mob-btn {
     display: none;
 }
@@ -262,9 +499,7 @@
     align-items: center;
     gap: 0.5rem;
 
-    .gs-input {
-        font-size: 0.9rem;
-    }
+    .gs-input { font-size: 0.9rem; }
 }
 
 .gs-mob-close {
@@ -290,31 +525,33 @@
     }
 }
 
+// ── Mobile filter bar ──────────────────────────────────────────────────────────
+
+.gs-mob-filters {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: #030303;
+
+    .gs-fp-row {
+        padding: 0.3rem 1.25rem;
+    }
+
+    .gs-fp-clear {
+        margin: 0.25rem 1.25rem;
+        font-size: 0.65rem;
+    }
+}
+
+// ── Mobile results ─────────────────────────────────────────────────────────────
+
 .gs-mob-results {
     flex: 1;
     overflow-y: auto;
     padding-bottom: 2rem;
 
-    .gs-result {
-        padding: 0.75rem 1.25rem;
-    }
-
-    .gs-recent {
-        padding: 0.65rem 1.25rem;
-        font-size: 0.82rem;
-    }
-
-    .gs-section-lbl {
-        padding: 0.65rem 1.25rem 0.25rem;
-    }
-
-    .gs-empty {
-        padding: 2rem 1.25rem;
-        font-size: 0.82rem;
-        gap: 0.75rem;
-    }
-
-    .gs-clear-recent {
-        padding: 0.65rem 1.25rem;
-    }
+    .gs-result   { padding: 0.75rem 1.25rem; }
+    .gs-recent   { padding: 0.65rem 1.25rem; font-size: 0.82rem; }
+    .gs-section-lbl { padding: 0.65rem 1.25rem 0.25rem; }
+    .gs-empty    { padding: 2rem 1.25rem; font-size: 0.82rem; gap: 0.75rem; }
+    .gs-clear-recent { padding: 0.65rem 1.25rem; }
 }

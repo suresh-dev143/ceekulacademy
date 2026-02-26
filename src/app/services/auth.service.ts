@@ -31,7 +31,7 @@ export class AuthService {
             email: 'priya.sharma@ceekulmisson.org',
             role: 'Director',
             assignedState: 'Uttar Pradesh',
-            assignedDistrict: 'Varanasi'
+            assignedDistrict: 'Raebareli'
         },
         {
             id: 'DIR-003',
@@ -84,10 +84,10 @@ export class AuthService {
     ];
 
     // Default to first director for development
-    private currentUser = signal<UserProfile>(this.directorProfiles[2]);
+    private currentUser = signal<UserProfile>(this.directorProfiles[0]);
 
     currentUserProfile = this.currentUser.asReadonly();
-    currentUserRole = signal<UserRole>(this.directorProfiles[2].role).asReadonly();
+    currentUserRole = signal<UserRole>(this.directorProfiles[0].role).asReadonly();
 
     // Login with specific director profile
     loginAsDirector(directorId: string) {

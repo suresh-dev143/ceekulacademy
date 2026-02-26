@@ -11,6 +11,7 @@ export interface NavItem {
     exact?: boolean;
     badge?: number;
     disabled?: boolean;
+    isActive?: boolean;  // programmatic highlight (no router match needed)
 }
 
 export interface NavSection {
@@ -38,10 +39,10 @@ export class SidebarLeftComponent {
     // ── Core sections (all roles) ──────────────────────────────────────
     private readonly coreSections: NavSection[] = [
         {
-            label: 'Core',
+            label: '',
             items: [
-                { label: 'Dashboard',   icon: 'fa-th-large',     route: '/home',              exact: true  },
-                { label: 'My Schedule', icon: 'fa-calendar-alt', route: '/my-schedule' },
+                // { label: 'Dashboard',   icon: 'fa-th-large',     route: '/home',              },
+                { label: 'My Schedule', icon: 'fa-calendar-alt', route: '/my-schedule' , exact: true },
                 { label: 'My Courses',  icon: 'fa-book-open',    route: '/dashboard/courses' },
             ]
         },
@@ -59,7 +60,7 @@ export class SidebarLeftComponent {
         Student: {
             label: 'Academic',
             items: [
-                { label: 'Student Hub',     icon: 'fa-tachometer-alt',  route: '/dashboard/student' },
+                { label: 'Student Home',     icon: 'fa-tachometer-alt',  route: '/dashboard/student' },
                 { label: 'Nearby Learning', icon: 'fa-map-marker-alt',  route: '/dashboard/student/nearby' },
                 { label: 'Assignments',     icon: 'fa-tasks',           route: '#', disabled: true },
                 { label: 'Results',         icon: 'fa-chart-bar',       route: '#', disabled: true },
@@ -93,14 +94,6 @@ export class SidebarLeftComponent {
                 { label: 'Resource Mgmt',       icon: 'fa-boxes',         route: '#', disabled: true },
             ]
         },
-        Director: {
-            label: 'Leadership',
-            items: [
-                { label: 'Director Hub', icon: 'fa-crown',          route: '/dashboard/director' },
-                { label: 'District',     icon: 'fa-map',            route: '/district' },
-                { label: 'Issues',       icon: 'fa-exclamation-circle', route: '/issues' },
-            ]
-        },
         Admin: {
             label: 'Administration',
             items: [
@@ -131,6 +124,33 @@ export class SidebarLeftComponent {
     // ── All sections computed from current role ────────────────────────
     allSections = computed((): NavSection[] => {
         const role = this.userRole();
+
+        if (role === 'Director') {
+            return [
+                {
+                    label: 'Leadership',
+                    items: [
+                        { label: 'Advisor',   icon: 'fa-user-tie',          route: '#', disabled: true },
+                        { label: 'Director',  icon: 'fa-crown',             route: '/dashboard/director', isActive: true },
+                        { label: 'Manager',   icon: 'fa-user-cog',          route: '#', disabled: true },
+                        { label: 'Volunteer', icon: 'fa-hands-helping',     route: '#', disabled: true },
+                    ]
+                },
+                {
+                    label: 'Personal',
+                    items: [
+                        { label: 'My Profile', icon: 'fa-user-circle', route: '/my-profile' },
+                    ]
+                },
+                // {
+                //     label: 'Community',
+                //     items: [
+                //         { label: 'Local Issue', icon: 'fa-exclamation-circle', route: '/issues' },
+                //     ]
+                // },
+            ];
+        }
+
         const institutional = this.institutionalMap[role] ?? null;
         return [
             ...this.coreSections,

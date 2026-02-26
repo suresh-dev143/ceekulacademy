@@ -1,14 +1,25 @@
 <nav class="snav" [class.snav--collapsed]="collapsed">
 
     <!-- ── Identity Strip ── -->
-    <div class="snav-identity">
+    <!-- <div class="snav-identity">
         @if (!collapsed) {
         <div class="snav-user-info">
             <div class="snav-username">{{ userProfile().name }}</div>
             <div class="snav-role">{{ userRole() }}</div>
         </div>
         }
+    </div> -->
+
+    <!-- ── District Banner (Director only) ── -->
+    @if (userRole() === 'Director') {
+    <div class="snav-district">
+        @if (!collapsed) {
+        <div class="snav-district-name">{{ userProfile().assignedDistrict | uppercase }}</div>
+        } @else {
+        <!-- <i class="fas fa-map-pin snav-district-icon"></i> -->
+        }
     </div>
+    }
 
     <!-- ── Navigation Sections ── -->
     <div class="snav-body">
@@ -22,11 +33,12 @@
             @for (item of section.items; track item.label) {
             @if (!item.disabled) {
             <a class="snav-item"
+               [class.snav-item--active]="item.isActive"
                [routerLink]="item.route"
                routerLinkActive="snav-item--active"
                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
                [title]="collapsed ? item.label : ''">
-                <i class="fas {{ item.icon }} snav-item-icon"></i>
+                <!-- <i class="fas {{ item.icon }} snav-item-icon"></i> -->
                 @if (!collapsed) {
                 <span class="snav-item-label">{{ item.label }}</span>
                 @if (item.badge) {
@@ -36,7 +48,7 @@
             </a>
             } @else {
             <div class="snav-item snav-item--disabled" [title]="collapsed ? item.label + ' (coming soon)' : ''">
-                <i class="fas {{ item.icon }} snav-item-icon"></i>
+                <!-- <i class="fas {{ item.icon }} snav-item-icon"></i> -->
                 @if (!collapsed) {
                 <span class="snav-item-label">{{ item.label }}</span>
                 <span class="snav-item-soon">Soon</span>

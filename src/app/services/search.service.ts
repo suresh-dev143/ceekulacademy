@@ -3,17 +3,37 @@ import { AuthService } from './auth.service';
 import { ScheduleService } from './schedule.service';
 import { ProfileService, StudentInfo, TeacherInfo, PartnerInfo } from './profile.service';
 
-export type SearchCategory = 'Course' | 'Schedule' | 'Person' | 'Page' | 'Facility';
+// ── Core types ─────────────────────────────────────────────────────────────────
+export type SearchCategory =
+    | 'Course' | 'Schedule' | 'Person' | 'Page' | 'Facility'
+    | 'Program' | 'Session' | 'Institution' | 'Document' | 'Report';
 
-export interface SearchResult {
-    id: string;
-    title: string;
-    subtitle: string;
-    category: SearchCategory;
-    icon: string;   // Font Awesome class e.g. 'fa-book'
-    route: string;  // Angular route path
+export type FilterCategory =
+    | 'all' | 'programs' | 'courses' | 'sessions'
+    | 'users' | 'institutions' | 'documents' | 'reports';
+
+export type SearchStatus =
+    | 'active' | 'completed' | 'pending' | 'cancelled' | 'verified' | 'unverified';
+
+export type DateRange = 'today' | 'this-week' | 'this-month' | '';
+
+export interface SearchFilters {
+    category:  FilterCategory;
+    status:    SearchStatus[];
+    dateRange: DateRange;
 }
 
+export interface SearchResult {
+    id:       string;
+    title:    string;
+    subtitle: string;
+    category: SearchCategory;
+    icon:     string;
+    route:    string;
+    status?:  SearchStatus;
+}
+
+// ── Static page index ──────────────────────────────────────────────────────────
 const PAGES: SearchResult[] = [
     { id: 'p-home',       title: 'Home',               subtitle: 'Go to home page',                    category: 'Page', icon: 'fa-home',              route: '/home' },
     { id: 'p-about',      title: 'About',              subtitle: 'Learn about Ceekul Mission',          category: 'Page', icon: 'fa-info-circle',        route: '/about' },
@@ -33,23 +53,36 @@ const PAGES: SearchResult[] = [
     { id: 'p-issues',     title: 'Issues',             subtitle: 'Community issues tracker',            category: 'Page', icon: 'fa-exclamation-circle', route: '/issues' },
 ];
 
+// ── Mapping: FilterCategory → SearchCategory[] ─────────────────────────────────
+const FILTER_MAP: Record<FilterCategory, SearchCategory[]> = {
+    all:          [],
+    programs:     ['Program'],
+    courses:      ['Course'],
+    sessions:     ['Schedule', 'Session'],
+    users:        ['Person'],
+    institutions: ['Facility', 'Institution'],
+    documents:    ['Document'],
+    reports:      ['Report'],
+};
+
 @Injectable({ providedIn: 'root' })
 export class SearchService {
-    private authService    = inject(AuthService);
+    private authService     = inject(AuthService);
     private scheduleService = inject(ScheduleService);
     private profileService  = inject(ProfileService);
 
     private _recent = signal<string[]>([]);
     readonly recentSearches = this._recent.asReadonly();
 
+    // ── Full text search (returns ALL matching, before filter narrowing) ────────
     search(query: string): SearchResult[] {
         const q = query.trim().toLowerCase();
         if (!q) return [];
 
-        const role    = this.authService.currentUserRole();
+        const role = this.authService.currentUserRole();
         const all: SearchResult[] = [...PAGES];
 
-        // ── Schedule items (today) ─────────────────────────────────────
+        // ── Schedule items (today) ─────────────────────────────────────────────
         const todayStr = new Date().toISOString().split('T')[0];
         const todayItems = this.scheduleService.items().filter(i => i.date === todayStr);
 
@@ -66,10 +99,10 @@ export class SearchService {
                     : `${item.startTime}–${item.endTime} · ${item.location}`,
                 category: 'Schedule',
                 icon: typeIcon,
-                route: '/my-schedule'
+                route: '/my-schedule',
+                status: 'active',
             });
 
-            // Deduplicated teacher person entries
             if (item.teacher) {
                 const tid = 'person-t-' + item.teacher.replace(/\s+/g, '-');
                 if (!all.find(r => r.id === tid)) {
@@ -79,13 +112,13 @@ export class SearchService {
                         subtitle: `Teacher · ${item.title}`,
                         category: 'Person',
                         icon: 'fa-user-tie',
-                        route: '/my-schedule'
+                        route: '/my-schedule',
                     });
                 }
             }
         }
 
-        // ── Role-specific data ─────────────────────────────────────────
+        // ── Role-specific data ─────────────────────────────────────────────────
         const roleInfo = this.profileService.profile().roleInfo;
 
         if (roleInfo.type === 'Student') {
@@ -97,7 +130,8 @@ export class SearchService {
                     subtitle: `Enrolled · ${si.institution}`,
                     category: 'Course',
                     icon: 'fa-book',
-                    route: '/dashboard/courses'
+                    route: '/dashboard/courses',
+                    status: 'active',
                 });
             }
         }
@@ -111,7 +145,8 @@ export class SearchService {
                     subtitle: `Subject · ${ti.qualification}`,
                     category: 'Course',
                     icon: 'fa-book-open',
-                    route: '/dashboard/teacher'
+                    route: '/dashboard/teacher',
+                    status: 'active',
                 });
             }
             const sampleStudents = ['Arjun Verma', 'Priya Singh', 'Rohan Das', 'Meena Patel', 'Suresh Kumar'];
@@ -122,7 +157,7 @@ export class SearchService {
                     subtitle: 'Student · Batch A',
                     category: 'Person',
                     icon: 'fa-user-graduate',
-                    route: '/dashboard/teacher'
+                    route: '/dashboard/teacher',
                 });
             }
         }
@@ -136,7 +171,8 @@ export class SearchService {
                     subtitle: `Facility · ${pi.institutionName}`,
                     category: 'Facility',
                     icon: 'fa-building',
-                    route: '/dashboard/partner'
+                    route: '/dashboard/partner',
+                    status: 'active',
                 });
             }
             for (const teacher of pi.assignedTeachers) {
@@ -146,27 +182,80 @@ export class SearchService {
                     subtitle: `Assigned Teacher · ${pi.institutionName}`,
                     category: 'Person',
                     icon: 'fa-user-tie',
-                    route: '/dashboard/partner'
+                    route: '/dashboard/partner',
                 });
             }
         }
 
-        // ── Filter ─────────────────────────────────────────────────────
+        // ── Director-specific data ─────────────────────────────────────────────
+        if (role === 'Director') {
+            const dirPrograms: SearchResult[] = [
+                { id: 'dprog-youth',    title: 'Youth Leadership Program',    subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-project-diagram', route: '/dashboard/director', status: 'active' },
+                { id: 'dprog-women',    title: 'Women Empowerment Initiative', subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-venus',            route: '/dashboard/director', status: 'active' },
+                { id: 'dprog-digital',  title: 'Digital Literacy Drive',       subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-laptop',           route: '/dashboard/director', status: 'pending' },
+                { id: 'dprog-rural',    title: 'Rural Education Outreach',     subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-school',           route: '/dashboard/director', status: 'completed' },
+            ];
+            const dirInstitutions: SearchResult[] = [
+                { id: 'inst-mary', title: "St. Mary's College",      subtitle: 'Partner Institution · Raebareli', category: 'Institution', icon: 'fa-university', route: '/district', status: 'verified' },
+                { id: 'inst-poly', title: 'Raebareli Polytechnic',   subtitle: 'Partner Institution · Raebareli', category: 'Institution', icon: 'fa-university', route: '/district', status: 'active' },
+                { id: 'inst-govt', title: 'Govt. Inter College',     subtitle: 'Partner Institution · Raebareli', category: 'Institution', icon: 'fa-school',     route: '/district', status: 'verified' },
+            ];
+            const dirReports: SearchResult[] = [
+                { id: 'rep-q1',  title: 'Q1 Progress Report',      subtitle: 'Compliance Report · Raebareli', category: 'Report', icon: 'fa-file-alt',      route: '/dashboard/director', status: 'completed' },
+                { id: 'rep-enr', title: 'Enrollment Summary',      subtitle: 'District Report · Raebareli',   category: 'Report', icon: 'fa-chart-pie',     route: '/dashboard/director', status: 'active' },
+                { id: 'rep-com', title: 'Compliance Audit Log',    subtitle: 'Audit Document · Raebareli',    category: 'Document', icon: 'fa-clipboard-list', route: '/dashboard/director', status: 'pending' },
+            ];
+            all.push(...dirPrograms, ...dirInstitutions, ...dirReports);
+        }
+
+        // ── Text filter ────────────────────────────────────────────────────────
         const filtered = all.filter(r =>
             r.title.toLowerCase().includes(q) ||
             r.subtitle.toLowerCase().includes(q)
         );
 
-        // Sort: exact title-start matches first
         filtered.sort((a, b) => {
             const aStart = a.title.toLowerCase().startsWith(q) ? 0 : 1;
             const bStart = b.title.toLowerCase().startsWith(q) ? 0 : 1;
             return aStart - bStart;
         });
 
-        return filtered.slice(0, 12);
+        return filtered.slice(0, 20);
     }
 
+    // ── Apply structured filters on top of text search results ────────────────
+    applyFilters(results: SearchResult[], filters: SearchFilters): SearchResult[] {
+        let out = [...results];
+
+        // Category filter
+        if (filters.category !== 'all') {
+            const allowedCats = FILTER_MAP[filters.category];
+            out = out.filter(r => allowedCats.includes(r.category));
+        }
+
+        // Status filter (multi-select OR logic)
+        if (filters.status.length > 0) {
+            out = out.filter(r => r.status && filters.status.includes(r.status));
+        }
+
+        return out;
+    }
+
+    // ── Count results per FilterCategory (for badge display) ──────────────────
+    countsByFilterCategory(results: SearchResult[]): Map<FilterCategory, number> {
+        const map = new Map<FilterCategory, number>();
+        for (const r of results) {
+            for (const [filterCat, cats] of Object.entries(FILTER_MAP) as [FilterCategory, SearchCategory[]][]) {
+                if (filterCat === 'all') continue;
+                if (cats.includes(r.category)) {
+                    map.set(filterCat, (map.get(filterCat) ?? 0) + 1);
+                }
+            }
+        }
+        return map;
+    }
+
+    // ── Recent searches ────────────────────────────────────────────────────────
     addRecentSearch(q: string): void {
         const trimmed = q.trim();
         if (!trimmed) return;
@@ -178,5 +267,17 @@ export class SearchService {
 
     clearRecentSearches(): void {
         this._recent.set([]);
+    }
+
+    // ── Filter persistence (localStorage) ─────────────────────────────────────
+    saveFilters(f: SearchFilters): void {
+        try { localStorage.setItem('gs-filters', JSON.stringify(f)); } catch { /* noop */ }
+    }
+
+    loadSavedFilters(): Partial<SearchFilters> {
+        try {
+            const raw = localStorage.getItem('gs-filters');
+            return raw ? JSON.parse(raw) : {};
+        } catch { return {}; }
     }
 }

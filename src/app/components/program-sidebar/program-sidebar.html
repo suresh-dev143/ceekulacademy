@@ -1,0 +1,108 @@
+<nav class="pnav">
+
+    @for (p of allPrograms(); track p.id) {
+    @let activeProg = isActiveProgram(p.id);
+
+    <!-- ── Program Root (Level 0) ───────────────────────────────────────── -->
+    <div class="pnav-root" [class.pnav-root--active]="activeProg">
+        @if (activeProg) {
+        <span class="pnav-chevron pnav-root-chevron"
+              [class.pnav-chevron--open]="!treeCollapsed()"
+              (click)="toggleTree($event)"
+              title="Collapse tree">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <path d="M3 2L7 5L3 8" stroke="currentColor" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </span>
+        } @else {
+        <span class="pnav-root-dot"></span>
+        }
+        <span class="pnav-root-label"
+              (click)="activeProg ? goToProgram() : goToOtherProgram(p.id)">{{ p.title }}</span>
+    </div>
+
+    <!-- ── Section List (active program only) ──────────────────────────── -->
+    @if (activeProg && !treeCollapsed()) {
+    @let prog = program();
+    @if (prog) {
+    <div class="pnav-tree">
+
+        @for (section of prog.children; track section.id) {
+
+        <!-- Level 1: Course ──────────────────────────────────────────────── -->
+        <div class="pnav-group">
+
+            <div class="pnav-node pnav-l1"
+                 [class.pnav-node--active]="isActive(section.id)"
+                 [attr.data-node-id]="section.id">
+                <!-- Chevron: toggle only -->
+                <span class="pnav-chevron"
+                      [class.pnav-chevron--open]="isExpanded(section.id)"
+                      (click)="toggleNode($event, section.id)">
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M3 2L7 5L3 8" stroke="currentColor" stroke-width="1.5"
+                              stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <!-- Label: navigate only -->
+                <span class="pnav-label" (click)="goToSection(section)">{{ section.label }}</span>
+            </div>
+
+            <!-- Level 2: Syllabus Section ──────────────────────────────────── -->
+            @if (isExpanded(section.id) && section.children.length) {
+            <div class="pnav-children pnav-children--animated">
+
+                @for (sub of section.children; track sub.id) {
+
+                <div class="pnav-group">
+
+                    <div class="pnav-node pnav-l2"
+                         [class.pnav-node--active]="isActive(sub.id)"
+                         [attr.data-node-id]="sub.id">
+                        <!-- Chevron: toggle only -->
+                        <span class="pnav-chevron"
+                              [class.pnav-chevron--open]="isExpanded(sub.id)"
+                              (click)="toggleNode($event, sub.id)">
+                            <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                                <path d="M3 2L7 5L3 8" stroke="currentColor" stroke-width="1.5"
+                                      stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <!-- Label: navigate only -->
+                        <span class="pnav-label" (click)="goToSub(section, sub)">{{ sub.label }}</span>
+                    </div>
+
+                    <!-- Level 3: Syllabus Items ─────────────────────────────── -->
+                    @if (isExpanded(sub.id) && sub.children.length) {
+                    <div class="pnav-children pnav-children--animated">
+
+                        @for (item of sub.children; track item.id) {
+                        <div class="pnav-node pnav-l3"
+                             [class.pnav-node--active]="isActive(item.id)"
+                             [attr.data-node-id]="item.id"
+                             (click)="goToItem(section, sub, item)">
+                            <span class="pnav-dot"></span>
+                            <span class="pnav-label">{{ item.label }}</span>
+                        </div>
+                        }
+
+                    </div>
+                    }
+
+                </div>
+                }
+
+            </div>
+            }
+
+        </div>
+        }
+
+    </div>
+    }
+    }
+
+    }
+
+</nav>

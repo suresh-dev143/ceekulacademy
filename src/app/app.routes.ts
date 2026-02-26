@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { LandingComponent } from './pages/landing/landing';
+import { HomeComponent } from './pages/home/home';
 import { AboutComponent } from './pages/about/about';
 import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
@@ -9,7 +9,7 @@ import { InnovativeComponent } from './pages/innovative/innovative';
 import { ProgramsComponent } from './pages/programs/programs';
 import { CentersComponent } from './pages/centers/centers';
 import { TransformationComponent } from './pages/transformation/transformation';
-import { HomeComponent } from './pages/home/home';
+import { DashboardHomeComponent } from './pages/dashboard/dashboard-home';
 import { CoursesComponent } from './pages/courses/courses';
 import { DirectorDashboardComponent } from './pages/director-dashboard/director-dashboard';
 import { PartnerDashboardComponent } from './pages/partner-dashboard/partner-dashboard';
@@ -22,21 +22,20 @@ import { DonatePageComponent } from './pages/donate/donate';
 import { InvestPageComponent } from './pages/invest/invest';
 import { StudentDashboardComponent } from './pages/student-dashboard/student-dashboard';
 import { HealthConnectComponent } from './pages/health-connect/health-connect';
-import { WorkshopsPageComponent } from './pages/teacher-workshops/teacher-workshops';
 import { MyScheduleComponent } from './pages/my-schedule/my-schedule';
 import { MyProfileComponent } from './pages/my-profile/my-profile';
+import { ProgramDetailComponent } from './pages/program-detail/program-detail';
 
 export const routes: Routes = [
-    { path: '', component: LandingComponent },
-    { path: 'home', component: HomeComponent },
+    { path: '', component: HomeComponent },
+    { path: 'dashboard', component: DashboardHomeComponent },
     { path: 'dashboard/courses', component: CoursesComponent },
     { path: 'dashboard/director', component: DirectorDashboardComponent },
     { path: 'dashboard/partner', component: PartnerDashboardComponent },
     { path: 'dashboard/student', component: StudentDashboardComponent },
     { path: 'dashboard/student/nearby', component: StudentNearbyComponent },
     { path: 'dashboard/teacher', component: TeacherDashboardComponent },
-    // { path: 'dashboard/teacher/workshops', redirectTo: 'workshops', pathMatch: 'full' },
-    { path: 'dashboard/teacher/workshops', component:WorkshopsPageComponent },
+    { path: 'dashboard/teacher/workshops', redirectTo: 'workshops', pathMatch: 'full' },
     { path: 'about', component: AboutComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
@@ -49,6 +48,9 @@ export const routes: Routes = [
     { path: 'innovative', component: InnovativeComponent },
     { path: 'courses', component: InnovativeComponent },
     { path: 'programs', component: ProgramsComponent },
+    { path: 'programs/:programId', component: ProgramDetailComponent },
+    { path: 'programs/:programId/:sectionId', component: ProgramDetailComponent },
+    { path: 'programs/:programId/:sectionId/:subSectionId', component: ProgramDetailComponent },
     { path: 'workshops', component: PublicWorkshopsPageComponent },
     { path: 'transformation', component: TransformationComponent },
     { path: 'centers', component: CentersComponent },
