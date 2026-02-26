@@ -22,9 +22,11 @@
 
         <!-- Center Column (Main Content) -->
         <main class="col-center" [class.left-collapsed]="leftCollapsed()" [class.right-collapsed]="rightCollapsed()">
+            @if (showSearch) {
             <div class="center-search-bar">
                 <app-global-search></app-global-search>
             </div>
+            }
             <ng-content></ng-content>
         </main>
 

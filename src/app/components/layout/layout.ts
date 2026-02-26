@@ -19,6 +19,7 @@ export class LayoutComponent {
 
     @Input() showLeftSidebar = true;
     @Input() showRightSidebar = true;
+    @Input() showSearch = true;
 
     toggleLeft() {
         this.leftCollapsed.set(!this.leftCollapsed());

@@ -1,0 +1,146 @@
+<app-layout [showSearch]="false">
+    <div class="research-container animate-fade-in">
+
+        <!-- ── Header ── -->
+        <div class="view-header centered">
+            <h1 class="page-title">Research</h1>
+            <p class="section-subtitle">Explore, enroll, create, and manage academic research initiatives.</p>
+        </div>
+
+        <!-- ── Create Button (Researcher only) ── -->
+        @if (isResearcher()) {
+        <div class="create-research-section">
+            <a class="btn-create-research" routerLink="/research/new">+ New Research</a>
+        </div>
+        }
+
+        <!-- ── Filter Panel ── -->
+        <div class="filter-panel">
+            <!-- Search Row -->
+            <div class="search-row">
+                <div class="search-input-box">
+                    <input type="text" class="search-input"
+                        [ngModel]="searchQuery()"
+                        (ngModelChange)="searchQuery.set($event)"
+                        placeholder="Search by title, description, researcher...">
+                    @if (searchQuery()) {
+                    <button class="clear-btn" (click)="searchQuery.set('')">×</button>
+                    }
+                </div>
+                @if (activeFilterCount() > 0) {
+                <button class="clear-all-btn" (click)="clearFilters()">
+                    <span>Clear Filters</span>
+                    <span class="badge">{{ activeFilterCount() }}</span>
+                </button>
+                }
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-row">
+                <div class="filter-group">
+                    <div class="filter-label">Category</div>
+                    <div class="toggle-group">
+                        @for (opt of categoryOptions; track opt) {
+                        <button class="toggle-btn" [class.active]="categoryFilter() === opt"
+                            (click)="categoryFilter.set(opt)">{{ opt }}</button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-row">
+                <div class="filter-group">
+                    <div class="filter-label">Status</div>
+                    <div class="toggle-group">
+                        @for (opt of statusOptions; track opt) {
+                        <button class="toggle-btn" [class.active]="statusFilter() === opt"
+                            (click)="statusFilter.set(opt)">{{ opt }}</button>
+                        }
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Level</div>
+                    <div class="toggle-group">
+                        @for (opt of levelOptions; track opt) {
+                        <button class="toggle-btn" [class.active]="levelFilter() === opt"
+                            (click)="levelFilter.set(opt)">{{ opt }}</button>
+                        }
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Mentor Available</div>
+                    <div class="toggle-group">
+                        @for (opt of mentorOptions; track opt) {
+                        <button class="toggle-btn" [class.active]="mentorFilter() === opt"
+                            (click)="mentorFilter.set(opt)">{{ opt }}</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Research Grid ── -->
+        @if (filteredResearch().length > 0) {
+        <div class="course-grid">
+            @for (r of filteredResearch(); track r.id) {
+            <div class="course-card">
+
+                <div class="card-top">
+                    <div class="card-badges">
+                        <div class="mode-tag">{{ r.category }}</div>
+                        <div class="availability-tag"
+                            [class.status-open]="r.status === 'Open'"
+                            [class.status-progress]="r.status === 'In Progress'"
+                            [class.status-done]="r.status === 'Completed'">
+                            {{ r.status }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="level-badge" [class]="'level-' + r.level.toLowerCase()">
+                    {{ r.level }}
+                </div>
+
+                <h3 class="course-title">{{ r.title }}</h3>
+
+                <p class="course-desc">{{ r.description }}</p>
+
+                <div class="course-meta">
+                    <span>{{ r.createdBy }}</span>
+                    <span>{{ r.participantsCount }} participants</span>
+                    <span>{{ r.duration }}</span>
+                    @if (r.mentorAvailable) {
+                    <span class="mentor-tag">Mentor</span>
+                    }
+                </div>
+
+                <div class="skill-tags">
+                    @for (skill of r.skills; track skill) {
+                    <span class="skill-chip">{{ skill }}</span>
+                    }
+                </div>
+
+                <div class="course-action">
+                    @if (isResearcher()) {
+                    <span>Manage</span>
+                    } @else if (r.status === 'Open') {
+                    <span>Apply Now</span>
+                    } @else {
+                    <span>View Details</span>
+                    }
+                </div>
+
+            </div>
+            }
+        </div>
+        } @else {
+        <div class="empty-search">
+            <p><strong>No research found</strong> matching your filters.</p>
+            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Try adjusting your search criteria.</p>
+        </div>
+        }
+
+    </div>
+</app-layout>

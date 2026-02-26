@@ -84,10 +84,10 @@ export class AuthService {
     ];
 
     // Default to first director for development
-    private currentUser = signal<UserProfile>(this.directorProfiles[0]);
+    private currentUser = signal<UserProfile>(this.directorProfiles[3]);
 
     currentUserProfile = this.currentUser.asReadonly();
-    currentUserRole = signal<UserRole>(this.directorProfiles[0].role).asReadonly();
+    currentUserRole = signal<UserRole>(this.directorProfiles[3].role).asReadonly();
 
     // Login with specific director profile
     loginAsDirector(directorId: string) {

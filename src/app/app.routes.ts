@@ -25,6 +25,8 @@ import { HealthConnectComponent } from './pages/health-connect/health-connect';
 import { MyScheduleComponent } from './pages/my-schedule/my-schedule';
 import { MyProfileComponent } from './pages/my-profile/my-profile';
 import { ProgramDetailComponent } from './pages/program-detail/program-detail';
+import { ResearchPageComponent } from './pages/research/research';
+import { ResearchNewComponent } from './pages/research/research-new/research-new';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -57,5 +59,7 @@ export const routes: Routes = [
     { path: 'health-connect', component: HealthConnectComponent },
     { path: 'my-schedule', component: MyScheduleComponent },
     { path: 'my-profile', component: MyProfileComponent },
+    { path: 'research/new', component: ResearchNewComponent },
+    { path: 'research',     component: ResearchPageComponent },
     { path: '**', redirectTo: '' }
 ];

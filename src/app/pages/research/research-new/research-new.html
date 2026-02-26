@@ -1,0 +1,629 @@
+<app-layout [showSearch]="false">
+<div class="rnew-container animate-fade-in">
+
+    <!-- ── Page Header ── -->
+    <div class="rnew-header">
+        <div class="header-top-row">
+            <button class="btn-back" (click)="goBack()">&#8592; Back to Research</button>
+            <div class="draft-pill" [class.saved]="draftSavedAt()">
+                <span class="draft-dot"></span>
+                <span>{{ draftSavedAt() || 'Unsaved draft' }}</span>
+            </div>
+        </div>
+        <div class="view-header centered">
+            <h1 class="page-title">Futuristic Research</h1>
+            <p class="section-subtitle">Structured Proposal for Innovation &amp; Academic Advancement</p>
+        </div>
+    </div>
+
+    <!-- ── Progress Tracker ── -->
+    <div class="progress-track">
+        <div class="progress-steps">
+            @for (s of sectionMeta; track s.idx) {
+            <div class="progress-step"
+                [class.complete]="sectionComplete()[s.idx]"
+                [class.active]="openSections().has(s.idx)"
+                (click)="toggleSection(s.idx)"
+                [title]="s.title">
+                <div class="step-dot">
+                    @if (sectionComplete()[s.idx]) { ✓ } @else { {{ s.idx + 1 }} }
+                </div>
+                <div class="step-label">{{ s.title }}</div>
+            </div>
+            }
+        </div>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" [style.width.%]="overallProgress()"></div>
+            </div>
+            <span class="progress-pct-label">{{ overallProgress() }}%</span>
+        </div>
+    </div>
+
+    <!-- ── Body: Form + Panel ── -->
+    <div class="rnew-body">
+
+        <!-- ── Form Sections ── -->
+        <div class="rnew-form">
+
+            <!-- ────────────────── Section 01: Describe Your Idea ── -->
+            <div class="form-section" [class.is-open]="openSections().has(0)">
+                <div class="section-header" (click)="toggleSection(0)">
+                    <span class="section-num" [class.complete]="sectionComplete()[0]">
+                        @if (sectionComplete()[0]) { ✓ } @else { 01 }
+                    </span>
+                    <div class="section-meta">
+                        <h3 class="section-title">Describe Your Idea</h3>
+                        <span class="section-badge required">Required</span>
+                    </div>
+                    <span class="chevron" [class.open]="openSections().has(0)">&#9662;</span>
+                </div>
+
+                @if (openSections().has(0)) {
+                <div class="section-body">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Idea Title <span class="req-mark">*</span>
+                        </label>
+                        <input type="text" class="form-control"
+                            [ngModel]="ideaTitle()"
+                            (ngModelChange)="ideaTitle.set($event)"
+                            placeholder="e.g. AI-Driven Early Detection of Antibiotic Resistance in Clinical Environments">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Idea Description <span class="req-mark">*</span>
+                            <span class="char-count" [class.near-limit]="ideaDescription().length > descCharLimit * 0.8">
+                                {{ ideaDescription().length }} / {{ descCharLimit }}
+                            </span>
+                        </label>
+                        <textarea class="form-control" rows="6"
+                            [ngModel]="ideaDescription()"
+                            (ngModelChange)="ideaDescription.set($event)"
+                            [maxlength]="descCharLimit"
+                            placeholder="Describe the core innovation, the problem it addresses, and why this research is significant. Write for a formal academic review panel."></textarea>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- ────────────────── Section 02: Background Knowledge ── -->
+            <div class="form-section" [class.is-open]="openSections().has(1)">
+                <div class="section-header" (click)="toggleSection(1)">
+                    <span class="section-num" [class.complete]="sectionComplete()[1]">
+                        @if (sectionComplete()[1]) { ✓ } @else { 02 }
+                    </span>
+                    <div class="section-meta">
+                        <h3 class="section-title">Background Knowledge</h3>
+                        <span class="section-badge">Optional</span>
+                    </div>
+                    <span class="chevron" [class.open]="openSections().has(1)">&#9662;</span>
+                </div>
+
+                @if (openSections().has(1)) {
+                <div class="section-body">
+                    <div class="form-group">
+                        <label class="form-label">Relevant Research or Context</label>
+                        <textarea class="form-control" rows="4"
+                            [ngModel]="bgContext()"
+                            (ngModelChange)="bgContext.set($event)"
+                            placeholder="Summarize existing literature, prior art, or theoretical frameworks that inform your research..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Key Concepts or Technologies</label>
+                        <div class="tag-input-wrap">
+                            <div class="tags-area">
+                                @for (concept of concepts(); track concept) {
+                                <span class="concept-tag">
+                                    {{ concept }}
+                                    <button class="tag-remove" (click)="removeConcept(concept)">&#215;</button>
+                                </span>
+                                }
+                                <input type="text" class="tag-input"
+                                    [ngModel]="conceptInput()"
+                                    (ngModelChange)="conceptInput.set($event)"
+                                    (keydown)="onConceptKeydown($event)"
+                                    placeholder="Type a concept, press Enter...">
+                            </div>
+                        </div>
+                        <div class="concept-suggestions">
+                            @for (s of suggestedConcepts; track s) {
+                            <button class="suggestion-chip"
+                                [class.selected]="concepts().includes(s)"
+                                (click)="addSuggestedConcept(s)">{{ s }}</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- ────────────────── Section 03: Review of Prior Research ── -->
+            <div class="form-section" [class.is-open]="openSections().has(2)">
+                <div class="section-header" (click)="toggleSection(2)">
+                    <span class="section-num" [class.complete]="sectionComplete()[2]">
+                        @if (sectionComplete()[2]) { ✓ } @else { 03 }
+                    </span>
+                    <div class="section-meta">
+                        <h3 class="section-title">Review of Prior Research</h3>
+                        <span class="section-badge governance">Governance</span>
+                    </div>
+                    <span class="chevron" [class.open]="openSections().has(2)">&#9662;</span>
+                </div>
+
+                @if (openSections().has(2)) {
+                <div class="section-body">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Have you reviewed existing research on the Ceekul Academy Platform?
+                        </label>
+                        <div class="radio-group">
+                            <label class="radio-option" (click)="hasReviewed.set(true)">
+                                <div class="radio-btn" [class.selected]="hasReviewed() === true"></div>
+                                <span>Yes — I have reviewed existing research on the platform</span>
+                            </label>
+                            <label class="radio-option" (click)="hasReviewed.set(false)">
+                                <div class="radio-btn" [class.selected]="hasReviewed() === false"></div>
+                                <span>No — This is a fully independent idea</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    @if (hasReviewed() === true) {
+                    <div class="conditional-fields animate-fade-in">
+                        <div class="form-group">
+                            <label class="form-label">
+                                How does your idea build upon or differ from existing work?
+                            </label>
+                            <textarea class="form-control" rows="4"
+                                [ngModel]="buildUpon()"
+                                (ngModelChange)="buildUpon.set($event)"
+                                placeholder="Explain the relationship between your research and existing platform work. Identify points of continuity and differentiation..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expert &amp; Community Feedback Potential</label>
+                            <textarea class="form-control" rows="3"
+                                [ngModel]="feedbackPotential()"
+                                (ngModelChange)="feedbackPotential.set($event)"
+                                placeholder="How can structured expert or community feedback improve or validate your research idea?"></textarea>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+
+            <!-- ────────────────── Section 04: Research Plan ── -->
+            <div class="form-section" [class.is-open]="openSections().has(3)">
+                <div class="section-header" (click)="toggleSection(3)">
+                    <span class="section-num" [class.complete]="sectionComplete()[3]">
+                        @if (sectionComplete()[3]) { ✓ } @else { 04 }
+                    </span>
+                    <div class="section-meta">
+                        <h3 class="section-title">Conceive the Research Plan</h3>
+                        <span class="section-badge required">Required</span>
+                    </div>
+                    <span class="chevron" [class.open]="openSections().has(3)">&#9662;</span>
+                </div>
+
+                @if (openSections().has(3)) {
+                <div class="section-body">
+                    <div class="form-group">
+                        <label class="form-label">
+                            Research Objectives <span class="req-mark">*</span>
+                        </label>
+                        <p class="form-hint">Begin each objective with an action verb: Develop, Analyze, Evaluate, Design, Validate...</p>
+                        <textarea class="form-control" rows="4"
+                            [ngModel]="objectives()"
+                            (ngModelChange)="objectives.set($event)"
+                            placeholder="1. Develop a model that...&#10;2. Analyze the correlation between...&#10;3. Evaluate the performance of..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Methodology Type</label>
+                        <div class="method-selector">
+                            @for (m of methodologyTypes; track m) {
+                            <button class="method-btn"
+                                [class.active]="methodologyType() === m"
+                                (click)="methodologyType.set(m)">{{ m }}</button>
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            Methodology &amp; Approach <span class="req-mark">*</span>
+                        </label>
+                        <textarea class="form-control" rows="5"
+                            [ngModel]="methodology()"
+                            (ngModelChange)="methodology.set($event)"
+                            placeholder="Describe in detail how you will conduct this research. Include data collection strategies, analysis methods, validation approaches, and experimental controls..."></textarea>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- ────────────────── Section 05: Expected Outcome ── -->
+            <div class="form-section" [class.is-open]="openSections().has(4)">
+                <div class="section-header" (click)="toggleSection(4)">
+                    <span class="section-num" [class.complete]="sectionComplete()[4]">
+                        @if (sectionComplete()[4]) { ✓ } @else { 05 }
+                    </span>
+                    <div class="section-meta">
+                        <h3 class="section-title">Expected Outcome</h3>
+                        <span class="section-badge required">Required</span>
+                    </div>
+                    <span class="chevron" [class.open]="openSections().has(4)">&#9662;</span>
+                </div>
+
+                @if (openSections().has(4)) {
+                <div class="section-body">
+                    <div class="form-group">
+                        <label class="form-label">
+                            What do you hope to achieve? <span class="req-mark">*</span>
+                        </label>
+                        <p class="form-hint">
+                            Frame outcomes in measurable, verifiable terms. Consider academic impact,
+                            societal benefit, and practical deliverables.
+                        </p>
+                        <textarea class="form-control" rows="5"
+                            [ngModel]="expectedOutcome()"
+                            (ngModelChange)="expectedOutcome.set($event)"
+                            placeholder="e.g. A validated diagnostic model with ≥92% accuracy. A published open-access dataset of 10,000+ annotated samples. A reproducible methodology paper submitted to a peer-reviewed journal..."></textarea>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- ────────────────── Section 06: Resources Needed ── -->
+            <div class="form-section" [class.is-open]="openSections().has(5)">
+                <div class="section-header" (click)="toggleSection(5)">
+                    <span class="section-num" [class.complete]="sectionComplete()[5]">
+                        @if (sectionComplete()[5]) { ✓ } @else { 06 }
+                    </span>
+                    <div class="section-meta">
+                        <h3 class="section-title">Resources Needed</h3>
+                        <span class="section-badge">Optional</span>
+                    </div>
+                    <span class="chevron" [class.open]="openSections().has(5)">&#9662;</span>
+                </div>
+
+                @if (openSections().has(5)) {
+                <div class="section-body">
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label class="form-label">Required Tools / Software</label>
+                            <textarea class="form-control" rows="3"
+                                [ngModel]="tools()"
+                                (ngModelChange)="tools.set($event)"
+                                placeholder="e.g. Python 3.11, TensorFlow 2.x, SPSS, PCR Equipment, Electron Microscope..."></textarea>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label class="form-label">Institutional Support</label>
+                            <textarea class="form-control" rows="3"
+                                [ngModel]="institutionalSupport()"
+                                (ngModelChange)="institutionalSupport.set($event)"
+                                placeholder="e.g. University lab access, hospital data partnership, government research grant, cloud infrastructure..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label class="form-label">
+                                Funding Requirement
+                                <span class="form-optional">(optional)</span>
+                            </label>
+                            <div class="input-prefix-wrap">
+                                <span class="input-prefix">&#8377;</span>
+                                <input type="number" class="form-control with-prefix"
+                                    [ngModel]="funding()"
+                                    (ngModelChange)="funding.set($event ? +$event : null)"
+                                    placeholder="0" min="0">
+                            </div>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label class="form-label">Timeline Duration</label>
+                            <select class="form-control"
+                                [ngModel]="duration()"
+                                (ngModelChange)="duration.set($event)">
+                                <option value="">Select duration</option>
+                                @for (d of durationOptions; track d) {
+                                <option [value]="d">{{ d }}</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- ────────────────── Section 07: Collaboration ── -->
+            <div class="form-section" [class.is-open]="openSections().has(6)">
+                <div class="section-header" (click)="toggleSection(6)">
+                    <span class="section-num" [class.complete]="sectionComplete()[6]">
+                        @if (sectionComplete()[6]) { ✓ } @else { 07 }
+                    </span>
+                    <div class="section-meta">
+                        <h3 class="section-title">Collaboration</h3>
+                        <span class="section-badge">Optional</span>
+                    </div>
+                    <span class="chevron" [class.open]="openSections().has(6)">&#9662;</span>
+                </div>
+
+                @if (openSections().has(6)) {
+                <div class="section-body">
+                    <div class="form-group">
+                        <label class="form-label">Research Mode</label>
+                        <div class="radio-group">
+                            <label class="radio-option" (click)="collabMode.set('alone')">
+                                <div class="radio-btn" [class.selected]="collabMode() === 'alone'"></div>
+                                <span>Conducting this research independently</span>
+                            </label>
+                            <label class="radio-option" (click)="collabMode.set('with-collaborators')">
+                                <div class="radio-btn" [class.selected]="collabMode() === 'with-collaborators'"></div>
+                                <span>Working with collaborators</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    @if (collabMode() === 'with-collaborators') {
+                    <div class="conditional-fields animate-fade-in">
+                        <div class="profit-toggle-row">
+                            <label class="toggle-label">
+                                <div class="toggle-switch" [class.on]="profitShare()"
+                                    (click)="profitShare.set(!profitShare())">
+                                    <div class="toggle-knob"></div>
+                                </div>
+                                <span>Enable Profit Share Distribution</span>
+                            </label>
+                        </div>
+
+                        <div class="collab-table">
+                            <div class="collab-table-head">
+                                <div class="ct-col ct-name">Collaborator Name</div>
+                                <div class="ct-col ct-role">Role / Contribution</div>
+                                @if (profitShare()) {
+                                <div class="ct-col ct-share">Share %</div>
+                                }
+                                <div class="ct-col ct-action"></div>
+                            </div>
+
+                            @for (c of collaborators(); track c.id) {
+                            <div class="collab-row">
+                                <div class="ct-col ct-name">
+                                    <input type="text" class="form-control sm"
+                                        [ngModel]="c.name"
+                                        (ngModelChange)="updateCollaborator(c.id, 'name', $event)"
+                                        placeholder="Full name">
+                                </div>
+                                <div class="ct-col ct-role">
+                                    <input type="text" class="form-control sm"
+                                        [ngModel]="c.role"
+                                        (ngModelChange)="updateCollaborator(c.id, 'role', $event)"
+                                        placeholder="e.g. Data Analyst, Lab Technician">
+                                </div>
+                                @if (profitShare()) {
+                                <div class="ct-col ct-share">
+                                    <input type="number" class="form-control sm"
+                                        [ngModel]="c.share"
+                                        (ngModelChange)="updateCollaborator(c.id, 'share', +$event)"
+                                        placeholder="0" min="0" max="100">
+                                </div>
+                                }
+                                <div class="ct-col ct-action">
+                                    <button class="btn-remove-row" (click)="removeCollaborator(c.id)">&#215;</button>
+                                </div>
+                            </div>
+                            }
+
+                            <button class="btn-add-row" (click)="addCollaborator()">
+                                + Add Collaborator
+                            </button>
+
+                            @if (profitShare() && collaborators().length > 0) {
+                            <div class="share-total" [class.invalid]="totalShare() !== 100">
+                                <span>Total Share: <strong>{{ totalShare() }}%</strong></span>
+                                @if (totalShare() !== 100) {
+                                <span class="share-warning">Must equal 100%</span>
+                                } @else {
+                                <span class="share-valid">&#10003; Valid</span>
+                                }
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+
+            <!-- ────────────────── Section 08: Expert & Visibility ── -->
+            <div class="form-section" [class.is-open]="openSections().has(7)">
+                <div class="section-header" (click)="toggleSection(7)">
+                    <span class="section-num" [class.complete]="sectionComplete()[7]">
+                        @if (sectionComplete()[7]) { ✓ } @else { 08 }
+                    </span>
+                    <div class="section-meta">
+                        <h3 class="section-title">Expert Selection &amp; Visibility</h3>
+                        <span class="section-badge">Optional</span>
+                    </div>
+                    <span class="chevron" [class.open]="openSections().has(7)">&#9662;</span>
+                </div>
+
+                @if (openSections().has(7)) {
+                <div class="section-body">
+                    <div class="form-group">
+                        <label class="form-label">Select Expert Reviewers</label>
+                        <p class="form-hint">Domain experts will provide structured, qualified feedback on your proposal.</p>
+                        <div class="expert-grid">
+                            @for (expert of availableExperts; track expert.id) {
+                            <div class="expert-card"
+                                [class.selected]="selectedExperts().includes(expert.id)"
+                                (click)="toggleExpert(expert.id)">
+                                <div class="expert-avatar">{{ expert.name[0] }}</div>
+                                <div class="expert-info">
+                                    <div class="expert-name">{{ expert.name }}</div>
+                                    <div class="expert-field">{{ expert.field }}</div>
+                                </div>
+                                <div class="expert-check">&#10003;</div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Submit to Open Forum</label>
+                        <p class="form-hint">Enables community peer review across the Ceekul Academy platform.</p>
+                        <div class="radio-group">
+                            <label class="radio-option" (click)="openForum.set(true)">
+                                <div class="radio-btn" [class.selected]="openForum()"></div>
+                                <span>Yes — Enable public visibility &amp; community peer review</span>
+                            </label>
+                            <label class="radio-option" (click)="openForum.set(false)">
+                                <div class="radio-btn" [class.selected]="!openForum()"></div>
+                                <span>No — Private expert review only</span>
+                            </label>
+                        </div>
+                        @if (openForum()) {
+                        <div class="info-notice animate-fade-in">
+                            Your proposal will be visible to all platform members and eligible for community peer review and commentary.
+                        </div>
+                        } @else {
+                        <div class="info-notice private animate-fade-in">
+                            Your proposal will only be accessible to your assigned expert reviewers.
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+
+        </div><!-- /rnew-form -->
+
+        <!-- ── Right Guidance Panel ── -->
+        <aside class="rnew-panel">
+
+            <!-- Draft status -->
+            <div class="panel-card draft-card">
+                <div class="draft-status-row">
+                    <div class="draft-indicator" [class.saved]="draftSavedAt()">
+                        <span class="draft-dot"></span>
+                        <span class="draft-text">{{ draftSavedAt() || 'Not saved yet' }}</span>
+                    </div>
+                    <button class="btn-save-draft" (click)="saveDraft()">Save</button>
+                </div>
+                <p class="draft-note">Auto-saves every 30 seconds</p>
+            </div>
+
+            <!-- Circular progress -->
+            <div class="panel-card">
+                <div class="panel-section-title">Proposal Completion</div>
+                <div class="circular-wrap">
+                    <svg viewBox="0 0 36 36" class="circular-svg">
+                        <path class="circle-bg"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        <path class="circle-fill"
+                            [style.stroke-dasharray]="overallProgress() + ', 100'"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                        <text x="18" y="21" class="circle-text">{{ overallProgress() }}%</text>
+                    </svg>
+                </div>
+                <div class="section-status-list">
+                    @for (s of sectionMeta; track s.idx) {
+                    <div class="status-item" [class.complete]="sectionComplete()[s.idx]">
+                        <span class="status-dot"></span>
+                        <span class="status-label">{{ s.title }}</span>
+                        @if (s.required) { <span class="status-req">req</span> }
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Contextual guidance -->
+            <div class="panel-card guidance-card">
+                <div class="panel-section-title">{{ currentGuidance().title }}</div>
+                <div class="guidance-tips">
+                    @for (tip of currentGuidance().tips; track tip) {
+                    <div class="guidance-tip">
+                        <span class="tip-bullet">&#8212;</span>
+                        <span>{{ tip }}</span>
+                    </div>
+                    }
+                </div>
+                <div class="quality-checklist">
+                    <div class="checklist-title">Quality Checklist</div>
+                    @for (item of currentGuidance().checklist; track item) {
+                    <label class="checklist-item">
+                        <input type="checkbox">
+                        <span>{{ item }}</span>
+                    </label>
+                    }
+                </div>
+            </div>
+
+        </aside>
+    </div><!-- /rnew-body -->
+
+    <!-- ── Sticky Action Footer ── -->
+    <div class="rnew-footer">
+        <span class="footer-note">* Sections 01, 04, and 05 must be completed before submission</span>
+        <div class="footer-actions">
+            <button class="btn-draft-footer" (click)="saveDraft()">Save as Draft</button>
+            <button class="btn-submit-footer"
+                [disabled]="!canSubmit()"
+                (click)="openConfirmModal()">
+                Submit for Review
+            </button>
+        </div>
+    </div>
+
+</div><!-- /rnew-container -->
+
+<!-- ── Confirmation Modal ── -->
+@if (showConfirmModal()) {
+<div class="modal-overlay" (click)="closeConfirmModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-icon-wrap">
+                <span class="modal-icon">&#10003;</span>
+            </div>
+            <h2 class="modal-title">Submit Research Proposal</h2>
+            <p class="modal-desc">
+                Once submitted, your proposal enters the formal academic review queue and cannot be edited without reviewer approval.
+            </p>
+        </div>
+
+        <div class="modal-summary">
+            <div class="summary-row">
+                <span class="summary-label">Title</span>
+                <span class="summary-value">{{ ideaTitle() }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Submitted by</span>
+                <span class="summary-value">{{ currentUser().name }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Review type</span>
+                <span class="summary-value">
+                    @if (openForum() && selectedExperts().length > 0) { Open Forum + {{ selectedExperts().length }} Expert(s) }
+                    @else if (openForum()) { Open Forum }
+                    @else if (selectedExperts().length > 0) { {{ selectedExperts().length }} Expert Reviewer(s) }
+                    @else { Unassigned — Platform will route automatically }
+                </span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Visibility</span>
+                <span class="summary-value">{{ openForum() ? 'Public' : 'Private' }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Completion</span>
+                <span class="summary-value">{{ overallProgress() }}% of all sections</span>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-modal-cancel" (click)="closeConfirmModal()">Review Again</button>
+            <button class="btn-modal-confirm" (click)="submitProposal()">Confirm &amp; Submit</button>
+        </div>
+    </div>
+</div>
+}
+
+</app-layout>
