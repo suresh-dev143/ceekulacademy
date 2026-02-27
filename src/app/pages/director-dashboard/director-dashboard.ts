@@ -37,7 +37,7 @@ import { AdvisorService } from '../../services/advisor.service';
             <h1 class="page-title">Director Dashboard</h1>
             <p class="district-name">
               <i class="fas fa-map-marker-alt"></i> 
-              {{ currentUser().assignedDistrict }} District, {{ currentUser().assignedState }}
+              {{ currentUser()?.assignedDistrict }} District, {{ currentUser()?.assignedState }}
             </p>
           </div>
           <div class="header-actions">
@@ -106,7 +106,7 @@ import { AdvisorService } from '../../services/advisor.service';
         <!-- Right Side Panel Content (Projected) -->
         <div slot="right-panel">
           <div class="district-insights glass-card">
-            <h3><i class="fas fa-chart-line"></i> {{ currentUser().assignedState }} Insights</h3>
+            <h3><i class="fas fa-chart-line"></i> {{ currentUser()?.assignedState }} Insights</h3>
             <div class="insight-item">
               <span class="label">Partner Engagement</span>
               <div class="mini-progress"><div class="fill" style="width: 78%"></div></div>
@@ -204,22 +204,22 @@ export class DirectorDashboardComponent {
 
   // State-filtered data
   statePartners = computed(() => {
-    const state = this.currentUser().assignedState;
+    const state = this.currentUser()?.assignedState;
     return state ? this.directorService.partnersByState(state)() : [];
   });
 
   stateManagers = computed(() => {
-    const state = this.currentUser().assignedState;
+    const state = this.currentUser()?.assignedState;
     return state ? this.directorService.managersByState(state)() : [];
   });
 
   stateVolunteers = computed(() => {
-    const state = this.currentUser().assignedState;
+    const state = this.currentUser()?.assignedState;
     return state ? this.directorService.volunteersByState(state)() : [];
   });
 
   stateActivities = computed(() => {
-    const state = this.currentUser().assignedState;
+    const state = this.currentUser()?.assignedState;
     return state ? this.directorService.activitiesByState(state)() : [];
   });
 

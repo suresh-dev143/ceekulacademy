@@ -2,8 +2,8 @@
     @if (currentUserRole() === 'Teacher' || currentUserRole()==='Student'|| currentUserRole()==='Researcher'|| currentUserRole()==='Entrepreneur') {
      <app-my-schedule></app-my-schedule>
     }
-    @if (currentUserRole() === 'Director') {
+   
+     @else {
         <app-layout>
-    <app-programs-section></app-programs-section></app-layout>
-    }
+    <app-programs-section></app-programs-section></app-layout>}
     

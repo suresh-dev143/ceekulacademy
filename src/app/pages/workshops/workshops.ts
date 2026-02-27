@@ -200,7 +200,7 @@ export class PublicWorkshopsPageComponent {
             title: formValue.workshopTitle,
             description: formValue.workshopDescription,
             expertDescription: formValue.expertDescription,
-            instructor: formValue.instructorType === 'myself' ? this.currentUser().name : 'Open to All',
+            instructor: formValue.instructorType === 'myself' ? (this.currentUser()?.name ?? 'Unknown') : 'Open to All',
             date: startDate,
             duration: duration,
             type: formValue.workshopMode === 'online' ? 'Online' : 'Hybrid',

@@ -51,7 +51,9 @@ export class ProgramSidebarComponent implements AfterViewInit {
 
     private scrollActiveIntoView(nodeId: string) {
         const el = this.elRef.nativeElement.querySelector(`[data-node-id="${nodeId}"]`);
-        el?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
     }
 
     // ── Predicates ──────────────────────────────────────────────────────────

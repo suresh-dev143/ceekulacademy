@@ -31,7 +31,7 @@ export class ResearchPageComponent {
     private researchSvc = inject(ResearchService);
 
     currentUser  = this.authService.currentUserProfile;
-    isResearcher = computed(() => this.currentUser().role === 'Researcher');
+    isResearcher = computed(() => this.currentUser()?.role === 'Researcher');
 
     // ── Filter state ───────────────────────────────────────────────────
     searchQuery    = signal('');
@@ -122,7 +122,7 @@ export class ResearchPageComponent {
             description:     this.newDescription(),
             level:           this.newLevel(),
             status:          'Open',
-            createdBy:       this.currentUser().name,
+            createdBy:       this.currentUser()?.name ?? '',
             mentorAvailable: this.newMentorAvailable(),
             skills:          this.newSkills().split(',').map(s => s.trim()).filter(Boolean),
             duration:        this.newDuration(),

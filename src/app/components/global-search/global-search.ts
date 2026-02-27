@@ -109,7 +109,7 @@ export class GlobalSearchComponent {
 
     // ── Role-based quick filters ───────────────────────────────────────────────
     roleFilterOptions = computed(() =>
-        ROLE_QUICK_FILTERS[this.authService.currentUserRole()] ?? []
+        (this.authService.currentUserRole() ? ROLE_QUICK_FILTERS[this.authService.currentUserRole()!] : null) ?? []
     );
 
     // ── Filtered results (text results → apply category + status) ─────────────

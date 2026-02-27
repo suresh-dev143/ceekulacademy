@@ -25,7 +25,7 @@ export class ResearchNewComponent implements OnInit, OnDestroy {
     private authService = inject(AuthService);
 
     currentUser  = this.authService.currentUserProfile;
-    isResearcher = computed(() => this.currentUser().role === 'Researcher');
+    isResearcher = computed(() => this.currentUser()?.role === 'Researcher');
 
     // ── Section open/active state ─────────────────────────────────────
     openSections  = signal<Set<number>>(new Set([0]));

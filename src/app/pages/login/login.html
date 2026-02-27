@@ -46,8 +46,8 @@
                     <a href="#" class="forgot-link">Forgot password?</a>
                 </div>
 
-                <button type="submit" class="submit-btn" [disabled]="isSubmitting">
-                    @if (isSubmitting) {
+                <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
+                    @if (isSubmitting()) {
                     <span>Signing in...</span>
                     } @else {
                     <span>Sign In</span>

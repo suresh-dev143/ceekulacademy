@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LayoutComponent } from '../../components/layout/layout';
+import { AuthService, RegisterRequest } from '../../services/auth.service';
+
 @Component({
     selector: 'app-register',
     imports: [CommonModule, ReactiveFormsModule, RouterLink, LayoutComponent],
@@ -13,6 +15,8 @@ export class RegisterComponent {
     registerForm: FormGroup;
     currentStep: number = 1;
     totalSteps: number = 3;
+
+    isSubmitting = signal(false);
 
     // Available roles
     roles = [
@@ -50,7 +54,11 @@ export class RegisterComponent {
         'Any Other'
     ];
 
-    constructor(private fb: FormBuilder, private router: Router) {
+    constructor(
+        private fb: FormBuilder,
+        private router: Router,
+        private authService: AuthService
+    ) {
         this.registerForm = this.fb.group({
             // Step 1: Basic Details
             name: ['', Validators.required],
@@ -111,9 +119,7 @@ export class RegisterComponent {
 
     // Navigation Logic
     nextStep() {
-
         this.currentStep++;
-
     }
 
     prevStep() {
@@ -134,7 +140,9 @@ export class RegisterComponent {
 
             case 2:
                 this.selectedRoles.markAllAsTouched();
-                const partnerTypeValid = this.isRoleSelected('Partner') ? (this.registerForm.get('partnerType')?.valid ?? false) : true;
+                const partnerTypeValid = this.isRoleSelected('Partner')
+                    ? (this.registerForm.get('partnerType')?.valid ?? false)
+                    : true;
                 return this.selectedRoles.valid && partnerTypeValid;
 
             case 3:
@@ -156,16 +164,39 @@ export class RegisterComponent {
     }
 
     onSubmit() {
-        
-        if (this.registerForm.valid) {
-            console.log('Registration submitted:', this.registerForm.value);
-            alert('Registration submitted! Welcome to CEEKUL MISSION.');
-        } else {
-            console.log('Form invalid', this.registerForm.errors);
+        if (this.registerForm.invalid) {
             this.registerForm.markAllAsTouched();
+            return;
         }
-        // this.router.navigate(['/dashboard/partner']);
-        
-        
+
+        const v = this.registerForm.value;
+
+        const payload: RegisterRequest = {
+            email:        v.email,
+            password:     v.password,
+            authProvider: 'EMAIL_PASSWORD',
+            name:         v.name,
+            dateOfBirth:  v.dob,
+            gender:       v.gender,
+            selectedRole: v.selectedRoles[0] ?? '',
+            address: {
+                village:  v.village,
+                pincode:  v.pincode,
+                district: v.district,
+            },
+        };
+
+        this.isSubmitting.set(true);
+
+        this.authService.register(payload).subscribe({
+            next: (res) => {
+                this.isSubmitting.set(false);
+                const role = res.user.role?.toLowerCase() ?? '';
+                this.router.navigate([`/${role}-dashboard`]).catch(() => {
+                    this.router.navigate(['/dashboard']);
+                });
+            },
+            error: () => this.isSubmitting.set(false)
+        });
     }
 }

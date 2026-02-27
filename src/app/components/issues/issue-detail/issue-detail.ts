@@ -194,7 +194,7 @@ export class IssueDetailComponent {
 
     isAuthorized() {
         const role = this.userRole();
-        return ['Volunteer', 'Manager', 'Director', 'Admin'].includes(role);
+        return !!role && ['Volunteer', 'Manager', 'Director', 'Admin'].includes(role);
     }
 
     canVerify() {
@@ -225,7 +225,7 @@ export class IssueDetailComponent {
             nextStatus = 'Needs Clarification';
         }
 
-        this.issueService.updateStatus(this.issue.id, nextStatus, role, this.remarks);
+        this.issueService.updateStatus(this.issue.id, nextStatus, role ?? '', this.remarks);
         this.close.emit();
     }
 }

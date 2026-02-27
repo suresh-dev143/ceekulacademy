@@ -129,7 +129,7 @@ export class WorkshopManagerComponent implements OnInit {
                 id: `ws-00${this.workshopsList().length + 1}`,
                 title: formValue.workshopTitle,
                 description: formValue.workshopDescription,
-                instructor: formValue.instructorType === 'myself' ? this.currentUser().name : 'Open to All',
+                instructor: formValue.instructorType === 'myself' ? (this.currentUser()?.name ?? 'Unknown') : 'Open to All',
                 date: startDate,
                 duration: duration,
                 type: formValue.workshopMode === 'online' ? 'Online' : 'Hybrid',

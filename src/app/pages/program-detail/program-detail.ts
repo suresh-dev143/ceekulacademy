@@ -20,8 +20,9 @@ export class ProgramDetailComponent implements OnInit, OnDestroy {
     private route      = inject(ActivatedRoute);
     private router     = inject(Router);
 
-    searchQuery = signal('');
-    content     = computed((): ActiveContent | null => this.navService.activeContent());
+    searchQuery       = signal('');
+    mobileSidebarOpen = signal(false);
+    content           = computed((): ActiveContent | null => this.navService.activeContent());
 
     private sub!: Subscription;
 

@@ -6,7 +6,7 @@
             <p class="section-subtitle">Explore, enroll, create, and manage practical learning sessions.</p>
         </div>
         <!-- Create Tab / Teacher View -->
-        @if (currentUser().role === 'Teacher' || currentUser().role === 'Instructor' || currentUser().role === 'Admin')
+        @if (currentUser()?.role === 'Teacher' || currentUser()?.role === 'Instructor' || currentUser()?.role === 'Admin')
         {
         <div class="create-workshop-section">
             @if (!isCreatingWorkshop()) {
@@ -25,7 +25,7 @@
         @if (showWorkshopEnrollment() && selectedWorkshop()) {
         <app-enroll-workshop
             [workshop]="selectedWorkshop()"
-            [userRole]="currentUser().role"
+            [userRole]="currentUser()?.role ?? ''"
             (enrolled)="onEnrollmentSubmitted($event)"
             (cancel)="closeWorkshopEnrollment()">
         </app-enroll-workshop>

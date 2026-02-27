@@ -1,6 +1,13 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { Observable, map, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-export type UserRole = 'Student' | 'Teacher' | 'Researcher' | 'Entrepreneur' | 'Admin' | 'Director' | 'Partner' | 'Volunteer' | 'Manager' | 'Instructor';
+export type UserRole =
+    | 'Student' | 'Teacher' | 'Researcher' | 'Entrepreneur'
+    | 'Admin' | 'Director' | 'Partner' | 'Volunteer' | 'Manager' | 'Instructor';
 
 export interface UserProfile {
     id: string;
@@ -11,110 +18,153 @@ export interface UserProfile {
     assignedDistrict?: string;
 }
 
-@Injectable({
-    providedIn: 'root'
-})
+// ── API Request / Response shapes ─────────────────────────────────────────────
+
+/** Payload sent to POST /users/signup */
+export interface RegisterRequest {
+    email:        string;
+    password:     string;
+    authProvider: 'EMAIL_PASSWORD';
+    name:         string;
+    dateOfBirth:  string;
+    gender:       string;
+    selectedRole: string;
+    address: {
+        village:  string;
+        pincode:  string;
+        district: string;
+    };
+}
+
+export interface LoginRequest {
+    email:    string;
+    password: string;
+}
+
+/** Raw shape returned by the backend */
+interface ApiUser {
+    _id:                string;
+    name:               string;
+    email:              string;
+    authProvider:       string;
+    selectedRole:       string;
+    verificationStatus: string;
+    status:             string;
+}
+
+interface ApiAuthResponse {
+    status:  boolean;
+    message: string;
+    result: {
+        user:  ApiUser;
+        token: string;
+    };
+}
+
+/** Normalised internal shape used by the app */
+export interface AuthResponse {
+    token: string;
+    user:  UserProfile;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-    // Sample director profiles for different states
-    private directorProfiles: UserProfile[] = [
-        {
-            id: 'DIR-001',
-            name: 'Rajesh Kumar',
-            email: 'rajesh.kumar@ceekulmisson.org',
-            role: 'Student',
-            assignedState: 'Uttar Pradesh',
-            assignedDistrict: 'Bulandshahr'
-        },
-        {
-            id: 'DIR-002',
-            name: 'Priya Sharma',
-            email: 'priya.sharma@ceekulmisson.org',
-            role: 'Director',
-            assignedState: 'Uttar Pradesh',
-            assignedDistrict: 'Raebareli'
-        },
-        {
-            id: 'DIR-003',
-            name: 'Amit Verma',
-            email: 'amit.verma@ceekulmisson.org',
-            role: 'Teacher',
-            assignedState: 'Maharashtra',
-            assignedDistrict: 'Pune'
-        },
-        {
-            id: 'DIR-003',
-            name: 'Amit Verma',
-            email: 'amit.verma@ceekulmisson.org',
-            role: 'Researcher',
-            assignedState: 'Maharashtra',
-            assignedDistrict: 'Pune'
-        },
-        {
-            id: 'DIR-003',
-            name: 'Amit Verma',
-            email: 'amit.verma@ceekulmisson.org',
-            role: 'Entrepreneur',
-            assignedState: 'Maharashtra',
-            assignedDistrict: 'Pune'
-        },
-        {
-            id: 'DIR-003',
-            name: 'Suresh chand',
-            email: 'amit.verma@ceekulmisson.org',
-            role: 'Admin',
-            assignedState: 'Maharashtra',
-            assignedDistrict: 'Pune'
-        },
-        {
-            id: 'DIR-003',
-            name: 'Amit Verma',
-            email: 'amit.verma@ceekulmisson.org',
-            role: 'Volunteer',
-            assignedState: 'Maharashtra',
-            assignedDistrict: 'Pune'
-        },
-        {
-            id: 'DIR-003',
-            name: 'Amit Verma',
-            email: 'amit.verma@ceekulmisson.org',
-            role: 'Manager',
-            assignedState: 'Maharashtra',
-            assignedDistrict: 'Pune'
+
+    private http       = inject(HttpClient);
+    private router     = inject(Router);
+    private platformId = inject(PLATFORM_ID);
+    private isBrowser  = isPlatformBrowser(this.platformId);
+
+    private readonly base = environment.apiUrl;
+
+    // ── State ─────────────────────────────────────────────────────────────────
+
+    private _currentUser = signal<UserProfile | null>(this.loadUserFromStorage());
+    private _token       = signal<string | null>(this.isBrowser ? localStorage.getItem('auth_token') : null);
+
+    currentUserProfile = this._currentUser.asReadonly();
+    isLoggedIn         = computed(() => !!this._token() && !!this._currentUser());
+
+    // ── HTTP API ──────────────────────────────────────────────────────────────
+
+    register(payload: RegisterRequest): Observable<AuthResponse> {
+        return this.http
+            .post<ApiAuthResponse>(`${this.base}/users/signup`, payload)
+            .pipe(
+                map(res => ({
+                    token: res.result.token,
+                    user:  {
+                        id:    res.result.user._id,
+                        name:  res.result.user.name,
+                        email: res.result.user.email,
+                        role:  res.result.user.selectedRole as UserRole,
+                    } satisfies UserProfile,
+                })),
+                tap(res => this.storeSession(res))
+            );
+    }
+
+    login(payload: LoginRequest): Observable<AuthResponse> {
+        return this.http
+            .post<AuthResponse>(`${this.base}/api/auth/login`, payload)
+            .pipe(tap(res => this.storeSession(res)));
+    }
+
+    logout() {
+        if (this.isBrowser) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
         }
-    ];
+        this._token.set(null);
+        this._currentUser.set(null);
+        this.router.navigate(['/login']);
+    }
 
-    // Default to first director for development
-    private currentUser = signal<UserProfile>(this.directorProfiles[3]);
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
-    currentUserProfile = this.currentUser.asReadonly();
-    currentUserRole = signal<UserRole>(this.directorProfiles[3].role).asReadonly();
+    private storeSession(res: AuthResponse) {
+        if (this.isBrowser) {
+            localStorage.setItem('auth_token', res.token);
+            localStorage.setItem('auth_user', JSON.stringify(res.user));
+        }
+        this._token.set(res.token);
+        this._currentUser.set(res.user);
+    }
 
-    // Login with specific director profile
-    loginAsDirector(directorId: string) {
-        const profile = this.directorProfiles.find(d => d.id === directorId);
-        if (profile) {
-            this.currentUser.set(profile);
+    private loadUserFromStorage(): UserProfile | null {
+        if (!isPlatformBrowser(inject(PLATFORM_ID))) return null;
+        try {
+            const raw = localStorage.getItem('auth_user');
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
         }
     }
 
-    // Set user profile (for testing different states)
+    // ── Legacy helpers (kept for existing pages) ───────────────────────────────
+
+    get currentUserRole() {
+        return computed(() => this._currentUser()?.role ?? null);
+    }
+
     setUserProfile(profile: UserProfile) {
-        this.currentUser.set(profile);
+        this._currentUser.set(profile);
     }
 
-    // Legacy role setter for backward compatibility
     setRole(role: UserRole) {
-        const current = this.currentUser();
-        this.currentUser.set({ ...current, role });
+        const current = this._currentUser();
+        if (current) this._currentUser.set({ ...current, role });
     }
 
     isAuthorized(): boolean {
-        const role = this.currentUser().role;
-        return ['Teacher', 'Researcher', 'Entrepreneur', 'Admin', 'Director'].includes(role);
+        const role = this._currentUser()?.role;
+        return !!role && ['Teacher', 'Researcher', 'Entrepreneur', 'Admin', 'Director'].includes(role);
     }
 
-    // Get available director profiles for simulation
-    getAvailableDirectors(): UserProfile[] {
-        return this.directorProfiles;
-    }
+    // ── Dev helpers ───────────────────────────────────────────────────────────
+
+    loginAsDirector(_directorId: string) { /* kept for dev simulation */ }
+    getAvailableDirectors(): UserProfile[] { return []; }
 }

@@ -215,8 +215,12 @@
                             }
 
                             @if (currentStep === totalSteps) {
-                            <button type="submit" class="submit-btn" >
+                            <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
+                                @if (isSubmitting()) {
+                                Registering... <i class="fas fa-spinner fa-spin"></i>
+                                } @else {
                                 Complete Registration <i class="fas fa-rocket"></i>
+                                }
                             </button>
                             }
                     </div>

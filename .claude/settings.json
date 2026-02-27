@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx ng build:*)"
+      "Bash(npx ng build:*)",
+      "Bash(ls -1 /Users/gs/Documents/GitHub/ceekulmission/src/app/services/*.ts)"
     ]
   }
 }

@@ -7,12 +7,28 @@
     <div class="pd-grid">
 
         <!-- LEFT 21% — Program Tree Sidebar ─────────────────────────────── -->
-        <aside class="pd-col pd-col-left">
+        <aside class="pd-col pd-col-left" [class.pd-col-left--open]="mobileSidebarOpen()">
             <app-program-sidebar></app-program-sidebar>
         </aside>
 
         <!-- CENTER 55% — Content Area ──────────────────────────────────── -->
         <main class="pd-col pd-col-center">
+
+            <!-- Mobile Sidebar Toggle (hidden on desktop) ────────────────── -->
+            <div class="pd-mobile-nav-bar">
+                <button class="pd-sidebar-toggle" (click)="mobileSidebarOpen.set(!mobileSidebarOpen())">
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                        <path d="M1.5 3.5h12M1.5 7.5h12M1.5 11.5h12"
+                              stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <span>Program Navigation</span>
+                    <svg class="pd-toggle-chev" [class.pd-toggle-chev--open]="mobileSidebarOpen()"
+                         width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor"
+                              stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
 
             <!-- Search Bar ───────────────────────────────────────────────── -->
             <div class="pd-search-wrap">

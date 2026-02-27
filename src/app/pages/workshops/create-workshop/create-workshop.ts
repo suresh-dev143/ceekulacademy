@@ -94,6 +94,7 @@ export class CreateWorkshop
             const formValue = this.workshopForm.getRawValue();
             this.workshopCreated.emit(formValue);
         }
+        console.log('workshop form value: ',this.workshopForm.value);
     }
 
     onCancel() {

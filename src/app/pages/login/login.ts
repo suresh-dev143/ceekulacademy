@@ -1,48 +1,56 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router'
+import { Router, RouterLink } from '@angular/router';
 import { LayoutComponent } from '../../components/layout/layout';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink,LayoutComponent],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, LayoutComponent],
     templateUrl: './login.html',
     styleUrl: './login.scss'
 })
 export class LoginComponent {
     loginForm: FormGroup;
-    isSubmitting = false;
+    isSubmitting = signal(false);
 
-    constructor(private fb: FormBuilder) {
+    constructor(
+        private fb: FormBuilder,
+        private router: Router,
+        private authService: AuthService
+    ) {
         this.loginForm = this.fb.group({
-            email: ['', [Validators.required, Validators.email]],
-            password: ['', [Validators.required, Validators.minLength(6)]],
+            email:      ['', [Validators.required, Validators.email]],
+            password:   ['', [Validators.required, Validators.minLength(6)]],
             rememberMe: [false]
         });
     }
 
+    get email()    { return this.loginForm.get('email'); }
+    get password() { return this.loginForm.get('password'); }
+
     onSubmit() {
-        if (this.loginForm.valid) {
-            this.isSubmitting = true;
-            console.log('Login form submitted:', this.loginForm.value);
-            // TODO: Implement actual authentication logic
-            setTimeout(() => {
-                this.isSubmitting = false;
-                alert('Login functionality will be implemented with backend integration');
-            }, 1000);
-        } else {
-            Object.keys(this.loginForm.controls).forEach(key => {
-                this.loginForm.get(key)?.markAsTouched();
-            });
+        if (this.loginForm.invalid) {
+            Object.keys(this.loginForm.controls).forEach(key =>
+                this.loginForm.get(key)?.markAsTouched()
+            );
+            return;
         }
-    }
 
-    get email() {
-        return this.loginForm.get('email');
-    }
+        this.isSubmitting.set(true);
 
-    get password() {
-        return this.loginForm.get('password');
+        const { email, password } = this.loginForm.value;
+
+        this.authService.login({ email, password }).subscribe({
+            next: (res) => {
+                this.isSubmitting.set(false);
+                const role = res.user.role?.toLowerCase() ?? '';
+                this.router.navigate([`/${role}-dashboard`]).catch(() => {
+                    this.router.navigate(['/dashboard']);
+                });
+            },
+            error: () => this.isSubmitting.set(false)
+        });
     }
 }

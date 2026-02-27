@@ -4,10 +4,11 @@ import { SidebarLeftComponent } from '../sidebar-left/sidebar-left';
 import { ChatPanelComponent } from '../chat-panel/chat-panel';
 import { NavbarComponent } from '../navbar/navbar';
 import { GlobalSearchComponent } from '../global-search/global-search';
+import { ToastComponent } from '../toast/toast';
 
 @Component({
     selector: 'app-layout',
-    imports: [CommonModule, SidebarLeftComponent, ChatPanelComponent, NavbarComponent, GlobalSearchComponent],
+    imports: [CommonModule, SidebarLeftComponent, ChatPanelComponent, NavbarComponent, GlobalSearchComponent, ToastComponent],
     templateUrl: './layout.html',
     styleUrl: './layout.scss'
 })

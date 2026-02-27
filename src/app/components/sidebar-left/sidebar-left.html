@@ -14,7 +14,7 @@
     @if (userRole() === 'Director') {
     <div class="snav-district">
         @if (!collapsed) {
-        <div class="snav-district-name">{{ userProfile().assignedDistrict | uppercase }}</div>
+        <div class="snav-district-name">{{ userProfile()?.assignedDistrict | uppercase }}</div>
         } @else {
         <!-- <i class="fas fa-map-pin snav-district-icon"></i> -->
         }

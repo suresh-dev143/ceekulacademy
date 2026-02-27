@@ -57,7 +57,7 @@ export class SidebarLeftComponent {
             ];
         }
 
-        const institutional = this.institutionalMap[role] ?? null;
+        const institutional = role ? (this.institutionalMap[role] ?? null) : null;
         return [
             ...this.commonSections,
             ...(institutional ? [institutional] : []),
