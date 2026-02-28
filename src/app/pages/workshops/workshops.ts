@@ -1,255 +1,265 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, skip } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 import { AuthService } from '../../services/auth.service';
 import { LayoutComponent } from '../../components/layout/layout';
 import { CreateWorkshop } from './create-workshop/create-workshop';
-import { EnrollWorkshop } from './enroll-workshop/enroll-workshop';
-import { CreatedWorkshopData } from '../../services/workshop.service';
+import { WorkshopCardComponent } from './workshop-card/workshop-card';
+import { WorkshopDetailComponent } from './workshop-detail/workshop-detail';
+import {
+    WorkshopService,
+    WorkshopListItem,
+    WorkshopStatus,
+    CreatedWorkshopData,
+} from '../../services/workshop.service';
 import { ToastService } from '../../core/services/toast.service';
+
+// ── Type helpers ──────────────────────────────────────────────────────────────
+
+type StatusFilter = 'all' | WorkshopStatus;
+type ModeFilter   = 'all' | 'online' | 'hybrid';
+
+/** Pagination row item: a page number, or null = ellipsis gap. */
+type PageItem = number | null;
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 @Component({
     selector: 'app-public-workshops-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, LayoutComponent, CreateWorkshop, EnrollWorkshop],
+    imports: [
+        CommonModule, FormsModule,
+        LayoutComponent, CreateWorkshop, WorkshopCardComponent, WorkshopDetailComponent,
+    ],
     templateUrl: './workshops.html',
-    styleUrl: './workshops.scss',
+    styleUrl:    './workshops.scss',
 })
 export class PublicWorkshopsPageComponent {
-    public authService = inject(AuthService);
+
+    private ws    = inject(WorkshopService);
     private toast = inject(ToastService);
+    authService   = inject(AuthService);
+
     currentUser = this.authService.currentUserProfile;
-    selectedWorkshop = signal<any>(null);
-    showWorkshopEnrollment = signal<boolean>(false);
+
+    // ── API data ──────────────────────────────────────────────────────────────
+
+    workshops = signal<WorkshopListItem[]>([]);
+    isLoading = signal<boolean>(true);
+
+    // ── Filters ───────────────────────────────────────────────────────────────
+
+    /** Raw value bound to the search `<input>` (undelayed). */
+    searchRaw   = signal<string>('');
+    /** Debounced value used by filteredWorkshops computed. */
+    searchQuery = signal<string>('');
+
+    statusFilter = signal<StatusFilter>('all');
+    modeFilter   = signal<ModeFilter>('all');
+
+    private readonly searchInput$ = new Subject<string>();
+
+    // ── Pagination ────────────────────────────────────────────────────────────
+
+    readonly pageSize = 9;
+    currentPage = signal<number>(1);
+
+    // ── UI state ──────────────────────────────────────────────────────────────
+
     isCreatingWorkshop = signal<boolean>(false);
+    selectedWorkshop   = signal<WorkshopListItem | null>(null);
+    showWorkshopDetail = signal<boolean>(false);
 
-    // --- Filter options ---
-    dateOptions = ['Any', 'Today', 'This Week', 'This Month'] as const;
-    modeOptions = ['All', 'Online', 'Offline'] as const;
-    availabilityOptions = ['All', 'Available', 'Not Available'] as const;
+    readonly skeletonItems = [1, 2, 3, 4, 5, 6];
 
-    // --- Filter signals ---
-    searchQuery   = signal<string>('');
-    modeFilter    = signal<'All' | 'Online' | 'Offline'>('All');
-    dateFilter    = signal<'Any' | 'Today' | 'This Week' | 'This Month'>('Any');
-    availabilityFilter = signal<'All' | 'Available' | 'Not Available'>('All');
-    selectedDate  = signal<string>('');  // Specific date selection (YYYY-MM-DD)
-    startTime     = signal<string>('');  // Start time (HH:mm)
-    endTime       = signal<string>('');  // End time (HH:mm)
-    locationQuery = signal<string>('');
-    maxDistance   = signal<number>(0);   // 0 = any distance
+    // ── Filter display config ─────────────────────────────────────────────────
 
-    workshopsList = signal<any[]>([
-        {
-            id: 'ws-001',
-            title: 'AI for Everyone',
-            description: '',
-            instructor: 'Dr. Rashmi Chandra & Keshan',
-            date: '2026-03-15',
-            startTime: '09:00',
-            endTime: '12:00',
-            duration: '3 Hours',
-            type: 'Online',
-            fee: 100,
-            city: 'Online',
-            distance: 0,
-            instructorAvailable: true
-        },
-        {
-            id: 'ws-002',
-            title: 'AI for Healthcare',
-            description: '',
-           instructor: 'Dr. Rashmi Chandra & Keshan',
-           date: '2026-03-20',
-           startTime: '14:00',
-           endTime: '17:00',
-            duration: '3 Hours',
-            type: 'Online',
-            fee: 100,
-            city: 'Online',
-            distance: 0,
-            instructorAvailable: true
-        },
-        {
-            id: 'ws-003',
-            title: 'AI for Film Education',
-            description: '',
-          instructor: 'Keshan',
-           date: '2026-03-25',
-           startTime: '10:00',
-           endTime: '13:00',
-            duration: '3 Hours',
-            type: 'Online',
-            fee: 100,
-            city: 'Online',
-            distance: 0,
-            instructorAvailable: false
-        },
-        {
-            id: 'ws-004',
-            title: 'AI for Web Automation',
-            description: '',
-         instructor: 'Keshan',
-           date: '2026-04-05',
-           startTime: '15:30',
-           endTime: '18:30',
-            duration: '3 Hours',
-            type: 'Online',
-            fee: 100,
-            city: 'Online',
-            distance: 0,
-            instructorAvailable: true
-        },
-    ]);
+    readonly statusOptions: { value: StatusFilter; label: string }[] = [
+        { value: 'all',       label: 'All' },
+        { value: 'draft',     label: 'Draft' },
+        { value: 'published', label: 'Published' },
+        { value: 'active',    label: 'Active' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'cancelled', label: 'Cancelled' },
+    ];
+
+    readonly modeOptions: { value: ModeFilter; label: string }[] = [
+        { value: 'all',    label: 'All' },
+        { value: 'online', label: 'Online' },
+        { value: 'hybrid', label: 'Hybrid' },
+    ];
+
+    // ── Computed ──────────────────────────────────────────────────────────────
 
     filteredWorkshops = computed(() => {
-        const q    = this.searchQuery().toLowerCase().trim();
-        const mode = this.modeFilter();
-        const date = this.dateFilter();
-        const availability = this.availabilityFilter();
-        const selectedDate = this.selectedDate();
-        const startTimeFilter = this.startTime();
-        const endTimeFilter = this.endTime();
-        const loc  = this.locationQuery().toLowerCase().trim();
-        const dist = this.maxDistance();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const q      = this.searchQuery().toLowerCase().trim();
+        const status = this.statusFilter();
+        const mode   = this.modeFilter();
 
-        return this.workshopsList().filter(w => {
-            // Text search
-            if (q && ![w.title, w.description, w.instructor, w.type, w.city]
-                .some(f => f?.toLowerCase().includes(q))) return false;
-
-            // Mode filter
-            if (mode !== 'All' && w.type !== mode) return false;
-
-            // Date filter (preset options)
-            if (date !== 'Any') {
-                const wd = new Date(w.date);
-                wd.setHours(0, 0, 0, 0);
-                if (date === 'Today') {
-                    if (wd.getTime() !== today.getTime()) return false;
-                } else if (date === 'This Week') {
-                    const week = new Date(today);
-                    week.setDate(today.getDate() + 7);
-                    if (wd < today || wd > week) return false;
-                } else if (date === 'This Month') {
-                    if (wd.getMonth() !== today.getMonth() ||
-                        wd.getFullYear() !== today.getFullYear()) return false;
-                }
-            }
-
-            // Specific date selection (calendar picker)
-            if (selectedDate) {
-                const workshopDateStr = w.date ? new Date(w.date).toISOString().split('T')[0] : '';
-                if (workshopDateStr !== selectedDate) return false;
-            }
-
-            // Start time filter
-            if (startTimeFilter && w.startTime) {
-                if (w.startTime < startTimeFilter) return false;
-            }
-
-            // End time filter
-            if (endTimeFilter && w.endTime) {
-                if (w.endTime > endTimeFilter) return false;
-            }
-
-            // Instructor availability filter
-            if (availability !== 'All') {
-                const isAvailable = w.instructorAvailable === true;
-                if (availability === 'Available' && !isAvailable) return false;
-                if (availability === 'Not Available' && isAvailable) return false;
-            }
-
-            // Location text (city contains typed text)
-            if (loc && !w.city?.toLowerCase().includes(loc)) return false;
-
-            // Distance filter — only applies to Offline workshops
-            if (dist > 0 && w.type === 'Offline' && w.distance > dist) return false;
-
+        return this.workshops().filter(w => {
+            if (q &&
+                !w.workshopTitle.toLowerCase().includes(q) &&
+                !w.workshopDescription.toLowerCase().includes(q) &&
+                !w.expertDescription.toLowerCase().includes(q)) return false;
+            if (status !== 'all' && w.status !== status) return false;
+            if (mode !== 'all' && w.workshopMode !== mode) return false;
             return true;
         });
     });
 
-    activeFilterCount = computed(() => {
-        let count = 0;
-        if (this.modeFilter() !== 'All') count++;
-        if (this.dateFilter() !== 'Any') count++;
-        if (this.availabilityFilter() !== 'All') count++;
-        if (this.selectedDate().trim()) count++;
-        if (this.startTime().trim()) count++;
-        if (this.endTime().trim()) count++;
-        if (this.locationQuery().trim()) count++;
-        if (this.maxDistance() > 0) count++;
-        return count;
+    paginatedWorkshops = computed(() => {
+        const start = (this.currentPage() - 1) * this.pageSize;
+        return this.filteredWorkshops().slice(start, start + this.pageSize);
     });
 
-    toggleWorkshopCreation() {
-        this.isCreatingWorkshop.set(!this.isCreatingWorkshop());
+    totalPages = computed(() =>
+        Math.max(1, Math.ceil(this.filteredWorkshops().length / this.pageSize))
+    );
+
+    /** Compact page list with nulls for ellipsis gaps. */
+    paginationItems = computed((): PageItem[] => {
+        const total = this.totalPages();
+        if (total <= 1) return [];
+        if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
+
+        const curr = this.currentPage();
+        const set  = new Set<number>([1, total]);
+        for (let p = Math.max(1, curr - 1); p <= Math.min(total, curr + 1); p++) set.add(p);
+
+        const sorted = [...set].sort((a, b) => a - b);
+        const items: PageItem[] = [];
+        for (let i = 0; i < sorted.length; i++) {
+            if (i > 0 && sorted[i] - sorted[i - 1] > 1) items.push(null);
+            items.push(sorted[i]);
+        }
+        return items;
+    });
+
+    activeFilterCount = computed(() => {
+        let n = 0;
+        if (this.searchQuery().trim())     n++;
+        if (this.statusFilter() !== 'all') n++;
+        if (this.modeFilter()   !== 'all') n++;
+        return n;
+    });
+
+    get canCreateWorkshop(): boolean {
+        const role = this.currentUser()?.role ?? '';
+        return ['Teacher', 'Instructor', 'Admin', 'Director'].includes(role);
     }
 
-    cancelCreateWorkshop() {
-        this.isCreatingWorkshop.set(false);
+    // ── Constructor ───────────────────────────────────────────────────────────
+
+    constructor() {
+        // Debounce search input → update searchQuery signal + reset page
+        this.searchInput$.pipe(
+            debounceTime(300),
+            distinctUntilChanged(),
+            takeUntilDestroyed()
+        ).subscribe(q => {
+            this.searchQuery.set(q);
+            this.currentPage.set(1);
+        });
+
+        // Auto-refresh list after workshop creation (skip initial BehaviorSubject value)
+        this.ws.refresh$.pipe(
+            skip(1),
+            takeUntilDestroyed()
+        ).subscribe(() => this.loadWorkshops());
+
+        this.loadWorkshops();
     }
 
-    onWorkshopCreated(data: CreatedWorkshopData) {
-        const firstSession = data.sessions?.[0];
-        const totalFee = data.totalRevenuePotential ?? 0;
+    // ── Data loading ──────────────────────────────────────────────────────────
 
-        const newWorkshop = {
-            id: data._id,
-            title: data.workshopTitle,
-            description: data.workshopDescription,
-            expertDescription: data.expertDescription,
-            instructor: data.instructorType === 'myself'
-                ? (this.currentUser()?.name ?? 'Unknown')
-                : 'Open to All',
-            date: firstSession?.date ?? new Date().toISOString().split('T')[0],
-            startTime: firstSession?.startTime ?? '',
-            endTime: firstSession?.endTime ?? '',
-            duration: `${data.sessions?.length ?? 1} Session${(data.sessions?.length ?? 1) !== 1 ? 's' : ''}`,
-            type: data.workshopMode === 'online' ? 'Online' : 'Hybrid',
-            fee: totalFee,
-            city: data.workshopMode === 'online' ? 'Online' : 'In-person',
-            distance: 0,
-            instructorAvailable: true,
-        };
-
-        this.workshopsList.update(list => [newWorkshop, ...list]);
-        this.isCreatingWorkshop.set(false);
-        this.toast.success('Workshop created successfully!');
+    loadWorkshops(): void {
+        this.isLoading.set(true);
+        this.ws.getMyWorkshops({ page: 1, limit: 100 }).subscribe({
+            next: res => {
+                this.workshops.set(res.data.workshops);
+                this.isLoading.set(false);
+            },
+            error: () => this.isLoading.set(false),
+        });
     }
 
-    clearFilters() {
+    // ── Search ────────────────────────────────────────────────────────────────
+
+    onSearchInput(value: string): void {
+        this.searchRaw.set(value);
+        this.searchInput$.next(value);
+    }
+
+    // ── Filter setters (reset page on change) ─────────────────────────────────
+
+    setStatusFilter(value: string): void {
+        this.statusFilter.set(value as StatusFilter);
+        this.currentPage.set(1);
+    }
+
+    setModeFilter(value: string): void {
+        this.modeFilter.set(value as ModeFilter);
+        this.currentPage.set(1);
+    }
+
+    clearFilters(): void {
+        this.searchRaw.set('');
         this.searchQuery.set('');
-        this.modeFilter.set('All');
-        this.dateFilter.set('Any');
-        this.availabilityFilter.set('All');
-        this.selectedDate.set('');
-        this.startTime.set('');
-        this.endTime.set('');
-        this.locationQuery.set('');
-        this.maxDistance.set(0);
+        this.searchInput$.next('');
+        this.statusFilter.set('all');
+        this.modeFilter.set('all');
+        this.currentPage.set(1);
     }
 
-    selectWorkshop(workshop: any) {
-        this.selectedWorkshop.set(workshop);
-        this.showWorkshopEnrollment.set(true);
+    // ── Pagination ────────────────────────────────────────────────────────────
+
+    goToPage(page: number | null): void {
+        if (page === null) return;
+        if (page < 1 || page > this.totalPages()) return;
+        this.currentPage.set(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    closeWorkshopEnrollment() {
-        this.selectedWorkshop.set(null);
-        this.showWorkshopEnrollment.set(false);
+    // ── Workshop actions ──────────────────────────────────────────────────────
+
+    onWorkshopCreated(_data: CreatedWorkshopData): void {
+        this.isCreatingWorkshop.set(false);
+        this.toast.success('Workshop created successfully!');
+        this.ws.triggerRefresh();
     }
 
-    onEnrollmentSubmitted(formValue: any) {
-        console.log('Workshop Enrollment:', {
-            workshop: this.selectedWorkshop(),
-            ...formValue
-        });
-        this.toast.success('Enrollment submitted successfully!');
-        this.closeWorkshopEnrollment();
+    cancelCreateWorkshop(): void {
+        this.isCreatingWorkshop.set(false);
+    }
+
+    onViewWorkshop(w: WorkshopListItem): void {
+        this.selectedWorkshop.set(w);
+        this.showWorkshopDetail.set(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    onManageWorkshop(w: WorkshopListItem): void {
+        this.onViewWorkshop(w);
+    }
+
+    onBookWorkshop(w: WorkshopListItem): void {
+        this.onViewWorkshop(w);
+    }
+
+    onAuditWorkshop(w: WorkshopListItem): void {
+        this.onViewWorkshop(w);
+    }
+
+    closeWorkshopDetail(): void {
+        this.selectedWorkshop.set(null);
+        this.showWorkshopDetail.set(false);
+    }
+
+    onSessionAdded(): void {
+        this.loadWorkshops();
     }
 }

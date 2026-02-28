@@ -1,0 +1,723 @@
+// ── Workshop Detail  ──────────────────────────────────────────────────────────
+// Prefix: wd-*   |   Theme: dark institutional, accent #FF6B00
+// ─────────────────────────────────────────────────────────────────────────────
+
+$accent:       #FF6B00;
+$accent-h:     #FF8800;
+$error-color:  #ef4444;
+$warn-color:   #f59e0b;
+$blue:         #3b82f6;
+$green:        #22c55e;
+$border:       rgba(255, 255, 255, 0.08);
+$border-soft:  rgba(255, 255, 255, 0.05);
+$text-dim:     rgba(255, 255, 255, 0.35);
+$text-mid:     rgba(255, 255, 255, 0.55);
+$bg-card:      rgba(255, 255, 255, 0.04);
+$bg-input:     rgba(255, 255, 255, 0.05);
+
+// ── Status badge palette ──────────────────────────────────────────────────────
+
+$status-colors: (
+    draft:     ($blue,         rgba($blue, 0.12)),
+    published: ($green,        rgba($green, 0.12)),
+    active:    ($green,        rgba($green, 0.12)),
+    ongoing:   ($warn-color,   rgba($warn-color, 0.12)),
+    completed: (#6b7280,       rgba(107, 114, 128, 0.12)),
+    cancelled: ($error-color,  rgba($error-color, 0.12)),
+);
+
+// ── Wrapper ───────────────────────────────────────────────────────────────────
+
+.wd-wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding-bottom: 3rem;
+    animation: wdFadeIn 0.25s ease-out;
+}
+
+@keyframes wdFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Back button ───────────────────────────────────────────────────────────────
+
+.wd-back-btn {
+    background: none;
+    border: none;
+    color: $text-mid;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    margin-bottom: 1.75rem;
+    transition: color 0.2s;
+
+    &:hover { color: var(--text-primary); }
+    i { font-size: 0.8rem; }
+}
+
+// ── Workshop header ───────────────────────────────────────────────────────────
+
+.wd-header {
+    background: $bg-card;
+    border: 1px solid $border;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.25rem;
+}
+
+.wd-header-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.9rem;
+}
+
+// Generic badge
+.wd-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+
+    // Status variants
+    @each $key, $pair in $status-colors {
+        &--#{$key} {
+            color: nth($pair, 1);
+            background: nth($pair, 2);
+            border: 1px solid rgba(nth($pair, 1), 0.3);
+        }
+    }
+
+    // Mode
+    &--mode {
+        color: #4ade80;
+        background: rgba($green, 0.1);
+        border: 1px solid rgba($green, 0.25);
+
+        &.wd-badge--hybrid {
+            color: $accent;
+            background: rgba($accent, 0.1);
+            border-color: rgba($accent, 0.3);
+        }
+    }
+
+    // Timezone
+    &--tz {
+        color: $text-mid;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid $border;
+    }
+}
+
+.wd-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.85rem;
+    line-height: 1.3;
+}
+
+.wd-header-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    font-size: 0.8rem;
+    color: $text-dim;
+
+    span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+
+        i { color: $accent; font-size: 0.72rem; }
+    }
+}
+
+.wd-revenue {
+    color: #4ade80 !important;
+    font-weight: 600;
+}
+
+// ── Info grid ─────────────────────────────────────────────────────────────────
+
+.wd-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.wd-info-card {
+    background: $bg-card;
+    border: 1px solid $border-soft;
+    border-radius: 14px;
+    padding: 1.4rem 1.5rem;
+}
+
+.wd-info-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: $text-dim;
+    margin: 0 0 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    i { color: $accent; }
+}
+
+.wd-info-text {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+// ── Audit notice ──────────────────────────────────────────────────────────────
+
+.wd-audit-notice {
+    background: rgba($blue, 0.06);
+    border: 1px solid rgba($blue, 0.2);
+    border-radius: 10px;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.82rem;
+    color: #93c5fd;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+
+    i { font-size: 0.85rem; }
+}
+
+// ── Sessions section ──────────────────────────────────────────────────────────
+
+.wd-sessions-section {
+    background: $bg-card;
+    border: 1px solid $border-soft;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.25rem;
+}
+
+.wd-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.wd-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: $text-dim;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+
+    i { color: $accent; }
+}
+
+.wd-session-count-badge {
+    background: rgba($accent, 0.15);
+    border: 1px solid rgba($accent, 0.3);
+    color: $accent;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+}
+
+.wd-add-btn {
+    background: rgba($accent, 0.1);
+    border: 1px solid rgba($accent, 0.3);
+    color: $accent;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+
+    &:hover { background: rgba($accent, 0.18); }
+}
+
+// ── Add session form card ─────────────────────────────────────────────────────
+
+.wd-add-form-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba($accent, 0.2);
+    border-radius: 13px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    animation: wdFadeIn 0.2s ease-out;
+}
+
+.wd-add-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: $accent;
+    margin-bottom: 1.25rem;
+}
+
+.wd-add-form-close {
+    background: none;
+    border: none;
+    color: $text-mid;
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.25rem;
+    transition: color 0.2s;
+
+    &:hover { color: $error-color; }
+}
+
+// ── Form elements ─────────────────────────────────────────────────────────────
+
+.wd-form-grid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    &--3 { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+.wd-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.wd-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.wd-input {
+    background: $bg-input;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    font-family: inherit;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background 0.2s;
+
+    &::placeholder { color: $text-dim; }
+
+    &:focus {
+        border-color: $accent;
+        background: rgba(255,255,255,0.07);
+    }
+
+    &.is-error {
+        border-color: rgba($error-color, 0.55);
+        background: rgba($error-color, 0.04);
+    }
+
+    &::-webkit-calendar-picker-indicator {
+        filter: invert(1) brightness(0.7);
+        cursor: pointer;
+    }
+}
+
+.wd-select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='rgba(255,255,255,0.4)' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    padding-right: 2.2rem;
+    option { background: #1e1e1e; }
+}
+
+.wd-error {
+    font-size: 0.75rem;
+    color: $error-color;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    &::before { content: '⚠'; font-size: 0.68rem; }
+}
+
+// Alerts
+.wd-today-hint {
+    background: rgba($warn-color, 0.08);
+    border: 1px solid rgba($warn-color, 0.25);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.78rem;
+    color: $warn-color;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    i { flex-shrink: 0; }
+}
+
+.wd-conflict-alert {
+    background: rgba($error-color, 0.07);
+    border: 1px solid rgba($error-color, 0.3);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.78rem;
+    color: $error-color;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    i { flex-shrink: 0; }
+}
+
+// ── Radio group ───────────────────────────────────────────────────────────────
+
+.wd-radio-group {
+    display: flex;
+    gap: 1.25rem;
+    padding-top: 0.35rem;
+}
+
+.wd-radio {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    user-select: none;
+
+    input[type="radio"] {
+        position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+    }
+
+    .wd-radio-mark {
+        width: 16px; height: 16px;
+        border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.15);
+        display: inline-flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        transition: border-color 0.2s;
+
+        &::after {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: $accent;
+            opacity: 0;
+            transform: scale(0.4);
+            transition: opacity 0.15s, transform 0.15s;
+        }
+    }
+
+    input[type="radio"]:checked ~ .wd-radio-mark {
+        border-color: $accent;
+        &::after { opacity: 1; transform: scale(1); }
+    }
+
+    &:hover .wd-radio-mark { border-color: rgba($accent, 0.5); }
+}
+
+// ── Form action row ───────────────────────────────────────────────────────────
+
+.wd-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid $border-soft;
+}
+
+.wd-btn {
+    padding: 0.6rem 1.4rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+
+    &--cancel {
+        background: none;
+        border: 1px solid rgba(255,255,255,0.12);
+        color: $text-mid;
+
+        &:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    }
+
+    &--submit {
+        background: linear-gradient(135deg, $accent 0%, $accent-h 100%);
+        border: none;
+        color: white;
+
+        &:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba($accent, 0.4);
+        }
+
+        &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+    }
+}
+
+// ── Sessions list ─────────────────────────────────────────────────────────────
+
+.wd-empty-sessions {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: $text-dim;
+
+    i { font-size: 2rem; display: block; margin-bottom: 0.75rem; opacity: 0.4; }
+    p { font-size: 0.9rem; margin: 0 0 1.1rem; }
+}
+
+.wd-sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.wd-session-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid $border-soft;
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    transition: border-color 0.2s, background 0.2s;
+
+    &:hover {
+        border-color: rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.03);
+    }
+}
+
+.wd-session-index {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba($accent, 0.12);
+    border: 1px solid rgba($accent, 0.25);
+    color: $accent;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+}
+
+.wd-session-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.wd-session-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.wd-session-activity {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.wd-session-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.wd-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.22rem 0.55rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+
+    &--duration {
+        background: rgba($green, 0.1);
+        border: 1px solid rgba($green, 0.25);
+        color: #4ade80;
+    }
+
+    &--online {
+        background: rgba(34, 197, 94, 0.08);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        color: #4ade80;
+    }
+
+    &--hybrid {
+        background: rgba($accent, 0.08);
+        border: 1px solid rgba($accent, 0.2);
+        color: $accent;
+    }
+
+    &--free {
+        background: rgba($blue, 0.1);
+        border: 1px solid rgba($blue, 0.25);
+        color: #93c5fd;
+    }
+}
+
+.wd-session-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+}
+
+.wd-session-meta-item {
+    font-size: 0.78rem;
+    color: $text-dim;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+
+    i { color: $accent; font-size: 0.7rem; }
+}
+
+.wd-session-fee {
+    color: #4ade80 !important;
+    font-weight: 600;
+}
+
+.wd-session-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.wd-icon-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.75rem;
+    border: 1px solid;
+    transition: all 0.2s;
+
+    &--edit {
+        background: rgba($accent, 0.07);
+        border-color: rgba($accent, 0.2);
+        color: $accent;
+        &:hover:not(:disabled) { background: rgba($accent, 0.15); }
+    }
+
+    &--delete {
+        background: rgba($error-color, 0.07);
+        border-color: rgba($error-color, 0.2);
+        color: $error-color;
+        &:hover:not(:disabled) { background: rgba($error-color, 0.14); }
+    }
+
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+// ── Student action bar ────────────────────────────────────────────────────────
+
+.wd-student-bar {
+    background: rgba($green, 0.05);
+    border: 1px solid rgba($green, 0.18);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.wd-student-bar-text {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i { color: $green; }
+}
+
+.wd-enroll-btn {
+    background: linear-gradient(135deg, $accent 0%, $accent-h 100%);
+    border: none;
+    color: white;
+    padding: 0.65rem 1.5rem;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s;
+    white-space: nowrap;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba($accent, 0.4);
+    }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+    .wd-info-grid   { grid-template-columns: 1fr; }
+    .wd-form-grid--3 { grid-template-columns: 1fr 1fr; }
+    .wd-header { padding: 1.5rem; }
+    .wd-sessions-section { padding: 1.25rem; }
+    .wd-title { font-size: 1.4rem; }
+}
+
+@media (max-width: 480px) {
+    .wd-form-grid--3 { grid-template-columns: 1fr; }
+    .wd-student-bar { flex-direction: column; align-items: stretch; }
+    .wd-enroll-btn { justify-content: center; }
+    .wd-radio-group { flex-direction: column; gap: 0.5rem; }
+}
