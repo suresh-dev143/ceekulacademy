@@ -1,150 +1,304 @@
-<div class="workshop-form-container">
-    <div class="form-header">
-        <button class="btn-cancel" (click)="onCancel()" style="margin-bottom: 1.5rem;">
-            Cancel
+<div class="cwf-wrap">
+
+    <!-- ══ Header ══════════════════════════════════════════════════════════ -->
+    <div class="cwf-header">
+        <div>
+            <div class="cwf-eyebrow">NEW WORKSHOP</div>
+            <h2 class="cwf-title">Create a Workshop</h2>
+        </div>
+        <button type="button" class="cwf-cancel-btn" (click)="onCancel()">
+            <i class="fas fa-times"></i> Cancel
         </button>
     </div>
 
-    <form [formGroup]="workshopForm" (ngSubmit)="onSubmit()">
-        <div class="form-section">
-            <h3>Workshop Details</h3>
-            <div class="form-group">
-                <label class="form-label">Workshop Title *</label>
-                <input type="text" class="form-control" formControlName="workshopTitle"
-                    placeholder="e.g., Advanced AI Development">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Description *</label>
-                <textarea class="form-control" formControlName="workshopDescription" rows="4"
-                    placeholder="Describe your workshop..."></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Your Description *</label>
-                <textarea class="form-control" formControlName="expertDescription" rows="4"
-                    placeholder="Describe yourself..."></textarea>
-            </div>
-        </div>
+    <form [formGroup]="workshopForm" (ngSubmit)="onSubmit()" novalidate>
 
-        <div class="form-section">
-            <h3>Workshop Mode</h3>
-            <div class="radio-group">
-                <label class="radio-option">
-                    <input type="radio" formControlName="workshopMode" value="online">
-                    <span>Online</span>
-                </label>
-                <label class="radio-option">
-                    <input type="radio" formControlName="workshopMode" value="hybrid">
-                    <span>Hybrid (Online + In-Person)</span>
-                </label>
-            </div>
-        </div>
+        <!-- ══ 1. WORKSHOP DETAILS ═══════════════════════════════════════════ -->
+        <section class="cwf-section">
+            <div class="cwf-section-label"><span class="cwf-dot"></span> WORKSHOP DETAILS</div>
 
-        <div class="form-section">
-            <h3>Timezone</h3>
-            <div class="form-group">
-                <label class="form-label">Select Timezone *</label>
-                <select class="form-control" formControlName="timezone">
-                    <option value="">Choose a timezone</option>
-                    <option value="UTC">UTC (Coordinated Universal Time)</option>
-                    <option value="IST">IST (Indian Standard Time, UTC+5:30)</option>
-                    <option value="EST">EST (Eastern Standard Time, UTC-5)</option>
-                    <option value="CST">CST (Central Standard Time, UTC-6)</option>
-                    <option value="PST">PST (Pacific Standard Time, UTC-8)</option>
-                    <option value="GMT">GMT (Greenwich Mean Time, UTC+0)</option>
-                    <option value="CET">CET (Central European Time, UTC+1)</option>
-                    <option value="JST">JST (Japan Standard Time, UTC+9)</option>
-                    <option value="AEST">AEST (Australian Eastern Standard Time, UTC+10)</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-section">
-            <h3>Instructor</h3>
-            <div class="radio-group">
-                <label class="radio-option">
-                    <input type="radio" formControlName="instructorType" value="myself">
-                    <span>Myself</span>
-                </label>
-                <label class="radio-option">
-                    <input type="radio" formControlName="instructorType" value="open">
-                    <span>Open to Other Instructors</span>
-                </label>
-            </div>
-        </div>
-
-        <div class="form-section">
-            <div class="section-header">
-                <h3>Schedule <span class="subtitle">(Sessions)</span></h3>
-                <button type="button" class="btn-add-schedule" (click)="addScheduleRow()"
-                    [disabled]="schedule.length >= 5">
-                    Add Session
-                </button>
-            </div>
-
-            @for (row of schedule.controls; track $index) {
-            <div class="schedule-row">
-                <div class="schedule-grid">
-                    <div class="form-group">
-                        <label class="form-label">Date *</label>
-                        <input type="date" class="form-control" [formControl]="$any(row.get('date'))">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Start Time *</label>
-                        <input type="time" class="form-control" [formControl]="$any(row.get('startTime'))">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">End Time *</label>
-                        <input type="time" class="form-control" [formControl]="$any(row.get('endTime'))">
-                    </div>
+            <!-- Title -->
+            <div class="cwf-field">
+                <label class="cwf-label">Workshop Title *</label>
+                <div class="cwf-input-wrap">
+                    <input type="text" class="cwf-input" formControlName="workshopTitle"
+                        [class.is-error]="fieldError('workshopTitle')"
+                        placeholder="e.g., Advanced AI Development Bootcamp"
+                        maxlength="100">
+                    <span class="cwf-char">
+                        {{ workshopForm.get('workshopTitle')?.value?.length ?? 0 }}/100
+                    </span>
                 </div>
+                @if (fieldHasError('workshopTitle', 'required')) {
+                <div class="cwf-error">Title is required.</div>
+                } @else if (fieldHasError('workshopTitle', 'minlength')) {
+                <div class="cwf-error">Title must be at least 5 characters.</div>
+                }
+            </div>
 
-                <div class="schedule-grid">
-                    <div class="form-group">
-                        <label class="form-label">Activity *</label>
-                        <input type="text" class="form-control" [formControl]="$any(row.get('activity'))"
-                            placeholder="e.g., Lecture, Hands-on">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Fee (₹) *</label>
-                        <input type="number" class="form-control" [formControl]="$any(row.get('fee'))"
-                            min="0">
-                    </div>
-                    <div class="radio-group">
-                        <label class="radio-option">
-                            <input type="radio" [formControl]="$any(row.get('mode'))" value="online">
+            <!-- Workshop Description -->
+            <div class="cwf-field">
+                <label class="cwf-label">Workshop Description *</label>
+                <div class="cwf-input-wrap">
+                    <textarea class="cwf-input cwf-textarea" formControlName="workshopDescription"
+                        [class.is-error]="fieldError('workshopDescription')"
+                        placeholder="Describe what participants will learn, prerequisites, and outcomes..."
+                        rows="4" maxlength="1000"></textarea>
+                    <span class="cwf-char">
+                        {{ workshopForm.get('workshopDescription')?.value?.length ?? 0 }}/1000
+                    </span>
+                </div>
+                @if (fieldHasError('workshopDescription', 'required')) {
+                <div class="cwf-error">Description is required.</div>
+                } @else if (fieldHasError('workshopDescription', 'minlength')) {
+                <div class="cwf-error">Description must be at least 20 characters.</div>
+                }
+            </div>
+
+            <!-- Expert Description -->
+            <div class="cwf-field">
+                <label class="cwf-label">Your Expert Description *</label>
+                <div class="cwf-input-wrap">
+                    <textarea class="cwf-input cwf-textarea" formControlName="expertDescription"
+                        [class.is-error]="fieldError('expertDescription')"
+                        placeholder="Describe your expertise, qualifications, and relevant experience..."
+                        rows="3" maxlength="500"></textarea>
+                    <span class="cwf-char">
+                        {{ workshopForm.get('expertDescription')?.value?.length ?? 0 }}/500
+                    </span>
+                </div>
+                @if (fieldHasError('expertDescription', 'required')) {
+                <div class="cwf-error">Expert description is required.</div>
+                } @else if (fieldHasError('expertDescription', 'minlength')) {
+                <div class="cwf-error">Expert description must be at least 20 characters.</div>
+                }
+            </div>
+        </section>
+
+        <!-- ══ 2. CONFIGURATION ═══════════════════════════════════════════════ -->
+        <section class="cwf-section">
+            <div class="cwf-section-label"><span class="cwf-dot"></span> CONFIGURATION</div>
+
+            <div class="cwf-config-grid">
+
+                <!-- Workshop Mode -->
+                <div class="cwf-field">
+                    <label class="cwf-label">Workshop Mode *</label>
+                    <div class="cwf-radio-group">
+                        <label class="cwf-radio">
+                            <input type="radio" formControlName="workshopMode" value="online">
+                            <span class="cwf-radio-mark"></span>
                             <span>Online</span>
                         </label>
-                        <label class="radio-option">
-                            <input type="radio" [formControl]="$any(row.get('mode'))" value="hybrid">
+                        <label class="cwf-radio">
+                            <input type="radio" formControlName="workshopMode" value="hybrid">
+                            <span class="cwf-radio-mark"></span>
                             <span>Hybrid (Online + In-Person)</span>
                         </label>
                     </div>
                 </div>
 
-                <div class="schedule-grid">
-                    @if (row.get('mode')?.value === 'hybrid') {
-                    <div class="form-group">
-                        <label class="form-label">Location *</label>
-                        <select class="form-control" [formControl]="$any(row.get('location'))">
-                            <option value="">Select Location</option>
-                            @for (loc of registeredLocations; track loc) {
-                            <option [value]="loc">{{ loc }}</option>
-                            }
-                        </select>
+                <!-- Timezone -->
+                <div class="cwf-field">
+                    <label class="cwf-label">Timezone *</label>
+                    <select class="cwf-input cwf-select" formControlName="timezone">
+                        @for (tz of timezones; track tz.key) {
+                        <option [value]="tz.key">{{ tz.label }}</option>
+                        }
+                    </select>
+                    <div class="cwf-hint">
+                        <i class="fas fa-info-circle"></i>
+                        All session date/time validation uses this timezone.
                     </div>
-                    }
                 </div>
 
-                <button type="button" class="btn-remove-schedule" (click)="removeScheduleRow($index)"
-                    [disabled]="schedule.length === 1">
-                    Remove
+                <!-- Instructor Type -->
+                <div class="cwf-field">
+                    <label class="cwf-label">Instructor *</label>
+                    <div class="cwf-radio-group">
+                        <label class="cwf-radio">
+                            <input type="radio" formControlName="instructorType" value="myself">
+                            <span class="cwf-radio-mark"></span>
+                            <span>Myself</span>
+                        </label>
+                        <label class="cwf-radio">
+                            <input type="radio" formControlName="instructorType" value="open">
+                            <span class="cwf-radio-mark"></span>
+                            <span>Open to Other Instructors</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ══ 3. SESSIONS ════════════════════════════════════════════════════ -->
+        <section class="cwf-section">
+            <div class="cwf-section-header">
+                <div class="cwf-section-label"><span class="cwf-dot"></span> SESSIONS</div>
+                <button type="button" class="cwf-add-btn"
+                    (click)="addSession()" [disabled]="sessions.length >= 10">
+                    <i class="fas fa-plus"></i> Add Session
                 </button>
             </div>
+
+            @for (session of sessions.controls; track $index) {
+            <div class="cwf-session-card" [class.is-invalid]="session.invalid && session.touched">
+
+                <!-- Session card header -->
+                <div class="cwf-session-head">
+                    <div class="cwf-session-num">
+                        <i class="fas fa-calendar-day"></i> Session {{ $index + 1 }}
+                    </div>
+                    @if (sessionDuration($index)) {
+                    <div class="cwf-duration-badge">
+                        <i class="fas fa-clock"></i> {{ sessionDuration($index) }}
+                    </div>
+                    }
+                    <button type="button" class="cwf-remove-btn"
+                        (click)="removeSession($index)"
+                        [disabled]="sessions.length === 1"
+                        title="Remove session">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+
+                <!-- Today scheduling hint -->
+                @if (isTodaySession($index)) {
+                <div class="cwf-today-hint">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    You are scheduling for <strong>today</strong>.
+                    Start time must be later than the current time in the selected timezone.
+                </div>
+                }
+
+                <!-- Row 1: Date / Start Time / End Time -->
+                <div class="cwf-session-grid">
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Date *</label>
+                        <input type="date" class="cwf-input"
+                            [formControl]="$any(session.get('date'))"
+                            [min]="todayStr"
+                            [class.is-error]="sessionFieldError($index, 'date', 'required') ||
+                                              sessionFieldError($index, 'date', 'pastDate')">
+                        @if (sessionFieldError($index, 'date', 'required')) {
+                        <div class="cwf-error">Date is required.</div>
+                        } @else if (sessionFieldError($index, 'date', 'pastDate')) {
+                        <div class="cwf-error">Cannot select a past date.</div>
+                        }
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Start Time *</label>
+                        <input type="time" class="cwf-input"
+                            [formControl]="$any(session.get('startTime'))"
+                            [min]="minStartTime($index)"
+                            [class.is-error]="sessionFieldError($index, 'startTime', 'required') ||
+                                              sessionError($index, 'pastTime')">
+                        @if (sessionFieldError($index, 'startTime', 'required')) {
+                        <div class="cwf-error">Start time is required.</div>
+                        } @else if (sessionError($index, 'pastTime')) {
+                        <div class="cwf-error">
+                            Start time is already past for today in the selected timezone.
+                        </div>
+                        }
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">End Time *</label>
+                        <input type="time" class="cwf-input"
+                            [formControl]="$any(session.get('endTime'))"
+                            [class.is-error]="sessionFieldError($index, 'endTime', 'required') ||
+                                              sessionError($index, 'endBeforeStart')">
+                        @if (sessionFieldError($index, 'endTime', 'required')) {
+                        <div class="cwf-error">End time is required.</div>
+                        } @else if (sessionError($index, 'endBeforeStart')) {
+                        <div class="cwf-error">End time must be after start time.</div>
+                        }
+                    </div>
+
+                </div>
+
+                <!-- Row 2: Activity / Fee / Session Mode -->
+                <div class="cwf-session-grid cwf-session-grid--lower">
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Activity *</label>
+                        <input type="text" class="cwf-input"
+                            [formControl]="$any(session.get('activity'))"
+                            [class.is-error]="sessionFieldError($index, 'activity', 'required')"
+                            placeholder="e.g., HTML/CSS Fundamentals">
+                        @if (sessionFieldError($index, 'activity', 'required')) {
+                        <div class="cwf-error">Activity description is required.</div>
+                        }
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Fee (₹) *</label>
+                        <input type="number" class="cwf-input"
+                            [formControl]="$any(session.get('fee'))"
+                            [class.is-error]="sessionFieldError($index, 'fee', 'min')"
+                            min="0" step="50" placeholder="0 for free">
+                        @if (sessionFieldError($index, 'fee', 'min')) {
+                        <div class="cwf-error">Fee cannot be negative.</div>
+                        }
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Session Mode *</label>
+                        <div class="cwf-radio-group cwf-radio-group--inline">
+                            <label class="cwf-radio">
+                                <input type="radio" [formControl]="$any(session.get('mode'))" value="online">
+                                <span class="cwf-radio-mark"></span>
+                                <span>Online</span>
+                            </label>
+                            <label class="cwf-radio">
+                                <input type="radio" [formControl]="$any(session.get('mode'))" value="hybrid">
+                                <span class="cwf-radio-mark"></span>
+                                <span>Hybrid</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Conditional: Venue (hybrid only) -->
+                @if (session.get('mode')?.value === 'hybrid') {
+                <div class="cwf-field cwf-field--venue">
+                    <label class="cwf-label">Venue / Location *</label>
+                    <select class="cwf-input cwf-select"
+                        [formControl]="$any(session.get('location'))"
+                        [class.is-error]="sessionFieldError($index, 'location', 'required')">
+                        <option value="">— Select a venue —</option>
+                        @for (loc of registeredLocations; track loc) {
+                        <option [value]="loc">{{ loc }}</option>
+                        }
+                    </select>
+                    @if (sessionFieldError($index, 'location', 'required')) {
+                    <div class="cwf-error">Venue is required for hybrid sessions.</div>
+                    }
+                </div>
+                }
+
+            </div>
             }
+        </section>
+
+        <!-- ══ Submit row ══════════════════════════════════════════════════════ -->
+        <div class="cwf-submit-row">
+            <button type="button" class="cwf-btn-secondary" (click)="onCancel()">
+                Cancel
+            </button>
+            <button type="submit" class="cwf-btn-primary"
+                [disabled]="workshopForm.invalid || isSubmitting()">
+                @if (isSubmitting()) {
+                <i class="fas fa-spinner fa-spin"></i> Creating Workshop...
+                } @else {
+                <i class="fas fa-plus-circle"></i> Create Workshop
+                }
+            </button>
         </div>
 
-        <button type="submit" class="btn-submit" >
-            Create Workshop
-        </button>
     </form>
 </div>

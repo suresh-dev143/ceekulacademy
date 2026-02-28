@@ -8,7 +8,7 @@ import { normalizeHttpError } from '../utils/error.utils';
 /** Paths that are part of the authentication flow.
  *  A 401 on these should NOT trigger a "session expired" redirect — the user
  *  is trying to log in, not already authenticated. */
-const AUTH_PATHS = ['/api/auth/login', '/users/signup'];
+const AUTH_PATHS = ['/users/login', '/users/signup'];
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     const toast  = inject(ToastService);

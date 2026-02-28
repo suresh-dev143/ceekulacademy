@@ -5,6 +5,8 @@ import { AuthService } from '../../services/auth.service';
 import { LayoutComponent } from '../../components/layout/layout';
 import { CreateWorkshop } from './create-workshop/create-workshop';
 import { EnrollWorkshop } from './enroll-workshop/enroll-workshop';
+import { CreatedWorkshopData } from '../../services/workshop.service';
+import { ToastService } from '../../core/services/toast.service';
 
 @Component({
     selector: 'app-public-workshops-page',
@@ -15,6 +17,7 @@ import { EnrollWorkshop } from './enroll-workshop/enroll-workshop';
 })
 export class PublicWorkshopsPageComponent {
     public authService = inject(AuthService);
+    private toast = inject(ToastService);
     currentUser = this.authService.currentUserProfile;
     selectedWorkshop = signal<any>(null);
     showWorkshopEnrollment = signal<boolean>(false);
@@ -190,28 +193,32 @@ export class PublicWorkshopsPageComponent {
         this.isCreatingWorkshop.set(false);
     }
 
-    onWorkshopCreated(formValue: any) {
-        const duration = `${formValue.schedule.length} Sessions`;
-        const totalFee = formValue.schedule.reduce((acc: number, curr: any) => acc + (curr.fee || 0), 0);
-        const startDate = formValue.schedule.length > 0 ? formValue.schedule[0].date : new Date().toISOString().split('T')[0];
+    onWorkshopCreated(data: CreatedWorkshopData) {
+        const firstSession = data.sessions?.[0];
+        const totalFee = data.totalRevenuePotential ?? 0;
 
         const newWorkshop = {
-            id: `ws-00${this.workshopsList().length + 1}`,
-            title: formValue.workshopTitle,
-            description: formValue.workshopDescription,
-            expertDescription: formValue.expertDescription,
-            instructor: formValue.instructorType === 'myself' ? (this.currentUser()?.name ?? 'Unknown') : 'Open to All',
-            date: startDate,
-            duration: duration,
-            type: formValue.workshopMode === 'online' ? 'Online' : 'Hybrid',
+            id: data._id,
+            title: data.workshopTitle,
+            description: data.workshopDescription,
+            expertDescription: data.expertDescription,
+            instructor: data.instructorType === 'myself'
+                ? (this.currentUser()?.name ?? 'Unknown')
+                : 'Open to All',
+            date: firstSession?.date ?? new Date().toISOString().split('T')[0],
+            startTime: firstSession?.startTime ?? '',
+            endTime: firstSession?.endTime ?? '',
+            duration: `${data.sessions?.length ?? 1} Session${(data.sessions?.length ?? 1) !== 1 ? 's' : ''}`,
+            type: data.workshopMode === 'online' ? 'Online' : 'Hybrid',
             fee: totalFee,
-            city: formValue.workshopMode === 'online' ? 'Online' : 'In-person',
-            distance: 0
+            city: data.workshopMode === 'online' ? 'Online' : 'In-person',
+            distance: 0,
+            instructorAvailable: true,
         };
 
         this.workshopsList.update(list => [newWorkshop, ...list]);
         this.isCreatingWorkshop.set(false);
-        alert('Workshop created successfully!');
+        this.toast.success('Workshop created successfully!');
     }
 
     clearFilters() {
@@ -242,7 +249,7 @@ export class PublicWorkshopsPageComponent {
             workshop: this.selectedWorkshop(),
             ...formValue
         });
-        alert('Enrollment submitted successfully!');
+        this.toast.success('Enrollment submitted successfully!');
         this.closeWorkshopEnrollment();
     }
 }

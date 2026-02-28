@@ -6,6 +6,8 @@ import {
     ProfileService, VerificationStatus,
     StudentInfo, TeacherInfo, PartnerInfo
 } from '../../services/profile.service';
+import { AuthService, UpdateProfileRequest, ChangePasswordRequest } from '../../services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
 
 type Section = 'personal' | 'identity' | 'security' | 'role' | 'completion';
 
@@ -30,7 +32,9 @@ function passwordMatchValidator(form: AbstractControl) {
 export class MyProfileComponent {
 
     private profileService = inject(ProfileService);
-    private fb = inject(FormBuilder);
+    private authService    = inject(AuthService);
+    private toast          = inject(ToastService);
+    private fb             = inject(FormBuilder);
 
     // ── Data ──────────────────────────────────────────────────────────
     profile = this.profileService.profile;
@@ -43,6 +47,7 @@ export class MyProfileComponent {
     // ── Edit modes ────────────────────────────────────────────────────
     editingPersonal  = signal<boolean>(false);
     editingIdentity  = signal<boolean>(false);
+    isSavingPersonal = signal<boolean>(false);
 
     // ── OTP ───────────────────────────────────────────────────────────
     otpFlow    = signal<'none' | 'mobile' | 'email'>('none');
@@ -51,9 +56,10 @@ export class MyProfileComponent {
     otpSuccess = signal<boolean>(false);
 
     // ── Password modal ────────────────────────────────────────────────
-    showPasswordModal  = signal<boolean>(false);
-    passwordError      = signal<string>('');
-    passwordSuccess    = signal<boolean>(false);
+    showPasswordModal   = signal<boolean>(false);
+    passwordError       = signal<string>('');
+    passwordSuccess     = signal<boolean>(false);
+    isChangingPassword  = signal<boolean>(false);
 
     // ── Deactivation ──────────────────────────────────────────────────
     showDeactivateConfirm = signal<boolean>(false);
@@ -91,6 +97,9 @@ export class MyProfileComponent {
     readonly docTypes = ['ID Proof', 'BPL Certificate', 'Income Certificate', 'Caste Certificate', 'Disability Certificate', 'School Certificate'];
 
     constructor() {
+        // Seed the profile signal with real auth data before reading any values
+        this.profileService.seedFromAuthUser(this.authService.currentUserProfile());
+
         const pi = this.profile().personalInfo;
         const ii = this.profile().identityInfo;
 
@@ -101,7 +110,11 @@ export class MyProfileComponent {
             dob:          [pi.dob,          Validators.required],
             placeOfBirth: [pi.placeOfBirth],
             gender:       [pi.gender,       Validators.required],
-            address:      [pi.address,      Validators.required]
+            address: this.fb.group({
+                village:  [pi.address.village,  Validators.required],
+                pincode:  [pi.address.pincode,  [Validators.required, Validators.pattern(/^\d{6}$/)]],
+                district: [pi.address.district, Validators.required],
+            })
         });
 
         this.identityForm = this.fb.group({
@@ -130,7 +143,8 @@ export class MyProfileComponent {
         const pi = this.profile().personalInfo;
         this.personalForm.patchValue({
             fullName: pi.fullName, mobile: pi.mobile, email: pi.email,
-            dob: pi.dob, placeOfBirth: pi.placeOfBirth, gender: pi.gender, address: pi.address
+            dob: pi.dob, placeOfBirth: pi.placeOfBirth, gender: pi.gender,
+            address: { village: pi.address.village, pincode: pi.address.pincode, district: pi.address.district }
         });
         this.editingPersonal.set(true);
     }
@@ -145,19 +159,49 @@ export class MyProfileComponent {
     savePersonal() {
         this.personalForm.markAllAsTouched();
         if (this.personalForm.invalid) return;
+
+        const userId = this.authService.currentUserProfile()?.id;
+        if (!userId) return;
+
         const v = this.personalForm.value;
-        const old = this.profile().personalInfo;
-        this.profileService.updatePersonalInfo({
-            fullName: v.fullName, dob: v.dob, placeOfBirth: v.placeOfBirth,
-            gender: v.gender, address: v.address
+
+        // HTML date input returns YYYY-MM-DD; API expects DD-MM-YYYY
+        const dateOfBirth = v.dob ? (v.dob as string).split('-').reverse().join('-') : undefined;
+
+        const payload: UpdateProfileRequest = {
+            name:        v.fullName,
+            dateOfBirth,
+            gender:      v.gender,
+            address: {
+                village:  v.address.village,
+                pincode:  v.address.pincode,
+                district: v.address.district,
+            },
+        };
+
+        this.isSavingPersonal.set(true);
+
+        this.authService.updateProfile(userId, payload).subscribe({
+            next: () => {
+                this.profileService.updatePersonalInfo({
+                    fullName:     v.fullName,
+                    dob:          v.dob,
+                    placeOfBirth: v.placeOfBirth,
+                    gender:       v.gender,
+                    address:      v.address,
+                });
+                this.profileService.addAuditEntry({
+                    field:    'Personal Info',
+                    oldValue: '—',
+                    newValue: 'Updated via API',
+                    status:   'Success',
+                });
+                this.toast.success('Profile updated successfully.');
+                this.isSavingPersonal.set(false);
+                this.editingPersonal.set(false);
+            },
+            error: () => this.isSavingPersonal.set(false),
         });
-        if (v.fullName !== old.fullName) {
-            this.profileService.addAuditEntry({ field: 'Full Name', oldValue: old.fullName, newValue: v.fullName, status: 'Success' });
-        }
-        if (v.address !== old.address) {
-            this.profileService.addAuditEntry({ field: 'Address', oldValue: old.address, newValue: v.address, status: 'Success' });
-        }
-        this.editingPersonal.set(false);
     }
 
     // ── Identity ──────────────────────────────────────────────────────
@@ -233,23 +277,32 @@ export class MyProfileComponent {
     savePassword() {
         this.passwordForm.markAllAsTouched();
         if (this.passwordForm.invalid) return;
+
+        const userId = this.authService.currentUserProfile()?.id;
+        if (!userId) return;
+
         const v = this.passwordForm.value;
-        if (v.newPassword !== v.confirmPassword) {
-            this.passwordError.set('Passwords do not match.');
-            return;
-        }
-        const ok = this.profileService.changePassword(v.oldPassword, v.newPassword);
-        if (!ok) {
-            this.passwordError.set('Incorrect current password. (Hint: password123)');
-            return;
-        }
+        const payload: ChangePasswordRequest = {
+            currentPassword: v.oldPassword,
+            newPassword:     v.newPassword,
+        };
+
+        this.isChangingPassword.set(true);
         this.passwordError.set('');
-        this.passwordSuccess.set(true);
-        this.passwordForm.reset();
-        setTimeout(() => {
-            this.passwordSuccess.set(false);
-            this.showPasswordModal.set(false);
-        }, 1800);
+
+        this.authService.changePassword(userId, payload).subscribe({
+            next: () => {
+                this.profileService.recordPasswordChange();
+                this.isChangingPassword.set(false);
+                this.passwordSuccess.set(true);
+                this.passwordForm.reset();
+                setTimeout(() => {
+                    this.passwordSuccess.set(false);
+                    this.showPasswordModal.set(false);
+                }, 1800);
+            },
+            error: () => this.isChangingPassword.set(false),
+        });
     }
 
     closePasswordModal() {

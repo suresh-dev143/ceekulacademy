@@ -1,0 +1,533 @@
+// ── Create Workshop Form ─────────────────────────────────────────────────────
+// Prefix: cwf-*   |   Theme: dark, accent #FF6B00
+// ─────────────────────────────────────────────────────────────────────────────
+
+$accent:        #FF6B00;
+$accent-hover:  #FF8800;
+$error-color:   #ef4444;
+$warn-color:    #f59e0b;
+$border-dim:    rgba(255, 255, 255, 0.1);
+$border-dimmer: rgba(255, 255, 255, 0.06);
+$text-dim:      rgba(255, 255, 255, 0.35);
+$text-mid:      rgba(255, 255, 255, 0.55);
+$bg-card:       rgba(255, 255, 255, 0.04);
+$bg-input:      rgba(255, 255, 255, 0.05);
+$bg-input-focus:rgba(255, 255, 255, 0.08);
+
+// ── Wrapper ──────────────────────────────────────────────────────────────────
+
+.cwf-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 0 3rem;
+    animation: cwfFadeIn 0.3s ease-out;
+}
+
+@keyframes cwfFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Header ───────────────────────────────────────────────────────────────────
+
+.cwf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
+}
+
+.cwf-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: $accent;
+    margin-bottom: 0.35rem;
+}
+
+.cwf-title {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.cwf-cancel-btn {
+    background: none;
+    border: 1px solid $border-dim;
+    color: $text-mid;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+
+    &:hover {
+        border-color: rgba(239, 68, 68, 0.4);
+        color: $error-color;
+        background: rgba(239, 68, 68, 0.06);
+    }
+}
+
+// ── Sections ─────────────────────────────────────────────────────────────────
+
+.cwf-section {
+    background: $bg-card;
+    border: 1px solid $border-dimmer;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.cwf-section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: $text-dim;
+    margin-bottom: 1.5rem;
+}
+
+.cwf-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: $accent;
+    flex-shrink: 0;
+}
+
+.cwf-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    .cwf-section-label { margin-bottom: 0; }
+}
+
+// ── Configuration grid ───────────────────────────────────────────────────────
+
+.cwf-config-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem 2rem;
+
+    // Timezone field spans full width
+    > .cwf-field:nth-child(2) { grid-column: 1 / -1; }
+}
+
+// ── Fields ───────────────────────────────────────────────────────────────────
+
+.cwf-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+
+    &--venue { margin-top: 0.5rem; }
+}
+
+.cwf-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.2px;
+}
+
+// ── Inputs ───────────────────────────────────────────────────────────────────
+
+.cwf-input-wrap {
+    position: relative;
+}
+
+.cwf-input {
+    width: 100%;
+    background: $bg-input;
+    border: 1px solid $border-dim;
+    border-radius: 9px;
+    padding: 0.65rem 0.9rem;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background 0.2s;
+
+    &::placeholder { color: $text-dim; }
+
+    &:focus {
+        border-color: $accent;
+        background: $bg-input-focus;
+    }
+
+    &.is-error {
+        border-color: rgba($error-color, 0.6);
+        background: rgba($error-color, 0.04);
+    }
+
+    // date / time picker icon
+    &::-webkit-calendar-picker-indicator {
+        filter: invert(1) brightness(0.7);
+        cursor: pointer;
+    }
+}
+
+.cwf-textarea {
+    resize: vertical;
+    min-height: 90px;
+    line-height: 1.55;
+    padding-bottom: 1.6rem; // room for char counter
+}
+
+.cwf-select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='rgba(255,255,255,0.4)' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    padding-right: 2.2rem;
+
+    option { background: #1e1e1e; }
+}
+
+// Character counter
+.cwf-char {
+    position: absolute;
+    bottom: 0.45rem;
+    right: 0.7rem;
+    font-size: 0.7rem;
+    color: $text-dim;
+    pointer-events: none;
+    line-height: 1;
+}
+
+// ── Error / Hint ─────────────────────────────────────────────────────────────
+
+.cwf-error {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: $error-color;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+
+    &::before {
+        content: '⚠';
+        font-size: 0.7rem;
+    }
+}
+
+.cwf-hint {
+    font-size: 0.75rem;
+    color: $text-dim;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.1rem;
+
+    i { font-size: 0.7rem; color: $warn-color; }
+}
+
+// ── Radio groups ─────────────────────────────────────────────────────────────
+
+.cwf-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    &--inline {
+        flex-direction: row;
+        gap: 1.5rem;
+    }
+}
+
+.cwf-radio {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    user-select: none;
+
+    // Hide native radio
+    input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+    }
+
+    // Custom mark
+    .cwf-radio-mark {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid $border-dim;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: border-color 0.2s, background 0.2s;
+
+        &::after {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: $accent;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.15s, transform 0.15s;
+        }
+    }
+
+    input[type="radio"]:checked ~ .cwf-radio-mark {
+        border-color: $accent;
+
+        &::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    &:hover .cwf-radio-mark { border-color: rgba($accent, 0.5); }
+    &:hover { color: var(--text-primary); }
+}
+
+// ── Add session button ────────────────────────────────────────────────────────
+
+.cwf-add-btn {
+    background: rgba($accent, 0.1);
+    border: 1px solid rgba($accent, 0.3);
+    color: $accent;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) { background: rgba($accent, 0.18); }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+}
+
+// ── Session cards ─────────────────────────────────────────────────────────────
+
+.cwf-session-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid $border-dimmer;
+    border-radius: 13px;
+    padding: 1.4rem 1.5rem;
+    margin-bottom: 1.25rem;
+    transition: border-color 0.2s;
+
+    &:last-of-type { margin-bottom: 0; }
+
+    &.is-invalid {
+        border-color: rgba($error-color, 0.35);
+        background: rgba($error-color, 0.02);
+    }
+}
+
+.cwf-session-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+}
+
+.cwf-session-num {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: $accent;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex: 1;
+}
+
+.cwf-duration-badge {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    color: #4ade80;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.28rem 0.65rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.cwf-remove-btn {
+    background: rgba($error-color, 0.08);
+    border: 1px solid rgba($error-color, 0.2);
+    color: $error-color;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+        background: rgba($error-color, 0.15);
+        border-color: rgba($error-color, 0.4);
+    }
+
+    &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+}
+
+// Today banner
+.cwf-today-hint {
+    background: rgba($warn-color, 0.08);
+    border: 1px solid rgba($warn-color, 0.25);
+    border-radius: 9px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.78rem;
+    color: $warn-color;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+
+    i { flex-shrink: 0; margin-top: 0.1rem; }
+}
+
+// ── Session grids ─────────────────────────────────────────────────────────────
+
+.cwf-session-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    &--lower { margin-bottom: 0; }
+}
+
+// ── Submit row ───────────────────────────────────────────────────────────────
+
+.cwf-submit-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.cwf-btn-secondary {
+    background: none;
+    border: 1px solid $border-dim;
+    color: $text-mid;
+    padding: 0.7rem 1.5rem;
+    border-radius: 9px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.04);
+    }
+}
+
+.cwf-btn-primary {
+    background: linear-gradient(135deg, $accent 0%, $accent-hover 100%);
+    border: none;
+    color: white;
+    padding: 0.7rem 1.75rem;
+    border-radius: 9px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.25s;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba($accent, 0.35);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+    .cwf-wrap { padding: 1.25rem 0 2rem; }
+
+    .cwf-title { font-size: 1.5rem; }
+
+    .cwf-section { padding: 1.25rem 1.25rem; }
+
+    .cwf-config-grid {
+        grid-template-columns: 1fr;
+
+        > .cwf-field:nth-child(2) { grid-column: auto; }
+    }
+
+    .cwf-session-grid,
+    .cwf-session-grid--lower {
+        grid-template-columns: 1fr 1fr;
+
+        // Fee takes full width on tablet
+        > .cwf-field:nth-child(2) { grid-column: auto; }
+    }
+
+    .cwf-submit-row { flex-direction: column-reverse; }
+
+    .cwf-btn-secondary,
+    .cwf-btn-primary { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+    .cwf-header { flex-direction: column; gap: 0.75rem; }
+
+    .cwf-cancel-btn { align-self: flex-end; }
+
+    .cwf-session-grid,
+    .cwf-session-grid--lower { grid-template-columns: 1fr; }
+
+    .cwf-radio-group--inline {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

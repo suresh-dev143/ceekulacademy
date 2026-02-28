@@ -46,7 +46,7 @@ export class LoginComponent {
             next: (res) => {
                 this.isSubmitting.set(false);
                 const role = res.user.role?.toLowerCase() ?? '';
-                this.router.navigate([`/${role}-dashboard`]).catch(() => {
+                this.router.navigate(['/dashboard', role]).catch(() => {
                     this.router.navigate(['/dashboard']);
                 });
             },

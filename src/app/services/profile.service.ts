@@ -3,6 +3,12 @@ import { Injectable, signal, computed } from '@angular/core';
 export type VerificationStatus = 'Pending' | 'Verified' | 'Rejected';
 export type ProfileRole = 'Student' | 'Teacher' | 'Partner' | 'Researcher' | 'Entrepreneur';
 
+export interface ProfileAddress {
+    village:  string;
+    pincode:  string;
+    district: string;
+}
+
 export interface PersonalInfo {
     fullName: string;
     mobile: string;
@@ -10,7 +16,7 @@ export interface PersonalInfo {
     dob: string;
     placeOfBirth: string;
     gender: string;
-    address: string;
+    address: ProfileAddress;
     emailVerified: boolean;
     mobileVerified: boolean;
     lastUpdated: string;
@@ -111,7 +117,7 @@ const SAMPLE: MyProfileData = {
         dob: '2003-08-14',
         placeOfBirth: 'Raebareli, Uttar Pradesh',
         gender: 'Male',
-        address: 'Ward No. 7, Gandhi Nagar, Raebareli, UP – 229001',
+        address: { village: 'Ward No. 7, Gandhi Nagar', pincode: '229001', district: 'Raebareli' },
         emailVerified: true,
         mobileVerified: false,
         lastUpdated: '14 Feb 2026, 10:32 AM'
@@ -203,7 +209,7 @@ export class ProfileService {
             { label: 'Mobile Number', done: !!p.personalInfo.mobile, action: 'Add mobile number', section: 'personal' },
             { label: 'Date of Birth', done: !!p.personalInfo.dob, action: 'Add date of birth', section: 'personal' },
             { label: 'Gender', done: !!p.personalInfo.gender, action: 'Select gender', section: 'personal' },
-            { label: 'Address', done: !!p.personalInfo.address, action: 'Add your address', section: 'personal' },
+            { label: 'Address', done: !!p.personalInfo.address?.village, action: 'Add your address', section: 'personal' },
             { label: 'Identity Type', done: !!p.identityInfo.identityType, action: 'Set identity type', section: 'identity' },
             { label: 'Document Uploaded', done: p.documents.length > 0, action: 'Upload ID proof', section: 'identity' },
             { label: 'Email Verified', done: p.personalInfo.emailVerified, action: 'Verify your email address', section: 'personal' },
@@ -212,6 +218,21 @@ export class ProfileService {
             { label: 'Two-Factor Auth', done: p.accountInfo.twoFAEnabled, action: 'Enable 2FA for account security', section: 'security' },
         ];
     });
+
+    seedFromAuthUser(user: { id: string; name: string; email: string; role: string } | null): void {
+        if (!user) return;
+        const validRoles: ProfileRole[] = ['Student', 'Teacher', 'Partner', 'Researcher', 'Entrepreneur'];
+        this._profile.update(p => ({
+            ...p,
+            userId: user.id,
+            role:   validRoles.includes(user.role as ProfileRole) ? user.role as ProfileRole : p.role,
+            personalInfo: {
+                ...p.personalInfo,
+                fullName: user.name,
+                email:    user.email,
+            }
+        }));
+    }
 
     updatePersonalInfo(patch: Partial<PersonalInfo>): void {
         this._profile.update(p => ({
@@ -295,6 +316,17 @@ export class ProfileService {
             personalInfo: { ...p.personalInfo, mobileVerified: true }
         }));
         this.addAuditEntry({ field: 'Mobile Verification', oldValue: 'Unverified', newValue: 'Verified', status: 'Success' });
+    }
+
+    recordPasswordChange(): void {
+        this._profile.update(p => ({
+            ...p,
+            accountInfo: {
+                ...p.accountInfo,
+                lastPasswordChange: new Date().toLocaleDateString('en-IN', { dateStyle: 'medium' })
+            }
+        }));
+        this.addAuditEntry({ field: 'Password', oldValue: '••••••••', newValue: '••••••••', status: 'Success' });
     }
 
     changePassword(_oldPwd: string, _newPwd: string): boolean {
