@@ -142,20 +142,20 @@ import { AdvisorService } from '../../services/advisor.service';
     .dashboard-header {
       display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;
       .page-title { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-weight: 800; margin: 0; background: linear-gradient(135deg, #fff 0%, #667eea 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-      .district-name { font-size: 0.9rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); margin: 0.5rem 0 0; i { color: #667eea; margin-right: 0.5rem; } }
+      .district-name { font-size: 0.9rem; font-weight: 600; color: color-mix(in srgb, #fff, transparent 50%); margin: 0.5rem 0 0; i { color: #667eea; margin-right: 0.5rem; } }
     }
 
     .header-actions { display: flex; gap: 1rem; align-items: center; }
-    .btn-outline { background: transparent; border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 0.6rem 1.2rem; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
+    .btn-outline { background: transparent; border: 1px solid color-mix(in srgb, #fff, transparent 90%); color: #fff; padding: 0.6rem 1.2rem; border-radius: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
     .role-badge { background: #667eea; color: #fff; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
     .dashboard-tabs {
-        display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; overflow-x: auto;
+        display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid color-mix(in srgb, #fff, transparent 90%); padding-bottom: 1rem; overflow-x: auto;
         .tab-btn {
-            background: transparent; border: none; color: rgba(255,255,255,0.5); padding: 0.8rem 1.5rem; border-radius: 12px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.8rem; transition: all 0.3s; white-space: nowrap;
+            background: transparent; border: none; color: color-mix(in srgb, #fff, transparent 50%); padding: 0.8rem 1.5rem; border-radius: 12px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.8rem; transition: all 0.3s; white-space: nowrap;
             i { font-size: 1.1rem; }
-            &:hover { color: #fff; background: rgba(255,255,255,0.05); }
-            &.active { background: rgba(102, 126, 234, 0.2); color: #667eea; i { color: #667eea; } }
+            &:hover { color: #fff; background: color-mix(in srgb, #fff, transparent 95%); }
+            &.active { background: color-mix(in srgb, #667eea, transparent 80%); color: #667eea; i { color: #667eea; } }
             .badge { background: #ef4444; color: #fff; padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.75rem; }
         }
     }
@@ -167,20 +167,20 @@ import { AdvisorService } from '../../services/advisor.service';
       h3 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; }
       .insight-item { 
         margin-bottom: 1.2rem;
-        .label { font-size: 0.8rem; font-weight: 600; color: rgba(255, 255, 255, 0.4); display: block; margin-bottom: 0.4rem; }
-        .mini-progress { height: 6px; background: rgba(255, 255, 255, 0.05); border-radius: 100px; overflow: hidden; .fill { height: 100%; background: #667eea; } }
+        .label { font-size: 0.8rem; font-weight: 600; color: color-mix(in srgb, #fff, transparent 60%); display: block; margin-bottom: 0.4rem; }
+        .mini-progress { height: 6px; background: color-mix(in srgb, #fff, transparent 95%); border-radius: 100px; overflow: hidden; .fill { height: 100%; background: #667eea; } }
       }
     }
 
     .district-alerts {
       margin-top: 2rem;
-      h4 { font-size: 0.85rem; font-weight: 800; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; margin-bottom: 1rem; }
+      h4 { font-size: 0.85rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 70%); text-transform: uppercase; margin-bottom: 1rem; }
       .alert {
         display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem; border-radius: 12px; font-weight: 600; margin-bottom: 0.8rem; font-size: 0.9rem;
         i { font-size: 1rem; }
-        &.warn { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
-        &.info { background: rgba(102, 126, 234, 0.1); color: #667eea; }
-        &.success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        &.warn { background: color-mix(in srgb, #fbbf24, transparent 90%); color: #fbbf24; }
+        &.info { background: color-mix(in srgb, #667eea, transparent 90%); color: #667eea; }
+        &.success { background: color-mix(in srgb, #10b981, transparent 90%); color: #10b981; }
       }
     }
 

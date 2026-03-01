@@ -48,15 +48,15 @@ import { IssueService, Issue } from '../../../services/issue.service';
     .list-filters { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; }
     
     .search-box { position: relative;
-      i { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.3); }
-      input { width: 100%; padding: 1rem 1rem 1rem 3rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; color: #fff; font-size: 1rem;
+      i { position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%); color: color-mix(in srgb, #fff, transparent 70%); }
+      input { width: 100%; padding: 1rem 1rem 1rem 3rem; background: color-mix(in srgb, #fff, transparent 97%); border: 1px solid color-mix(in srgb, #fff, transparent 92%); border-radius: 14px; color: #fff; font-size: 1rem;
         &:focus { outline: none; border-color: #667eea; }
       }
     }
 
     .filter-chips { display: flex; gap: 0.8rem; overflow-x: auto; padding-bottom: 0.5rem;
-      .chip { padding: 0.5rem 1.2rem; border-radius: 100px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.6); font-size: 0.85rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s;
-        &:hover { background: rgba(255, 255, 255, 0.08); }
+      .chip { padding: 0.5rem 1.2rem; border-radius: 100px; background: color-mix(in srgb, #fff, transparent 95%); border: 1px solid color-mix(in srgb, #fff, transparent 90%); color: color-mix(in srgb, #fff, transparent 40%); font-size: 0.85rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s;
+        &:hover { background: color-mix(in srgb, #fff, transparent 92%); }
         &.active { background: #667eea; border-color: #667eea; color: #fff; }
       }
     }
@@ -64,11 +64,11 @@ import { IssueService, Issue } from '../../../services/issue.service';
     .issue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
     
     .issue-card-compact { padding: 1.5rem; border-radius: 20px; cursor: pointer; transition: 0.3s;
-      &:hover { transform: translateY(-5px); border-color: #667eea; background: rgba(255, 255, 255, 0.05); }
+      &:hover { transform: translateY(-5px); border-color: #667eea; background: color-mix(in srgb, #fff, transparent 95%); }
     }
 
     .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
-      .issue-id { font-size: 0.75rem; font-weight: 800; color: rgba(255, 255, 255, 0.3); letter-spacing: 0.5px; }
+      .issue-id { font-size: 0.75rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 70%); letter-spacing: 0.5px; }
     }
 
     .status-badge { padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
@@ -79,9 +79,9 @@ import { IssueService, Issue } from '../../../services/issue.service';
     }
 
     .issue-cat { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: #fff; margin-bottom: 0.8rem; }
-    .issue-desc { font-size: 0.9rem; color: rgba(255, 255, 255, 0.5); line-height: 1.5; margin-bottom: 1.5rem; }
+    .issue-desc { font-size: 0.9rem; color: color-mix(in srgb, #fff, transparent 50%); line-height: 1.5; margin-bottom: 1.5rem; }
 
-    .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.05);
+    .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid color-mix(in srgb, #fff, transparent 95%);
       .location { font-size: 0.8rem; color: rgba(255, 255, 255, 0.4); i { color: #667eea; margin-right: 0.3rem; } }
       .urgency { font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
         &.high, &.critical { color: #ef4444; }

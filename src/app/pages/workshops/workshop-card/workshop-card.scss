@@ -1,25 +1,26 @@
 // ── Workshop Card  ───────────────────────────────────────────────────────────
 // Prefix: wc-*   |   Theme: dark, accent #FF6B00
 // ─────────────────────────────────────────────────────────────────────────────
+@use 'sass:list';
 
-$accent:  #FF6B00;
-$border:  rgba(255, 255, 255, 0.08);
-$text-dim: rgba(255, 255, 255, 0.38);
+$accent: #FF6B00;
+$border: color-mix(in srgb, #fff, transparent 92%);
+$text-dim: color-mix(in srgb, #fff, transparent 62%);
 
 // Status palette
 $status: (
-    draft:     (#3b82f6, rgba(59, 130, 246, 0.12)),
-    published: (#22c55e, rgba(34, 197, 94,  0.12)),
-    active:    (#22c55e, rgba(34, 197, 94,  0.12)),
-    ongoing:   (#f59e0b, rgba(245, 158, 11, 0.12)),
-    completed: (#6b7280, rgba(107, 114, 128, 0.12)),
-    cancelled: (#ef4444, rgba(239, 68, 68,  0.12)),
+    draft: (#3b82f6, color-mix(in srgb, #3b82f6, transparent 88%)),
+    published: (#22c55e, color-mix(in srgb, #22c55e, transparent 88%)),
+    active: (#22c55e, color-mix(in srgb, #22c55e, transparent 88%)),
+    ongoing: (#f59e0b, color-mix(in srgb, #f59e0b, transparent 88%)),
+    completed: (#6b7280, color-mix(in srgb, #6b7280, transparent 88%)),
+    cancelled: (#ef4444, color-mix(in srgb, #ef4444, transparent 88%)),
 );
 
 // ── Card shell ───────────────────────────────────────────────────────────────
 
 .wc-card {
-    background: rgba(255, 255, 255, 0.04);
+    background: color-mix(in srgb, #fff, transparent 96%);
     border: 1px solid $border;
     border-radius: 16px;
     padding: 1.4rem 1.5rem 1.25rem;
@@ -30,14 +31,14 @@ $status: (
 
     &:hover {
         transform: translateY(-4px);
-        border-color: rgba(255, 255, 255, 0.15);
-        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+        border-color: color-mix(in srgb, #fff, transparent 85%);
+        box-shadow: 0 8px 28px color-mix(in srgb, #000, transparent 65%);
     }
 
     // Left-edge status glow
     @each $key, $colors in $status {
         &[data-status='#{$key}'] {
-            border-left: 3px solid nth($colors, 1);
+            border-left: 3px solid list.nth($colors, 1);
         }
     }
 }
@@ -67,10 +68,12 @@ $status: (
     border-radius: 20px;
 
     @each $key, $colors in $status {
+        $color: list.nth($colors, 1);
+
         &--#{$key} {
-            color: nth($colors, 1);
-            background: nth($colors, 2);
-            border: 1px solid rgba(nth($colors, 1), 0.3);
+            color: $color;
+            background: list.nth($colors, 2);
+            border: 1px solid color-mix(in srgb, $color, transparent 70%);
         }
     }
 }
@@ -80,8 +83,8 @@ $status: (
     font-size: 0.68rem;
     font-weight: 600;
     color: #4ade80;
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.25);
+    background: color-mix(in srgb, #22c55e, transparent 90%);
+    border: 1px solid color-mix(in srgb, #22c55e, transparent 75%);
     padding: 0.22rem 0.6rem;
     border-radius: 20px;
     display: inline-flex;
@@ -90,8 +93,8 @@ $status: (
 
     &--hybrid {
         color: $accent;
-        background: rgba($accent, 0.1);
-        border-color: rgba($accent, 0.3);
+        background: color-mix(in srgb, $accent, transparent 90%);
+        border-color: color-mix(in srgb, $accent, transparent 70%);
     }
 }
 
@@ -138,7 +141,9 @@ $status: (
         flex-shrink: 0;
     }
 
-    &--tz { font-style: italic; }
+    &--tz {
+        font-style: italic;
+    }
 }
 
 // ── Sessions progress bar ─────────────────────────────────────────────────────
@@ -163,7 +168,10 @@ $status: (
     align-items: center;
     gap: 0.3rem;
 
-    i { color: $accent; font-size: 0.68rem; }
+    i {
+        color: $accent;
+        font-size: 0.68rem;
+    }
 }
 
 .wc-sessions-count {
@@ -174,7 +182,7 @@ $status: (
 
 .wc-progress-track {
     height: 4px;
-    background: rgba(255, 255, 255, 0.07);
+    background: color-mix(in srgb, #fff, transparent 93%);
     border-radius: 4px;
     overflow: hidden;
 }
@@ -212,22 +220,24 @@ $status: (
     white-space: nowrap;
 
     &--view {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: color-mix(in srgb, #fff, transparent 95%);
+        border: 1px solid color-mix(in srgb, #fff, transparent 90%);
         color: var(--text-secondary);
 
         &:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: color-mix(in srgb, #fff, transparent 90%);
             color: var(--text-primary);
         }
     }
 
     &--manage {
-        background: rgba($accent, 0.1);
-        border: 1px solid rgba($accent, 0.3);
+        background: color-mix(in srgb, $accent, transparent 90%);
+        border: 1px solid color-mix(in srgb, $accent, transparent 70%);
         color: $accent;
 
-        &:hover { background: rgba($accent, 0.18); }
+        &:hover {
+            background: color-mix(in srgb, $accent, transparent 82%);
+        }
     }
 
     &--book {
@@ -237,15 +247,17 @@ $status: (
 
         &:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba($accent, 0.35);
+            box-shadow: 0 4px 12px color-mix(in srgb, $accent, transparent 65%);
         }
     }
 
     &--audit {
-        background: rgba(59, 130, 246, 0.1);
-        border: 1px solid rgba(59, 130, 246, 0.3);
+        background: color-mix(in srgb, #3b82f6, transparent 90%);
+        border: 1px solid color-mix(in srgb, #3b82f6, transparent 70%);
         color: #60a5fa;
 
-        &:hover { background: rgba(59, 130, 246, 0.18); }
+        &:hover {
+            background: color-mix(in srgb, #3b82f6, transparent 82%);
+        }
     }
 }

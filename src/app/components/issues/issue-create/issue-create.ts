@@ -130,29 +130,29 @@ import { IssueService, IssueCategory } from '../../../services/issue.service';
     .issue-create-card { padding: 2.5rem; border-radius: 28px; max-width: 800px; margin: 0 auto; }
     .form-title { text-align: center; color: #fff; margin-bottom: 2rem; font-family: 'Montserrat', sans-serif; }
 
-    .form-section { margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .form-section { margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid color-mix(in srgb, #fff, transparent 95%); }
     .form-section:last-child { border-bottom: none; margin-bottom: 1rem; }
 
     h3 { font-family: 'Montserrat', sans-serif; font-size: 1.2rem; color: #667eea; margin-bottom: 1.5rem; display: flex; align-items: center; }
-    .section-hint { color: rgba(255, 255, 255, 0.5); font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .section-hint { color: color-mix(in srgb, #fff, transparent 50%); font-size: 0.9rem; margin-bottom: 1.5rem; }
 
     .form-group { margin-bottom: 1.5rem; label { display: block; font-size: 0.85rem; font-weight: 700; color: rgba(255, 255, 255, 0.4); margin-bottom: 0.6rem; text-transform: uppercase; } }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
     
-    .form-control { width: 100%; padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; color: #fff; font-size: 1rem;
-      &:focus { outline: none; border-color: #667eea; background: rgba(255, 255, 255, 0.05); }
+    .form-control { width: 100%; padding: 1rem; background: color-mix(in srgb, #fff, transparent 97%); border: 1px solid color-mix(in srgb, #fff, transparent 92%); border-radius: 12px; color: #fff; font-size: 1rem;
+      &:focus { outline: none; border-color: #667eea; background: color-mix(in srgb, #fff, transparent 95%); }
     }
 
     .urgency-selector { display: flex; gap: 0.8rem;
-      button { flex: 1; padding: 0.8rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); background: transparent; color: #fff; font-weight: 700; cursor: pointer; transition: 0.2s;
+      button { flex: 1; padding: 0.8rem; border-radius: 10px; border: 1px solid color-mix(in srgb, #fff, transparent 90%); background: transparent; color: #fff; font-weight: 700; cursor: pointer; transition: 0.2s;
         &.active { background: #667eea; border-color: #667eea; }
       }
     }
 
-    .upload-zone { border: 2px dashed rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 3rem; text-align: center; cursor: pointer; transition: 0.3s;
+    .upload-zone { border: 2px dashed color-mix(in srgb, #fff, transparent 90%); border-radius: 20px; padding: 3rem; text-align: center; cursor: pointer; transition: 0.3s;
       i { font-size: 3rem; color: #667eea; margin-bottom: 1rem; }
-      p { color: rgba(255, 255, 255, 0.5); font-weight: 500; }
-      &:hover { background: rgba(255, 255, 255, 0.02); border-color: #667eea; }
+      p { color: color-mix(in srgb, #fff, transparent 50%); font-weight: 500; }
+      &:hover { background: color-mix(in srgb, #fff, transparent 98%); border-color: #667eea; }
     }
 
     .media-previews { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem; margin-top: 2rem;
@@ -163,7 +163,7 @@ import { IssueService, IssueCategory } from '../../../services/issue.service';
       }
     }
 
-    .consent-check { display: flex; gap: 1rem; align-items: flex-start; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; line-height: 1.4;
+    .consent-check { display: flex; gap: 1rem; align-items: flex-start; color: color-mix(in srgb, #fff, transparent 40%); font-size: 0.9rem; line-height: 1.4;
       input { margin-top: 0.3rem; }
     }
 

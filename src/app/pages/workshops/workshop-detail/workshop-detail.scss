@@ -1,29 +1,30 @@
 // ── Workshop Detail  ──────────────────────────────────────────────────────────
 // Prefix: wd-*   |   Theme: dark institutional, accent #FF6B00
 // ─────────────────────────────────────────────────────────────────────────────
+@use 'sass:list';
 
-$accent:       #FF6B00;
-$accent-h:     #FF8800;
-$error-color:  #ef4444;
-$warn-color:   #f59e0b;
-$blue:         #3b82f6;
-$green:        #22c55e;
-$border:       rgba(255, 255, 255, 0.08);
-$border-soft:  rgba(255, 255, 255, 0.05);
-$text-dim:     rgba(255, 255, 255, 0.35);
-$text-mid:     rgba(255, 255, 255, 0.55);
-$bg-card:      rgba(255, 255, 255, 0.04);
-$bg-input:     rgba(255, 255, 255, 0.05);
+$accent: #FF6B00;
+$accent-h: #FF8800;
+$error-color: #ef4444;
+$warn-color: #f59e0b;
+$blue: #3b82f6;
+$green: #22c55e;
+$border: color-mix(in srgb, #fff, transparent 92%);
+$border-soft: color-mix(in srgb, #fff, transparent 95%);
+$text-dim: color-mix(in srgb, #fff, transparent 65%);
+$text-mid: color-mix(in srgb, #fff, transparent 45%);
+$bg-card: color-mix(in srgb, #fff, transparent 96%);
+$bg-input: color-mix(in srgb, #fff, transparent 95%);
 
 // ── Status badge palette ──────────────────────────────────────────────────────
 
 $status-colors: (
-    draft:     ($blue,         rgba($blue, 0.12)),
-    published: ($green,        rgba($green, 0.12)),
-    active:    ($green,        rgba($green, 0.12)),
-    ongoing:   ($warn-color,   rgba($warn-color, 0.12)),
-    completed: (#6b7280,       rgba(107, 114, 128, 0.12)),
-    cancelled: ($error-color,  rgba($error-color, 0.12)),
+    draft: ($blue, color-mix(in srgb, $blue, transparent 88%)),
+    published: ($green, color-mix(in srgb, $green, transparent 88%)),
+    active: ($green, color-mix(in srgb, $green, transparent 88%)),
+    ongoing: ($warn-color, color-mix(in srgb, $warn-color, transparent 88%)),
+    completed: (#6b7280, color-mix(in srgb, #6b7280, transparent 88%)),
+    cancelled: ($error-color, color-mix(in srgb, $error-color, transparent 88%)),
 );
 
 // ── Wrapper ───────────────────────────────────────────────────────────────────
@@ -36,8 +37,15 @@ $status-colors: (
 }
 
 @keyframes wdFadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 // ── Back button ───────────────────────────────────────────────────────────────
@@ -56,8 +64,13 @@ $status-colors: (
     margin-bottom: 1.75rem;
     transition: color 0.2s;
 
-    &:hover { color: var(--text-primary); }
-    i { font-size: 0.8rem; }
+    &:hover {
+        color: var(--text-primary);
+    }
+
+    i {
+        font-size: 0.8rem;
+    }
 }
 
 // ── Workshop header ───────────────────────────────────────────────────────────
@@ -91,30 +104,32 @@ $status-colors: (
 
     // Status variants
     @each $key, $pair in $status-colors {
+        $color: list.nth($pair, 1);
+
         &--#{$key} {
-            color: nth($pair, 1);
-            background: nth($pair, 2);
-            border: 1px solid rgba(nth($pair, 1), 0.3);
+            color: $color;
+            background: list.nth($pair, 2);
+            border: 1px solid color-mix(in srgb, $color, transparent 70%);
         }
     }
 
     // Mode
     &--mode {
         color: #4ade80;
-        background: rgba($green, 0.1);
-        border: 1px solid rgba($green, 0.25);
+        background: color-mix(in srgb, $green, transparent 90%);
+        border: 1px solid color-mix(in srgb, $green, transparent 75%);
 
         &.wd-badge--hybrid {
             color: $accent;
-            background: rgba($accent, 0.1);
-            border-color: rgba($accent, 0.3);
+            background: color-mix(in srgb, $accent, transparent 90%);
+            border-color: color-mix(in srgb, $accent, transparent 70%);
         }
     }
 
     // Timezone
     &--tz {
         color: $text-mid;
-        background: rgba(255,255,255,0.04);
+        background: color-mix(in srgb, #fff, transparent 96%);
         border: 1px solid $border;
     }
 }
@@ -125,6 +140,79 @@ $status-colors: (
     color: var(--text-primary);
     margin: 0 0 0.85rem;
     line-height: 1.3;
+}
+
+.wd-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 0.85rem;
+
+    .wd-title {
+        margin: 0;
+    }
+}
+
+.wd-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.wd-edit-info-btn {
+    background: color-mix(in srgb, $accent, transparent 92%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 80%);
+    color: $accent;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+
+    &:hover {
+        background: color-mix(in srgb, $accent, transparent 85%);
+        border-color: color-mix(in srgb, $accent, transparent 60%);
+    }
+
+    i {
+        font-size: 0.75rem;
+    }
+}
+
+.wd-cancel-btn {
+    background: color-mix(in srgb, $error-color, transparent 92%);
+    border: 1px solid color-mix(in srgb, $error-color, transparent 80%);
+    color: $error-color;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+        background: color-mix(in srgb, $error-color, transparent 85%);
+        border-color: color-mix(in srgb, $error-color, transparent 60%);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    i {
+        font-size: 0.75rem;
+    }
 }
 
 .wd-header-meta {
@@ -139,7 +227,10 @@ $status-colors: (
         align-items: center;
         gap: 0.35rem;
 
-        i { color: $accent; font-size: 0.72rem; }
+        i {
+            color: $accent;
+            font-size: 0.72rem;
+        }
     }
 }
 
@@ -175,7 +266,9 @@ $status-colors: (
     align-items: center;
     gap: 0.4rem;
 
-    i { color: $accent; }
+    i {
+        color: $accent;
+    }
 }
 
 .wd-info-text {
@@ -188,8 +281,8 @@ $status-colors: (
 // ── Audit notice ──────────────────────────────────────────────────────────────
 
 .wd-audit-notice {
-    background: rgba($blue, 0.06);
-    border: 1px solid rgba($blue, 0.2);
+    background: color-mix(in srgb, $blue, transparent 94%);
+    border: 1px solid color-mix(in srgb, $blue, transparent 80%);
     border-radius: 10px;
     padding: 0.85rem 1.1rem;
     font-size: 0.82rem;
@@ -199,7 +292,9 @@ $status-colors: (
     gap: 0.6rem;
     margin-bottom: 1.25rem;
 
-    i { font-size: 0.85rem; }
+    i {
+        font-size: 0.85rem;
+    }
 }
 
 // ── Sessions section ──────────────────────────────────────────────────────────
@@ -229,12 +324,14 @@ $status-colors: (
     align-items: center;
     gap: 0.55rem;
 
-    i { color: $accent; }
+    i {
+        color: $accent;
+    }
 }
 
 .wd-session-count-badge {
-    background: rgba($accent, 0.15);
-    border: 1px solid rgba($accent, 0.3);
+    background: color-mix(in srgb, $accent, transparent 85%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 70%);
     color: $accent;
     font-size: 0.68rem;
     font-weight: 700;
@@ -243,8 +340,8 @@ $status-colors: (
 }
 
 .wd-add-btn {
-    background: rgba($accent, 0.1);
-    border: 1px solid rgba($accent, 0.3);
+    background: color-mix(in srgb, $accent, transparent 90%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 70%);
     color: $accent;
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -256,14 +353,16 @@ $status-colors: (
     gap: 0.4rem;
     transition: all 0.2s;
 
-    &:hover { background: rgba($accent, 0.18); }
+    &:hover {
+        background: color-mix(in srgb, $accent, transparent 82%);
+    }
 }
 
 // ── Add session form card ─────────────────────────────────────────────────────
 
 .wd-add-form-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba($accent, 0.2);
+    background: color-mix(in srgb, white, transparent 98%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 80%);
     border-radius: 13px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -291,7 +390,9 @@ $status-colors: (
     padding: 0.25rem;
     transition: color 0.2s;
 
-    &:hover { color: $error-color; }
+    &:hover {
+        color: $error-color;
+    }
 }
 
 // ── Form elements ─────────────────────────────────────────────────────────────
@@ -301,7 +402,9 @@ $status-colors: (
     gap: 1rem;
     margin-bottom: 1rem;
 
-    &--3 { grid-template-columns: 1fr 1fr 1fr; }
+    &--3 {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
 }
 
 .wd-field {
@@ -318,7 +421,7 @@ $status-colors: (
 
 .wd-input {
     background: $bg-input;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
     border-radius: 8px;
     padding: 0.6rem 0.85rem;
     color: var(--text-primary);
@@ -329,16 +432,18 @@ $status-colors: (
     box-sizing: border-box;
     transition: border-color 0.2s, background 0.2s;
 
-    &::placeholder { color: $text-dim; }
+    &::placeholder {
+        color: $text-dim;
+    }
 
     &:focus {
         border-color: $accent;
-        background: rgba(255,255,255,0.07);
+        background: color-mix(in srgb, white, transparent 93%);
     }
 
     &.is-error {
-        border-color: rgba($error-color, 0.55);
-        background: rgba($error-color, 0.04);
+        border-color: color-mix(in srgb, $error-color, transparent 45%);
+        background: color-mix(in srgb, $error-color, transparent 96%);
     }
 
     &::-webkit-calendar-picker-indicator {
@@ -351,11 +456,14 @@ $status-colors: (
     appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='rgba(255,255,255,0.4)' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffffff' fill-opacity='0.4' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.85rem center;
     padding-right: 2.2rem;
-    option { background: #1e1e1e; }
+
+    option {
+        background: #1e1e1e;
+    }
 }
 
 .wd-error {
@@ -364,13 +472,17 @@ $status-colors: (
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    &::before { content: '⚠'; font-size: 0.68rem; }
+
+    &::before {
+        content: '⚠';
+        font-size: 0.68rem;
+    }
 }
 
 // Alerts
 .wd-today-hint {
-    background: rgba($warn-color, 0.08);
-    border: 1px solid rgba($warn-color, 0.25);
+    background: color-mix(in srgb, $warn-color, transparent 92%);
+    border: 1px solid color-mix(in srgb, $warn-color, transparent 75%);
     border-radius: 8px;
     padding: 0.6rem 0.9rem;
     font-size: 0.78rem;
@@ -380,12 +492,15 @@ $status-colors: (
     gap: 0.5rem;
     margin-bottom: 1rem;
     line-height: 1.5;
-    i { flex-shrink: 0; }
+
+    i {
+        flex-shrink: 0;
+    }
 }
 
 .wd-conflict-alert {
-    background: rgba($error-color, 0.07);
-    border: 1px solid rgba($error-color, 0.3);
+    background: color-mix(in srgb, $error-color, transparent 93%);
+    border: 1px solid color-mix(in srgb, $error-color, transparent 70%);
     border-radius: 8px;
     padding: 0.6rem 0.9rem;
     font-size: 0.78rem;
@@ -395,7 +510,10 @@ $status-colors: (
     gap: 0.5rem;
     margin-bottom: 1rem;
     line-height: 1.5;
-    i { flex-shrink: 0; }
+
+    i {
+        flex-shrink: 0;
+    }
 }
 
 // ── Radio group ───────────────────────────────────────────────────────────────
@@ -416,20 +534,28 @@ $status-colors: (
     user-select: none;
 
     input[type="radio"] {
-        position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
     }
 
     .wd-radio-mark {
-        width: 16px; height: 16px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
-        border: 2px solid rgba(255,255,255,0.15);
-        display: inline-flex; align-items: center; justify-content: center;
+        border: 2px solid color-mix(in srgb, #fff, transparent 85%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         flex-shrink: 0;
         transition: border-color 0.2s;
 
         &::after {
             content: '';
-            width: 7px; height: 7px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: $accent;
             opacity: 0;
@@ -438,12 +564,18 @@ $status-colors: (
         }
     }
 
-    input[type="radio"]:checked ~ .wd-radio-mark {
+    input[type="radio"]:checked~.wd-radio-mark {
         border-color: $accent;
-        &::after { opacity: 1; transform: scale(1); }
+
+        &::after {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
 
-    &:hover .wd-radio-mark { border-color: rgba($accent, 0.5); }
+    &:hover .wd-radio-mark {
+        border-color: color-mix(in srgb, $accent, transparent 50%);
+    }
 }
 
 // ── Form action row ───────────────────────────────────────────────────────────
@@ -470,10 +602,13 @@ $status-colors: (
 
     &--cancel {
         background: none;
-        border: 1px solid rgba(255,255,255,0.12);
+        border: 1px solid color-mix(in srgb, #fff, transparent 88%);
         color: $text-mid;
 
-        &:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        &:hover {
+            background: color-mix(in srgb, #fff, transparent 95%);
+            color: var(--text-primary);
+        }
     }
 
     &--submit {
@@ -483,10 +618,15 @@ $status-colors: (
 
         &:hover:not(:disabled) {
             transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba($accent, 0.4);
+            box-shadow: 0 4px 14px color-mix(in srgb, $accent, transparent 60%);
         }
 
-        &:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
     }
 }
 
@@ -497,8 +637,17 @@ $status-colors: (
     padding: 2.5rem 1rem;
     color: $text-dim;
 
-    i { font-size: 2rem; display: block; margin-bottom: 0.75rem; opacity: 0.4; }
-    p { font-size: 0.9rem; margin: 0 0 1.1rem; }
+    i {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 0.75rem;
+        opacity: 0.4;
+    }
+
+    p {
+        font-size: 0.9rem;
+        margin: 0 0 1.1rem;
+    }
 }
 
 .wd-sessions-list {
@@ -511,15 +660,15 @@ $status-colors: (
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    background: rgba(255,255,255,0.02);
+    background: color-mix(in srgb, #fff, transparent 98%);
     border: 1px solid $border-soft;
     border-radius: 12px;
     padding: 1.1rem 1.25rem;
     transition: border-color 0.2s, background 0.2s;
 
     &:hover {
-        border-color: rgba(255,255,255,0.1);
-        background: rgba(255,255,255,0.03);
+        border-color: color-mix(in srgb, #fff, transparent 90%);
+        background: color-mix(in srgb, #fff, transparent 97%);
     }
 }
 
@@ -527,8 +676,8 @@ $status-colors: (
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: rgba($accent, 0.12);
-    border: 1px solid rgba($accent, 0.25);
+    background: color-mix(in srgb, $accent, transparent 88%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 75%);
     color: $accent;
     font-size: 0.72rem;
     font-weight: 700;
@@ -579,26 +728,26 @@ $status-colors: (
     letter-spacing: 0.3px;
 
     &--duration {
-        background: rgba($green, 0.1);
-        border: 1px solid rgba($green, 0.25);
+        background: color-mix(in srgb, $green, transparent 90%);
+        border: 1px solid color-mix(in srgb, $green, transparent 75%);
         color: #4ade80;
     }
 
     &--online {
-        background: rgba(34, 197, 94, 0.08);
-        border: 1px solid rgba(34, 197, 94, 0.2);
+        background: color-mix(in srgb, #22c55e, transparent 92%);
+        border: 1px solid color-mix(in srgb, #22c55e, transparent 80%);
         color: #4ade80;
     }
 
     &--hybrid {
-        background: rgba($accent, 0.08);
-        border: 1px solid rgba($accent, 0.2);
+        background: color-mix(in srgb, $accent, transparent 92%);
+        border: 1px solid color-mix(in srgb, $accent, transparent 80%);
         color: $accent;
     }
 
     &--free {
-        background: rgba($blue, 0.1);
-        border: 1px solid rgba($blue, 0.25);
+        background: color-mix(in srgb, $blue, transparent 90%);
+        border: 1px solid color-mix(in srgb, $blue, transparent 75%);
         color: #93c5fd;
     }
 }
@@ -617,7 +766,10 @@ $status-colors: (
     gap: 0.35rem;
     white-space: nowrap;
 
-    i { color: $accent; font-size: 0.7rem; }
+    i {
+        color: $accent;
+        font-size: 0.7rem;
+    }
 }
 
 .wd-session-fee {
@@ -644,27 +796,125 @@ $status-colors: (
     transition: all 0.2s;
 
     &--edit {
-        background: rgba($accent, 0.07);
-        border-color: rgba($accent, 0.2);
+        background: color-mix(in srgb, $accent, transparent 93%);
+        border-color: color-mix(in srgb, $accent, transparent 80%);
         color: $accent;
-        &:hover:not(:disabled) { background: rgba($accent, 0.15); }
+
+        &:hover:not(:disabled) {
+            background: color-mix(in srgb, $accent, transparent 85%);
+        }
     }
 
     &--delete {
-        background: rgba($error-color, 0.07);
-        border-color: rgba($error-color, 0.2);
+        background: color-mix(in srgb, $error-color, transparent 93%);
+        border-color: color-mix(in srgb, $error-color, transparent 80%);
         color: $error-color;
-        &:hover:not(:disabled) { background: rgba($error-color, 0.14); }
+
+        &:hover:not(:disabled) {
+            background: color-mix(in srgb, $error-color, transparent 86%);
+        }
     }
 
-    &:disabled { opacity: 0.3; cursor: not-allowed; }
+    &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+}
+
+// ── Modal Overlay ─────────────────────────────────────────────────────────────
+
+.wd-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: color-mix(in srgb, #000, transparent 15%);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    animation: wdFadeIn 0.2s ease-out;
+}
+
+.wd-modal-card {
+    background: #141414;
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px color-mix(in srgb, #000, transparent 50%);
+}
+
+.wd-modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid $border-soft;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+
+        i {
+            color: $accent;
+        }
+    }
+}
+
+.wd-modal-close {
+    background: none;
+    border: none;
+    color: $text-dim;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+
+    &:hover {
+        color: var(--text-primary);
+    }
+}
+
+.wd-modal-form {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.wd-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.wd-modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid $border-soft;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    background: color-mix(in srgb, #fff, transparent 99%);
+}
+
+.wd-form-grid--2 {
+    grid-template-columns: 1fr 1fr;
 }
 
 // ── Student action bar ────────────────────────────────────────────────────────
 
 .wd-student-bar {
-    background: rgba($green, 0.05);
-    border: 1px solid rgba($green, 0.18);
+    background: color-mix(in srgb, $green, transparent 95%);
+    border: 1px solid color-mix(in srgb, $green, transparent 82%);
     border-radius: 14px;
     padding: 1.25rem 1.5rem;
     display: flex;
@@ -681,7 +931,9 @@ $status-colors: (
     align-items: center;
     gap: 0.5rem;
 
-    i { color: $green; }
+    i {
+        color: $green;
+    }
 }
 
 .wd-enroll-btn {
@@ -701,23 +953,50 @@ $status-colors: (
 
     &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba($accent, 0.4);
+        box-shadow: 0 6px 18px color-mix(in srgb, $accent, transparent 60%);
     }
 }
 
 // ── Responsive ────────────────────────────────────────────────────────────────
 
 @media (max-width: 768px) {
-    .wd-info-grid   { grid-template-columns: 1fr; }
-    .wd-form-grid--3 { grid-template-columns: 1fr 1fr; }
-    .wd-header { padding: 1.5rem; }
-    .wd-sessions-section { padding: 1.25rem; }
-    .wd-title { font-size: 1.4rem; }
+    .wd-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wd-form-grid--3 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .wd-header {
+        padding: 1.5rem;
+    }
+
+    .wd-sessions-section {
+        padding: 1.25rem;
+    }
+
+    .wd-title {
+        font-size: 1.4rem;
+    }
 }
 
 @media (max-width: 480px) {
-    .wd-form-grid--3 { grid-template-columns: 1fr; }
-    .wd-student-bar { flex-direction: column; align-items: stretch; }
-    .wd-enroll-btn { justify-content: center; }
-    .wd-radio-group { flex-direction: column; gap: 0.5rem; }
+    .wd-form-grid--3 {
+        grid-template-columns: 1fr;
+    }
+
+    .wd-student-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .wd-enroll-btn {
+        justify-content: center;
+    }
+
+    .wd-radio-group {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }

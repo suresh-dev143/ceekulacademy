@@ -42,6 +42,22 @@ export interface CreateWorkshopRequest {
     sessions: WorkshopSession[];
 }
 
+export interface UpdateWorkshopRequest {
+    workshopTitle: string;
+    workshopDescription: string;
+    expertDescription: string;
+    workshopMode: 'online' | 'hybrid';
+    timezone: string;
+    instructorType: 'myself' | 'open';
+    status?: WorkshopStatus;
+}
+
+export interface UpdatedWorkshopResponse {
+    status: boolean;
+    message: string;
+    data: WorkshopListItem;
+}
+
 export interface CreatedWorkshopData {
     _id: string;
     workshopTitle: string;
@@ -62,6 +78,16 @@ export interface CreateWorkshopResponse {
     status: boolean;
     message: string;
     data: CreatedWorkshopData;
+}
+
+export interface CancelWorkshopResponse {
+    status: boolean;
+    message: string;
+    data: {
+        _id: string;
+        workshopTitle: string;
+        status: WorkshopStatus;
+    };
 }
 
 // ── GET-MY types ──────────────────────────────────────────────────────────────
@@ -171,6 +197,68 @@ export class WorkshopService {
         return this.http.post<CreateWorkshopResponse>(
             `${this.base}/api/v1/workshops`,
             payload
+        );
+    }
+
+    // ── Update ────────────────────────────────────────────────────────────────
+
+    updateWorkshop(id: string, payload: UpdateWorkshopRequest): Observable<UpdatedWorkshopResponse> {
+        return this.http.put<UpdatedWorkshopResponse>(
+            `${this.base}/api/v1/workshops/${id}`,
+            payload
+        ).pipe(
+            map(res => ({
+                ...res,
+                data: {
+                    ...res.data,
+                    workshopTitle: decodeHtml(res.data.workshopTitle),
+                    workshopDescription: decodeHtml(res.data.workshopDescription),
+                    expertDescription: decodeHtml(res.data.expertDescription),
+                    sessions: res.data.sessions.map(s => ({
+                        ...s,
+                        activity: decodeHtml(s.activity),
+                    })),
+                }
+            }))
+        );
+    }
+
+    // ── Cancel ────────────────────────────────────────────────────────────────
+
+    cancelWorkshop(id: string): Observable<CancelWorkshopResponse> {
+        return this.http.patch<CancelWorkshopResponse>(
+            `${this.base}/api/v1/workshops/${id}/cancel`,
+            {}
+        ).pipe(
+            map(res => ({
+                ...res,
+                data: {
+                    ...res.data,
+                    workshopTitle: decodeHtml(res.data.workshopTitle)
+                }
+            }))
+        );
+    }
+
+    // ── Get by ID ─────────────────────────────────────────────────────────────
+
+    getWorkshopById(id: string): Observable<UpdatedWorkshopResponse> {
+        return this.http.get<UpdatedWorkshopResponse>(
+            `${this.base}/api/v1/workshops/${id}`
+        ).pipe(
+            map(res => ({
+                ...res,
+                data: {
+                    ...res.data,
+                    workshopTitle: decodeHtml(res.data.workshopTitle),
+                    workshopDescription: decodeHtml(res.data.workshopDescription),
+                    expertDescription: decodeHtml(res.data.expertDescription),
+                    sessions: res.data.sessions.map(s => ({
+                        ...s,
+                        activity: decodeHtml(s.activity),
+                    })),
+                }
+            }))
         );
     }
 

@@ -38,8 +38,8 @@
 .snav-avatar {
     width: 32px;
     height: 32px;
-    background: rgba(239, 157, 87, 0.1);
-    border: 1px solid rgba(239, 157, 87, 0.2);
+    background: color-mix(in srgb, #ef9d57, transparent 90%);
+    border: 1px solid color-mix(in srgb, #ef9d57, transparent 80%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -78,12 +78,12 @@
 // ── District Banner ────────────────────────────────────────────────────
 
 .snav-district {
-   margin: 15px 0;
-display: flex;
-justify-content: space-between;
-align-items: center;
-background: #000000;
-padding: 1.282rem 0.5rem;
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #000000;
+    padding: 1.282rem 0.5rem;
 
     .snav--collapsed & {
         display: flex;
@@ -97,7 +97,7 @@ padding: 1.282rem 0.5rem;
     font-weight: 800;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.3);
+    color: color-mix(in srgb, #fff, transparent 70%);
     margin-bottom: 0.15rem;
 }
 
@@ -120,7 +120,7 @@ padding: 1.282rem 0.5rem;
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-  
+
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
@@ -143,7 +143,7 @@ padding: 1.282rem 0.5rem;
     font-weight: 800;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.18);
+    color: color-mix(in srgb, #fff, transparent 82%);
     padding: 0.7rem 0.5rem 0.2rem;
     user-select: none;
 }
@@ -173,13 +173,13 @@ padding: 1.282rem 0.5rem;
     }
 
     &:hover:not(.snav-item--disabled) {
-        background: rgba(255, 255, 255, 0.025);
+        background: color-mix(in srgb, #fff, transparent 97.5%);
         color: var(--text-primary);
-        border-left-color: rgba(255, 255, 255, 0.1);
+        border-left-color: color-mix(in srgb, #fff, transparent 90%);
     }
 
     &.snav-item--active {
-        background: rgba(239, 157, 87, 0.07);
+        background: color-mix(in srgb, #ef9d57, transparent 93%);
         color: var(--text-primary);
         border-left-color: var(--accent-primary);
 
@@ -202,7 +202,7 @@ padding: 1.282rem 0.5rem;
     text-align: center;
     font-size: 0.75rem;
     flex-shrink: 0;
-    color: rgba(255, 255, 255, 0.4);
+    color: color-mix(in srgb, #fff, transparent 60%);
     transition: color 0.15s;
 
     .snav--collapsed & {
@@ -236,8 +236,8 @@ padding: 1.282rem 0.5rem;
     font-weight: 800;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: color-mix(in srgb, #fff, transparent 80%);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
     padding: 1px 4px;
     flex-shrink: 0;
 }

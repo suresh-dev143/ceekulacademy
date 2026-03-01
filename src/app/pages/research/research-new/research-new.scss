@@ -1,8 +1,8 @@
 // ── Research New — Futuristic Research Proposal Form ─────────────────────────
 
 $accent:      var(--accent-primary, #ef9d57);
-$border:      rgba(255, 255, 255, 0.08);
-$surface:     rgba(255, 255, 255, 0.03);
+$border:      color-mix(in srgb, #fff, transparent 92%);
+$surface:     color-mix(in srgb, #fff, transparent 97%);
 $surface-hover: rgba(255, 255, 255, 0.06);
 
 // ── Container ─────────────────────────────────────────────────────────────────
@@ -61,7 +61,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     align-items: center;
     gap: 0.4rem;
     font-size: 0.72rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: color-mix(in srgb, #fff, transparent 70%);
     white-space: nowrap;
 
     &.saved { color: #4ade80; }
@@ -117,7 +117,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
         left: calc(50% + 14px);
         right: calc(-50% + 14px);
         height: 1px;
-        background: rgba(255, 255, 255, 0.1);
+        background: color-mix(in srgb, #fff, transparent 90%);
         z-index: 0;
     }
 
@@ -131,13 +131,13 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     height: 28px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.04);
+    background: color-mix(in srgb, #fff, transparent 96%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.72rem;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.35);
+    color: color-mix(in srgb, #fff, transparent 65%);
     transition: all 0.25s;
     position: relative;
     z-index: 1;
@@ -159,13 +159,13 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 .step-label {
     font-size: 0.58rem;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.3);
+    color: color-mix(in srgb, #fff, transparent 70%);
     text-align: center;
     line-height: 1.2;
     max-width: 72px;
 
     .progress-step.active &  { color: $accent; }
-    .progress-step.complete & { color: rgba(255, 255, 255, 0.5); }
+    .progress-step.complete & { color: color-mix(in srgb, #fff, transparent 50%); }
 }
 
 .progress-bar-wrap {
@@ -233,8 +233,8 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     transition: border-color 0.2s;
 
     &.is-open {
-        border-color: rgba(255, 255, 255, 0.12);
-        background: rgba(255, 255, 255, 0.04);
+        border-color: color-mix(in srgb, #fff, transparent 88%);
+        background: color-mix(in srgb, #fff, transparent 96%);
     }
 }
 
@@ -254,8 +254,8 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid color-mix(in srgb, #fff, transparent 88%);
+    background: color-mix(in srgb, #fff, transparent 96%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -295,8 +295,8 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: color-mix(in srgb, #fff, transparent 70%);
+    border: 1px solid color-mix(in srgb, #fff, transparent 92%);
 
     &.required {
         background: rgba(239, 157, 87, 0.1);
@@ -313,7 +313,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 
 .chevron {
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.25);
+    color: color-mix(in srgb, #fff, transparent 75%);
     transition: transform 0.25s;
     flex-shrink: 0;
 
@@ -347,7 +347,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 .form-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.45);
+    color: color-mix(in srgb, #fff, transparent 55%);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: flex;
@@ -360,7 +360,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 
 .char-count {
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.25);
+    color: color-mix(in srgb, #fff, transparent 75%);
     text-transform: none;
     letter-spacing: 0;
 
@@ -369,14 +369,14 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 
 .form-hint {
     font-size: 0.78rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: color-mix(in srgb, #fff, transparent 70%);
     line-height: 1.45;
     margin: 0;
 }
 
 .form-optional {
     font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.25);
+    color: color-mix(in srgb, #fff, transparent 75%);
     text-transform: none;
     letter-spacing: 0;
     font-weight: 400;
@@ -384,8 +384,8 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 
 .form-control {
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: color-mix(in srgb, #fff, transparent 95%);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
     border-radius: 8px;
     padding: 0.7rem 1rem;
     color: var(--text-primary);
@@ -414,7 +414,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 .input-prefix-wrap {
     display: flex;
     align-items: stretch;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
     border-radius: 8px;
     overflow: hidden;
     transition: border-color 0.2s;
@@ -426,10 +426,10 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
     padding: 0 0.75rem;
-    background: rgba(255, 255, 255, 0.04);
-    color: rgba(255, 255, 255, 0.35);
+    background: color-mix(in srgb, #fff, transparent 96%);
+    color: color-mix(in srgb, #fff, transparent 65%);
     font-size: 0.88rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid color-mix(in srgb, #fff, transparent 90%);
     flex-shrink: 0;
 }
 
@@ -468,7 +468,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 
     &:hover {
         background: $surface-hover;
-        border-color: rgba(255, 255, 255, 0.12);
+        border-color: color-mix(in srgb, #fff, transparent 88%);
         color: var(--text-primary);
     }
 }
@@ -477,7 +477,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border: 1.5px solid color-mix(in srgb, #fff, transparent 75%);
     flex-shrink: 0;
     position: relative;
     transition: all 0.2s;
@@ -503,8 +503,8 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 // ── Tag input ─────────────────────────────────────────────────────────────────
 
 .tag-input-wrap {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: color-mix(in srgb, #fff, transparent 95%);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
     border-radius: 8px;
     padding: 0.5rem 0.75rem;
     transition: border-color 0.2s;
@@ -568,8 +568,8 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 }
 
 .suggestion-chip {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: color-mix(in srgb, #fff, transparent 96%);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
     border-radius: 4px;
     color: rgba(255, 255, 255, 0.4);
     padding: 0.22rem 0.6rem;
@@ -601,8 +601,8 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 }
 
 .method-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: color-mix(in srgb, #fff, transparent 95%);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
     border-radius: 8px;
     color: var(--text-secondary);
     padding: 0.45rem 0.85rem;
@@ -644,7 +644,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     width: 40px;
     height: 22px;
     border-radius: 11px;
-    background: rgba(255, 255, 255, 0.1);
+    background: color-mix(in srgb, #fff, transparent 90%);
     border: 1px solid rgba(255, 255, 255, 0.15);
     position: relative;
     transition: all 0.25s;
@@ -670,7 +670,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 }
 
 .collab-table {
-    background: rgba(255, 255, 255, 0.02);
+    background: color-mix(in srgb, #fff, transparent 98%);
     border: 1px solid $border;
     border-radius: 10px;
     overflow: hidden;
@@ -679,7 +679,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 .collab-table-head {
     display: flex;
     gap: 0;
-    background: rgba(255, 255, 255, 0.04);
+    background: color-mix(in srgb, #fff, transparent 96%);
     border-bottom: 1px solid $border;
     padding: 0.55rem 0.75rem;
 }
@@ -696,7 +696,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 .ct-col {
     font-size: 0.72rem;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.3);
+    color: color-mix(in srgb, #fff, transparent 70%);
     text-transform: uppercase;
     letter-spacing: 0.4px;
     display: flex;
@@ -755,7 +755,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     border-top: 1px solid $border;
     font-size: 0.82rem;
     color: var(--text-secondary);
-    background: rgba(255, 255, 255, 0.02);
+    background: color-mix(in srgb, #fff, transparent 98%);
 
     &.invalid { color: #f87171; }
 
@@ -766,7 +766,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     font-size: 0.72rem;
     font-weight: 600;
     color: #f87171;
-    background: rgba(239, 68, 68, 0.1);
+    background: color-mix(in srgb, #ef4444, transparent 90%);
     border: 1px solid rgba(239, 68, 68, 0.25);
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
@@ -791,11 +791,11 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid color-mix(in srgb, #fff, transparent 92%);
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s;
-    background: rgba(255, 255, 255, 0.03);
+    background: color-mix(in srgb, #fff, transparent 97%);
 
     &:hover {
         background: $surface-hover;
@@ -859,9 +859,9 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     line-height: 1.5;
 
     &.private {
-        color: rgba(255, 255, 255, 0.45);
-        background: rgba(255, 255, 255, 0.03);
-        border-color: rgba(255, 255, 255, 0.08);
+        color: color-mix(in srgb, #fff, transparent 55%);
+        background: color-mix(in srgb, #fff, transparent 97%);
+        border-color: color-mix(in srgb, #fff, transparent 92%);
     }
 }
 
@@ -879,7 +879,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.7px;
-    color: rgba(255, 255, 255, 0.3);
+    color: color-mix(in srgb, #fff, transparent 70%);
     margin-bottom: 0.85rem;
 }
 
@@ -898,7 +898,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     align-items: center;
     gap: 0.4rem;
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: color-mix(in srgb, #fff, transparent 70%);
 
     &.saved { color: #4ade80; }
 }
@@ -907,7 +907,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 
 .btn-save-draft {
     background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid color-mix(in srgb, #fff, transparent 88%);
     color: var(--text-secondary);
     border-radius: 6px;
     padding: 0.3rem 0.75rem;
@@ -917,7 +917,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     transition: all 0.2s;
     white-space: nowrap;
 
-    &:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
+    &:hover { background: color-mix(in srgb, #fff, transparent 90%); color: var(--text-primary); }
 }
 
 .draft-note {
@@ -973,9 +973,9 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     align-items: center;
     gap: 0.5rem;
     font-size: 0.72rem;
-    color: rgba(255, 255, 255, 0.3);
+    color: color-mix(in srgb, #fff, transparent 70%);
 
-    &.complete { color: rgba(255, 255, 255, 0.6); }
+    &.complete { color: color-mix(in srgb, #fff, transparent 40%); }
 }
 
 .status-dot {
@@ -1033,7 +1033,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    color: rgba(255, 255, 255, 0.25);
+    color: color-mix(in srgb, #fff, transparent 75%);
     margin-bottom: 0.6rem;
 }
 
@@ -1062,7 +1062,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     left: 0;
     right: 0;
     background: rgba(8, 8, 8, 0.94);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid color-mix(in srgb, #fff, transparent 92%);
     backdrop-filter: blur(12px);
     padding: 0.9rem 2rem;
     display: flex;
@@ -1074,7 +1074,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 
 .footer-note {
     font-size: 0.72rem;
-    color: rgba(255, 255, 255, 0.25);
+    color: color-mix(in srgb, #fff, transparent 75%);
     flex: 1;
 }
 
@@ -1095,7 +1095,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     cursor: pointer;
     transition: all 0.2s;
 
-    &:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-primary); }
+    &:hover { background: color-mix(in srgb, #fff, transparent 90%); color: var(--text-primary); }
 }
 
 .btn-submit-footer {
@@ -1137,7 +1137,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
 
 .modal {
     background: #0d0d0d;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
     border-radius: 16px;
     width: 100%;
     max-width: 520px;
@@ -1195,7 +1195,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     align-items: baseline;
     gap: 1rem;
     padding: 0.45rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid color-mix(in srgb, #fff, transparent 96%);
 
     &:last-child { border-bottom: none; }
 }
@@ -1205,7 +1205,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.4px;
-    color: rgba(255, 255, 255, 0.3);
+    color: color-mix(in srgb, #fff, transparent 70%);
     white-space: nowrap;
 }
 
@@ -1237,7 +1237,7 @@ $surface-hover: rgba(255, 255, 255, 0.06);
     cursor: pointer;
     transition: all 0.2s;
 
-    &:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
+    &:hover { background: color-mix(in srgb, #fff, transparent 95%); color: var(--text-primary); }
 }
 
 .btn-modal-confirm {

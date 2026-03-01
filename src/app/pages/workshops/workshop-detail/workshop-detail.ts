@@ -9,6 +9,9 @@ import {
     WorkshopListItem,
     WorkshopApiSession,
     AddSessionPayload,
+    UpdateWorkshopRequest,
+    UpdatedWorkshopResponse,
+    CancelWorkshopResponse,
 } from '../../../services/workshop.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { EnrollWorkshop } from '../enroll-workshop/enroll-workshop';
@@ -153,6 +156,33 @@ export class WorkshopDetailComponent {
     isSubmitting = signal(false);
     addForm!: FormGroup;
 
+    // ── Edit Info state ───────────────────────────────────────────────────────
+
+    isEditingInfo = signal(false);
+    isSavingInfo = signal(false);
+    isCancelling = signal(false);
+    isRefreshing = signal(false);
+    editInfoForm!: FormGroup;
+
+    // ── Internal data (starts from input, can be refreshed from API) ─────────────
+
+    internalWorkshop = signal<WorkshopListItem | null>(null);
+
+    /** The workshop object currently being displayed. */
+    currentWorkshop = computed(() => this.internalWorkshop() ?? this.workshop());
+
+    readonly timezones = [
+        { key: 'UTC', label: 'UTC  — Coordinated Universal Time' },
+        { key: 'IST', label: 'IST  — Indian Standard Time (UTC+5:30)' },
+        { key: 'EST', label: 'EST  — Eastern Standard Time (UTC−5)' },
+        { key: 'CST', label: 'CST  — Central Standard Time (UTC−6)' },
+        { key: 'PST', label: 'PST  — Pacific Standard Time (UTC−8)' },
+        { key: 'GMT', label: 'GMT  — Greenwich Mean Time (UTC+0)' },
+        { key: 'CET', label: 'CET  — Central European Time (UTC+1)' },
+        { key: 'JST', label: 'JST  — Japan Standard Time (UTC+9)' },
+        { key: 'AEST', label: 'AEST — Australian Eastern Time (UTC+10)' },
+    ];
+
     // ── Enroll state ──────────────────────────────────────────────────────────
 
     showEnrollForm = signal(false);
@@ -183,7 +213,7 @@ export class WorkshopDetailComponent {
 
         // 2. Instructor can only delete if they created the workshop (assumption based on prompt)
         if (role === 'Instructor') {
-            return this.workshop().createdBy === userId;
+            return this.currentWorkshop().createdBy === userId;
         }
 
         return false;
@@ -196,24 +226,24 @@ export class WorkshopDetailComponent {
             draft: 'Draft', published: 'Published', active: 'Active',
             ongoing: 'Ongoing', completed: 'Completed', cancelled: 'Cancelled',
         };
-        return m[this.workshop().status] ?? this.workshop().status;
+        return m[this.currentWorkshop().status] ?? this.currentWorkshop().status;
     }
 
     get modeLabel(): string {
-        return this.workshop().workshopMode === 'hybrid' ? 'Hybrid' : 'Online';
+        return this.currentWorkshop().workshopMode === 'hybrid' ? 'Hybrid' : 'Online';
     }
 
     get modeIcon(): string {
-        return this.workshop().workshopMode === 'hybrid' ? 'fa-map-marker-alt' : 'fa-wifi';
+        return this.currentWorkshop().workshopMode === 'hybrid' ? 'fa-map-marker-alt' : 'fa-wifi';
     }
 
     get instructorLabel(): string {
-        return this.workshop().instructorType === 'myself' ? 'Solo instructor' : 'Open to instructors';
+        return this.currentWorkshop().instructorType === 'myself' ? 'Solo instructor' : 'Open to instructors';
     }
 
     get formattedCreatedAt(): string {
         try {
-            return new Date(this.workshop().createdAt)
+            return new Date(this.currentWorkshop().createdAt)
                 .toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
         } catch { return '—'; }
     }
@@ -232,7 +262,7 @@ export class WorkshopDetailComponent {
     // ── Timezone helpers ──────────────────────────────────────────────────────
 
     private get tz(): string {
-        return this.workshop().timezone ?? 'IST';
+        return this.currentWorkshop().timezone ?? 'IST';
     }
 
     get todayStr(): string { return nowInTz(this.tz).dateStr; }
@@ -303,10 +333,17 @@ export class WorkshopDetailComponent {
     constructor() {
         // Sync local sessions whenever the workshop input changes
         effect(() => {
-            this.localSessions.set([...this.workshop().sessions]);
+            this.localSessions.set([...this.currentWorkshop().sessions]);
+        }, { allowSignalWrites: true });
+
+        // Reset internal workshop when input changes (to avoid stale data from previous workshop)
+        effect(() => {
+            this.workshop(); // track
+            this.internalWorkshop.set(null);
         }, { allowSignalWrites: true });
 
         this.buildForm();
+        this.buildEditInfoForm();
     }
 
     // ── Form builder ──────────────────────────────────────────────────────────
@@ -335,6 +372,18 @@ export class WorkshopDetailComponent {
         );
     }
 
+    private buildEditInfoForm(): void {
+        this.editInfoForm = this.fb.group({
+            workshopTitle: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+            workshopDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
+            expertDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
+            workshopMode: ['online', Validators.required],
+            timezone: ['IST', Validators.required],
+            instructorType: ['myself', Validators.required],
+            status: ['draft', Validators.required],
+        });
+    }
+
     private syncLocationValidator(mode: string): void {
         const loc = this.addForm.get('location')!;
         if (mode === 'hybrid') {
@@ -356,6 +405,106 @@ export class WorkshopDetailComponent {
     cancelAddForm(): void {
         this.showAddForm.set(false);
         this.addForm.reset({ mode: 'online', fee: 0 });
+    }
+
+    // ── Edit Info control ─────────────────────────────────────────────────────
+
+    openEditInfoForm(): void {
+        const w = this.currentWorkshop();
+        this.editInfoForm.patchValue({
+            workshopTitle: w.workshopTitle,
+            workshopDescription: w.workshopDescription,
+            expertDescription: w.expertDescription,
+            workshopMode: w.workshopMode,
+            timezone: w.timezone,
+            instructorType: w.instructorType,
+            status: w.status,
+        });
+        this.isEditingInfo.set(true);
+    }
+
+    cancelEditInfo(): void {
+        this.isEditingInfo.set(false);
+    }
+
+    onSaveInfo(): void {
+        this.editInfoForm.markAllAsTouched();
+        if (this.editInfoForm.invalid || this.isSavingInfo()) return;
+
+        const val = this.editInfoForm.getRawValue();
+        const payload: UpdateWorkshopRequest = {
+            workshopTitle: val.workshopTitle.trim(),
+            workshopDescription: val.workshopDescription.trim(),
+            expertDescription: val.expertDescription.trim(),
+            workshopMode: val.workshopMode,
+            timezone: val.timezone,
+            instructorType: val.instructorType,
+            status: val.status,
+        };
+
+        this.isSavingInfo.set(true);
+        this.ws.updateWorkshop(this.currentWorkshop()._id, payload).subscribe({
+            next: (res: UpdatedWorkshopResponse) => {
+                this.toast.success(res.message);
+                this.isSavingInfo.set(false);
+                this.isEditingInfo.set(false);
+                // Refresh data locally
+                this.refreshWorkshopData();
+                // Trigger refresh in parent to update the list and current detail view
+                this.sessionAdded.emit();
+            },
+            error: (err: any) => {
+                this.isSavingInfo.set(false);
+                const msg = err.error?.message || 'Failed to update workshop information';
+                this.toast.error(msg);
+            }
+        });
+    }
+
+    onCancelWorkshop(): void {
+        const w = this.currentWorkshop();
+        if (w.status === 'cancelled' || this.isCancelling()) return;
+
+        const confirmed = window.confirm(
+            `Are you sure you want to cancel "${w.workshopTitle}"? This action cannot be undone.`
+        );
+
+        if (!confirmed) return;
+
+        this.isCancelling.set(true);
+        this.ws.cancelWorkshop(w._id).subscribe({
+            next: (res: CancelWorkshopResponse) => {
+                this.toast.success(res.message);
+                this.isCancelling.set(false);
+                // Refresh data locally
+                this.refreshWorkshopData();
+                // Still notify parent to refresh list
+                this.sessionAdded.emit();
+            },
+            error: (err: any) => {
+                this.isCancelling.set(false);
+                const msg = err.error?.message || 'Failed to cancel workshop';
+                this.toast.error(msg);
+            }
+        });
+    }
+
+    /** Refetch workshop data from server ensuring child & parent consistency. */
+    refreshWorkshopData(): void {
+        const id = this.workshop()._id;
+        if (!id || this.isRefreshing()) return;
+
+        this.isRefreshing.set(true);
+        this.ws.getWorkshopById(id).subscribe({
+            next: (res) => {
+                this.internalWorkshop.set(res.data);
+                this.isRefreshing.set(false);
+            },
+            error: (err) => {
+                this.isRefreshing.set(false);
+                console.error('Failed to refresh workshop data:', err);
+            }
+        });
     }
 
     // ── Submit ────────────────────────────────────────────────────────────────
@@ -413,6 +562,13 @@ export class WorkshopDetailComponent {
                 this.toast.error(errorMsg);
             }
         });
+    }
+
+    // ── Validation Helpers ────────────────────────────────────────────────────
+
+    infoFieldError(path: string, key: string): boolean {
+        const c = this.editInfoForm.get(path);
+        return !!(c?.hasError(key) && c.touched);
     }
 
     // ── Enrollment ────────────────────────────────────────────────────────────

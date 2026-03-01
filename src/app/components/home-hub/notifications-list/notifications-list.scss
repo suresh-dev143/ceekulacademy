@@ -2,7 +2,7 @@
     background: #080808;
     border: none;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px color-mix(in srgb, #000, transparent 70%);
 }
 
 .notification-item {
@@ -10,7 +10,7 @@
     align-items: flex-start;
     gap: 1.2rem;
     padding: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid color-mix(in srgb, #fff, transparent 97%);
     transition: all 0.2s ease;
     cursor: pointer;
 
@@ -88,13 +88,13 @@
 
         .notif-time {
             font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.3);
+            color: color-mix(in srgb, #fff, transparent 70%);
         }
     }
 
     .notif-message {
         font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.5);
+        color: color-mix(in srgb, #fff, transparent 50%);
         margin: 0;
         line-height: 1.5;
     }
@@ -125,7 +125,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-        background: rgba(255, 255, 255, 0.02);
+        background: color-mix(in srgb, #fff, transparent 98%);
         color: #fff;
     }
 }

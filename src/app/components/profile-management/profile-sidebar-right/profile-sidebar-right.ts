@@ -44,14 +44,14 @@ import { CommonModule } from '@angular/common';
     .tips-list {
       list-style: none;
       padding: 0;
-      li { font-size: 0.85rem; color: rgba(255, 255, 255, 0.5); padding-left: 1rem; position: relative; margin-bottom: 0.8rem; line-height: 1.4;
+      li { font-size: 0.85rem; color: color-mix(in srgb, #fff, transparent 50%); padding-left: 1rem; position: relative; margin-bottom: 0.8rem; line-height: 1.4;
         &:before { content: "•"; position: absolute; left: 0; color: #667eea; }
       }
     }
     .score-display {
       margin-bottom: 0.5rem;
       .score-value { font-size: 2rem; font-weight: 800; color: #10b981; }
-      .score-max { font-size: 1.1rem; color: rgba(255, 255, 255, 0.3); font-weight: 700; }
+      .score-max { font-size: 1.1rem; color: color-mix(in srgb, #fff, transparent 70%); font-weight: 700; }
     }
     .score-desc { font-size: 0.8rem; color: rgba(255, 255, 255, 0.4); margin: 0; font-weight: 500; }
 

@@ -2,17 +2,17 @@
 // Prefix: cwf-*   |   Theme: dark, accent #FF6B00
 // ─────────────────────────────────────────────────────────────────────────────
 
-$accent:        #FF6B00;
-$accent-hover:  #FF8800;
-$error-color:   #ef4444;
-$warn-color:    #f59e0b;
-$border-dim:    rgba(255, 255, 255, 0.1);
-$border-dimmer: rgba(255, 255, 255, 0.06);
-$text-dim:      rgba(255, 255, 255, 0.35);
-$text-mid:      rgba(255, 255, 255, 0.55);
-$bg-card:       rgba(255, 255, 255, 0.04);
-$bg-input:      rgba(255, 255, 255, 0.05);
-$bg-input-focus:rgba(255, 255, 255, 0.08);
+$accent: #FF6B00;
+$accent-hover: #FF8800;
+$error-color: #ef4444;
+$warn-color: #f59e0b;
+$border-dim: color-mix(in srgb, #fff, transparent 90%);
+$border-dimmer: color-mix(in srgb, #fff, transparent 94%);
+$text-dim: color-mix(in srgb, #fff, transparent 65%);
+$text-mid: color-mix(in srgb, #fff, transparent 45%);
+$bg-card: color-mix(in srgb, #fff, transparent 96%);
+$bg-input: color-mix(in srgb, #fff, transparent 95%);
+$bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
 
 // ── Wrapper ──────────────────────────────────────────────────────────────────
 
@@ -24,8 +24,15 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
 }
 
 @keyframes cwfFadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 // ── Header ───────────────────────────────────────────────────────────────────
@@ -70,9 +77,9 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     margin-top: 0.25rem;
 
     &:hover {
-        border-color: rgba(239, 68, 68, 0.4);
+        border-color: color-mix(in srgb, $error-color, transparent 60%);
         color: $error-color;
-        background: rgba(239, 68, 68, 0.06);
+        background: color-mix(in srgb, $error-color, transparent 94%);
     }
 }
 
@@ -112,7 +119,9 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     align-items: center;
     margin-bottom: 1.5rem;
 
-    .cwf-section-label { margin-bottom: 0; }
+    .cwf-section-label {
+        margin-bottom: 0;
+    }
 }
 
 // ── Configuration grid ───────────────────────────────────────────────────────
@@ -123,7 +132,9 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     gap: 1.25rem 2rem;
 
     // Timezone field spans full width
-    > .cwf-field:nth-child(2) { grid-column: 1 / -1; }
+    >.cwf-field:nth-child(2) {
+        grid-column: 1 / -1;
+    }
 }
 
 // ── Fields ───────────────────────────────────────────────────────────────────
@@ -133,7 +144,9 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     flex-direction: column;
     gap: 0.45rem;
 
-    &--venue { margin-top: 0.5rem; }
+    &--venue {
+        margin-top: 0.5rem;
+    }
 }
 
 .cwf-label {
@@ -162,7 +175,9 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     box-sizing: border-box;
     transition: border-color 0.2s, background 0.2s;
 
-    &::placeholder { color: $text-dim; }
+    &::placeholder {
+        color: $text-dim;
+    }
 
     &:focus {
         border-color: $accent;
@@ -170,8 +185,8 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     }
 
     &.is-error {
-        border-color: rgba($error-color, 0.6);
-        background: rgba($error-color, 0.04);
+        border-color: color-mix(in srgb, $error-color, transparent 40%);
+        background: color-mix(in srgb, $error-color, transparent 96%);
     }
 
     // date / time picker icon
@@ -192,12 +207,14 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     appearance: none;
     -webkit-appearance: none;
     cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='rgba(255,255,255,0.4)' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='color-mix(in srgb, white, transparent 60%)' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.85rem center;
     padding-right: 2.2rem;
 
-    option { background: #1e1e1e; }
+    option {
+        background: #1e1e1e;
+    }
 }
 
 // Character counter
@@ -235,7 +252,10 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     gap: 0.35rem;
     margin-top: 0.1rem;
 
-    i { font-size: 0.7rem; color: $warn-color; }
+    i {
+        font-size: 0.7rem;
+        color: $warn-color;
+    }
 }
 
 // ── Radio groups ─────────────────────────────────────────────────────────────
@@ -293,7 +313,7 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
         }
     }
 
-    input[type="radio"]:checked ~ .cwf-radio-mark {
+    input[type="radio"]:checked~.cwf-radio-mark {
         border-color: $accent;
 
         &::after {
@@ -302,15 +322,20 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
         }
     }
 
-    &:hover .cwf-radio-mark { border-color: rgba($accent, 0.5); }
-    &:hover { color: var(--text-primary); }
+    &:hover .cwf-radio-mark {
+        border-color: color-mix(in srgb, $accent, transparent 50%);
+    }
+
+    &:hover {
+        color: var(--text-primary);
+    }
 }
 
 // ── Add session button ────────────────────────────────────────────────────────
 
 .cwf-add-btn {
-    background: rgba($accent, 0.1);
-    border: 1px solid rgba($accent, 0.3);
+    background: color-mix(in srgb, $accent, transparent 90%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 70%);
     color: $accent;
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -322,7 +347,9 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     gap: 0.4rem;
     transition: all 0.2s;
 
-    &:hover:not(:disabled) { background: rgba($accent, 0.18); }
+    &:hover:not(:disabled) {
+        background: color-mix(in srgb, $accent, transparent 82%);
+    }
 
     &:disabled {
         opacity: 0.45;
@@ -333,18 +360,20 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
 // ── Session cards ─────────────────────────────────────────────────────────────
 
 .cwf-session-card {
-    background: rgba(255, 255, 255, 0.02);
+    background: color-mix(in srgb, #fff, transparent 98%);
     border: 1px solid $border-dimmer;
     border-radius: 13px;
     padding: 1.4rem 1.5rem;
     margin-bottom: 1.25rem;
     transition: border-color 0.2s;
 
-    &:last-of-type { margin-bottom: 0; }
+    &:last-of-type {
+        margin-bottom: 0;
+    }
 
     &.is-invalid {
-        border-color: rgba($error-color, 0.35);
-        background: rgba($error-color, 0.02);
+        border-color: color-mix(in srgb, $error-color, transparent 65%);
+        background: color-mix(in srgb, $error-color, transparent 98%);
     }
 }
 
@@ -368,8 +397,8 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
 }
 
 .cwf-duration-badge {
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.25);
+    background: color-mix(in srgb, #22c55e, transparent 90%);
+    border: 1px solid color-mix(in srgb, #22c55e, transparent 75%);
     color: #4ade80;
     font-size: 0.72rem;
     font-weight: 700;
@@ -382,8 +411,8 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
 }
 
 .cwf-remove-btn {
-    background: rgba($error-color, 0.08);
-    border: 1px solid rgba($error-color, 0.2);
+    background: color-mix(in srgb, $error-color, transparent 92%);
+    border: 1px solid color-mix(in srgb, $error-color, transparent 80%);
     color: $error-color;
     width: 30px;
     height: 30px;
@@ -397,8 +426,8 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     transition: all 0.2s;
 
     &:hover:not(:disabled) {
-        background: rgba($error-color, 0.15);
-        border-color: rgba($error-color, 0.4);
+        background: color-mix(in srgb, $error-color, transparent 85%);
+        border-color: color-mix(in srgb, $error-color, transparent 60%);
     }
 
     &:disabled {
@@ -409,8 +438,8 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
 
 // Today banner
 .cwf-today-hint {
-    background: rgba($warn-color, 0.08);
-    border: 1px solid rgba($warn-color, 0.25);
+    background: color-mix(in srgb, $warn-color, transparent 92%);
+    border: 1px solid color-mix(in srgb, $warn-color, transparent 75%);
     border-radius: 9px;
     padding: 0.65rem 0.9rem;
     font-size: 0.78rem;
@@ -421,7 +450,10 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     margin-bottom: 1rem;
     line-height: 1.5;
 
-    i { flex-shrink: 0; margin-top: 0.1rem; }
+    i {
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+    }
 }
 
 // ── Session grids ─────────────────────────────────────────────────────────────
@@ -432,7 +464,9 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     gap: 1rem;
     margin-bottom: 1rem;
 
-    &--lower { margin-bottom: 0; }
+    &--lower {
+        margin-bottom: 0;
+    }
 }
 
 // ── Submit row ───────────────────────────────────────────────────────────────
@@ -456,9 +490,9 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
     transition: all 0.2s;
 
     &:hover {
-        border-color: rgba(255, 255, 255, 0.2);
+        border-color: color-mix(in srgb, white, transparent 80%);
         color: var(--text-primary);
-        background: rgba(255, 255, 255, 0.04);
+        background: color-mix(in srgb, white, transparent 96%);
     }
 }
 
@@ -478,7 +512,7 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
 
     &:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba($accent, 0.35);
+        box-shadow: 0 6px 20px color-mix(in srgb, $accent, transparent 65%);
     }
 
     &:disabled {
@@ -492,16 +526,24 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
 // ── Responsive ───────────────────────────────────────────────────────────────
 
 @media (max-width: 768px) {
-    .cwf-wrap { padding: 1.25rem 0 2rem; }
+    .cwf-wrap {
+        padding: 1.25rem 0 2rem;
+    }
 
-    .cwf-title { font-size: 1.5rem; }
+    .cwf-title {
+        font-size: 1.5rem;
+    }
 
-    .cwf-section { padding: 1.25rem 1.25rem; }
+    .cwf-section {
+        padding: 1.25rem 1.25rem;
+    }
 
     .cwf-config-grid {
         grid-template-columns: 1fr;
 
-        > .cwf-field:nth-child(2) { grid-column: auto; }
+        >.cwf-field:nth-child(2) {
+            grid-column: auto;
+        }
     }
 
     .cwf-session-grid,
@@ -509,22 +551,36 @@ $bg-input-focus:rgba(255, 255, 255, 0.08);
         grid-template-columns: 1fr 1fr;
 
         // Fee takes full width on tablet
-        > .cwf-field:nth-child(2) { grid-column: auto; }
+        >.cwf-field:nth-child(2) {
+            grid-column: auto;
+        }
     }
 
-    .cwf-submit-row { flex-direction: column-reverse; }
+    .cwf-submit-row {
+        flex-direction: column-reverse;
+    }
 
     .cwf-btn-secondary,
-    .cwf-btn-primary { width: 100%; justify-content: center; }
+    .cwf-btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 @media (max-width: 480px) {
-    .cwf-header { flex-direction: column; gap: 0.75rem; }
+    .cwf-header {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
 
-    .cwf-cancel-btn { align-self: flex-end; }
+    .cwf-cancel-btn {
+        align-self: flex-end;
+    }
 
     .cwf-session-grid,
-    .cwf-session-grid--lower { grid-template-columns: 1fr; }
+    .cwf-session-grid--lower {
+        grid-template-columns: 1fr;
+    }
 
     .cwf-radio-group--inline {
         flex-direction: column;

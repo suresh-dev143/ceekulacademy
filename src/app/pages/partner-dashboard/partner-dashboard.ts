@@ -9,18 +9,18 @@ import { PartnerActivityComponent } from '../../components/partner/partner-activ
 import { PartnerService } from '../../services/partner.service';
 
 @Component({
-    selector: 'app-partner-dashboard',
-    standalone: true,
-    imports: [
-        CommonModule,
-        LayoutComponent,
-        PartnerOverviewComponent,
-        NearbyTeachersComponent,
-        NearbyStudentsComponent,
-        InfrastructureManagerComponent,
-        PartnerActivityComponent
-    ],
-    template: `
+  selector: 'app-partner-dashboard',
+  standalone: true,
+  imports: [
+    CommonModule,
+    LayoutComponent,
+    PartnerOverviewComponent,
+    NearbyTeachersComponent,
+    NearbyStudentsComponent,
+    InfrastructureManagerComponent,
+    PartnerActivityComponent
+  ],
+  template: `
     <app-layout>
       <div class="partner-dashboard-container">
         <!-- Partner Overview Hub -->
@@ -88,7 +88,7 @@ import { PartnerService } from '../../services/partner.service';
       </div>
     </app-layout>
   `,
-    styles: [`
+  styles: [`
     .partner-dashboard-container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
     @media (max-width: 768px) { .partner-dashboard-container { padding: 1rem; } }
     @media (max-width: 480px) { .partner-dashboard-container { padding: 0.75rem; } }
@@ -98,23 +98,23 @@ import { PartnerService } from '../../services/partner.service';
     .partner-insights {
       padding: 1.5rem; border-radius: 20px;
       .panel-title { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; i { color: #8b5cf6; } }
-      h4 { font-size: 0.8rem; font-weight: 800; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; margin: 1.5rem 0 1rem; }
+      h4 { font-size: 0.8rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 70%); text-transform: uppercase; margin: 1.5rem 0 1rem; }
     }
 
     .insight-card {
-      background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 12px; padding: 1rem;
+      background: color-mix(in srgb, #8b5cf6, transparent 90%); border: 1px solid color-mix(in srgb, #8b5cf6, transparent 80%); border-radius: 12px; padding: 1rem;
       .insight-text { font-size: 0.85rem; color: #fff; margin-bottom: 0.8rem; strong { color: #8b5cf6; } }
       .insight-action { width: 100%; background: #8b5cf6; color: #fff; border: none; padding: 0.4rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
     }
 
     .suggestion-item {
-      display: flex; align-items: center; gap: 0.8rem; background: rgba(255, 255, 255, 0.03); padding: 0.8rem; border-radius: 12px; margin-bottom: 0.5rem;
-      .sugg-avatar { width: 32px; height: 32px; background: rgba(139, 92, 246, 0.2); color: #8b5cf6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; }
+      display: flex; align-items: center; gap: 0.8rem; background: color-mix(in srgb, #fff, transparent 97%); padding: 0.8rem; border-radius: 12px; margin-bottom: 0.5rem;
+      .sugg-avatar { width: 32px; height: 32px; background: color-mix(in srgb, #8b5cf6, transparent 80%); color: #8b5cf6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; }
       .sugg-info { display: flex; flex-direction: column; .sugg-name { font-size: 0.8rem; font-weight: 700; color: #fff; } .sugg-match { font-size: 0.65rem; color: #10b981; font-weight: 600; } }
     }
 
     .alert-item {
-      display: flex; align-items: flex-start; gap: 0.82rem; font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); line-height: 1.4;
+      display: flex; align-items: flex-start; gap: 0.82rem; font-size: 0.8rem; color: color-mix(in srgb, #fff, transparent 50%); line-height: 1.4;
       i { margin-top: 0.2rem; color: #3b82f6; }
     }
 
@@ -123,20 +123,20 @@ import { PartnerService } from '../../services/partner.service';
   `]
 })
 export class PartnerDashboardComponent {
-    private partnerService = inject(PartnerService);
+  private partnerService = inject(PartnerService);
 
-    partner = this.partnerService.currentPartner;
-    teachers = this.partnerService.nearbyTeachers;
-    students = this.partnerService.nearbyStudents;
-    infrastructure = this.partnerService.currentInfrastructure;
-    radius = this.partnerService.currentRadius;
-    stats = this.partnerService.stats;
+  partner = this.partnerService.currentPartner;
+  teachers = this.partnerService.nearbyTeachers;
+  students = this.partnerService.nearbyStudents;
+  infrastructure = this.partnerService.currentInfrastructure;
+  radius = this.partnerService.currentRadius;
+  stats = this.partnerService.stats;
 
-    handleRadiusChange(newRadius: number) {
-        this.partnerService.setRadius(newRadius);
-    }
+  handleRadiusChange(newRadius: number) {
+    this.partnerService.setRadius(newRadius);
+  }
 
-    handleInvite(userId: number) {
-        this.partnerService.inviteUser(userId);
-    }
+  handleInvite(userId: number) {
+    this.partnerService.inviteUser(userId);
+  }
 }

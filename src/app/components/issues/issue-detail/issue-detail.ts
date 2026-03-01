@@ -110,9 +110,9 @@ import { AuthService } from '../../../services/auth.service';
       &:hover { color: #fff; }
     }
 
-    .detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    .detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid color-mix(in srgb, #fff, transparent 95%); }
     
-    .issue-id { font-size: 0.8rem; font-weight: 800; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+    .issue-id { font-size: 0.8rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 70%); text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
     h2 { font-family: 'Montserrat', sans-serif; font-size: 2rem; color: #fff; margin-bottom: 1rem; }
     
     .status-row { display: flex; gap: 1rem; align-items: center; }
@@ -121,11 +121,11 @@ import { AuthService } from '../../../services/auth.service';
       &.volunteer-verified { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
       &.resolved { background: rgba(16, 185, 129, 0.1); color: #10b981; }
     }
-    .urgency-tag { font-size: 0.75rem; font-weight: 700; color: rgba(255, 255, 255, 0.5);
+    .urgency-tag { font-size: 0.75rem; font-weight: 700; color: color-mix(in srgb, #fff, transparent 50%);
       &.high, &.critical { color: #ef4444; }
     }
 
-    .timestamp { font-size: 0.9rem; color: rgba(255, 255, 255, 0.3); margin-top: 1rem; i { margin-right: 0.5rem; } }
+    .timestamp { font-size: 0.9rem; color: color-mix(in srgb, #fff, transparent 70%); margin-top: 1rem; i { margin-right: 0.5rem; } }
 
     .detail-content {
       section { margin-bottom: 3rem; 
@@ -133,7 +133,7 @@ import { AuthService } from '../../../services/auth.service';
       }
     }
 
-    .description-section p { font-size: 1.1rem; color: rgba(255, 255, 255, 0.8); line-height: 1.7; margin-bottom: 2rem; }
+    .description-section p { font-size: 1.1rem; color: color-mix(in srgb, #fff, transparent 20%); line-height: 1.7; margin-bottom: 2rem; }
     
     .media-gallary { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem;
       .media-item { width: 140px; height: 140px; border-radius: 12px; overflow: hidden; flex-shrink: 0; background: #222;
@@ -143,30 +143,30 @@ import { AuthService } from '../../../services/auth.service';
     }
 
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-    .info-block p { color: rgba(255, 255, 255, 0.6); margin-bottom: 0.5rem; font-size: 1rem; strong { color: #fff; margin-right: 0.5rem; } }
+    .info-block p { color: color-mix(in srgb, #fff, transparent 40%); margin-bottom: 0.5rem; font-size: 1rem; strong { color: #fff; margin-right: 0.5rem; } }
 
-    .private-overlay { background: rgba(255, 255, 255, 0.03); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 2rem; text-align: center; color: rgba(255, 255, 255, 0.2);
+    .private-overlay { background: color-mix(in srgb, #fff, transparent 97%); border: 1px dashed color-mix(in srgb, #fff, transparent 90%); border-radius: 12px; padding: 2rem; text-align: center; color: rgba(255, 255, 255, 0.2);
        i { display: block; font-size: 1.5rem; margin-bottom: 0.5rem; }
        span { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; }
     }
 
     .timeline { position: relative; padding-left: 1.5rem;
-      &::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.05); }
+      &::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: color-mix(in srgb, #fff, transparent 95%); }
       .timeline-event { position: relative; margin-bottom: 2rem;
         .event-marker { position: absolute; left: -1.5rem; top: 0.5rem; width: 8px; height: 8px; border-radius: 50%; background: #667eea; border: 2px solid #0a0a0f; transform: translateX(-40%); }
-        .event-content { background: rgba(255, 255, 255, 0.02); padding: 1rem 1.5rem; border-radius: 12px;
+        .event-content { background: color-mix(in srgb, #fff, transparent 98%); padding: 1rem 1.5rem; border-radius: 12px;
           .event-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem;
             .event-status { font-weight: 800; font-size: 0.85rem; color: #fff; }
-            .event-time { font-size: 0.75rem; color: rgba(255, 255, 255, 0.3); }
+            .event-time { font-size: 0.75rem; color: color-mix(in srgb, #fff, transparent 70%); }
           }
           .event-meta { font-size: 0.8rem; color: #667eea; font-weight: 700; margin-bottom: 0.5rem; }
-          .event-remarks { font-size: 0.9rem; color: rgba(255, 255, 255, 0.5); font-style: italic; }
+          .event-remarks { font-size: 0.9rem; color: color-mix(in srgb, #fff, transparent 50%); font-style: italic; }
         }
       }
     }
 
-    .action-panel { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 20px;
-      .form-control { width: 100%; padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; color: #fff; margin-bottom: 1.5rem; resize: none;
+    .action-panel { background: color-mix(in srgb, #fff, transparent 98%); border: 1px solid color-mix(in srgb, #fff, transparent 95%); padding: 2rem; border-radius: 20px;
+      .form-control { width: 100%; padding: 1rem; background: color-mix(in srgb, #fff, transparent 97%); border: 1px solid color-mix(in srgb, #fff, transparent 92%); border-radius: 12px; color: #fff; margin-bottom: 1.5rem; resize: none;
         &:focus { outline: none; border-color: #667eea; }
       }
       .action-buttons { display: flex; gap: 1rem; flex-wrap: wrap;

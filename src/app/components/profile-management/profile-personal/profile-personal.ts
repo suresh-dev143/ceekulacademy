@@ -91,17 +91,17 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
-        label { font-size: 0.85rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); }
+        label { font-size: 0.85rem; font-weight: 600; color: color-mix(in srgb, #fff, transparent 50%); }
         input, select {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: color-mix(in srgb, #fff, transparent 95%);
+          border: 1px solid color-mix(in srgb, #fff, transparent 90%);
           border-radius: 12px;
           padding: 0.8rem 1rem;
           color: white;
           font-family: inherit;
-          &:focus { outline: none; border-color: #667eea; background: rgba(255, 255, 255, 0.08); }
+          &:focus { outline: none; border-color: #667eea; background: color-mix(in srgb, #fff, transparent 92%); }
           &[readonly] { background: transparent; border-color: transparent; padding-left: 0; cursor: default; }
-          &.readonly-input { color: rgba(255, 255, 255, 0.3); }
+          &.readonly-input { color: color-mix(in srgb, #fff, transparent 70%); }
         }
         select:disabled { background: transparent; border-color: transparent; appearance: none; padding-left: 0; color: white; opacity: 1; }
       }
@@ -112,7 +112,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
       gap: 1rem;
       margin-top: 2rem;
       button { padding: 0.7rem 1.5rem; border-radius: 12px; font-weight: 700; cursor: pointer; }
-      .btn-cancel { background: transparent; border: 1px solid rgba(255, 255, 255, 0.1); color: white; }
+      .btn-cancel { background: transparent; border: 1px solid color-mix(in srgb, #fff, transparent 90%); color: white; }
       .btn-save { background: #667eea; border: none; color: white; box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3); }
     }
   `]

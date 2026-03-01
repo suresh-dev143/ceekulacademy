@@ -253,7 +253,7 @@
     }
 
     &.selected {
-        background: rgba(240, 142, 56, 0.1);
+        background: color-mix(in srgb, #f08e38, transparent 90%);
         border-color: var(--accent-primary);
 
         .role-label {
@@ -310,7 +310,7 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 1.5rem;
-        border-bottom: 1px solid rgba(240, 142, 56, 0.2);
+        border-bottom: 1px solid color-mix(in srgb, #f08e38, transparent 80%);
         padding-bottom: 0.75rem;
 
         h5 {
@@ -334,16 +334,14 @@
             cursor: pointer;
             transition: all 0.2s ease;
 
-            &:hover {
-                border-color: #ff4d4d;
-                color: #ff4d4d;
-                background: rgba(255, 77, 77, 0.1);
-            }
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+            background: color-mix(in srgb, #ff4d4d, transparent 90%);
         }
-    }
 
-    &:hover {
-        background: #080808;
+        &:hover {
+            background: #080808;
+        }
     }
 }
 

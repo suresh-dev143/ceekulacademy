@@ -7,7 +7,7 @@ $accent-dim: rgba(239, 157, 87, 0.08);
 $border:     rgba(255, 255, 255, 0.06);
 $text-1:     rgba(255, 255, 255, 0.90);
 $text-2:     rgba(255, 255, 255, 0.55);
-$text-3:     rgba(255, 255, 255, 0.35);
+$text-3:     color-mix(in srgb, #fff, transparent 65%);
 
 :host {
     display: flex;

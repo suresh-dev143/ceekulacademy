@@ -147,29 +147,29 @@ import { CourseService, Course } from '../../services/course.service';
 
     .teacher-insights { margin-top:2rem;padding: 1.5rem; border-radius: 24px;
       .panel-title { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.8rem; i { color: #8b5cf6; } }
-      h4 { font-size: 0.75rem; font-weight: 800; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; margin: 2rem 0 1rem; letter-spacing: 0.5px; }
+      h4 { font-size: 0.75rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 70%); text-transform: uppercase; margin: 2rem 0 1rem; letter-spacing: 0.5px; }
     }
 
     .insight-alert { 
-      background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 16px; padding: 1.2rem;
+      background: color-mix(in srgb, #3b82f6, transparent 90%); border: 1px solid color-mix(in srgb, #3b82f6, transparent 80%); border-radius: 16px; padding: 1.2rem;
       p { font-size: 0.85rem; color: #fff; line-height: 1.5; margin-bottom: 1rem; strong { color: #60a5fa; } }
       .btn-action { width: 100%; background: #3b82f6; color: #fff; border: none; padding: 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
     }
 
     .match-card {
-      background: rgba(255, 255, 255, 0.03); border-radius: 16px; padding: 1.2rem;
-      .match-score { font-size: 0.65rem; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block; margin-bottom: 0.8rem; }
-      p { font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); line-height: 1.5; margin-bottom: 1rem; strong { color: #fff; } }
-      .btn-ghost-xs { width: 100%; background: transparent; border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+      background: color-mix(in srgb, #fff, transparent 97%); border-radius: 16px; padding: 1.2rem;
+      .match-score { font-size: 0.65rem; font-weight: 800; color: #10b981; background: color-mix(in srgb, #10b981, transparent 90%); padding: 0.2rem 0.5rem; border-radius: 4px; display: inline-block; margin-bottom: 0.8rem; }
+      p { font-size: 0.8rem; color: color-mix(in srgb, #fff, transparent 50%); line-height: 1.5; margin-bottom: 1rem; strong { color: #fff; } }
+      .btn-ghost-xs { width: 100%; background: transparent; border: 1px solid color-mix(in srgb, #fff, transparent 90%); color: #fff; padding: 0.5rem; border-radius: 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
     }
 
-    .notif-item { display: flex; gap: 0.8rem; align-items: center; font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); margin-bottom: 0.8rem;
+    .notif-item { display: flex; gap: 0.8rem; align-items: center; font-size: 0.75rem; color: color-mix(in srgb, #fff, transparent 60%); margin-bottom: 0.8rem;
       .notif-dot { width: 6px; height: 6px; background: #8b5cf6; border-radius: 50%; }
     }
 
     /* Modal Styles */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 2rem; }
-    .modal-content { background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 28px; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: color-mix(in srgb, #000, transparent 20%); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 2rem; }
+    .modal-content { background: #111; border: 1px solid color-mix(in srgb, #fff, transparent 90%); border-radius: 28px; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px color-mix(in srgb, #000, transparent 50%); }
 
     .animate-fade-in-up { animation: fadeInUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1); }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

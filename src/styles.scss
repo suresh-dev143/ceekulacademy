@@ -6,9 +6,9 @@
     --accent-primary: #ef9d57;
     --text-primary: #FFFFFF;
     --text-secondary: #AAAAAA;
-    --border-color: rgba(255, 255, 255, 0.05);
+    --border-color: color-mix(in srgb, #fff, transparent 95%);
     --table-header-text: #ef9d57;
-    --row-border: rgba(255, 255, 255, 0.03);
+    --row-border: color-mix(in srgb, #fff, transparent 97%);
     --hover-bg: #ef9d57;
 }
 
@@ -17,6 +17,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
 }
 
 html,
@@ -32,6 +36,47 @@ body {
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     box-sizing: border-box;
+}
+
+/* Mobile Typography Enhancement */
+@media (max-width: 768px) {
+    html {
+        font-size: 18px;
+    }
+
+    body {
+        line-height: 1.7;
+    }
+
+    /* Fine-tune heading scaling for larger root */
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.3rem;
+    }
+
+    p,
+    span,
+    label,
+    a,
+    li,
+    td,
+    th,
+    small,
+    i,
+    [class*="-label"],
+    [class*="-text"],
+    [class*="-desc"],
+    [class*="-sub"],
+    [class*="-meta"] {
+        font-size: 1rem !important;
+    }
 }
 
 *,
@@ -109,7 +154,7 @@ h2 {
 button,
 .btn {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
     color: var(--text-primary);
     font-size: 0.8rem;
     font-weight: 700;
@@ -127,7 +172,7 @@ button,
     padding: 0.75rem 1.5rem;
 
     &:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: color-mix(in srgb, #fff, transparent 95%);
         border-color: var(--accent-primary);
         color: var(--text-primary);
     }
@@ -158,19 +203,19 @@ input,
 select,
 textarea {
     background: #0a0a0a !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid color-mix(in srgb, #fff, transparent 95%) !important;
     color: var(--text-primary) !important;
     padding: 0.8rem 1rem;
     border-radius: 0;
     font-size: 0.95rem;
-    height:2.5rem;
+    height: 2.5rem;
     width: 100%;
     max-width: 100%;
     transition: all 0.2s ease;
 
     &:focus {
         outline: none;
-        border-color: rgba(255, 255, 255, 0.15) !important;
+        border-color: color-mix(in srgb, #fff, transparent 85%) !important;
         background: #111 !important;
     }
 
@@ -203,20 +248,20 @@ table {
         font-size: 0.75rem;
         font-weight: 800;
         letter-spacing: 0.15em;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        background: rgba(255, 255, 255, 0.01);
+        border-bottom: 1px solid color-mix(in srgb, #fff, transparent 95%);
+        background: color-mix(in srgb, #fff, transparent 99%);
     }
 
     td {
         padding: 1.2rem 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid color-mix(in srgb, #fff, transparent 98%);
         color: var(--text-primary);
         font-size: 0.9rem;
         opacity: 0.9;
     }
 
     tr:hover {
-        background: rgba(255, 255, 255, 0.02);
+        background: color-mix(in srgb, #fff, transparent 98%);
     }
 }
 
@@ -229,7 +274,7 @@ table {
     margin-bottom: 2.5rem;
     width: 100%;
     max-width: 100%;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px color-mix(in srgb, #000, transparent 70%);
 }
 
 /* Utility classes */
@@ -248,5 +293,5 @@ table {
     backdrop-filter: none !important;
     background: var(--bg-card) !important;
     border: none !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 8px 32px color-mix(in srgb, #000, transparent 60%) !important;
 }

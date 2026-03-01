@@ -80,12 +80,12 @@
     flex-direction: column;
     height: 100%;
     border-radius: 0;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 16px color-mix(in srgb, #000, transparent 70%);
 
     &:hover {
         background: #0c0c0c;
         transform: translateY(-5px);
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 12px 32px color-mix(in srgb, #000, transparent 50%);
 
         .category-icon i {
             color: var(--accent-primary);

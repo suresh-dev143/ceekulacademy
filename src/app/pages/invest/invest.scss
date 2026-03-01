@@ -8,7 +8,7 @@
 
 .invest-form {
     background: #010101;
-   
+
     padding: 3rem 1.5rem;
     width: 100%;
     max-width: 900px;
@@ -156,7 +156,7 @@
 
         &.selected {
             border-color: var(--accent-primary);
-            background: rgba(240, 142, 56, 0.05);
+            background: color-mix(in srgb, #f08e38, transparent 95%);
 
             .radio-circle {
                 border-color: var(--accent-primary);

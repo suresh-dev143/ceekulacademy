@@ -208,7 +208,7 @@
 
 .toggle-sidebar-btn.right {
     right: 1rem;
-    top:7.9rem;
+    top: 7.9rem;
 }
 
 .expand-sidebar-btn.left {
@@ -261,12 +261,12 @@
     right: 0;
     height: 70px;
     background: #050505;
-    border-top: 1px solid rgba(255, 255, 255, 0.05); // Subtle separator
+    border-top: 1px solid color-mix(in srgb, #fff, transparent 95%); // Subtle separator
     z-index: 2000;
     padding: 0 1rem;
     justify-content: space-around;
     align-items: center;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 -4px 20px color-mix(in srgb, #000, transparent 50%);
 
     @media (max-width: 991px) {
         display: flex;
@@ -325,6 +325,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: color-mix(in srgb, #000, transparent 20%);
     z-index: 900;
 }

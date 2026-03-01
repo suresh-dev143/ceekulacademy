@@ -5,37 +5,37 @@ import { LayoutComponent } from '../../components/layout/layout';
 
 // ── Data interfaces ────────────────────────────────────────────────────────
 interface CampLocation {
-    id: number;
-    name: string;
-    address: string;
-    city: string;
-    pinCode: string;
-    distance: number;
-    slotsAvailable: number;
+  id: number;
+  name: string;
+  address: string;
+  city: string;
+  pinCode: string;
+  distance: number;
+  slotsAvailable: number;
 }
 
 interface HealthCamp {
-    id: number;
-    name: string;
-    specialty: string;
-    mode: 'Online' | 'Hybrid';
-    date: string;
-    time: string;
-    duration: string;
-    doctor: string;
-    description: string;
-    totalSlots: number;
-    bookedSlots: number;
-    tags: string[];
-    meetLink?: string;
-    locations?: CampLocation[];
+  id: number;
+  name: string;
+  specialty: string;
+  mode: 'Online' | 'Hybrid';
+  date: string;
+  time: string;
+  duration: string;
+  doctor: string;
+  description: string;
+  totalSlots: number;
+  bookedSlots: number;
+  tags: string[];
+  meetLink?: string;
+  locations?: CampLocation[];
 }
 
 @Component({
-    selector: 'app-health-connect',
-    standalone: true,
-    imports: [CommonModule, FormsModule, LayoutComponent],
-    template: `
+  selector: 'app-health-connect',
+  standalone: true,
+  imports: [CommonModule, FormsModule, LayoutComponent],
+  template: `
     <app-layout>
       <div class="hc-page">
 
@@ -509,14 +509,14 @@ interface HealthCamp {
       </div>
     </app-layout>
   `,
-    styles: [`
+  styles: [`
     .hc-page { max-width: 1100px; margin: 0 auto; padding: 0 0 4rem; }
 
     /* ── Hero ──────────────────────────────────────────────────────── */
     .hc-hero { padding: 3rem 2rem 0; background: #000; }
     .hero-label { font-size: 0.62rem; font-weight: 900; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 0.75rem; }
     .hero-title { font-size: clamp(1.5rem, 3.5vw, 2.5rem); font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; line-height: 1.15; margin: 0 0 0.75rem; }
-    .hero-desc { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.6; max-width: 640px; margin-bottom: 2rem; }
+    .hero-desc { font-size: 0.85rem; color: color-mix(in srgb, #fff, transparent 60%); line-height: 1.6; max-width: 640px; margin-bottom: 2rem; }
 
     /* ── Main Tab Bar ───────────────────────────────────────────────── */
     .main-tabs {
@@ -529,7 +529,7 @@ interface HealthCamp {
       background: transparent;
       border: none;
       border-bottom: 2px solid transparent;
-      color: rgba(255,255,255,0.4);
+      color: color-mix(in srgb, #fff, transparent 60%);
       padding: 0.9rem 1.75rem;
       font-size: 0.78rem;
       font-weight: 900;
@@ -567,12 +567,12 @@ interface HealthCamp {
     .filter-search .fi { width: 100%; }
     .filter-row-inline { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: flex-start; }
     .filter-pill-group { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
-    .filter-lbl { font-size: 0.6rem; font-weight: 900; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; margin-right: 0.25rem; }
+    .filter-lbl { font-size: 0.6rem; font-weight: 900; color: color-mix(in srgb, #fff, transparent 70%); text-transform: uppercase; letter-spacing: 1px; margin-right: 0.25rem; }
     .fpill {
       padding: 0.35rem 0.85rem;
       border: 1px solid var(--row-border);
       background: #000;
-      color: rgba(255,255,255,0.35);
+      color: color-mix(in srgb, #fff, transparent 65%);
       font-size: 0.68rem;
       font-weight: 900;
       text-transform: uppercase;
@@ -580,10 +580,10 @@ interface HealthCamp {
       cursor: pointer;
       transition: 0.2s;
       font-family: inherit;
-      &:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
-      &.on { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.4); }
-      &.online.on { background: rgba(59,130,246,0.15); color: #60a5fa; border-color: #60a5fa; }
-      &.hybrid.on { background: rgba(16,185,129,0.15); color: #34d399; border-color: #34d399; }
+      &:hover { color: #fff; border-color: color-mix(in srgb, #fff, transparent 70%); }
+      &.on { background: color-mix(in srgb, #fff, transparent 92%); color: #fff; border-color: color-mix(in srgb, #fff, transparent 60%); }
+      &.online.on { background: color-mix(in srgb, #3b82f6, transparent 85%); color: #60a5fa; border-color: #60a5fa; }
+      &.hybrid.on { background: color-mix(in srgb, #10b981, transparent 85%); color: #34d399; border-color: #34d399; }
     }
 
     /* ── Results header ─────────────────────────────────────────────── */
@@ -596,8 +596,8 @@ interface HealthCamp {
       border-top: none;
       background: #030303;
     }
-    .result-count { font-size: 0.7rem; font-weight: 900; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
-    .result-hint { font-size: 0.62rem; color: rgba(255,255,255,0.2); font-weight: 600; }
+    .result-count { font-size: 0.7rem; font-weight: 900; color: color-mix(in srgb, #fff, transparent 50%); text-transform: uppercase; letter-spacing: 1px; }
+    .result-hint { font-size: 0.62rem; color: color-mix(in srgb, #fff, transparent 80%); font-weight: 600; }
 
     /* ── Camps Grid ─────────────────────────────────────────────────── */
     .camps-grid {
@@ -629,13 +629,13 @@ interface HealthCamp {
     .cc-mode-badge {
       font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px;
       padding: 0.25rem 0.65rem; border: 1px solid;
-      &.online { color: #60a5fa; border-color: #3b82f6; background: rgba(59,130,246,0.1); }
-      &.hybrid  { color: #34d399; border-color: #10b981; background: rgba(16,185,129,0.1); }
+      &.online { color: #60a5fa; border-color: #3b82f6; background: color-mix(in srgb, #3b82f6, transparent 90%); }
+      &.hybrid  { color: #34d399; border-color: #10b981; background: color-mix(in srgb, #10b981, transparent 90%); }
     }
     .cc-slots {
       font-size: 0.65rem; font-weight: 900; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;
       &.low  { color: #f59e0b; }
-      &.full { color: rgba(255,255,255,0.25); }
+      &.full { color: color-mix(in srgb, #fff, transparent 75%); }
     }
 
     .cc-name { font-size: 0.95rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; line-height: 1.3; }
@@ -647,32 +647,32 @@ interface HealthCamp {
       gap: 0.6rem 1rem;
     }
     .cc-meta-item { display: flex; flex-direction: column; gap: 0.15rem; }
-    .cc-meta-lbl { font-size: 0.58rem; font-weight: 900; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 1px; }
-    .cc-meta-val { font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.8); }
+    .cc-meta-lbl { font-size: 0.58rem; font-weight: 900; color: color-mix(in srgb, #fff, transparent 75%); text-transform: uppercase; letter-spacing: 1px; }
+    .cc-meta-val { font-size: 0.78rem; font-weight: 700; color: color-mix(in srgb, #fff, transparent 20%); }
 
-    .cc-desc { font-size: 0.75rem; color: rgba(255,255,255,0.4); line-height: 1.5; margin: 0; }
+    .cc-desc { font-size: 0.75rem; color: color-mix(in srgb, #fff, transparent 60%); line-height: 1.5; margin: 0; }
 
     .cc-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-    .cc-tag { font-size: 0.58rem; font-weight: 900; color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 0.15rem 0.5rem; text-transform: uppercase; letter-spacing: 0.4px; }
+    .cc-tag { font-size: 0.58rem; font-weight: 900; color: color-mix(in srgb, #fff, transparent 70%); border: 1px solid color-mix(in srgb, #fff, transparent 90%); padding: 0.15rem 0.5rem; text-transform: uppercase; letter-spacing: 0.4px; }
 
     /* Slots progress bar */
-    .slots-bar-wrap { height: 3px; background: rgba(255,255,255,0.07); position: relative; }
+    .slots-bar-wrap { height: 3px; background: color-mix(in srgb, #fff, transparent 93%); position: relative; }
     .slots-bar-fill { height: 100%; background: #10b981; transition: width 0.4s; &.warn { background: #f59e0b; } }
-    .slots-text { font-size: 0.62rem; color: rgba(255,255,255,0.25); font-weight: 700; }
+    .slots-text { font-size: 0.62rem; color: color-mix(in srgb, #fff, transparent 75%); font-weight: 700; }
 
     /* Online info */
     .online-info {
-      background: rgba(59,130,246,0.08);
+      background: color-mix(in srgb, #3b82f6, transparent 92%);
       border-left: 2px solid #3b82f6;
       padding: 0.65rem 0.9rem;
     }
     .online-info-lbl { display: block; font-size: 0.58rem; font-weight: 900; color: #60a5fa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem; }
-    .online-info-val { font-size: 0.72rem; color: rgba(255,255,255,0.5); font-weight: 600; }
+    .online-info-val { font-size: 0.72rem; color: color-mix(in srgb, #fff, transparent 50%); font-weight: 600; }
 
     /* Hybrid Locations */
     .hybrid-locations {
-      border: 1px solid rgba(16,185,129,0.25);
-      background: rgba(16,185,129,0.04);
+      border: 1px solid color-mix(in srgb, #10b981, transparent 75%);
+      background: color-mix(in srgb, #10b981, transparent 96%);
     }
     .loc-header {
       display: flex;
@@ -680,37 +680,37 @@ interface HealthCamp {
       align-items: center;
       padding: 0.7rem 1rem;
       cursor: pointer;
-      &:hover { background: rgba(16,185,129,0.06); }
+      &:hover { background: color-mix(in srgb, #10b981, transparent 94%); }
     }
     .loc-header-title { font-size: 0.65rem; font-weight: 900; color: #34d399; text-transform: uppercase; letter-spacing: 1px; }
     .loc-toggle { font-size: 0.6rem; color: rgba(255,255,255,0.3); }
 
-    .loc-list { border-top: 1px solid rgba(16,185,129,0.15); }
+    .loc-list { border-top: 1px solid color-mix(in srgb, #10b981, transparent 85%); }
     .loc-row {
       display: flex;
       gap: 0.75rem;
       padding: 0.8rem 1rem;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid color-mix(in srgb, #fff, transparent 96%);
       cursor: pointer;
       transition: 0.15s;
       &:last-child { border-bottom: none; }
-      &:hover { background: rgba(255,255,255,0.03); }
-      &.sel { background: rgba(16,185,129,0.08); }
+      &:hover { background: color-mix(in srgb, #fff, transparent 97%); }
+      &.sel { background: color-mix(in srgb, #10b981, transparent 92%); }
     }
     .loc-pick { padding-top: 2px; }
     .loc-radio {
       display: block;
       width: 14px;
       height: 14px;
-      border: 2px solid rgba(255,255,255,0.2);
+      border: 2px solid color-mix(in srgb, #fff, transparent 80%);
       border-radius: 50%;
       transition: 0.15s;
-      &.on { border-color: #10b981; background: #10b981; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
+      &.on { border-color: #10b981; background: #10b981; box-shadow: 0 0 0 3px color-mix(in srgb, #10b981, transparent 80%); }
     }
     .loc-body { flex: 1; display: flex; flex-direction: column; gap: 0.2rem; }
     .loc-name { font-size: 0.78rem; font-weight: 800; color: #fff; }
-    .loc-addr { font-size: 0.65rem; color: rgba(255,255,255,0.4); font-weight: 600; }
-    .loc-dist { font-size: 0.6rem; color: rgba(255,255,255,0.25); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .loc-addr { font-size: 0.65rem; color: color-mix(in srgb, #fff, transparent 60%); font-weight: 600; }
+    .loc-dist { font-size: 0.6rem; color: color-mix(in srgb, #fff, transparent 75%); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .loc-slots {
       font-size: 0.65rem; font-weight: 900; color: #10b981; text-transform: uppercase;
       align-self: flex-start; padding-top: 2px; white-space: nowrap;
@@ -733,11 +733,11 @@ interface HealthCamp {
       transition: 0.2s;
       font-family: inherit;
       &:hover:not(:disabled) { background: var(--accent-primary); color: #000; }
-      &:disabled { border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.2); cursor: not-allowed; background: #000; }
+      &:disabled { border-color: color-mix(in srgb, #fff, transparent 90%); color: color-mix(in srgb, #fff, transparent 80%); cursor: not-allowed; background: #000; }
     }
-    .register-hint { font-size: 0.62rem; color: rgba(255,255,255,0.25); font-weight: 700; text-align: center; }
+    .register-hint { font-size: 0.62rem; color: color-mix(in srgb, #fff, transparent 75%); font-weight: 700; text-align: center; }
     .registered-badge {
-      background: rgba(16,185,129,0.12);
+      background: color-mix(in srgb, #10b981, transparent 88%);
       border: 1px solid #10b981;
       color: #34d399;
       padding: 0.65rem 1rem;
@@ -754,14 +754,14 @@ interface HealthCamp {
       border: 1px solid var(--row-border);
       border-top: none;
       text-align: center;
-      p { font-size: 0.82rem; color: rgba(255,255,255,0.3); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+      p { font-size: 0.82rem; color: color-mix(in srgb, #fff, transparent 70%); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     }
 
     /* ── Registration Modal ─────────────────────────────────────────── */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.85);
+      background: color-mix(in srgb, #000, transparent 15%);
       z-index: 5000;
       display: flex;
       align-items: center;
@@ -791,13 +791,13 @@ interface HealthCamp {
     }
     .modal-tag { display: inline-block; font-size: 0.58rem; font-weight: 900; color: var(--accent-primary); border: 1px solid var(--accent-primary); padding: 0.1rem 0.5rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; }
     .modal-title { font-size: 1.1rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 0.25rem; }
-    .modal-sub { font-size: 0.72rem; color: rgba(255,255,255,0.4); font-weight: 700; }
-    .modal-close { background: transparent; border: 1px solid var(--row-border); color: rgba(255,255,255,0.5); width: 32px; height: 32px; cursor: pointer; font-size: 0.8rem; flex-shrink: 0; transition: 0.2s; &:hover { border-color: #fff; color: #fff; } }
+    .modal-sub { font-size: 0.72rem; color: color-mix(in srgb, #fff, transparent 60%); font-weight: 700; }
+    .modal-close { background: transparent; border: 1px solid var(--row-border); color: color-mix(in srgb, #fff, transparent 50%); width: 32px; height: 32px; cursor: pointer; font-size: 0.8rem; flex-shrink: 0; transition: 0.2s; &:hover { border-color: #fff; color: #fff; } }
 
     .modal-location-summary {
       margin: 1.25rem 2rem 0;
       padding: 0.9rem 1.1rem;
-      background: rgba(16,185,129,0.08);
+      background: color-mix(in srgb, #10b981, transparent 92%);
       border-left: 3px solid #10b981;
       display: flex;
       flex-direction: column;
@@ -809,10 +809,10 @@ interface HealthCamp {
     .modal-online-info {
       margin: 1.25rem 2rem 0;
       padding: 0.9rem 1.1rem;
-      background: rgba(59,130,246,0.08);
+      background: color-mix(in srgb, #3b82f6, transparent 92%);
       border-left: 3px solid #3b82f6;
       font-size: 0.78rem;
-      color: rgba(255,255,255,0.55);
+      color: color-mix(in srgb, #fff, transparent 45%);
       line-height: 1.6;
       font-weight: 600;
     }
@@ -831,16 +831,16 @@ interface HealthCamp {
       bottom: 0;
       background: #080808;
     }
-    .btn-cancel { background: transparent; border: 1px solid var(--row-border); color: rgba(255,255,255,0.5); padding: 0.7rem 1.4rem; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.2s; font-family: inherit; &:hover { border-color: #fff; color: #fff; } }
+    .btn-cancel { background: transparent; border: 1px solid var(--row-border); color: color-mix(in srgb, #fff, transparent 50%); padding: 0.7rem 1.4rem; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.2s; font-family: inherit; &:hover { border-color: #fff; color: #fff; } }
     .btn-confirm { background: var(--accent-primary); border: 1px solid var(--accent-primary); color: #000; padding: 0.7rem 1.8rem; font-size: 0.78rem; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.2s; font-family: inherit; &:hover:not(:disabled) { background: #fff; border-color: #fff; } &:disabled { opacity: 0.35; cursor: not-allowed; } }
 
     /* ── Progress Track ─────────────────────────────────────────────── */
     .progress-track { display: flex; flex-wrap: wrap; border: 1px solid var(--row-border); border-top: none; }
     .progress-step { flex: 1; min-width: 70px; padding: 0.75rem 1rem; display: flex; flex-direction: column; gap: 0.2rem; border-right: 1px solid var(--row-border); transition: 0.2s; &:last-child { border-right: none; } }
-    .step-num { font-size: 0.62rem; font-weight: 900; color: rgba(255,255,255,0.2); letter-spacing: 1px; }
-    .step-lbl { font-size: 0.65rem; font-weight: 800; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 0.5px; }
-    .progress-step.active { background: rgba(255,255,255,0.03); .step-num { color: var(--accent-primary); } .step-lbl { color: #fff; } }
-    .progress-step.done { background: rgba(16,185,129,0.06); .step-num { color: #10b981; } .step-lbl { color: rgba(255,255,255,0.5); } }
+    .step-num { font-size: 0.62rem; font-weight: 900; color: color-mix(in srgb, #fff, transparent 80%); letter-spacing: 1px; }
+    .step-lbl { font-size: 0.65rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 80%); text-transform: uppercase; letter-spacing: 0.5px; }
+    .progress-step.active { background: color-mix(in srgb, #fff, transparent 97%); .step-num { color: var(--accent-primary); } .step-lbl { color: #fff; } }
+    .progress-step.done { background: color-mix(in srgb, #10b981, transparent 94%); .step-num { color: #10b981; } .step-lbl { color: color-mix(in srgb, #fff, transparent 50%); } }
 
     /* ── Form Base ──────────────────────────────────────────────────── */
     .hc-form { display: flex; flex-direction: column; gap: 0; }
@@ -848,7 +848,7 @@ interface HealthCamp {
     .section-header { margin-bottom: 2rem; }
     .part-tag { display: inline-block; font-size: 0.58rem; font-weight: 900; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 3px; border: 1px solid var(--accent-primary); padding: 0.2rem 0.6rem; margin-bottom: 0.75rem; }
     .section-title { font-size: clamp(0.95rem, 2.5vw, 1.35rem); font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 0.4rem; }
-    .section-desc { font-size: 0.8rem; color: rgba(255,255,255,0.38); line-height: 1.5; margin: 0; }
+    .section-desc { font-size: 0.8rem; color: color-mix(in srgb, #fff, transparent 62%); line-height: 1.5; margin: 0; }
     .sub-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--row-border); }
     .sub-title { font-size: 0.72rem; font-weight: 900; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 2px; margin: 0 0 1.25rem; }
 
@@ -860,57 +860,57 @@ interface HealthCamp {
 
     /* ── Fields ─────────────────────────────────────────────────────── */
     .fg { display: flex; flex-direction: column; gap: 0.4rem; }
-    .fl { font-size: 0.62rem; font-weight: 900; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 1px; }
+    .fl { font-size: 0.62rem; font-weight: 900; color: color-mix(in srgb, #fff, transparent 62%); text-transform: uppercase; letter-spacing: 1px; }
     .fl.req::after { content: " *"; color: var(--accent-primary); }
-    .fh { font-size: 0.6rem; color: rgba(255,255,255,0.18); font-weight: 600; }
-    .fi { background: #000; border: 1px solid var(--row-border); color: #fff; padding: 0.72rem 1rem; font-size: 0.86rem; font-weight: 600; outline: none; width: 100%; transition: border-color 0.2s; font-family: inherit; &:focus { border-color: var(--accent-primary); } &::placeholder { color: rgba(255,255,255,0.13); font-weight: 500; } }
-    .fs { background: #000; border: 1px solid var(--row-border); color: #fff; padding: 0.72rem 1rem; font-size: 0.86rem; font-weight: 600; outline: none; width: 100%; cursor: pointer; transition: border-color 0.2s; font-family: inherit; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; &:focus { border-color: var(--accent-primary); } option { background: #111; } }
-    .fta { background: #000; border: 1px solid var(--row-border); color: #fff; padding: 0.72rem 1rem; font-size: 0.86rem; font-weight: 600; outline: none; width: 100%; resize: vertical; transition: border-color 0.2s; font-family: inherit; line-height: 1.6; &:focus { border-color: var(--accent-primary); } &::placeholder { color: rgba(255,255,255,0.13); font-weight: 500; } }
+    .fh { font-size: 0.6rem; color: color-mix(in srgb, #fff, transparent 82%); font-weight: 600; }
+    .fi { background: #000; border: 1px solid var(--row-border); color: #fff; padding: 0.72rem 1rem; font-size: 0.86rem; font-weight: 600; outline: none; width: 100%; transition: border-color 0.2s; font-family: inherit; &:focus { border-color: var(--accent-primary); } &::placeholder { color: color-mix(in srgb, #fff, transparent 87%); font-weight: 500; } }
+    .fs { background: #000; border: 1px solid var(--row-border); color: #fff; padding: 0.72rem 1rem; font-size: 0.86rem; font-weight: 600; outline: none; width: 100%; cursor: pointer; transition: border-color 0.2s; font-family: inherit; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='color-mix(in srgb, #fff, transparent 70%)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; &:focus { border-color: var(--accent-primary); } option { background: #111; } }
+    .fta { background: #000; border: 1px solid var(--row-border); color: #fff; padding: 0.72rem 1rem; font-size: 0.86rem; font-weight: 600; outline: none; width: 100%; resize: vertical; transition: border-color 0.2s; font-family: inherit; line-height: 1.6; &:focus { border-color: var(--accent-primary); } &::placeholder { color: color-mix(in srgb, #fff, transparent 87%); font-weight: 500; } }
 
     /* ── Radio Cards ────────────────────────────────────────────────── */
     .radio-card-group { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
     @media (min-width: 500px) { .radio-card-group { grid-template-columns: 1fr 1fr; } .radio-card-group.four-col { grid-template-columns: 1fr 1fr; } }
     @media (min-width: 900px) { .radio-card-group.four-col { grid-template-columns: 1fr 1fr 1fr 1fr; } }
-    .radio-card { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.2rem; border: 1px solid var(--row-border); background: #000; cursor: pointer; transition: 0.2s; &:hover { border-color: rgba(255,255,255,0.2); } &.sel { border-color: var(--accent-primary); background: rgba(255,100,0,0.06); } input[type="radio"] { margin-top: 3px; accent-color: var(--accent-primary); flex-shrink: 0; } }
+    .radio-card { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 1.2rem; border: 1px solid var(--row-border); background: #000; cursor: pointer; transition: 0.2s; &:hover { border-color: color-mix(in srgb, #fff, transparent 80%); } &.sel { border-color: var(--accent-primary); background: color-mix(in srgb, #FF6400, transparent 94%); } input[type="radio"] { margin-top: 3px; accent-color: var(--accent-primary); flex-shrink: 0; } }
     .radio-card.sm { padding: 0.8rem 1rem; }
     .rc-body { display: flex; flex-direction: column; gap: 0.25rem; }
     .rc-title { font-size: 0.8rem; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
-    .rc-sub { font-size: 0.68rem; color: rgba(255,255,255,0.33); font-weight: 600; }
+    .rc-sub { font-size: 0.68rem; color: color-mix(in srgb, #fff, transparent 67%); font-weight: 600; }
 
     /* ── Pills & Chips ──────────────────────────────────────────────── */
     .pill-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .pill { padding: 0.4rem 0.9rem; border: 1px solid var(--row-border); background: #000; color: rgba(255,255,255,0.38); font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.4rem; input { display: none; } &:hover { border-color: rgba(255,255,255,0.3); color: #fff; } &.on { background: var(--accent-primary); color: #000; border-color: var(--accent-primary); } }
+    .pill { padding: 0.4rem 0.9rem; border: 1px solid var(--row-border); background: #000; color: color-mix(in srgb, #fff, transparent 62%); font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.4rem; input { display: none; } &:hover { border-color: color-mix(in srgb, #fff, transparent 70%); color: #fff; } &.on { background: var(--accent-primary); color: #000; border-color: var(--accent-primary); } }
     .chip-group { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-    .chip { padding: 0.38rem 0.85rem; border: 1px solid var(--row-border); background: #000; color: rgba(255,255,255,0.38); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: 0.2s; &:hover { border-color: rgba(255,255,255,0.3); color: #fff; } &.on { background: rgba(255,100,0,0.14); color: var(--accent-primary); border-color: var(--accent-primary); } }
+    .chip { padding: 0.38rem 0.85rem; border: 1px solid var(--row-border); background: #000; color: color-mix(in srgb, #fff, transparent 62%); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: 0.2s; &:hover { border-color: color-mix(in srgb, #fff, transparent 70%); color: #fff; } &.on { background: color-mix(in srgb, #FF6400, transparent 86%); color: var(--accent-primary); border-color: var(--accent-primary); } }
 
     /* ── File Upload ────────────────────────────────────────────────── */
-    .file-zone { border: 1px dashed rgba(255,255,255,0.12); background: #000; padding: 1.75rem; text-align: center; cursor: pointer; transition: 0.2s; &:hover { border-color: var(--accent-primary); } &.compact { padding: 1.1rem; } }
+    .file-zone { border: 1px dashed color-mix(in srgb, #fff, transparent 88%); background: #000; padding: 1.75rem; text-align: center; cursor: pointer; transition: 0.2s; &:hover { border-color: var(--accent-primary); } &.compact { padding: 1.1rem; } }
     .file-inp { display: none; }
     .file-lbl { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; cursor: pointer; }
-    .file-main { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; }
-    .file-hint { font-size: 0.62rem; color: rgba(255,255,255,0.18); font-weight: 600; }
+    .file-main { font-size: 0.8rem; font-weight: 700; color: color-mix(in srgb, #fff, transparent 55%); text-transform: uppercase; letter-spacing: 0.5px; }
+    .file-hint { font-size: 0.62rem; color: color-mix(in srgb, #fff, transparent 82%); font-weight: 600; }
 
     /* ── Checkbox ───────────────────────────────────────────────────── */
     .checkbox-row { display: flex; align-items: flex-start; gap: 0.7rem; cursor: pointer; input[type="checkbox"] { margin-top: 2px; width: 15px; height: 15px; accent-color: var(--accent-primary); flex-shrink: 0; } }
-    .cb-label { font-size: 0.78rem; color: rgba(255,255,255,0.55); line-height: 1.5; font-weight: 600; }
+    .cb-label { font-size: 0.78rem; color: color-mix(in srgb, #fff, transparent 45%); line-height: 1.5; font-weight: 600; }
     .hc-link { color: var(--accent-primary); text-decoration: none; &:hover { text-decoration: underline; } }
 
     /* ── Tags ───────────────────────────────────────────────────────── */
-    .opt-tag { font-size: 0.56rem; font-weight: 800; color: rgba(255,255,255,0.22); text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.1); padding: 0.1rem 0.4rem; margin-left: 0.4rem; vertical-align: middle; }
+    .opt-tag { font-size: 0.56rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 78%); text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid color-mix(in srgb, #fff, transparent 90%); padding: 0.1rem 0.4rem; margin-left: 0.4rem; vertical-align: middle; }
     .req-mark { font-size: 0.56rem; font-weight: 900; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 1px; border: 1px solid var(--accent-primary); padding: 0.1rem 0.4rem; margin-left: 0.4rem; vertical-align: middle; }
 
     /* ── Dividers ───────────────────────────────────────────────────── */
     .section-divider { height: 1px; background: var(--row-border); margin: 0.25rem 0; }
-    .divider-label { font-size: 0.6rem; font-weight: 900; color: rgba(255,255,255,0.28); text-transform: uppercase; letter-spacing: 2px; }
-    .conditional-banner { font-size: 0.6rem; font-weight: 900; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 2px; border-left: 3px solid var(--accent-primary); padding: 0.5rem 1rem; background: rgba(255,100,0,0.05); margin-top: 0.25rem; }
+    .divider-label { font-size: 0.6rem; font-weight: 900; color: color-mix(in srgb, #fff, transparent 72%); text-transform: uppercase; letter-spacing: 2px; }
+    .conditional-banner { font-size: 0.6rem; font-weight: 900; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 2px; border-left: 3px solid var(--accent-primary); padding: 0.5rem 1rem; background: color-mix(in srgb, #FF6400, transparent 95%); margin-top: 0.25rem; }
 
     /* ── Action Buttons ─────────────────────────────────────────────── */
     .action-btn-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-    .action-btn { background: #000; border: 1px solid var(--row-border); color: rgba(255,255,255,0.45); padding: 0.65rem 1.3rem; font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; font-family: inherit; &:hover { border-color: var(--accent-primary); color: var(--accent-primary); } }
+    .action-btn { background: #000; border: 1px solid var(--row-border); color: color-mix(in srgb, #fff, transparent 55%); padding: 0.65rem 1.3rem; font-size: 0.72rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; font-family: inherit; &:hover { border-color: var(--accent-primary); color: var(--accent-primary); } }
 
     /* ── Submit ─────────────────────────────────────────────────────── */
     .hc-submit-wrap { border: 1px solid var(--row-border); border-top: none; background: #030303; padding: 2.5rem 2rem; display: flex; flex-direction: column; gap: 1.5rem; align-items: flex-start; }
-    .submit-notice { font-size: 0.72rem; color: rgba(255,255,255,0.22); line-height: 1.6; max-width: 680px; font-weight: 600; }
+    .submit-notice { font-size: 0.72rem; color: color-mix(in srgb, #fff, transparent 78%); line-height: 1.6; max-width: 680px; font-weight: 600; }
     .submit-btn { background: var(--accent-primary); border: none; color: #000; padding: 1rem 2.5rem; font-size: 0.85rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: 0.2s; font-family: inherit; &:hover { background: #fff; } }
 
     @media (max-width: 599px) {
@@ -929,289 +929,289 @@ interface HealthCamp {
 })
 export class HealthConnectComponent {
 
-    // ── Page ────────────────────────────────────────────────────────
-    activePage = signal<'care' | 'camps'>('camps');
+  // ── Page ────────────────────────────────────────────────────────
+  activePage = signal<'care' | 'camps'>('camps');
 
-    // ── Health Camps Data ────────────────────────────────────────────
-    camps: HealthCamp[] = [
-        {
-            id: 1,
-            name: 'Diabetes Awareness & Screening Camp',
-            specialty: 'Endocrinology',
-            mode: 'Hybrid',
-            date: '2026-03-08',
-            time: '9:00 AM – 1:00 PM',
-            duration: '4 Hours',
-            doctor: 'Dr. Kavita Rao',
-            description: 'Free blood sugar testing, HbA1c checks, and diet counselling for diabetes prevention and management.',
-            totalSlots: 80,
-            bookedSlots: 67,
-            tags: ['Free', 'Blood Sugar', 'Diet Counselling', 'Screening'],
-            locations: [
-                { id: 11, name: 'Noida Community Science Lab', address: 'Sector 62, Noida', city: 'Noida', pinCode: '201309', distance: 3.4, slotsAvailable: 8 },
-                { id: 12, name: 'TechHub Training Center', address: 'Sector 18, Noida', city: 'Noida', pinCode: '201301', distance: 1.8, slotsAvailable: 3 },
-                { id: 13, name: 'Green Valley College', address: 'Greater Noida West', city: 'Greater Noida', pinCode: '201306', distance: 14.2, slotsAvailable: 2 }
-            ]
-        },
-        {
-            id: 2,
-            name: 'Mental Health & Stress Relief Webinar',
-            specialty: 'Psychiatry & Psychology',
-            mode: 'Online',
-            date: '2026-03-12',
-            time: '6:00 PM – 8:00 PM',
-            duration: '2 Hours',
-            doctor: 'Dr. Arjun Mehta',
-            description: 'Live interactive session covering stress management, anxiety coping techniques, and guided mindfulness exercises.',
-            totalSlots: 150,
-            bookedSlots: 89,
-            tags: ['Free', 'Live Q&A', 'Mindfulness', 'Anxiety', 'Stress'],
-            meetLink: 'https://meet.ceekul.health/mental-camp-march'
-        },
-        {
-            id: 3,
-            name: 'Cardiac Health Checkup Camp',
-            specialty: 'Cardiology',
-            mode: 'Hybrid',
-            date: '2026-03-15',
-            time: '8:00 AM – 12:00 PM',
-            duration: '4 Hours',
-            doctor: 'Dr. Sarah Chen',
-            description: 'ECG, blood pressure screening, cholesterol check, and cardiac risk assessment with certified cardiologists.',
-            totalSlots: 60,
-            bookedSlots: 48,
-            tags: ['ECG', 'Blood Pressure', 'Cholesterol', 'Paid — ₹199'],
-            locations: [
-                { id: 21, name: 'City Public Library Hall', address: 'Sector 5, Noida', city: 'Noida', pinCode: '201301', distance: 2.9, slotsAvailable: 7 },
-                { id: 22, name: 'Digital Skill Center', address: 'Sector 15A, Noida', city: 'Noida', pinCode: '201301', distance: 4.5, slotsAvailable: 5 }
-            ]
-        },
-        {
-            id: 4,
-            name: 'Women\'s Wellness & Gynecology Camp',
-            specialty: 'Gynaecology',
-            mode: 'Hybrid',
-            date: '2026-03-20',
-            time: '10:00 AM – 2:00 PM',
-            duration: '4 Hours',
-            doctor: 'Dr. Kavita Rao',
-            description: 'Confidential gynaecological consultations, PCOS screening, breast health awareness, and reproductive health guidance.',
-            totalSlots: 50,
-            bookedSlots: 50,
-            tags: ['Women Only', 'PCOS', 'Breast Health', 'Confidential'],
-            locations: [
-                { id: 31, name: 'Noida Community Science Lab', address: 'Sector 62, Noida', city: 'Noida', pinCode: '201309', distance: 3.4, slotsAvailable: 0 },
-                { id: 32, name: 'Global Excellence School', address: 'Sector 29, Noida', city: 'Noida', pinCode: '201303', distance: 7.2, slotsAvailable: 0 }
-            ]
-        },
-        {
-            id: 5,
-            name: 'Nutrition & Diet Planning Webinar',
-            specialty: 'Nutrition & Dietetics',
-            mode: 'Online',
-            date: '2026-03-22',
-            time: '11:00 AM – 12:30 PM',
-            duration: '90 Minutes',
-            doctor: 'Ms. Neha Gupta (Nutritionist)',
-            description: 'Learn to build a balanced diet, understand macronutrients, manage weight, and get a personalised diet roadmap.',
-            totalSlots: 200,
-            bookedSlots: 112,
-            tags: ['Free', 'Diet Planning', 'Weight Management', 'Personalised'],
-            meetLink: 'https://meet.ceekul.health/nutrition-march'
-        },
-        {
-            id: 6,
-            name: 'Paediatric Vaccination & Child Health Drive',
-            specialty: 'Paediatrics',
-            mode: 'Hybrid',
-            date: '2026-03-25',
-            time: '9:00 AM – 4:00 PM',
-            duration: 'Full Day',
-            doctor: 'Dr. Rajesh Khanna',
-            description: 'Vaccination drive for children aged 0–12 years, growth monitoring, developmental screening, and parent counselling.',
-            totalSlots: 100,
-            bookedSlots: 61,
-            tags: ['Children 0–12', 'Vaccination', 'Free', 'Growth Monitoring'],
-            locations: [
-                { id: 41, name: 'TechHub Training Center', address: 'Sector 18, Noida', city: 'Noida', pinCode: '201301', distance: 1.8, slotsAvailable: 18 },
-                { id: 42, name: 'Global Excellence School', address: 'Sector 29, Noida', city: 'Noida', pinCode: '201303', distance: 7.2, slotsAvailable: 12 },
-                { id: 43, name: 'Anjali Community Hall', address: 'Sector 40, Noida', city: 'Noida', pinCode: '201303', distance: 5.6, slotsAvailable: 9 }
-            ]
-        }
-    ];
+  // ── Health Camps Data ────────────────────────────────────────────
+  camps: HealthCamp[] = [
+    {
+      id: 1,
+      name: 'Diabetes Awareness & Screening Camp',
+      specialty: 'Endocrinology',
+      mode: 'Hybrid',
+      date: '2026-03-08',
+      time: '9:00 AM – 1:00 PM',
+      duration: '4 Hours',
+      doctor: 'Dr. Kavita Rao',
+      description: 'Free blood sugar testing, HbA1c checks, and diet counselling for diabetes prevention and management.',
+      totalSlots: 80,
+      bookedSlots: 67,
+      tags: ['Free', 'Blood Sugar', 'Diet Counselling', 'Screening'],
+      locations: [
+        { id: 11, name: 'Noida Community Science Lab', address: 'Sector 62, Noida', city: 'Noida', pinCode: '201309', distance: 3.4, slotsAvailable: 8 },
+        { id: 12, name: 'TechHub Training Center', address: 'Sector 18, Noida', city: 'Noida', pinCode: '201301', distance: 1.8, slotsAvailable: 3 },
+        { id: 13, name: 'Green Valley College', address: 'Greater Noida West', city: 'Greater Noida', pinCode: '201306', distance: 14.2, slotsAvailable: 2 }
+      ]
+    },
+    {
+      id: 2,
+      name: 'Mental Health & Stress Relief Webinar',
+      specialty: 'Psychiatry & Psychology',
+      mode: 'Online',
+      date: '2026-03-12',
+      time: '6:00 PM – 8:00 PM',
+      duration: '2 Hours',
+      doctor: 'Dr. Arjun Mehta',
+      description: 'Live interactive session covering stress management, anxiety coping techniques, and guided mindfulness exercises.',
+      totalSlots: 150,
+      bookedSlots: 89,
+      tags: ['Free', 'Live Q&A', 'Mindfulness', 'Anxiety', 'Stress'],
+      meetLink: 'https://meet.ceekul.health/mental-camp-march'
+    },
+    {
+      id: 3,
+      name: 'Cardiac Health Checkup Camp',
+      specialty: 'Cardiology',
+      mode: 'Hybrid',
+      date: '2026-03-15',
+      time: '8:00 AM – 12:00 PM',
+      duration: '4 Hours',
+      doctor: 'Dr. Sarah Chen',
+      description: 'ECG, blood pressure screening, cholesterol check, and cardiac risk assessment with certified cardiologists.',
+      totalSlots: 60,
+      bookedSlots: 48,
+      tags: ['ECG', 'Blood Pressure', 'Cholesterol', 'Paid — ₹199'],
+      locations: [
+        { id: 21, name: 'City Public Library Hall', address: 'Sector 5, Noida', city: 'Noida', pinCode: '201301', distance: 2.9, slotsAvailable: 7 },
+        { id: 22, name: 'Digital Skill Center', address: 'Sector 15A, Noida', city: 'Noida', pinCode: '201301', distance: 4.5, slotsAvailable: 5 }
+      ]
+    },
+    {
+      id: 4,
+      name: 'Women\'s Wellness & Gynecology Camp',
+      specialty: 'Gynaecology',
+      mode: 'Hybrid',
+      date: '2026-03-20',
+      time: '10:00 AM – 2:00 PM',
+      duration: '4 Hours',
+      doctor: 'Dr. Kavita Rao',
+      description: 'Confidential gynaecological consultations, PCOS screening, breast health awareness, and reproductive health guidance.',
+      totalSlots: 50,
+      bookedSlots: 50,
+      tags: ['Women Only', 'PCOS', 'Breast Health', 'Confidential'],
+      locations: [
+        { id: 31, name: 'Noida Community Science Lab', address: 'Sector 62, Noida', city: 'Noida', pinCode: '201309', distance: 3.4, slotsAvailable: 0 },
+        { id: 32, name: 'Global Excellence School', address: 'Sector 29, Noida', city: 'Noida', pinCode: '201303', distance: 7.2, slotsAvailable: 0 }
+      ]
+    },
+    {
+      id: 5,
+      name: 'Nutrition & Diet Planning Webinar',
+      specialty: 'Nutrition & Dietetics',
+      mode: 'Online',
+      date: '2026-03-22',
+      time: '11:00 AM – 12:30 PM',
+      duration: '90 Minutes',
+      doctor: 'Ms. Neha Gupta (Nutritionist)',
+      description: 'Learn to build a balanced diet, understand macronutrients, manage weight, and get a personalised diet roadmap.',
+      totalSlots: 200,
+      bookedSlots: 112,
+      tags: ['Free', 'Diet Planning', 'Weight Management', 'Personalised'],
+      meetLink: 'https://meet.ceekul.health/nutrition-march'
+    },
+    {
+      id: 6,
+      name: 'Paediatric Vaccination & Child Health Drive',
+      specialty: 'Paediatrics',
+      mode: 'Hybrid',
+      date: '2026-03-25',
+      time: '9:00 AM – 4:00 PM',
+      duration: 'Full Day',
+      doctor: 'Dr. Rajesh Khanna',
+      description: 'Vaccination drive for children aged 0–12 years, growth monitoring, developmental screening, and parent counselling.',
+      totalSlots: 100,
+      bookedSlots: 61,
+      tags: ['Children 0–12', 'Vaccination', 'Free', 'Growth Monitoring'],
+      locations: [
+        { id: 41, name: 'TechHub Training Center', address: 'Sector 18, Noida', city: 'Noida', pinCode: '201301', distance: 1.8, slotsAvailable: 18 },
+        { id: 42, name: 'Global Excellence School', address: 'Sector 29, Noida', city: 'Noida', pinCode: '201303', distance: 7.2, slotsAvailable: 12 },
+        { id: 43, name: 'Anjali Community Hall', address: 'Sector 40, Noida', city: 'Noida', pinCode: '201303', distance: 5.6, slotsAvailable: 9 }
+      ]
+    }
+  ];
 
-    // ── Camp Filters ─────────────────────────────────────────────────
-    campSearch = '';
-    campModeFilter = 'All';
-    campSpecFilter = 'All';
-    campCityFilter = 'All';
+  // ── Camp Filters ─────────────────────────────────────────────────
+  campSearch = '';
+  campModeFilter = 'All';
+  campSpecFilter = 'All';
+  campCityFilter = 'All';
 
-    campSpecialties = ['All', 'Endocrinology', 'Cardiology', 'Psychiatry & Psychology', 'Gynaecology', 'Paediatrics', 'Nutrition & Dietetics'];
-    campCities = ['All', 'Noida', 'Greater Noida'];
+  campSpecialties = ['All', 'Endocrinology', 'Cardiology', 'Psychiatry & Psychology', 'Gynaecology', 'Paediatrics', 'Nutrition & Dietetics'];
+  campCities = ['All', 'Noida', 'Greater Noida'];
 
-    filteredCamps = computed(() => {
-        const q = this.campSearch.toLowerCase();
-        return this.camps.filter(c => {
-            const matchQ = !q || c.name.toLowerCase().includes(q) || c.specialty.toLowerCase().includes(q) || c.doctor.toLowerCase().includes(q);
-            const matchMode = this.campModeFilter === 'All' || c.mode === this.campModeFilter;
-            const matchSpec = this.campSpecFilter === 'All' || c.specialty === this.campSpecFilter;
-            const matchCity = this.campCityFilter === 'All' || (c.locations || []).some(l => l.city === this.campCityFilter) || this.campCityFilter === 'All';
-            return matchQ && matchMode && matchSpec && matchCity;
-        });
+  filteredCamps = computed(() => {
+    const q = this.campSearch.toLowerCase();
+    return this.camps.filter(c => {
+      const matchQ = !q || c.name.toLowerCase().includes(q) || c.specialty.toLowerCase().includes(q) || c.doctor.toLowerCase().includes(q);
+      const matchMode = this.campModeFilter === 'All' || c.mode === this.campModeFilter;
+      const matchSpec = this.campSpecFilter === 'All' || c.specialty === this.campSpecFilter;
+      const matchCity = this.campCityFilter === 'All' || (c.locations || []).some(l => l.city === this.campCityFilter) || this.campCityFilter === 'All';
+      return matchQ && matchMode && matchSpec && matchCity;
     });
+  });
 
-    // ── Location Selection (per camp) ────────────────────────────────
-    private selectedLocations = new Map<number, number>(); // campId → locationId
-    openLocationsCamp: number | null = null;
+  // ── Location Selection (per camp) ────────────────────────────────
+  private selectedLocations = new Map<number, number>(); // campId → locationId
+  openLocationsCamp: number | null = null;
 
-    toggleLocations(campId: number) {
-        this.openLocationsCamp = this.openLocationsCamp === campId ? null : campId;
-    }
+  toggleLocations(campId: number) {
+    this.openLocationsCamp = this.openLocationsCamp === campId ? null : campId;
+  }
 
-    selectLocation(campId: number, locationId: number) {
-        this.selectedLocations.set(campId, locationId);
-    }
+  selectLocation(campId: number, locationId: number) {
+    this.selectedLocations.set(campId, locationId);
+  }
 
-    getSelectedLocation(campId: number): number | undefined {
-        return this.selectedLocations.get(campId);
-    }
+  getSelectedLocation(campId: number): number | undefined {
+    return this.selectedLocations.get(campId);
+  }
 
-    getLocationName(campId: number): string {
-        const camp = this.camps.find(c => c.id === campId);
-        const locId = this.selectedLocations.get(campId);
-        const loc = camp?.locations?.find(l => l.id === locId);
-        return loc ? `${loc.name}, ${loc.address}` : '';
-    }
+  getLocationName(campId: number): string {
+    const camp = this.camps.find(c => c.id === campId);
+    const locId = this.selectedLocations.get(campId);
+    const loc = camp?.locations?.find(l => l.id === locId);
+    return loc ? `${loc.name}, ${loc.address}` : '';
+  }
 
-    slotsLeft(camp: HealthCamp): number {
-        return camp.totalSlots - camp.bookedSlots;
-    }
+  slotsLeft(camp: HealthCamp): number {
+    return camp.totalSlots - camp.bookedSlots;
+  }
 
-    // ── Registration Modal ───────────────────────────────────────────
-    registrationModal = false;
-    selectedCamp: HealthCamp | null = null;
-    registeredCamps = new Set<number>();
+  // ── Registration Modal ───────────────────────────────────────────
+  registrationModal = false;
+  selectedCamp: HealthCamp | null = null;
+  registeredCamps = new Set<number>();
 
-    // Registration form fields
-    regName = '';
-    regPhone = '';
-    regEmail = '';
-    regAge: number | null = null;
-    regNotes = '';
-    regConsent = false;
+  // Registration form fields
+  regName = '';
+  regPhone = '';
+  regEmail = '';
+  regAge: number | null = null;
+  regNotes = '';
+  regConsent = false;
 
-    openRegistration(camp: HealthCamp) {
-        this.selectedCamp = camp;
-        this.registrationModal = true;
-        this.regName = ''; this.regPhone = ''; this.regEmail = '';
-        this.regAge = null; this.regNotes = ''; this.regConsent = false;
-    }
+  openRegistration(camp: HealthCamp) {
+    this.selectedCamp = camp;
+    this.registrationModal = true;
+    this.regName = ''; this.regPhone = ''; this.regEmail = '';
+    this.regAge = null; this.regNotes = ''; this.regConsent = false;
+  }
 
-    closeModal() {
-        this.registrationModal = false;
-        this.selectedCamp = null;
-    }
+  closeModal() {
+    this.registrationModal = false;
+    this.selectedCamp = null;
+  }
 
-    confirmRegistration() {
-        if (!this.selectedCamp) return;
-        const campId = this.selectedCamp.id;
-        this.registeredCamps.add(campId);
-        // Update bookedSlots
-        const camp = this.camps.find(c => c.id === campId);
-        if (camp) camp.bookedSlots = Math.min(camp.bookedSlots + 1, camp.totalSlots);
-        this.closeModal();
-    }
+  confirmRegistration() {
+    if (!this.selectedCamp) return;
+    const campId = this.selectedCamp.id;
+    this.registeredCamps.add(campId);
+    // Update bookedSlots
+    const camp = this.camps.find(c => c.id === campId);
+    if (camp) camp.bookedSlots = Math.min(camp.bookedSlots + 1, camp.totalSlots);
+    this.closeModal();
+  }
 
-    // ── Care Registration Form ───────────────────────────────────────
-    userType = '';
-    email = '';
-    phone = '';
-    password = '';
-    confirmPassword = '';
-    termsAgreed = false;
+  // ── Care Registration Form ───────────────────────────────────────
+  userType = '';
+  email = '';
+  phone = '';
+  password = '';
+  confirmPassword = '';
+  termsAgreed = false;
 
-    fullLegalName = '';
-    dateOfBirth = '';
-    gender = '';
-    preferredLanguage = '';
-    countryOfResidence = '';
-    currentAddress = '';
+  fullLegalName = '';
+  dateOfBirth = '';
+  gender = '';
+  preferredLanguage = '';
+  countryOfResidence = '';
+  currentAddress = '';
 
-    caregiverFullName = '';
-    caregiverRelationship = '';
-    dependentFullName = '';
-    dependentDOB = '';
-    dependentGender = '';
-    dependentLanguage = '';
-    dependentCountry = '';
-    dependentAddress = '';
+  caregiverFullName = '';
+  caregiverRelationship = '';
+  dependentFullName = '';
+  dependentDOB = '';
+  dependentGender = '';
+  dependentLanguage = '';
+  dependentCountry = '';
+  dependentAddress = '';
 
-    knownAllergies: string[] = [];
-    allergyOpts = ['Medications', 'Food', 'Environmental', 'Latex', 'Insect Stings', 'None', 'Other'];
-    currentMedications = '';
-    chronicConditions: string[] = [];
-    chronicOpts = ['Diabetes', 'Hypertension', 'Asthma', 'Heart Disease', 'Anxiety', 'Depression', 'Thyroid', 'None', 'Other'];
-    pastSurgeries = '';
-    familyHistory: string[] = [];
-    familyHistoryOpts = ['Heart Disease', 'Cancer', 'Diabetes', 'Stroke', 'Genetic Conditions', 'None', 'Other'];
-    smokingStatus = '';
-    alcoholConsumption = '';
-    physicalActivityLevel = '';
-    vaccinationStatus = '';
-    emergencyContactName = '';
-    emergencyContactPhone = '';
-    emergencyContactRelationship = '';
+  knownAllergies: string[] = [];
+  allergyOpts = ['Medications', 'Food', 'Environmental', 'Latex', 'Insect Stings', 'None', 'Other'];
+  currentMedications = '';
+  chronicConditions: string[] = [];
+  chronicOpts = ['Diabetes', 'Hypertension', 'Asthma', 'Heart Disease', 'Anxiety', 'Depression', 'Thyroid', 'None', 'Other'];
+  pastSurgeries = '';
+  familyHistory: string[] = [];
+  familyHistoryOpts = ['Heart Disease', 'Cancer', 'Diabetes', 'Stroke', 'Genetic Conditions', 'None', 'Other'];
+  smokingStatus = '';
+  alcoholConsumption = '';
+  physicalActivityLevel = '';
+  vaccinationStatus = '';
+  emergencyContactName = '';
+  emergencyContactPhone = '';
+  emergencyContactRelationship = '';
 
-    hasInsurance = '';
-    insuranceProvider = '';
-    policyNumber = '';
-    groupNumber = '';
-    consentToBillInsurance = false;
-    paymentMethodPreference = '';
-    financialAidRequestBrief = '';
-    paymentMethods = [
-        { val: 'card', label: 'Credit / Debit Card' },
-        { val: 'wallet', label: 'Digital Wallet' },
-        { val: 'bank', label: 'Bank Transfer' },
-        { val: 'aid', label: 'Financial Aid / Payment Plan' }
-    ];
+  hasInsurance = '';
+  insuranceProvider = '';
+  policyNumber = '';
+  groupNumber = '';
+  consentToBillInsurance = false;
+  paymentMethodPreference = '';
+  financialAidRequestBrief = '';
+  paymentMethods = [
+    { val: 'card', label: 'Credit / Debit Card' },
+    { val: 'wallet', label: 'Digital Wallet' },
+    { val: 'bank', label: 'Bank Transfer' },
+    { val: 'aid', label: 'Financial Aid / Payment Plan' }
+  ];
 
-    careModePreference = '';
-    reasonForVisit = '';
-    symptomList: string[] = [];
-    symptomOpts = ['Fever', 'Cough', 'Headache', 'Fatigue', 'Pain', 'Dizziness', 'Nausea', 'Mental Distress', 'Rash', 'Shortness of Breath', 'Other'];
-    symptomStartDate = '';
-    symptomSeverity = '';
-    preferredConsultationTime = '';
-    doctorGenderPreference = '';
-    specialtyPreference = '';
-    locationAccess = false;
-    preferredCenterLocation = '';
-    preferredInPersonTime = '';
-    doctorGenderPreferenceInPerson = '';
-    specialtyPreferenceInPerson = '';
-    kitTypeRequested = '';
-    deliveryAddress = '';
-    confirmSelfTest = false;
+  careModePreference = '';
+  reasonForVisit = '';
+  symptomList: string[] = [];
+  symptomOpts = ['Fever', 'Cough', 'Headache', 'Fatigue', 'Pain', 'Dizziness', 'Nausea', 'Mental Distress', 'Rash', 'Shortness of Breath', 'Other'];
+  symptomStartDate = '';
+  symptomSeverity = '';
+  preferredConsultationTime = '';
+  doctorGenderPreference = '';
+  specialtyPreference = '';
+  locationAccess = false;
+  preferredCenterLocation = '';
+  preferredInPersonTime = '';
+  doctorGenderPreferenceInPerson = '';
+  specialtyPreferenceInPerson = '';
+  kitTypeRequested = '';
+  deliveryAddress = '';
+  confirmSelfTest = false;
 
-    notificationPreference: string[] = [];
-    notificationOpts = ['SMS', 'Email', 'In-App Push Notifications'];
-    consentAutomatedReminders = false;
-    consentHealthTips = false;
-    optInForSurveys = false;
+  notificationPreference: string[] = [];
+  notificationOpts = ['SMS', 'Email', 'In-App Push Notifications'];
+  consentAutomatedReminders = false;
+  consentHealthTips = false;
+  optInForSurveys = false;
 
-    // ── Helpers ──────────────────────────────────────────────────────
-    toggle(arr: string[], value: string) {
-        const idx = arr.indexOf(value);
-        if (idx > -1) arr.splice(idx, 1);
-        else arr.push(value);
-    }
+  // ── Helpers ──────────────────────────────────────────────────────
+  toggle(arr: string[], value: string) {
+    const idx = arr.indexOf(value);
+    if (idx > -1) arr.splice(idx, 1);
+    else arr.push(value);
+  }
 
-    isIn(arr: string[], value: string): boolean {
-        return arr.includes(value);
-    }
+  isIn(arr: string[], value: string): boolean {
+    return arr.includes(value);
+  }
 
-    handleSubmit() {
-        console.log('Health Connect care registration submitted');
-    }
+  handleSubmit() {
+    console.log('Health Connect care registration submitted');
+  }
 }

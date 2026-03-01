@@ -7,7 +7,7 @@
 
     <!-- ══ Enrollment overlay ════════════════════════════════════════════════════ -->
     @if (showEnrollForm()) {
-    <app-enroll-workshop [workshop]="workshop()" [userRole]="userRole()" (enrolled)="onEnrolled($event)"
+    <app-enroll-workshop [workshop]="currentWorkshop()" [userRole]="userRole()" (enrolled)="onEnrolled($event)"
         (cancel)="showEnrollForm.set(false)">
     </app-enroll-workshop>
     } @else {
@@ -15,28 +15,44 @@
     <!-- ══ Workshop header ═══════════════════════════════════════════════════ -->
     <div class="wd-header">
         <div class="wd-header-badges">
-            <span class="wd-badge wd-badge--status" [class]="'wd-badge--' + workshop().status">
+            <span class="wd-badge wd-badge--status" [class]="'wd-badge--' + currentWorkshop().status">
                 {{ statusLabel }}
             </span>
-            <span class="wd-badge wd-badge--mode" [class.wd-badge--hybrid]="workshop().workshopMode === 'hybrid'">
+            <span class="wd-badge wd-badge--mode"
+                [class.wd-badge--hybrid]="currentWorkshop().workshopMode === 'hybrid'">
                 <i class="fas" [class]="modeIcon"></i> {{ modeLabel }}
             </span>
             <span class="wd-badge wd-badge--tz">
-                <i class="fas fa-globe"></i> {{ workshop().timezone }}
+                <i class="fas fa-globe"></i> {{ currentWorkshop().timezone }}
             </span>
         </div>
 
-        <h1 class="wd-title">{{ workshop().workshopTitle }}</h1>
+
+        <div class="wd-title-row">
+            <h1 class="wd-title">{{ currentWorkshop().workshopTitle }}</h1>
+            <div class="wd-actions">
+                @if ((isTeacher || isDirector) && currentWorkshop().status !== 'cancelled') {
+                <button type="button" class="wd-edit-info-btn" (click)="openEditInfoForm()" title="Edit Workshop Info">
+                    <i class="fas fa-edit"></i> Edit Info
+                </button>
+                <button type="button" class="wd-cancel-btn" (click)="onCancelWorkshop()" [disabled]="isCancelling()"
+                    title="Cancel Workshop">
+                    <i class="fas" [class]="isCancelling() ? 'fa-spinner fa-spin' : 'fa-ban'"></i>
+                    {{ isCancelling() ? 'Cancelling...' : 'Cancel Workshop' }}
+                </button>
+                }
+            </div>
+        </div>
 
         <div class="wd-header-meta">
             <span><i class="fas fa-user-tie"></i> {{ instructorLabel }}</span>
             <span><i class="fas fa-calendar-alt"></i> Created {{ formattedCreatedAt }}</span>
             <span><i class="fas fa-layer-group"></i>
-                {{ workshop().sessions.length }} Session{{ workshop().sessions.length !== 1 ? 's' : '' }}
+                {{ currentWorkshop().sessions.length }} Session{{ currentWorkshop().sessions.length !== 1 ? 's' : '' }}
             </span>
             <span class="wd-revenue">
                 <i class="fas fa-rupee-sign"></i>
-                {{ workshop().totalRevenuePotential | number:'1.0-0' }} revenue potential
+                {{ currentWorkshop().totalRevenuePotential | number:'1.0-0' }} revenue potential
             </span>
         </div>
     </div>
@@ -47,13 +63,13 @@
             <h3 class="wd-info-title">
                 <i class="fas fa-info-circle"></i> About This Workshop
             </h3>
-            <p class="wd-info-text">{{ workshop().workshopDescription }}</p>
+            <p class="wd-info-text">{{ currentWorkshop().workshopDescription }}</p>
         </div>
         <div class="wd-info-card">
             <h3 class="wd-info-title">
                 <i class="fas fa-user-graduate"></i> Expert Background
             </h3>
-            <p class="wd-info-text">{{ workshop().expertDescription }}</p>
+            <p class="wd-info-text">{{ currentWorkshop().expertDescription }}</p>
         </div>
     </div>
 
@@ -331,5 +347,104 @@
     }
 
     }<!-- end enrollment overlay check -->
+
+    <!-- ══ Edit Info Modal ═══════════════════════════════════════════════════ -->
+    @if (isEditingInfo()) {
+    <div class="wd-modal-overlay">
+        <div class="wd-modal-card">
+            <div class="wd-modal-header">
+                <h2><i class="fas fa-edit"></i> Edit Workshop Information</h2>
+                <button type="button" class="wd-modal-close" (click)="cancelEditInfo()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form [formGroup]="editInfoForm" (ngSubmit)="onSaveInfo()" class="wd-modal-form">
+
+                <div class="wd-field">
+                    <label class="wd-label">Workshop Title *</label>
+                    <input type="text" class="wd-input" formControlName="workshopTitle"
+                        placeholder="Enter a descriptive title"
+                        [class.is-error]="editInfoForm.get('workshopTitle')?.invalid && editInfoForm.get('workshopTitle')?.touched">
+                    @if (infoFieldError('workshopTitle', 'required')) { <div class="wd-error">Title is required</div> }
+                    @if (infoFieldError('workshopTitle', 'minlength')) { <div class="wd-error">Minimum 5 characters
+                    </div> }
+                </div>
+
+                <div class="wd-field">
+                    <label class="wd-label">Workshop Description *</label>
+                    <textarea class="wd-input wd-textarea" formControlName="workshopDescription" rows="4"
+                        placeholder="What will students learn?"
+                        [class.is-error]="editInfoForm.get('workshopDescription')?.invalid && editInfoForm.get('workshopDescription')?.touched"></textarea>
+                    @if (infoFieldError('workshopDescription', 'required')) { <div class="wd-error">Description is
+                        required</div> }
+                    @if (infoFieldError('workshopDescription', 'minlength')) { <div class="wd-error">Minimum 20
+                        characters</div> }
+                </div>
+
+                <div class="wd-field">
+                    <label class="wd-label">Expert Description *</label>
+                    <textarea class="wd-input wd-textarea" formControlName="expertDescription" rows="3"
+                        placeholder="Your background and expertise"
+                        [class.is-error]="editInfoForm.get('expertDescription')?.invalid && editInfoForm.get('expertDescription')?.touched"></textarea>
+                    @if (infoFieldError('expertDescription', 'required')) { <div class="wd-error">Expert bio is required
+                    </div> }
+                    @if (infoFieldError('expertDescription', 'minlength')) { <div class="wd-error">Minimum 20 characters
+                    </div> }
+                </div>
+
+                <div class="wd-form-grid wd-form-grid--2">
+                    <div class="wd-field">
+                        <label class="wd-label">Workshop Mode *</label>
+                        <select class="wd-input wd-select" formControlName="workshopMode">
+                            <option value="online">Online</option>
+                            <option value="hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="wd-field">
+                        <label class="wd-label">Timezone *</label>
+                        <select class="wd-input wd-select" formControlName="timezone">
+                            @for (tz of timezones; track tz.key) {
+                            <option [value]="tz.key">{{ tz.label }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="wd-form-grid wd-form-grid--2">
+                    <div class="wd-field">
+                        <label class="wd-label">Instructor Type *</label>
+                        <select class="wd-input wd-select" formControlName="instructorType">
+                            <option value="myself">Myself (Solo)</option>
+                            <option value="open">Open to Instructors</option>
+                        </select>
+                    </div>
+                    <div class="wd-field">
+                        <label class="wd-label">Status *</label>
+                        <select class="wd-input wd-select" formControlName="status">
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="wd-modal-footer">
+                    <button type="button" class="wd-btn wd-btn--cancel" (click)="cancelEditInfo()">Cancel</button>
+                    <button type="submit" class="wd-btn wd-btn--submit"
+                        [disabled]="editInfoForm.invalid || isSavingInfo()">
+                        @if (isSavingInfo()) {
+                        <i class="fas fa-spinner fa-spin"></i> Saving...
+                        } @else {
+                        <i class="fas fa-save"></i> Save Changes
+                        }
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    }
 
 </div>

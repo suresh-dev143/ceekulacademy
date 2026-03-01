@@ -185,7 +185,7 @@
 
     &:hover {
         border-color: var(--accent-primary);
-        background: rgba(240, 142, 56, 0.05);
+        background: color-mix(in srgb, #f08e38, transparent 95%);
 
         h3 {
             color: var(--accent-primary);

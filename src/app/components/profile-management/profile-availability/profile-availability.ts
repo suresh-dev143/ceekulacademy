@@ -43,7 +43,7 @@ import { CommonModule } from '@angular/common';
         align-items: center;
         .day-name { font-weight: 700; color: #fff; }
         .slots { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .slot-tag { background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.7); padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .slot-tag { background: color-mix(in srgb, #fff, transparent 95%); color: color-mix(in srgb, #fff, transparent 30%); padding: 0.3rem 0.8rem; border-radius: 8px; font-size: 0.8rem; border: 1px solid color-mix(in srgb, #fff, transparent 90%); }
       }
     }
     .empty-state { text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.4); 

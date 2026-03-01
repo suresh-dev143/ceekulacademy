@@ -43,14 +43,14 @@ import { CommonModule } from '@angular/common';
       .avatar {
         width: 120px;
         height: 120px;
-        background: rgba(255, 255, 255, 0.05);
+        background: color-mix(in srgb, #fff, transparent 95%);
         border: 2px solid rgba(102, 126, 234, 0.3);
         border-radius: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 4rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 10px 30px color-mix(in srgb, #000, transparent 70%);
       }
       .change-photo-btn {
         position: absolute;
@@ -104,13 +104,13 @@ import { CommonModule } from '@angular/common';
         justify-content: space-between;
         font-size: 0.8rem;
         font-weight: 700;
-        color: rgba(255, 255, 255, 0.5);
+        color: color-mix(in srgb, #fff, transparent 50%);
         margin-bottom: 0.5rem;
         .percentage { color: #10b981; }
       }
       .progress-bar {
         height: 8px;
-        background: rgba(255, 255, 255, 0.05);
+        background: color-mix(in srgb, #fff, transparent 95%);
         border-radius: 100px;
         overflow: hidden;
         .progress-fill {

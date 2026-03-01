@@ -81,7 +81,7 @@ import { NearbyInfrastructure } from '../../../services/student-discovery.servic
     .btn-accent-sm { flex: 1.2; background: #000000; color: var(--text-primary); border: 1px solid var(--accent-primary); padding: 0.75rem; border-radius: 0; font-size: 0.85rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: 0.2s; &:hover { background: var(--accent-primary); color: #000000; } }
     .btn-ghost-sm { flex: 0.8; background: transparent; border: 1px solid var(--row-border); color: var(--text-secondary); padding: 0.75rem; border-radius: 0; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; &:hover { border-color: var(--accent-primary); color: var(--text-primary); } }
 
-    .empty-state { padding: 3rem; text-align: center; color: rgba(255, 255, 255, 0.3); font-weight: 600; }
+    .empty-state { padding: 3rem; text-align: center; color: color-mix(in srgb, #fff, transparent 70%); font-weight: 600; }
   `]
 })
 export class StudentInfrastructureDiscoveryComponent {

@@ -4,22 +4,22 @@
 // ═══════════════════════════════════════════════════════════════
 
 // ── Design tokens ─────────────────────────────────────────────
-$accent:       #ef9d57;
-$green:        #22c55e;
-$amber:        #f59e0b;
-$red:          #ef4444;
-$gray:         #6b7280;
-$inclusion:    #c084fc;
-$research:     #60a5fa;
-$innovation:   #ef9d57;
-$digital:      #22c55e;
+$accent: #ef9d57;
+$green: #22c55e;
+$amber: #f59e0b;
+$red: #ef4444;
+$gray: #6b7280;
+$inclusion: #c084fc;
+$research: #60a5fa;
+$innovation: #ef9d57;
+$digital: #22c55e;
 $civilization: #fbbf24;
 
-$bg0:     #000000;
-$bg1:     #060606;
-$bg2:     #0d0d0d;
-$border:  rgba(255, 255, 255, 0.05);
-$borderA: rgba(239, 157, 87, 0.18);
+$bg0: #000000;
+$bg1: #060606;
+$bg2: #0d0d0d;
+$border: color-mix(in srgb, #fff, transparent 95%);
+$borderA: color-mix(in srgb, #ef9d57, transparent 82%);
 
 // ── FULL-PAGE CONTAINER ───────────────────────────────────────
 .centers-page {
@@ -57,10 +57,10 @@ $borderA: rgba(239, 157, 87, 0.18);
         .cmd-title {
             font-size: 0.6rem;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.3);
+            color: color-mix(in srgb, #fff, transparent 70%);
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 1px solid color-mix(in srgb, #fff, transparent 90%);
             padding-left: 0.75rem;
         }
     }
@@ -91,13 +91,13 @@ $borderA: rgba(239, 157, 87, 0.18);
         .cmd-time {
             font-size: 0.72rem;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.6);
+            color: color-mix(in srgb, #fff, transparent 40%);
             font-variant-numeric: tabular-nums;
         }
 
         .cmd-upd {
             font-size: 0.6rem;
-            color: rgba(255, 255, 255, 0.22);
+            color: color-mix(in srgb, #fff, transparent 78%);
             border-left: 1px solid $border;
             padding-left: 0.75rem;
         }
@@ -106,7 +106,7 @@ $borderA: rgba(239, 157, 87, 0.18);
 
 // ── SEARCH ROW ────────────────────────────────────────────────
 .search-row {
-    background: rgba(10, 10, 10, 0.9);
+    background: color-mix(in srgb, #0a0a0a, transparent 10%);
     border-bottom: 1px solid $borderA;
     display: flex;
     align-items: center;
@@ -128,7 +128,10 @@ $borderA: rgba(239, 157, 87, 0.18);
             font-family: inherit;
             padding: 0 1.25rem;
             outline: none;
-            &::placeholder { color: rgba(255, 255, 255, 0.2); }
+
+            &::placeholder {
+                color: color-mix(in srgb, #fff, transparent 80%);
+            }
         }
 
         .search-btn {
@@ -143,14 +146,17 @@ $borderA: rgba(239, 157, 87, 0.18);
             align-items: center;
             justify-content: center;
             transition: background 0.2s;
-            &:hover { background: #d9864a; }
+
+            &:hover {
+                background: #d9864a;
+            }
         }
     }
 
     .back-btn {
         padding: 0 1rem;
         height: 100%;
-        background: rgba($accent, 0.1);
+        background: color-mix(in srgb, $accent, transparent 90%);
         border: none;
         border-left: 1px solid $borderA;
         color: $accent;
@@ -164,7 +170,10 @@ $borderA: rgba(239, 157, 87, 0.18);
         gap: 0.4rem;
         white-space: nowrap;
         transition: background 0.2s;
-        &:hover { background: rgba($accent, 0.2); }
+
+        &:hover {
+            background: color-mix(in srgb, $accent, transparent 80%);
+        }
     }
 }
 
@@ -182,19 +191,40 @@ $borderA: rgba(239, 157, 87, 0.18);
     overflow-x: hidden;
     min-height: 0;
     scrollbar-width: thin;
-    scrollbar-color: rgba($accent, 0.15) transparent;
-    &::-webkit-scrollbar { width: 3px; }
-    &::-webkit-scrollbar-thumb { background: rgba($accent, 0.2); }
+    scrollbar-color: color-mix(in srgb, $accent, transparent 85%) transparent;
+
+    &::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: color-mix(in srgb, $accent, transparent 80%);
+    }
 }
 
-.cp-left   { background: $bg1; border-right: 1px solid $border; }
-.cp-center { background: $bg0; border-right: 1px solid $border; }
-.cp-right  {
+.cp-left {
+    background: $bg1;
+    border-right: 1px solid $border;
+}
+
+.cp-center {
+    background: $bg0;
+    border-right: 1px solid $border;
+}
+
+.cp-right {
     background: $bg1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    app-chat-panel { flex: 1; display: flex; flex-direction: column; min-height: 0; height: 100%; }
+
+    app-chat-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        height: 100%;
+    }
 }
 
 // ── SHARED COLUMN HEADER ──────────────────────────────────────
@@ -218,12 +248,15 @@ $borderA: rgba(239, 157, 87, 0.18);
         display: flex;
         align-items: center;
         gap: 0.4rem;
-        i { font-size: 0.68rem; }
+
+        i {
+            font-size: 0.68rem;
+        }
     }
 
     .col-strip-sub {
         font-size: 0.58rem;
-        color: rgba(255, 255, 255, 0.22);
+        color: color-mix(in srgb, #fff, transparent 78%);
     }
 }
 
@@ -231,10 +264,10 @@ $borderA: rgba(239, 157, 87, 0.18);
     padding: 0.35rem 0.9rem;
     font-size: 0.5rem;
     font-weight: 800;
-    color: rgba(255, 255, 255, 0.2);
+    color: color-mix(in srgb, #fff, transparent 80%);
     letter-spacing: 2px;
     text-transform: uppercase;
-    background: rgba(255, 255, 255, 0.02);
+    background: color-mix(in srgb, #fff, transparent 98%);
     border-bottom: 1px solid $border;
 }
 
@@ -243,17 +276,21 @@ $borderA: rgba(239, 157, 87, 0.18);
     padding: 0.45rem 1rem;
     font-size: 0.6rem;
     font-weight: 800;
-    color: rgba(255, 255, 255, 0.35);
+    color: color-mix(in srgb, #fff, transparent 65%);
     letter-spacing: 2px;
     text-transform: uppercase;
-    background: rgba(255, 255, 255, 0.02);
+    background: color-mix(in srgb, #fff, transparent 98%);
     border-bottom: 1px solid $border;
     border-top: 1px solid $border;
     display: flex;
     align-items: center;
     gap: 0.45rem;
     margin-top: 0.25rem;
-    i { font-size: 0.65rem; color: $accent; }
+
+    i {
+        font-size: 0.65rem;
+        color: $accent;
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -278,7 +315,7 @@ $borderA: rgba(239, 157, 87, 0.18);
             .cis-lbl {
                 font-size: 0.5rem;
                 font-weight: 800;
-                color: rgba(255, 255, 255, 0.25);
+                color: color-mix(in srgb, #fff, transparent 75%);
                 letter-spacing: 1.5px;
                 text-transform: uppercase;
             }
@@ -292,11 +329,14 @@ $borderA: rgba(239, 157, 87, 0.18);
 
             .cis-sub {
                 font-size: 0.55rem;
-                color: rgba(255, 255, 255, 0.3);
+                color: color-mix(in srgb, #fff, transparent 70%);
                 display: flex;
                 align-items: center;
                 gap: 0.3rem;
-                i { font-size: 0.6rem; }
+
+                i {
+                    font-size: 0.6rem;
+                }
             }
         }
     }
@@ -312,18 +352,18 @@ $borderA: rgba(239, 157, 87, 0.18);
         height: auto;
 
         .r-grid {
-            fill: rgba(255, 255, 255, 0.02);
-            stroke: rgba(255, 255, 255, 0.06);
+            fill: color-mix(in srgb, #fff, transparent 98%);
+            stroke: color-mix(in srgb, #fff, transparent 94%);
             stroke-width: 0.5;
         }
 
         .r-axis {
-            stroke: rgba(255, 255, 255, 0.08);
+            stroke: color-mix(in srgb, #fff, transparent 92%);
             stroke-width: 0.5;
         }
 
         .r-data {
-            fill: rgba(239, 157, 87, 0.12);
+            fill: color-mix(in srgb, #ef9d57, transparent 88%);
             stroke: $accent;
             stroke-width: 1.5;
         }
@@ -331,7 +371,7 @@ $borderA: rgba(239, 157, 87, 0.18);
         .r-lbl {
             font-size: 8px;
             font-weight: 700;
-            fill: rgba(255, 255, 255, 0.35);
+            fill: color-mix(in srgb, #fff, transparent 65%);
             font-family: 'Inter', sans-serif;
             letter-spacing: 0.5px;
         }
@@ -354,7 +394,7 @@ $borderA: rgba(239, 157, 87, 0.18);
         flex-direction: column;
         align-items: center;
         padding: 0.2rem 0.1rem;
-        background: rgba(255, 255, 255, 0.02);
+        background: color-mix(in srgb, #fff, transparent 98%);
         border: 1px solid $border;
 
         .cc-lbl {
@@ -377,14 +417,19 @@ $borderA: rgba(239, 157, 87, 0.18);
 .cis-ai-summary {
     margin-top: 0.5rem;
     font-size: 0.62rem;
-    color: rgba(255, 255, 255, 0.45);
+    color: color-mix(in srgb, #fff, transparent 55%);
     line-height: 1.5;
     padding: 0.4rem 0.5rem;
-    background: rgba(239, 157, 87, 0.04);
-    border-left: 2px solid rgba($accent, 0.3);
+    background: color-mix(in srgb, #ef9d57, transparent 96%);
+    border-left: 2px solid color-mix(in srgb, $accent, transparent 70%);
     display: flex;
     gap: 0.35rem;
-    i { flex-shrink: 0; margin-top: 2px; font-size: 0.6rem; }
+
+    i {
+        flex-shrink: 0;
+        margin-top: 2px;
+        font-size: 0.6rem;
+    }
 }
 
 // Metric sections
@@ -402,7 +447,10 @@ $borderA: rgba(239, 157, 87, 0.18);
         display: flex;
         align-items: center;
         gap: 0.35rem;
-        i { font-size: 0.6rem; }
+
+        i {
+            font-size: 0.6rem;
+        }
     }
 
     .ms-grid {
@@ -414,7 +462,12 @@ $borderA: rgba(239, 157, 87, 0.18);
             display: flex;
             flex-direction: column;
 
-            &.full { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 0.5rem; }
+            &.full {
+                grid-column: 1 / -1;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5rem;
+            }
 
             .ms-val {
                 font-size: 0.9rem;
@@ -425,7 +478,7 @@ $borderA: rgba(239, 157, 87, 0.18);
 
             .ms-lbl {
                 font-size: 0.48rem;
-                color: rgba(255, 255, 255, 0.25);
+                color: color-mix(in srgb, #fff, transparent 75%);
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
@@ -439,19 +492,28 @@ $borderA: rgba(239, 157, 87, 0.18);
         display: flex;
         align-items: center;
         gap: 0.3rem;
-        i { font-size: 0.55rem; }
+
+        i {
+            font-size: 0.55rem;
+        }
     }
 }
 
 // Per-center compact CIS cards
-.left-list { display: flex; flex-direction: column; }
+.left-list {
+    display: flex;
+    flex-direction: column;
+}
 
 .left-card {
     padding: 0.5rem 0.9rem;
     border-bottom: 1px solid $border;
     cursor: pointer;
     transition: background 0.15s;
-    &:hover { background: rgba(255, 255, 255, 0.025); }
+
+    &:hover {
+        background: color-mix(in srgb, #fff, transparent 97.5%);
+    }
 
     .lc-head {
         display: flex;
@@ -460,7 +522,7 @@ $borderA: rgba(239, 157, 87, 0.18);
         margin-bottom: 0.25rem;
 
         .lc-cc {
-            background: rgba($accent, 0.12);
+            background: color-mix(in srgb, $accent, transparent 88%);
             color: $accent;
             font-size: 0.5rem;
             font-weight: 900;
@@ -479,7 +541,10 @@ $borderA: rgba(239, 157, 87, 0.18);
             text-overflow: ellipsis;
         }
 
-        i { font-size: 0.6rem; flex-shrink: 0; }
+        i {
+            font-size: 0.6rem;
+            flex-shrink: 0;
+        }
 
         .lc-score {
             font-size: 0.95rem;
@@ -497,7 +562,7 @@ $borderA: rgba(239, 157, 87, 0.18);
 
         .lcb-track {
             height: 3px;
-            background: rgba(255, 255, 255, 0.05);
+            background: color-mix(in srgb, #fff, transparent 95%);
 
             .lcb-fill {
                 height: 100%;
@@ -521,7 +586,7 @@ $borderA: rgba(239, 157, 87, 0.18);
         gap: 0.7rem;
         padding: 0.65rem 0.9rem;
         border-bottom: 1px solid $border;
-        background: rgba($accent, 0.04);
+        background: color-mix(in srgb, $accent, transparent 96%);
 
         .pv-cc {
             background: $accent;
@@ -549,13 +614,18 @@ $borderA: rgba(239, 157, 87, 0.18);
 
             .pv-dir {
                 font-size: 0.62rem;
-                color: rgba(255, 255, 255, 0.45);
-                i { color: $accent; font-size: 0.58rem; margin-right: 0.25rem; }
+                color: color-mix(in srgb, #fff, transparent 55%);
+
+                i {
+                    color: $accent;
+                    font-size: 0.58rem;
+                    margin-right: 0.25rem;
+                }
             }
 
             .pv-meta {
                 font-size: 0.55rem;
-                color: rgba(255, 255, 255, 0.25);
+                color: color-mix(in srgb, #fff, transparent 75%);
                 letter-spacing: 0.3px;
             }
         }
@@ -566,7 +636,7 @@ $borderA: rgba(239, 157, 87, 0.18);
     padding: 1.5rem;
     text-align: center;
     font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.2);
+    color: color-mix(in srgb, #fff, transparent 80%);
     font-style: italic;
 }
 
@@ -588,22 +658,38 @@ $borderA: rgba(239, 157, 87, 0.18);
         padding: 0.65rem 0.4rem;
         border-right: 1px solid $border;
         color: #fff;
-        &:last-child { border-right: none; }
-        &.tks-accent .tks-big { color: $accent; }
-        &.green .tks-big { color: $green; }
-        &.amber .tks-big { color: $amber; }
+
+        &:last-child {
+            border-right: none;
+        }
+
+        &.tks-accent .tks-big {
+            color: $accent;
+        }
+
+        &.green .tks-big {
+            color: $green;
+        }
+
+        &.amber .tks-big {
+            color: $amber;
+        }
 
         .tks-big {
             font-size: 1.7rem;
             font-weight: 900;
             line-height: 1;
             font-variant-numeric: tabular-nums;
-            .tks-of { font-size: 0.9rem; opacity: 0.4; }
+
+            .tks-of {
+                font-size: 0.9rem;
+                opacity: 0.4;
+            }
         }
 
         .tks-lbl {
             font-size: 0.52rem;
-            color: rgba(255, 255, 255, 0.3);
+            color: color-mix(in srgb, #fff, transparent 70%);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-top: 0.2rem;
@@ -624,7 +710,10 @@ $borderA: rgba(239, 157, 87, 0.18);
         border-bottom: 1px solid $border;
         align-items: flex-start;
         transition: background 0.15s;
-        &:hover { background: rgba(255, 255, 255, 0.02); }
+
+        &:hover {
+            background: color-mix(in srgb, #fff, transparent 98%);
+        }
 
         .feed-type {
             font-size: 0.55rem;
@@ -638,7 +727,10 @@ $borderA: rgba(239, 157, 87, 0.18);
             gap: 0.25rem;
             flex-shrink: 0;
             white-space: nowrap;
-            i { font-size: 0.55rem; }
+
+            i {
+                font-size: 0.55rem;
+            }
         }
 
         .feed-body {
@@ -663,10 +755,34 @@ $borderA: rgba(239, 157, 87, 0.18);
                 font-size: 0.58rem;
                 flex-wrap: wrap;
 
-                .feed-center { color: $accent; font-weight: 700; }
-                .feed-pax, .feed-female { color: rgba(255, 255, 255, 0.35); display: flex; align-items: center; gap: 0.2rem; i { font-size: 0.52rem; } }
-                .feed-inc { font-weight: 700; font-size: 0.55rem; text-transform: uppercase; }
-                .feed-ago { color: rgba(255, 255, 255, 0.22); margin-left: auto; white-space: nowrap; }
+                .feed-center {
+                    color: $accent;
+                    font-weight: 700;
+                }
+
+                .feed-pax,
+                .feed-female {
+                    color: color-mix(in srgb, #fff, transparent 65%);
+                    display: flex;
+                    align-items: center;
+                    gap: 0.2rem;
+
+                    i {
+                        font-size: 0.52rem;
+                    }
+                }
+
+                .feed-inc {
+                    font-weight: 700;
+                    font-size: 0.55rem;
+                    text-transform: uppercase;
+                }
+
+                .feed-ago {
+                    color: color-mix(in srgb, #fff, transparent 78%);
+                    margin-left: auto;
+                    white-space: nowrap;
+                }
             }
         }
     }
@@ -683,19 +799,19 @@ $borderA: rgba(239, 157, 87, 0.18);
         display: block;
 
         .map-grid {
-            stroke: rgba(255, 255, 255, 0.03);
+            stroke: color-mix(in srgb, #fff, transparent 97%);
             stroke-width: 0.5;
         }
 
         .map-land {
-            fill: rgba(255, 255, 255, 0.04);
-            stroke: rgba(255, 255, 255, 0.08);
+            fill: color-mix(in srgb, #fff, transparent 96%);
+            stroke: color-mix(in srgb, #fff, transparent 92%);
             stroke-width: 0.5;
         }
 
         .map-label {
             font-size: 6px;
-            fill: rgba(255, 255, 255, 0.4);
+            fill: color-mix(in srgb, #fff, transparent 60%);
             font-family: 'Inter', sans-serif;
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -703,7 +819,7 @@ $borderA: rgba(239, 157, 87, 0.18);
 
         .map-title {
             font-size: 6px;
-            fill: rgba(239, 157, 87, 0.5);
+            fill: color-mix(in srgb, #ef9d57, transparent 50%);
             font-family: 'Inter', sans-serif;
             font-weight: 800;
             letter-spacing: 1px;
@@ -726,7 +842,10 @@ $borderA: rgba(239, 157, 87, 0.18);
         border-right: 1px solid $border;
         gap: 0.15rem;
         text-align: center;
-        &:last-child { border-right: none; }
+
+        &:last-child {
+            border-right: none;
+        }
 
         .uc-big {
             font-size: 1.6rem;
@@ -735,11 +854,14 @@ $borderA: rgba(239, 157, 87, 0.18);
             font-variant-numeric: tabular-nums;
         }
 
-        i { font-size: 0.68rem; opacity: 0.7; }
+        i {
+            font-size: 0.68rem;
+            opacity: 0.7;
+        }
 
         .uc-lbl {
             font-size: 0.5rem;
-            color: rgba(255, 255, 255, 0.25);
+            color: color-mix(in srgb, #fff, transparent 75%);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             line-height: 1.3;
@@ -759,7 +881,10 @@ $borderA: rgba(239, 157, 87, 0.18);
         padding: 0.5rem 1rem;
         border-bottom: 1px solid $border;
         align-items: flex-start;
-        &:last-child { border-bottom: none; }
+
+        &:last-child {
+            border-bottom: none;
+        }
 
         .rs-novelty {
             font-size: 1.1rem;
@@ -789,13 +914,21 @@ $borderA: rgba(239, 157, 87, 0.18);
                 gap: 0.6rem;
                 font-size: 0.58rem;
 
-                .rs-center { color: $accent; font-weight: 700; }
+                .rs-center {
+                    color: $accent;
+                    font-weight: 700;
+                }
+
                 .rs-cat {
-                    color: rgba(255, 255, 255, 0.3);
-                    background: rgba(255, 255, 255, 0.04);
+                    color: color-mix(in srgb, #fff, transparent 70%);
+                    background: color-mix(in srgb, #fff, transparent 96%);
                     padding: 0.05rem 0.3rem;
                 }
-                .rs-ago { margin-left: auto; color: rgba(255, 255, 255, 0.22); }
+
+                .rs-ago {
+                    margin-left: auto;
+                    color: color-mix(in srgb, #fff, transparent 78%);
+                }
             }
         }
     }
@@ -819,14 +952,14 @@ $borderA: rgba(239, 157, 87, 0.18);
                 position: absolute;
                 transform: translateX(-50%);
                 font-size: 0.5rem;
-                color: rgba(255, 255, 255, 0.2);
+                color: color-mix(in srgb, #fff, transparent 80%);
                 top: 0;
             }
         }
 
         .pm-track {
             height: 14px;
-            background: rgba(255, 255, 255, 0.05);
+            background: color-mix(in srgb, #fff, transparent 95%);
             position: relative;
             overflow: hidden;
 
@@ -851,7 +984,7 @@ $borderA: rgba(239, 157, 87, 0.18);
 
             .pm-sub {
                 font-size: 0.55rem;
-                color: rgba(255, 255, 255, 0.22);
+                color: color-mix(in srgb, #fff, transparent 78%);
                 text-align: right;
             }
         }
@@ -862,11 +995,11 @@ $borderA: rgba(239, 157, 87, 0.18);
 .ai-summary {
     padding: 0.6rem 1rem;
     font-size: 0.68rem;
-    color: rgba(255, 255, 255, 0.45);
+    color: color-mix(in srgb, #fff, transparent 55%);
     line-height: 1.55;
-    background: rgba(239, 157, 87, 0.03);
+    background: color-mix(in srgb, #ef9d57, transparent 97%);
     border-bottom: 1px solid $border;
-    border-left: 3px solid rgba($accent, 0.3);
+    border-left: 3px solid color-mix(in srgb, $accent, transparent 70%);
 }
 
 // AI Advisor Panel
@@ -882,7 +1015,7 @@ $borderA: rgba(239, 157, 87, 0.18);
         display: flex;
         gap: 0.6rem;
         padding: 0.45rem 0.65rem;
-        background: rgba(255, 255, 255, 0.02);
+        background: color-mix(in srgb, #fff, transparent 98%);
         border-left: 3px solid;
 
         .ap-icon {
@@ -925,7 +1058,7 @@ $borderA: rgba(239, 157, 87, 0.18);
 
             .ap-message {
                 font-size: 0.65rem;
-                color: rgba(255, 255, 255, 0.5);
+                color: color-mix(in srgb, #fff, transparent 50%);
                 line-height: 1.4;
             }
         }
@@ -954,7 +1087,10 @@ $borderA: rgba(239, 157, 87, 0.18);
             display: flex;
             align-items: center;
             gap: 0.3rem;
-            i { font-size: 0.58rem; }
+
+            i {
+                font-size: 0.58rem;
+            }
         }
     }
 
@@ -968,20 +1104,27 @@ $borderA: rgba(239, 157, 87, 0.18);
 
     .ctc-impact {
         font-size: 0.68rem;
-        color: rgba(255, 255, 255, 0.45);
+        color: color-mix(in srgb, #fff, transparent 55%);
         margin-bottom: 0.45rem;
         display: flex;
         align-items: flex-start;
         gap: 0.3rem;
-        i { flex-shrink: 0; margin-top: 2px; }
+
+        i {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
     }
 
     .ctc-score-bar {
         height: 6px;
-        background: rgba(255, 255, 255, 0.06);
+        background: color-mix(in srgb, #fff, transparent 94%);
         margin-bottom: 0.3rem;
 
-        .ctc-fill { height: 100%; transition: width 0.5s; }
+        .ctc-fill {
+            height: 100%;
+            transition: width 0.5s;
+        }
     }
 
     .ctc-score-info {
@@ -990,15 +1133,20 @@ $borderA: rgba(239, 157, 87, 0.18);
         gap: 1rem;
         font-size: 0.62rem;
 
-        .ctc-learners, .ctc-time {
-            color: rgba(255, 255, 255, 0.3);
+        .ctc-learners,
+        .ctc-time {
+            color: color-mix(in srgb, #fff, transparent 70%);
             display: flex;
             align-items: center;
             gap: 0.3rem;
-            i { color: $accent; font-size: 0.58rem; }
+
+            i {
+                color: $accent;
+                font-size: 0.58rem;
+            }
         }
 
-        > span:first-child {
+        >span:first-child {
             font-size: 1rem;
             font-weight: 900;
             font-variant-numeric: tabular-nums;
@@ -1021,7 +1169,12 @@ $borderA: rgba(239, 157, 87, 0.18);
         align-items: flex-start;
         gap: 0.35rem;
         line-height: 1.4;
-        i { flex-shrink: 0; margin-top: 2px; font-size: 0.58rem; }
+
+        i {
+            flex-shrink: 0;
+            margin-top: 2px;
+            font-size: 0.58rem;
+        }
     }
 }
 
@@ -1037,7 +1190,7 @@ $borderA: rgba(239, 157, 87, 0.18);
         .cmp-lbl {
             font-size: 0.55rem;
             font-weight: 800;
-            color: rgba(255, 255, 255, 0.3);
+            color: color-mix(in srgb, #fff, transparent 70%);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 0.2rem;
@@ -1056,19 +1209,22 @@ $borderA: rgba(239, 157, 87, 0.18);
 
                 .cmp-tag {
                     font-size: 0.52rem;
-                    color: rgba(255, 255, 255, 0.25);
+                    color: color-mix(in srgb, #fff, transparent 75%);
                     min-width: 40px;
                 }
 
                 .cmp-track {
                     flex: 1;
                     height: 4px;
-                    background: rgba(255, 255, 255, 0.05);
+                    background: color-mix(in srgb, #fff, transparent 95%);
 
-                    .cmp-fill { height: 100%; transition: width 0.4s; }
+                    .cmp-fill {
+                        height: 100%;
+                        transition: width 0.4s;
+                    }
                 }
 
-                > span:last-child {
+                >span:last-child {
                     font-size: 0.65rem;
                     font-weight: 800;
                     min-width: 36px;
@@ -1085,8 +1241,17 @@ $borderA: rgba(239, 157, 87, 0.18);
 // ═══════════════════════════════════════════════════════════════
 
 @keyframes blink {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.3; transform: scale(0.7); }
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.3;
+        transform: scale(0.7);
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1094,20 +1259,68 @@ $borderA: rgba(239, 157, 87, 0.18);
 // ═══════════════════════════════════════════════════════════════
 
 @media (max-width: 1200px) {
-    .cp-grid { grid-template-columns: 1fr 1fr; overflow-y: auto; height: auto; }
-    .cp-left  { overflow-y: visible; height: auto; }
-    .cp-center { grid-column: 1 / -1; overflow-y: visible; height: auto; }
-    .cp-right  { grid-column: 1 / -1; height: 600px; overflow: hidden; }
-    .today-kpi-strip { grid-template-columns: repeat(3, 1fr); }
-    .uplift-counters { grid-template-columns: repeat(3, 1fr); }
+    .cp-grid {
+        grid-template-columns: 1fr 1fr;
+        overflow-y: auto;
+        height: auto;
+    }
+
+    .cp-left {
+        overflow-y: visible;
+        height: auto;
+    }
+
+    .cp-center {
+        grid-column: 1 / -1;
+        overflow-y: visible;
+        height: auto;
+    }
+
+    .cp-right {
+        grid-column: 1 / -1;
+        height: 600px;
+        overflow: hidden;
+    }
+
+    .today-kpi-strip {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .uplift-counters {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
-    .centers-page { grid-template-rows: auto auto 1fr; }
-    .cmd-bar  { flex-wrap: wrap; height: auto; padding: 0.5rem 0.9rem; }
-    .cp-grid  { grid-template-columns: 1fr; }
-    .cp-left  { height: auto; overflow-y: visible; }
-    .cp-right { height: 500px; grid-column: 1; }
-    .today-kpi-strip { grid-template-columns: repeat(2, 1fr); }
-    .uplift-counters { grid-template-columns: repeat(2, 1fr); }
+    .centers-page {
+        grid-template-rows: auto auto 1fr;
+    }
+
+    .cmd-bar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 0.5rem 0.9rem;
+    }
+
+    .cp-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cp-left {
+        height: auto;
+        overflow-y: visible;
+    }
+
+    .cp-right {
+        height: 500px;
+        grid-column: 1;
+    }
+
+    .today-kpi-strip {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .uplift-counters {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }

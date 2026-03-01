@@ -12,19 +12,19 @@ import { StudentInfrastructureSearchComponent } from '../../components/student/s
 import { StudentProfileEditComponent } from '../../components/student/student-profile-edit/student-profile-edit';
 
 @Component({
-    selector: 'app-student-dashboard',
-    standalone: true,
-    imports: [
-        CommonModule,
-        LayoutComponent,
-        StudentDashboardOverviewComponent,
-        StudentEnrolledCoursesComponent,
-        StudentCourseSearchComponent,
-        StudentTeacherSearchComponent,
-        StudentInfrastructureSearchComponent,
-        StudentProfileEditComponent
-    ],
-    template: `
+  selector: 'app-student-dashboard',
+  standalone: true,
+  imports: [
+    CommonModule,
+    LayoutComponent,
+    StudentDashboardOverviewComponent,
+    StudentEnrolledCoursesComponent,
+    StudentCourseSearchComponent,
+    StudentTeacherSearchComponent,
+    StudentInfrastructureSearchComponent,
+    StudentProfileEditComponent
+  ],
+  template: `
     <app-layout>
       <div class="student-dashboard-container">
         <!-- Navigation Tabs -->
@@ -170,7 +170,7 @@ import { StudentProfileEditComponent } from '../../components/student/student-pr
       </div>
     </app-layout>
   `,
-    styles: [`
+  styles: [`
     .student-dashboard-container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
 
     /* Navigation Tabs */
@@ -184,15 +184,15 @@ import { StudentProfileEditComponent } from '../../components/student/student-pr
       padding: 0.6rem 1.2rem; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; cursor: pointer;
       display: flex; align-items: center; gap: 0.5rem; transition: 0.2s; letter-spacing: 0.5px;
       &:hover { color: #fff; }
-      &.active { background: rgba(255,255,255,0.05); color: var(--accent-primary); border: 1px solid var(--row-border); border-bottom: 2px solid var(--accent-primary); }
+      &.active { background: color-mix(in srgb, #fff, transparent 95%); color: var(--accent-primary); border: 1px solid var(--row-border); border-bottom: 2px solid var(--accent-primary); }
     }
 
     /* Right Panel */
-    .right-panel-box { padding: 1.5rem; border-radius: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--row-border); }
+    .right-panel-box { padding: 1.5rem; border-radius: 16px; background: color-mix(in srgb, #fff, transparent 98%); border: 1px solid var(--row-border); }
     .panel-title { font-size: 0.9rem; font-weight: 900; color: #fff; text-transform: uppercase; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; letter-spacing: 1px; i { color: var(--accent-primary); } }
-    .panel-text { font-size: 0.8rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+    .panel-text { font-size: 0.8rem; color: color-mix(in srgb, #fff, transparent 50%); line-height: 1.5; }
 
-    .tip-box { background: rgba(59,130,246,0.1); border-left: 3px solid #3b82f6; padding: 0.8rem; font-size: 0.8rem; color: rgba(255,255,255,0.7); line-height: 1.4; margin-bottom: 1.5rem; strong { color: #fff; } }
+    .tip-box { background: color-mix(in srgb, #3b82f6, transparent 90%); border-left: 3px solid #3b82f6; padding: 0.8rem; font-size: 0.8rem; color: color-mix(in srgb, #fff, transparent 30%); line-height: 1.4; margin-bottom: 1.5rem; strong { color: #fff; } }
 
     .recommendation h4 { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 800; margin-bottom: 0.8rem; letter-spacing: 0.5px; }
     .rec-item { display: flex; align-items: center; gap: 0.8rem; background: #000; padding: 0.8rem; border: 1px solid var(--row-border); transition: 0.2s; &:hover { border-color: var(--accent-primary); } }
@@ -219,58 +219,58 @@ import { StudentProfileEditComponent } from '../../components/student/student-pr
   `]
 })
 export class StudentDashboardComponent {
-    private dashboardService = inject(StudentDashboardService);
+  private dashboardService = inject(StudentDashboardService);
 
-    activeTab = signal('overview');
+  activeTab = signal('overview');
 
-    // Signals from Service
-    profile = this.dashboardService.profile;
-    stats = this.dashboardService.stats;
+  // Signals from Service
+  profile = this.dashboardService.profile;
+  stats = this.dashboardService.stats;
 
-    // Enrolled
-    enrolledCourses = this.dashboardService.enrolledCourses;
-    enrolledCategories = this.dashboardService.enrolledCategories;
-    enrolledSearchQuery = this.dashboardService.enrolledSearchQuery;
-    enrolledCategoryFilter = this.dashboardService.enrolledCategoryFilter;
-    enrolledPriceFilter = this.dashboardService.enrolledPriceFilter;
+  // Enrolled
+  enrolledCourses = this.dashboardService.enrolledCourses;
+  enrolledCategories = this.dashboardService.enrolledCategories;
+  enrolledSearchQuery = this.dashboardService.enrolledSearchQuery;
+  enrolledCategoryFilter = this.dashboardService.enrolledCategoryFilter;
+  enrolledPriceFilter = this.dashboardService.enrolledPriceFilter;
 
-    // Catalog
-    catalogCourses = this.dashboardService.catalogCourses;
-    catalogCategories = this.dashboardService.catalogCategories;
-    catalogSearchQuery = this.dashboardService.catalogSearchQuery;
-    catalogCategoryFilter = this.dashboardService.catalogCategoryFilter;
-    catalogPriceFilter = this.dashboardService.catalogPriceFilter;
-    catalogLevelFilter = this.dashboardService.catalogLevelFilter;
+  // Catalog
+  catalogCourses = this.dashboardService.catalogCourses;
+  catalogCategories = this.dashboardService.catalogCategories;
+  catalogSearchQuery = this.dashboardService.catalogSearchQuery;
+  catalogCategoryFilter = this.dashboardService.catalogCategoryFilter;
+  catalogPriceFilter = this.dashboardService.catalogPriceFilter;
+  catalogLevelFilter = this.dashboardService.catalogLevelFilter;
 
-    // Teachers
-    teachers = this.dashboardService.teachers;
-    teacherSearchQuery = this.dashboardService.teacherSearchQuery;
-    teacherSubjectFilter = this.dashboardService.teacherSubjectFilter;
-    teacherModeFilter = this.dashboardService.teacherModeFilter;
-    teacherVerifiedOnly = this.dashboardService.teacherVerifiedOnly;
+  // Teachers
+  teachers = this.dashboardService.teachers;
+  teacherSearchQuery = this.dashboardService.teacherSearchQuery;
+  teacherSubjectFilter = this.dashboardService.teacherSubjectFilter;
+  teacherModeFilter = this.dashboardService.teacherModeFilter;
+  teacherVerifiedOnly = this.dashboardService.teacherVerifiedOnly;
 
-    // Infra
-    infrastructure = this.dashboardService.infrastructure;
-    infraSearchQuery = this.dashboardService.infraSearchQuery;
-    infraTypeFilter = this.dashboardService.infraTypeFilter;
-    infraMaxDistance = this.dashboardService.infraMaxDistance;
-    infraVerifiedOnly = this.dashboardService.infraVerifiedOnly;
+  // Infra
+  infrastructure = this.dashboardService.infrastructure;
+  infraSearchQuery = this.dashboardService.infraSearchQuery;
+  infraTypeFilter = this.dashboardService.infraTypeFilter;
+  infraMaxDistance = this.dashboardService.infraMaxDistance;
+  infraVerifiedOnly = this.dashboardService.infraVerifiedOnly;
 
-    // Actions
-    handleEnroll(courseId: number) {
-        console.log('Enroll clicked:', courseId);
-        // Future: Call service to enroll
-    }
+  // Actions
+  handleEnroll(courseId: number) {
+    console.log('Enroll clicked:', courseId);
+    // Future: Call service to enroll
+  }
 
-    handleJoinRequest(teacherId: number) {
-        console.log('Join request:', teacherId);
-    }
+  handleJoinRequest(teacherId: number) {
+    console.log('Join request:', teacherId);
+  }
 
-    handleInfraInterest(infraId: number) {
-        console.log('Infra interest:', infraId);
-    }
+  handleInfraInterest(infraId: number) {
+    console.log('Infra interest:', infraId);
+  }
 
-    handleProfileUpdate(updated: any) {
-        this.dashboardService.updateProfile(updated);
-    }
+  handleProfileUpdate(updated: any) {
+    this.dashboardService.updateProfile(updated);
+  }
 }

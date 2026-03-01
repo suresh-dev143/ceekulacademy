@@ -79,7 +79,7 @@ import { NearbyStudent } from '../../../services/teacher-dashboard.service';
     .btn-primary-xs { flex: 1; background: #000000; color: var(--text-primary); border: 1px solid var(--accent-primary); padding: 0.7rem; border-radius: 0; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; &:hover { background: var(--accent-primary); color: #000000; } }
     .btn-icon { width: 42px; background: #000000; border: 1px solid var(--row-border); color: var(--text-secondary); border-radius: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; &:hover { border-color: var(--accent-primary); color: var(--accent-primary); } }
 
-    .empty-state { text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.3); font-weight: 600; }
+    .empty-state { text-align: center; padding: 2rem; color: color-mix(in srgb, #fff, transparent 70%); font-weight: 600; }
   `]
 })
 export class TeacherNearbyStudentsComponent {

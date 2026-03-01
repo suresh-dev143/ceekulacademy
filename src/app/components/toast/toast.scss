@@ -32,8 +32,8 @@
     }
 
     &--error {
-        background: rgba(239, 68, 68, 0.15);
-        border-color: rgba(239, 68, 68, 0.3);
+        background: color-mix(in srgb, #ef4444, transparent 85%);
+        border-color: color-mix(in srgb, #ef4444, transparent 70%);
         color: #f87171;
     }
 

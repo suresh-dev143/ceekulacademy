@@ -96,7 +96,7 @@ import { IssueDetailComponent } from '../../components/issues/issue-detail/issue
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
-      .page-subtitle { color: rgba(255, 255, 255, 0.6); font-size: 1.1rem; }
+      .page-subtitle { color: color-mix(in srgb, #fff, transparent 40%); font-size: 1.1rem; }
     }
 
     .actions-bar {
@@ -120,17 +120,17 @@ import { IssueDetailComponent } from '../../components/issues/issue-detail/issue
         background: #667eea;
         color: #fff;
         border: none;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
-        &.active { background: #5a6fd1; outline: 2px solid rgba(255,255,255,0.2); }
+        box-shadow: 0 4px 15px color-mix(in srgb, #667eea, transparent 70%);
+        &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px color-mix(in srgb, #667eea, transparent 60%); }
+        &.active { background: #5a6fd1; outline: 2px solid color-mix(in srgb, #fff, transparent 80%); }
       }
 
       .btn-ghost {
-        background: rgba(255, 255, 255, 0.05);
-        color: rgba(255, 255, 255, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        &:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
-        &.active { background: rgba(255, 255, 255, 0.1); border-color: #667eea; color: #fff; }
+        background: color-mix(in srgb, #fff, transparent 95%);
+        color: color-mix(in srgb, #fff, transparent 30%);
+        border: 1px solid color-mix(in srgb, #fff, transparent 90%);
+        &:hover { background: color-mix(in srgb, #fff, transparent 92%); color: #fff; }
+        &.active { background: color-mix(in srgb, #fff, transparent 90%); border-color: #667eea; color: #fff; }
       }
     }
 
@@ -138,17 +138,17 @@ import { IssueDetailComponent } from '../../components/issues/issue-detail/issue
       padding: 1.5rem;
       h3 { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; color: #667eea; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
       ul { list-style: none; padding: 0; margin-bottom: 2rem;
-        li { color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; margin-bottom: 0.8rem; line-height: 1.4; display: flex; gap: 0.5rem;
+        li { color: color-mix(in srgb, #fff, transparent 40%); font-size: 0.9rem; margin-bottom: 0.8rem; line-height: 1.4; display: flex; gap: 0.5rem;
           &::before { content: '•'; color: #667eea; font-weight: bold; }
         }
       }
     }
 
     .status-legend {
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      border-top: 1px solid color-mix(in srgb, #fff, transparent 95%);
       padding-top: 1.5rem;
-      h4 { font-size: 0.85rem; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
-      .legend-item { display: flex; align-items: center; gap: 0.8rem; color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; margin-bottom: 0.6rem;
+      h4 { font-size: 0.85rem; color: color-mix(in srgb, #fff, transparent 70%); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+      .legend-item { display: flex; align-items: center; gap: 0.8rem; color: color-mix(in srgb, #fff, transparent 30%); font-size: 0.85rem; margin-bottom: 0.6rem;
         .dot { width: 8px; height: 8px; border-radius: 50%; }
         .submitted { background: #94a3b8; }
         .verified { background: #fbbf24; }

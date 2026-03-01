@@ -98,21 +98,21 @@ import { LayoutComponent } from '../../components/layout/layout';
       h1 { font-family: 'Montserrat', sans-serif; font-size: 3rem; font-weight: 900; color: #fff; margin-bottom: 1rem;
         .accent { color: var(--accent-primary); }
       }
-      p { color: rgba(255,255,255,0.6); font-size: 1.1rem; }
+      p { color: color-mix(in srgb, #fff, transparent 40%); font-size: 1.1rem; }
     }
 
     .contact-form {
-      padding: 3rem; border-radius: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+      padding: 3rem; border-radius: 24px; background: color-mix(in srgb, #fff, transparent 98%); border: 1px solid color-mix(in srgb, #fff, transparent 95%);
       .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
     }
 
     .form-group {
       margin-bottom: 1.5rem;
-      label { display: block; color: rgba(255,255,255,0.4); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem; }
+      label { display: block; color: color-mix(in srgb, #fff, transparent 60%); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.8rem; }
       input, textarea {
-        width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+        width: 100%; background: color-mix(in srgb, #fff, transparent 97%); border: 1px solid color-mix(in srgb, #fff, transparent 90%); border-radius: 12px;
         padding: 1rem; color: #fff; font-family: inherit; font-size: 0.95rem; transition: all 0.3s ease;
-        &:focus { outline: none; border-color: var(--accent-primary); background: rgba(255,255,255,0.06); }
+        &:focus { outline: none; border-color: var(--accent-primary); background: color-mix(in srgb, #fff, transparent 94%); }
       }
     }
 
@@ -120,7 +120,7 @@ import { LayoutComponent } from '../../components/layout/layout';
       width: 100%; padding: 1.2rem; background: var(--accent-primary); color: #000; border: none; border-radius: 12px;
       font-weight: 800; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
       transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      &:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 107, 0, 0.2); }
+      &:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 20px color-mix(in srgb, #FF6B00, transparent 80%); }
       &:disabled { opacity: 0.5; cursor: not-allowed; }
       i { margin-left: 0.8rem; }
     }
@@ -132,19 +132,19 @@ import { LayoutComponent } from '../../components/layout/layout';
 
     .info-item {
       display: flex; gap: 1.2rem; margin-bottom: 2rem;
-      .info-icon { width: 44px; height: 44px; background: rgba(255, 107, 0, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--accent-primary); font-size: 1.1rem; flex-shrink: 0; }
+      .info-icon { width: 44px; height: 44px; background: color-mix(in srgb, #FF6B00, transparent 90%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--accent-primary); font-size: 1.1rem; flex-shrink: 0; }
       .info-content {
-        label { display: block; color: rgba(255,255,255,0.3); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
+        label { display: block; color: color-mix(in srgb, #fff, transparent 70%); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
         p { color: #fff; font-size: 0.9rem; line-height: 1.4; }
       }
     }
 
     .social-links {
-      margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);
-      h4 { font-size: 0.75rem; font-weight: 800; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 1.5rem; letter-spacing: 1px; }
+      margin-top: 3rem; padding-top: 2rem; border-top: 1px solid color-mix(in srgb, #fff, transparent 95%);
+      h4 { font-size: 0.75rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 70%); text-transform: uppercase; margin-bottom: 1.5rem; letter-spacing: 1px; }
       .social-icons {
         display: flex; gap: 1rem;
-        a { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; color: #fff; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.05);
+        a { width: 40px; height: 40px; border-radius: 10px; background: color-mix(in srgb, #fff, transparent 97%); display: flex; align-items: center; justify-content: center; color: #fff; transition: all 0.3s ease; border: 1px solid color-mix(in srgb, #fff, transparent 95%);
           &:hover { background: var(--accent-primary); color: #000; border-color: var(--accent-primary); transform: translateY(-2px); }
         }
       }

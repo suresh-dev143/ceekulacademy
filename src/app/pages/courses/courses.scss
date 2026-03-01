@@ -154,7 +154,7 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: color-mix(in srgb, #000, transparent 10%);
     display: flex;
     align-items: center;
     justify-content: center;

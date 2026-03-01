@@ -173,7 +173,7 @@
 
     &:hover {
         transform: translateY(-2px);
-        background: rgba(255, 255, 255, 0.05);
+        background: color-mix(in srgb, #fff, transparent 95%);
     }
 
     &.whatsapp-btn:hover    { color: #25D366; }

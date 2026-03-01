@@ -1,6 +1,6 @@
 .footer {
     background: #050505;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid color-mix(in srgb, #fff, transparent 95%);
     padding: 6rem 0 3rem;
     color: var(--text-primary);
 }
@@ -98,7 +98,7 @@
 .footer-bottom {
     margin-top: 6rem;
     padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    border-top: 1px solid color-mix(in srgb, #fff, transparent 97%);
     text-align: center;
 }
 

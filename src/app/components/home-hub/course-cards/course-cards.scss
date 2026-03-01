@@ -60,7 +60,7 @@
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px color-mix(in srgb, #000, transparent 80%);
 
     &:hover {
         transform: translateY(-4px);
@@ -83,13 +83,13 @@
 .course-icon {
     width: 48px;
     height: 48px;
-    background: rgba(255, 255, 255, 0.05);
+    background: color-mix(in srgb, #fff, transparent 95%);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.8rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
 }
 
 .course-status-badge {
@@ -124,7 +124,7 @@
     }
 
     .instructor {
-        color: rgba(255, 255, 255, 0.5);
+        color: color-mix(in srgb, #fff, transparent 50%);
         font-size: 0.85rem;
         margin-bottom: 1.5rem;
         display: flex;
@@ -140,7 +140,7 @@
         display: flex;
         justify-content: space-between;
         font-size: 0.8rem;
-        color: rgba(255, 255, 255, 0.6);
+        color: color-mix(in srgb, #fff, transparent 40%);
         margin-bottom: 0.5rem;
         font-weight: 600;
 
@@ -152,7 +152,7 @@
 
     .progress-bar-container {
         height: 6px;
-        background: rgba(255, 255, 255, 0.1);
+        background: color-mix(in srgb, #fff, transparent 90%);
         border-radius: 10px;
         overflow: hidden;
 
@@ -195,12 +195,12 @@
     }
 
     &.secondary {
-        background: rgba(255, 255, 255, 0.05);
+        background: color-mix(in srgb, #fff, transparent 95%);
         color: #fff;
-        border-color: rgba(255, 255, 255, 0.1);
+        border-color: color-mix(in srgb, #fff, transparent 90%);
 
         &:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: color-mix(in srgb, #fff, transparent 90%);
         }
     }
 
@@ -218,12 +218,12 @@
     }
 
     &.manage {
-        background: rgba(255, 255, 255, 0.05);
-        color: rgba(255, 255, 255, 0.6);
+        background: color-mix(in srgb, #fff, transparent 95%);
+        color: color-mix(in srgb, #fff, transparent 40%);
 
         &:hover {
             color: #fff;
-            background: rgba(255, 255, 255, 0.1);
+            background: color-mix(in srgb, #fff, transparent 90%);
         }
     }
 }

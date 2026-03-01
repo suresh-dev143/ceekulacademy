@@ -67,7 +67,7 @@ import { NearbyProvider } from '../../../services/teacher-dashboard.service';
     .btn-outline-sm { background: #000000; border: 1px solid var(--accent-primary); color: var(--text-primary); padding: 0.6rem 1.25rem; border-radius: 0; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; &:hover { background: var(--accent-primary); color: #000000; } }
     .icon-btn { background: none; border: 1px solid var(--row-border); color: var(--text-secondary); width: 34px; height: 34px; border-radius: 0; cursor: pointer; transition: 0.2s; &:hover { color: var(--accent-primary); border-color: var(--accent-primary); } }
 
-    .empty-state { text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.3); font-weight: 600; }
+    .empty-state { text-align: center; padding: 2rem; color: color-mix(in srgb, #fff, transparent 70%); font-weight: 600; }
   `]
 })
 export class TeacherNearbyInfrastructureComponent {

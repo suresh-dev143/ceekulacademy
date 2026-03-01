@@ -13,7 +13,7 @@
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 48px color-mix(in srgb, #000, transparent 50%);
 }
 
 .form-header {
@@ -227,7 +227,7 @@
 
         &.selected {
             border-color: var(--accent-primary);
-            background: rgba(240, 142, 56, 0.05);
+            background: color-mix(in srgb, #f08e38, transparent 95%);
 
             .radio-circle {
                 border-color: var(--accent-primary);
@@ -258,7 +258,7 @@
     border: none;
     padding: 2.5rem;
     margin-bottom: 2.5rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 16px color-mix(in srgb, #000, transparent 80%);
 
     .summary-item {
         display: flex;
