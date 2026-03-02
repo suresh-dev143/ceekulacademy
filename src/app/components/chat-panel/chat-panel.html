@@ -1,39 +1,47 @@
-<div class="chat-header">
-    <div class="platform-icons">
-        <button class="platform-btn whatsapp-btn" title="WhatsApp">
-            <i class="fab fa-whatsapp"></i>
-        </button>
-        <button class="platform-btn chatgpt-btn" title="ChatGPT">
-            <i class="fas fa-robot"></i>
-        </button>
-        <button class="platform-btn gemini-btn" title="Gemini">
-            <i class="fab fa-google"></i>
-        </button>
-        <button class="platform-btn perplexity-btn" title="Perplexity">
-            <i class="fas fa-magnifying-glass"></i>
-        </button>
-        <button class="platform-btn twitter-btn" title="X / Twitter">
-            <i class="fab fa-twitter"></i>
+<div class="chat-panel-container">
+    <div class="chat-header">
+        <div class="chat-header-title">
+            <i class="fas fa-satellite-dish"></i> CEEKUL MISSION CONTROL
+        </div>
+        <button class="close-chat-btn" (click)="closeChat.emit()">
+            <i class="fas fa-times"></i>
         </button>
     </div>
 
-    <button class="close-chat-btn" (click)="closeChat.emit()">
-        <i class="fas fa-times"></i>
-    </button>
-</div>
-
-<div class="chat-messages">
-    <!-- @for (message of messages(); track $index) {
-    <div class="chat-message" [class.bot]="message.type === 'bot'" [class.user]="message.type === 'user'">
-        {{ message.text }}
+    <!-- Row 1: Study Material & Chat Interaction (50%) -->
+    <div class="chat-row row-1-messages" #chatScrollContainer>
+        @for (message of messages(); track $index) {
+        <div class="message-wrapper" [class.bot-wrapper]="message.type === 'bot'"
+            [class.user-wrapper]="message.type === 'user'">
+            <div class="chat-message" [class.bot]="message.type === 'bot'" [class.user]="message.type === 'user'">
+                <div class="message-content">{{ message.text }}</div>
+                @if (message.timestamp) {
+                <div class="message-timestamp">{{ message.timestamp | date:'shortTime' }}</div>
+                }
+            </div>
+        </div>
+        }
     </div>
-    } -->
-</div>
 
-<div class="chat-input-area">
-    <input type="text" class="chat-input" placeholder="Type a message..." [value]="currentMessage()"
-        (input)="currentMessage.set($any($event.target).value)" (keypress)="handleKeyPress($event)">
-    <button class="chat-send-btn" (click)="sendMessage()">
-       <i class="fa-solid fa-circle"></i>
-    </button>
+    <!-- Row 2: Typing & Send Section (10%) -->
+    <div class="chat-row row-2-input">
+        <input type="text" class="chat-input-modern" placeholder="Enter inquiry or materials..."
+            [value]="currentMessage()" (input)="currentMessage.set($any($event.target).value)"
+            (keydown.enter)="handleKeyPress($any($event))">
+        <button class="chat-send-modern" (click)="sendMessage()" [disabled]="!currentMessage().trim()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+
+    <!-- Row 3: Dynamic Tool Grid (40%) -->
+    <div class="chat-row row-3-tools">
+        <div class="tools-grid">
+            @for (tool of tools(); track tool.id) {
+            <button class="tool-card" [class.more-btn]="tool.isMore" (click)="handleToolClick(tool)">
+                <i [class]="tool.icon"></i>
+                <span>{{ tool.title }}</span>
+            </button>
+            }
+        </div>
+    </div>
 </div>

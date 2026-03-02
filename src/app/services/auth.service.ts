@@ -13,7 +13,7 @@ export interface UserProfile {
     id: string;
     name: string;
     email: string;
-    role: UserRole;
+    role: UserRole | 'Director';
     assignedState?: string;
     assignedDistrict?: string;
 }
@@ -22,80 +22,80 @@ export interface UserProfile {
 
 /** Payload sent to POST /users/signup */
 export interface RegisterRequest {
-    email:        string;
-    password:     string;
+    email: string;
+    password: string;
     authProvider: 'EMAIL_PASSWORD';
-    name:         string;
-    dateOfBirth:  string;
-    gender:       string;
+    name: string;
+    dateOfBirth: string;
+    gender: string;
     selectedRole: string;
     address: {
-        village:  string;
-        pincode:  string;
+        village: string;
+        pincode: string;
         district: string;
     };
 }
 
 export interface LoginRequest {
-    email:    string;
+    email: string;
     password: string;
 }
 
 export interface ChangePasswordRequest {
     currentPassword: string;
-    newPassword:     string;
+    newPassword: string;
 }
 
 export interface UpdateProfileRequest {
-    name?:         string;
-    dateOfBirth?:  string;
-    gender?:       string;
+    name?: string;
+    dateOfBirth?: string;
+    gender?: string;
     selectedRole?: string;
     address?: {
-        village:  string;
-        pincode:  string;
+        village: string;
+        pincode: string;
         district: string;
     };
 }
 
 /** Raw shape returned by the backend */
 interface ApiUser {
-    _id:                string;
-    name:               string;
-    email:              string;
-    authProvider:       string;
-    selectedRole:       string;
+    _id: string;
+    name: string;
+    email: string;
+    authProvider: string;
+    selectedRole: string;
     verificationStatus: string;
-    status:             string;
-    profileImage:       string;
-    lastLoginAt:        string;
+    status: string;
+    profileImage: string;
+    lastLoginAt: string;
 }
 
 /** Shape returned by POST /users/login */
 interface ApiLoginResponse {
-    status:  boolean;
+    status: boolean;
     message: string;
-    token:   string;
-    user:    ApiUser;
+    token: string;
+    user: ApiUser;
 }
 
 /** Shape returned by PUT /users/:id/profile */
 interface ApiProfileUpdateResponse {
-    status:  boolean;
+    status: boolean;
     message: string;
     user: {
-        _id:                string;
-        name:               string;
-        email:              string;
-        selectedRole:       string;
+        _id: string;
+        name: string;
+        email: string;
+        selectedRole: string;
         verificationStatus: string;
-        status:             string;
-        profileImage:       string;
-        dateOfBirth:        string;
-        gender:             string;
+        status: string;
+        profileImage: string;
+        dateOfBirth: string;
+        gender: string;
         address: {
-            village:  string;
-            pincode:  string;
+            village: string;
+            pincode: string;
             district: string;
         };
         updatedAt: string;
@@ -104,10 +104,10 @@ interface ApiProfileUpdateResponse {
 
 /** Shape returned by POST /users/signup */
 interface ApiAuthResponse {
-    status:  boolean;
+    status: boolean;
     message: string;
     result: {
-        user:  ApiUser;
+        user: ApiUser;
         token: string;
     };
 }
@@ -115,7 +115,7 @@ interface ApiAuthResponse {
 /** Normalised internal shape used by the app */
 export interface AuthResponse {
     token: string;
-    user:  UserProfile;
+    user: UserProfile;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -123,20 +123,20 @@ export interface AuthResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-    private http       = inject(HttpClient);
-    private router     = inject(Router);
+    private http = inject(HttpClient);
+    private router = inject(Router);
     private platformId = inject(PLATFORM_ID);
-    private isBrowser  = isPlatformBrowser(this.platformId);
+    private isBrowser = isPlatformBrowser(this.platformId);
 
     private readonly base = environment.apiUrl;
 
     // ── State ─────────────────────────────────────────────────────────────────
 
     private _currentUser = signal<UserProfile | null>(this.loadUserFromStorage());
-    private _token       = signal<string | null>(this.isBrowser ? localStorage.getItem('auth_token') : null);
+    private _token = signal<string | null>(this.isBrowser ? localStorage.getItem('auth_token') : null);
 
     currentUserProfile = this._currentUser.asReadonly();
-    isLoggedIn         = computed(() => !!this._token() && !!this._currentUser());
+    isLoggedIn = computed(() => !!this._token() && !!this._currentUser());
 
     // ── HTTP API ──────────────────────────────────────────────────────────────
 
@@ -146,11 +146,11 @@ export class AuthService {
             .pipe(
                 map(res => ({
                     token: res.result.token,
-                    user:  {
-                        id:    res.result.user._id,
-                        name:  res.result.user.name,
+                    user: {
+                        id: res.result.user._id,
+                        name: res.result.user.name,
                         email: res.result.user.email,
-                        role:  res.result.user.selectedRole as UserRole,
+                        role: res.result.user.selectedRole as UserRole,
                     } satisfies UserProfile,
                 })),
                 tap(res => this.storeSession(res))
@@ -163,11 +163,11 @@ export class AuthService {
             .pipe(
                 map(res => ({
                     token: res.token,
-                    user:  {
-                        id:    res.user._id,
-                        name:  res.user.name,
+                    user: {
+                        id: res.user._id,
+                        name: res.user.name,
                         email: res.user.email,
-                        role:  res.user.selectedRole as UserRole,
+                        role: res.user.selectedRole as UserRole,
                     } satisfies UserProfile,
                 })),
                 tap(res => this.storeSession(res))
@@ -186,10 +186,10 @@ export class AuthService {
             .put<ApiProfileUpdateResponse>(`${this.base}/users/${userId}/profile`, payload)
             .pipe(
                 map(res => ({
-                    id:    res.user._id,
-                    name:  res.user.name,
+                    id: res.user._id,
+                    name: res.user.name,
                     email: res.user.email,
-                    role:  res.user.selectedRole as UserRole,
+                    role: res.user.selectedRole as UserRole,
                 } satisfies UserProfile)),
                 tap(updated => {
                     const merged = { ...this._currentUser()!, ...updated };
