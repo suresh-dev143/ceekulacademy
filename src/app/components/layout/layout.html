@@ -15,7 +15,11 @@
             </button>
 
             <div class="sidebar-content">
+                @if (customLeftSidebar) {
+                <ng-content select="[slot=left-panel]"></ng-content>
+                } @else {
                 <app-sidebar-left [collapsed]="leftCollapsed()"></app-sidebar-left>
+                }
             </div>
         </aside>
         }
@@ -61,10 +65,10 @@
                 <span>&#x2B24;</span>
             </button>
             <button class="nav-item" (click)="toggleMobileSidebar()">
-                
-                 <span>&#x2B24;</span>
+
+                <span>&#x2B24;</span>
             </button>
-            
+
             <button class="nav-item">
 
                 <span>&#x2B24;</span>

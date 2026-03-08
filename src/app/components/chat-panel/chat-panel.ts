@@ -25,21 +25,45 @@ export class ChatPanelComponent implements AfterViewChecked {
     @Output() closeChat = new EventEmitter<void>();
     @ViewChild('chatScrollContainer') private chatScrollContainer!: ElementRef;
 
-    messages = signal<ChatMessage[]>([
-        { text: 'Welcome to Ceekul Mission! How can I assist you today?', type: 'bot', timestamp: new Date() }
-    ]);
+    // --- State ---
+    isToolSelectionOpen = signal(false);
 
-    tools = signal<ToolItem[]>([
+    // Mock Content Anchor for demonstration (e.g., passed via an Input in the future)
+    contentAnchor = signal<string>('module_1_lesson_4?t=120');
+
+    // --- Chat State ---
+    messages = signal<ChatMessage[]>([
+        { text: '', type: 'bot', timestamp: new Date() }
+    ]);
+    currentMessage = signal('');
+
+    // --- Tool Definitions ---
+    availableTools = signal<ToolItem[]>([
         { id: '1', title: 'Social Media', icon: 'fas fa-hashtag', action: 'social' },
         { id: '2', title: 'Learning & Innovation', icon: 'fas fa-lightbulb', action: 'learning' },
         { id: '3', title: 'Research Questions', icon: 'fas fa-microscope', action: 'research' },
         { id: '4', title: 'Right Thinking Tools', icon: 'fas fa-brain', action: 'thinking' },
         { id: '5', title: 'Project Development', icon: 'fas fa-project-diagram', action: 'project' },
-        { id: '6', title: 'Online Production', icon: 'fas fa-laptop-code', action: 'production' },
-        { id: 'more', title: 'More Tools', icon: 'fas fa-plus', action: 'more', isMore: true }
+        { id: '6', title: 'Online Production', icon: 'fas fa-laptop-code', action: 'production' }
     ]);
 
-    currentMessage = signal('');
+    selectedTools = signal<ToolItem[]>([]);
+
+    toggleToolSelection() {
+        this.isToolSelectionOpen.update(v => !v);
+    }
+
+    addTool(tool: ToolItem) {
+        if (!this.selectedTools().find(t => t.id === tool.id)) {
+            this.selectedTools.update(tools => [...tools, tool]);
+        }
+        this.isToolSelectionOpen.set(false);
+    }
+
+    removeSelectedTool(tool: ToolItem, event: Event) {
+        event.stopPropagation();
+        this.selectedTools.update(tools => tools.filter(t => t.id !== tool.id));
+    }
 
     ngAfterViewChecked() {
         this.scrollToBottom();
@@ -53,6 +77,10 @@ export class ChatPanelComponent implements AfterViewChecked {
         } catch (err) { }
     }
 
+    handleToolClick(tool: ToolItem) {
+        alert(`Opening Tool: ${tool.title} for anchor: ${this.contentAnchor()}`);
+    }
+
     sendMessage() {
         const message = this.currentMessage().trim();
         if (message) {
@@ -62,7 +90,7 @@ export class ChatPanelComponent implements AfterViewChecked {
             // Simulate bot response
             setTimeout(() => {
                 this.messages.update(msgs => [...msgs, {
-                    text: 'Thank you for your message. Our academic AI core will process this shortly.',
+                    text: 'Thank you for your message. Analyzing the selected content...',
                     type: 'bot',
                     timestamp: new Date()
                 }]);
@@ -72,25 +100,8 @@ export class ChatPanelComponent implements AfterViewChecked {
 
     handleKeyPress(event: KeyboardEvent) {
         if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent default enter behavior
+            event.preventDefault();
             this.sendMessage();
-        }
-    }
-
-    handleToolClick(tool: ToolItem) {
-        if (tool.isMore) {
-            // Mock addition for demo
-            this.tools.update(t => [
-                ...t.filter(item => !item.isMore),
-                { id: Date.now().toString(), title: 'New Tool', icon: 'fas fa-wrench', action: 'new' },
-                { id: 'more', title: 'More Tools', icon: 'fas fa-plus', action: 'more', isMore: true }
-            ]);
-        } else {
-            this.messages.update(msgs => [...msgs, {
-                text: `Opening tool: ${tool.title}...`,
-                type: 'bot',
-                timestamp: new Date()
-            }]);
         }
     }
 }

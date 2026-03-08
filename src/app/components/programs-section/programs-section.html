@@ -32,15 +32,27 @@
         @if (!selectedProgram()) {
         <div class="programs-grid">
             @for (program of programs; track program.id) {
+            @if (!program.hideFromGrid) {
+            @if (program.isCombined) {
+            <div class="program-card" style="display: flex; padding: 0; align-items: stretch;">
+                <div style="display: flex; align-items: center; padding: 1.5rem 0.3rem 1.5rem 1.5rem;"
+                    (click)="selectProgram({id: 'webinars'})">
+                    <h3>Webinars &</h3>
+                </div>
+                <div style="display: flex; align-items: center; padding: 1.5rem 1.5rem 1.5rem 0.3rem;"
+                    (click)="selectProgram({link: '/workshops'})">
+                    <h3>Workshops</h3>
+                </div>
+            </div>
+            } @else {
             <div class="program-card" [class.has-link]="program.link" (click)="selectProgram(program)">
                 <h3>{{ program.title }}</h3>
                 @if (program.description) {
                 <p class="program-desc">{{ program.description }}</p>
                 }
-                <span class="view-more">
-                    {{ program.link ? 'View All' : 'Explore' }} <i class="fas fa-chevron-right"></i>
-                </span>
             </div>
+            }
+            }
             }
         </div>
         } @else {
@@ -242,7 +254,7 @@
                     <button class="sub-tab" (click)="scrollToSection(sub)">
                         <span>{{ sub }}</span>
                     </button>
-                sections: [
+                    sections: [
                     }
                 </div>
                 <div class="subtitle-tabs">
@@ -443,7 +455,8 @@
                         <p class="section-desc">{{ section.description }}</p>
                         }
                         @if (section.link) {
-                        <a class="view-more-link" [routerLink]="section.link" (click)="$event.stopPropagation()">View Details <i class="fas fa-arrow-right"></i></a>
+                        <a class="view-more-link" [routerLink]="section.link" (click)="$event.stopPropagation()">View
+                            Details <i class="fas fa-arrow-right"></i></a>
                         }
                     </div>
                     }

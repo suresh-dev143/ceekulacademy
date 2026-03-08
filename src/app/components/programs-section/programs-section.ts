@@ -1,13 +1,13 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router,RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-programs-section',
     standalone: true,
-    imports: [CommonModule,RouterLink, ReactiveFormsModule],
+    imports: [CommonModule, RouterLink, ReactiveFormsModule],
     templateUrl: './programs-section.html',
     styleUrl: './programs-section.scss'
 })
@@ -364,7 +364,12 @@ export class ProgramsSectionComponent implements OnInit {
             }
         },
         {
+            id: 'webinars_workshops',
+            isCombined: true
+        },
+        {
             id: 'webinars',
+            hideFromGrid: true,
             title: 'Webinars',
 
             description: '',
@@ -382,6 +387,7 @@ export class ProgramsSectionComponent implements OnInit {
         {
             id: 'workshops',
             title: 'Workshops',
+            hideFromGrid: true,
             link: '/workshops',
             description: 'Hands-on practical learning sessions led by industry experts.',
             subSubtitles: ['Online', 'Offline', 'AI', 'Robotics'],
@@ -397,7 +403,8 @@ export class ProgramsSectionComponent implements OnInit {
             content: {
                 description: '',
                 sections: [
-                    {link: '/health-connect',
+                    {
+                        link: '/health-connect',
                         title: 'Health Camp',
                         description: 'Provides free medical check-ups, basic treatment, and health awareness to underserved communities.'
                     },
@@ -427,7 +434,7 @@ export class ProgramsSectionComponent implements OnInit {
 
         {
             id: 'harmony',
-            title: 'Global Harmony & Peace',
+            title: 'Harmony & Peace',
 
             description: '',
             subSubtitles: ['Cultural Exchange', 'Dialogue', 'Universal Values', 'Global Unity'],

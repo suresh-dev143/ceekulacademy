@@ -1,14 +1,13 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { LayoutComponent } from '../../components/layout/layout';
 import { ProgramsSectionComponent } from '../../components/programs-section/programs-section';
 import { AuthService } from '../../services/auth.service';
-import {MyScheduleComponent} from '../my-schedule/my-schedule';
+import { HomeSidebarLeftComponent } from './home-sidebar-left/home-sidebar-left';
 
 @Component({
     selector: 'app-home',
-    imports: [CommonModule, LayoutComponent,MyScheduleComponent, ProgramsSectionComponent],
+    imports: [CommonModule, LayoutComponent, ProgramsSectionComponent, HomeSidebarLeftComponent],
     templateUrl: './home.html',
     styleUrl: './home.scss'
 })

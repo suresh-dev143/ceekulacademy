@@ -1,7 +1,6 @@
 .programs-container {
     max-width: 1400px;
     margin: 17px auto;
-    padding: 2rem;
     color: white;
     font-family: 'Inter', sans-serif;
     position: relative;
@@ -41,11 +40,11 @@
     }
 
     .page-title {
-        font-size: 2.1rem;
+        font-size: 1.5rem;
 
         margin: 0;
         margin-top: 0.5rem;
-        color: var(--text-primary);
+        color: var(--accent-primary);
         text-transform: uppercase;
         letter-spacing: 1px;
         line-height: 1;
@@ -111,18 +110,18 @@
 // Level 0: Grid Styles
 .programs-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
+    // grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 0.12rem;
     width: 100%;
 }
 
 .program-card {
     background: var(--bg-card);
-    padding: 2.5rem;
+    padding: 1.5rem;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    min-height: 180px;
-    box-shadow: 0 4px 12px color-mix(in srgb, #000, transparent 80%);
+    // transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    height: 6rem;
+    // box-shadow: 0 4px 12px color-mix(in srgb, #000, transparent 80%);
     border: none;
 
     &:hover {
@@ -146,7 +145,7 @@
 
     font-size: 0.8rem;
     color: color-mix(in srgb, #fff, transparent 55%);
-    margin: 0.6rem 0 0;
+
     line-height: 1.4;
     font-weight: 500;
 
@@ -705,8 +704,12 @@
         }
 
         .hierarchical-content.left-aligned {
-            padding: 0 1rem;
+            padding: 0.12rem;
         }
+    }
+
+    .program-card {
+        padding: 1rem;
     }
 
     .sections-grid,

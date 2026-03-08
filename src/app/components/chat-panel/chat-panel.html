@@ -1,14 +1,51 @@
 <div class="chat-panel-container">
     <div class="chat-header">
-        <div class="chat-header-title">
-            <i class="fas fa-satellite-dish"></i> CEEKUL MISSION CONTROL
+
+        <div class="header-actions">
+            <button class="add-tools-btn" (click)="toggleToolSelection()">
+                <i class="fas fa-plus"></i> Add Tools
+            </button>
+            <button class="close-chat-btn" (click)="closeChat.emit()">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-        <button class="close-chat-btn" (click)="closeChat.emit()">
-            <i class="fas fa-times"></i>
-        </button>
     </div>
 
-    <!-- Row 1: Study Material & Chat Interaction (50%) -->
+
+
+    <div class="tools-section-wrapper" style="position: relative; flex: 0 0 auto;">
+        <!-- Tool Selection Dropdown Box -->
+        @if (isToolSelectionOpen()) {
+        <div class="tool-selection-dropdown">
+            @for (tool of availableTools(); track tool.id) {
+            <div class="tool-option" (click)="addTool(tool)">
+                <i [class]="tool.icon"></i> {{ tool.title }}
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Selected Tools Box -->
+        <div class="selected-tools-box">
+            @for (tool of selectedTools(); track tool.id) {
+            <div class="selected-tool-pill" (click)="handleToolClick(tool)" [title]="tool.title">
+                <i [class]="tool.icon"></i>
+                <i class="fas fa-times remove-icon" (click)="removeSelectedTool(tool, $event)"></i>
+            </div>
+            }
+            @if (selectedTools().length === 0) {
+            <div class="empty-tools-msg">
+                No tools selected. Click "Add Tools" above.
+            </div>
+            }
+        </div>
+    </div>
+
+    <div class="active-tool-header chat-separator">
+        <!-- <span class="tool-name">Chat Here</span> -->
+    </div>
+
+    <!-- Study Material & Chat Interaction -->
     <div class="chat-row row-1-messages" #chatScrollContainer>
         @for (message of messages(); track $index) {
         <div class="message-wrapper" [class.bot-wrapper]="message.type === 'bot'"
@@ -16,32 +53,19 @@
             <div class="chat-message" [class.bot]="message.type === 'bot'" [class.user]="message.type === 'user'">
                 <div class="message-content">{{ message.text }}</div>
                 @if (message.timestamp) {
-                <div class="message-timestamp">{{ message.timestamp | date:'shortTime' }}</div>
+                <!-- <div class="message-timestamp">{{ message.timestamp | date:'shortTime' }}</div> -->
                 }
             </div>
         </div>
         }
     </div>
 
-    <!-- Row 2: Typing & Send Section (10%) -->
+    <!-- Typing & Send Section -->
     <div class="chat-row row-2-input">
-        <input type="text" class="chat-input-modern" placeholder="Enter inquiry or materials..."
-            [value]="currentMessage()" (input)="currentMessage.set($any($event.target).value)"
-            (keydown.enter)="handleKeyPress($any($event))">
+        <input type="text" class="chat-input-modern" placeholder="Chat here..." [value]="currentMessage()"
+            (input)="currentMessage.set($any($event.target).value)" (keydown.enter)="handleKeyPress($any($event))">
         <button class="chat-send-modern" (click)="sendMessage()" [disabled]="!currentMessage().trim()">
             <i class="fas fa-paper-plane"></i>
         </button>
-    </div>
-
-    <!-- Row 3: Dynamic Tool Grid (40%) -->
-    <div class="chat-row row-3-tools">
-        <div class="tools-grid">
-            @for (tool of tools(); track tool.id) {
-            <button class="tool-card" [class.more-btn]="tool.isMore" (click)="handleToolClick(tool)">
-                <i [class]="tool.icon"></i>
-                <span>{{ tool.title }}</span>
-            </button>
-            }
-        </div>
     </div>
 </div>

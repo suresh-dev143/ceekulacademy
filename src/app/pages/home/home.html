@@ -1,9 +1,4 @@
-
-    @if (currentUserRole() === 'Teacher' || currentUserRole()==='Student'|| currentUserRole()==='Researcher'|| currentUserRole()==='Entrepreneur') {
-     <app-my-schedule></app-my-schedule>
-    }
-   
-     @else {
-        <app-layout>
-    <app-programs-section></app-programs-section></app-layout>}
-    
+<app-layout [customLeftSidebar]="true" [showRightSidebar]="true">
+    <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left>
+    <app-programs-section></app-programs-section>
+</app-layout>
