@@ -5,17 +5,11 @@
     <div class="gs-bar" [class.gs-bar--filters-active]="activeFilterCount() > 0">
         <i class="fas fa-search gs-icon"></i>
 
-        <input
-            class="gs-input"
-            type="text"
-            [value]="query()"
-            (input)="onInput($any($event.target).value)"
-            (keydown)="onKeydown($event)"
-            (focus)="isOpen.set(true)"
-            placeholder="Search programs, courses, people..."
-            autocomplete="off"
-            spellcheck="false"
-            aria-label="Global search">
+
+
+        <input class="gs-input" type="text" [value]="query()" (input)="onInput($any($event.target).value)"
+            (keydown)="onKeydown($event)" (focus)="isOpen.set(true)" [placeholder]="placeholderText()"
+            autocomplete="off" spellcheck="false" aria-label="Global search">
 
         <!-- Active filter chips (inline) -->
         @for (chip of activeFilterChips(); track chip.label) {
@@ -33,11 +27,9 @@
         }
 
         <!-- Filter toggle -->
-        <button class="gs-filter-btn"
-                [class.gs-filter-btn--open]="filtersOpen()"
-                [class.gs-filter-btn--active]="activeFilterCount() > 0"
-                (click)="toggleFilters()"
-                aria-label="Toggle filters">
+        <button class="gs-filter-btn" [class.gs-filter-btn--open]="filtersOpen()"
+            [class.gs-filter-btn--active]="activeFilterCount() > 0" (click)="toggleFilters()"
+            aria-label="Toggle filters">
             <i class="fas fa-sliders-h"></i>
             @if (activeFilterCount() > 0) {
             <span class="gs-filter-badge">{{ activeFilterCount() }}</span>
@@ -49,14 +41,28 @@
     @if (filtersOpen()) {
     <div class="gs-filter-panel">
 
+        <!-- Scope row -->
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Scope</span>
+            <div class="gs-fp-pills">
+                <button class="gs-fp-pill" [class.gs-fp-pill--active]="searchScope() === 'global'"
+                    (click)="setScope('global')">
+                    <i class="fas fa-globe"></i> Global
+                </button>
+                <button class="gs-fp-pill" [class.gs-fp-pill--active]="searchScope() === 'local'"
+                    (click)="setScope('local')">
+                    <i class="fas fa-map-marker-alt"></i> Local
+                </button>
+            </div>
+        </div>
+
         <!-- Category row -->
         <div class="gs-fp-row">
             <span class="gs-fp-lbl">Category</span>
             <div class="gs-fp-pills">
                 @for (cat of categoryOptions; track cat.value) {
-                <button class="gs-fp-pill"
-                        [class.gs-fp-pill--active]="activeCategory() === cat.value"
-                        (click)="setCategory(cat.value)">
+                <button class="gs-fp-pill" [class.gs-fp-pill--active]="activeCategory() === cat.value"
+                    (click)="setCategory(cat.value)">
                     {{ cat.label }}
                     @if (cat.value !== 'all' && categoryCounts().get(cat.value)) {
                     <span class="gs-fp-count">{{ categoryCounts().get(cat.value) }}</span>
@@ -72,8 +78,7 @@
             <div class="gs-fp-pills">
                 @for (s of statusOptions; track s.value) {
                 <button class="gs-fp-pill gs-fp-pill--status"
-                        [class.gs-fp-pill--active]="activeStatuses().includes(s.value)"
-                        (click)="toggleStatus(s.value)">
+                    [class.gs-fp-pill--active]="activeStatuses().includes(s.value)" (click)="toggleStatus(s.value)">
                     {{ s.label }}
                 </button>
                 }
@@ -85,10 +90,22 @@
             <span class="gs-fp-lbl">Date</span>
             <div class="gs-fp-pills">
                 @for (d of dateOptions; track d.value) {
-                <button class="gs-fp-pill"
-                        [class.gs-fp-pill--active]="activeDateRange() === d.value"
-                        (click)="setDateRange(d.value)">
+                <button class="gs-fp-pill" [class.gs-fp-pill--active]="activeDateRange() === d.value"
+                    (click)="setDateRange(d.value)">
                     {{ d.label }}
+                </button>
+                }
+            </div>
+        </div>
+
+        <!-- Mode row (Workshop specifics) -->
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Mode</span>
+            <div class="gs-fp-pills">
+                @for (m of modeOptions; track m.value) {
+                <button class="gs-fp-pill" [class.gs-fp-pill--active]="activeMode() === m.value"
+                    (click)="setMode(m.value)">
+                    {{ m.label }}
                 </button>
                 }
             </div>
@@ -100,9 +117,8 @@
             <span class="gs-fp-lbl">Quick</span>
             <div class="gs-fp-pills">
                 @for (opt of roleFilterOptions(); track opt.value) {
-                <button class="gs-fp-pill gs-fp-pill--role"
-                        [class.gs-fp-pill--active]="activeCategory() === opt.value"
-                        (click)="setCategory(opt.value)">
+                <button class="gs-fp-pill gs-fp-pill--role" [class.gs-fp-pill--active]="activeCategory() === opt.value"
+                    (click)="setCategory(opt.value)">
                     <i class="fas {{ opt.icon }}"></i>
                     {{ opt.label }}
                 </button>
@@ -125,7 +141,7 @@
     }
 
     <!-- ── Dropdown ── -->
-    @if (isOpen()) {
+    @if (isOpen() && searchScope() === 'global') {
 
     <!-- Recent searches -->
     @if (!query() && searchService.recentSearches().length > 0) {
@@ -156,10 +172,8 @@
         @for (group of groupedResults(); track group.category) {
         <div class="gs-section-lbl">{{ group.category }}</div>
         @for (result of group.items; track result.id) {
-        <div class="gs-result"
-             [class.gs-result--active]="activeIndex() === flatIndex(result)"
-             (mouseenter)="activeIndex.set(flatIndex(result))"
-             (click)="selectResult(result)">
+        <div class="gs-result" [class.gs-result--active]="activeIndex() === flatIndex(result)"
+            (mouseenter)="activeIndex.set(flatIndex(result))" (click)="selectResult(result)">
             <i class="fas {{ result.icon }} gs-ri"></i>
             <div class="gs-rt">
                 <span class="gs-rt-title" [innerHTML]="highlight(result.title)"></span>
@@ -184,7 +198,8 @@
             <i class="fas fa-search-minus"></i>
             <span>
                 @if (rawResults().length > 0) {
-                No matches for active filters — <button class="gs-empty-clear" (click)="clearAllFilters()">clear filters</button>
+                No matches for active filters — <button class="gs-empty-clear" (click)="clearAllFilters()">clear
+                    filters</button>
                 } @else {
                 No results for "{{ query() }}"
                 }
@@ -208,15 +223,9 @@
     <div class="gs-mob-header">
         <div class="gs-mob-bar">
             <i class="fas fa-search gs-icon"></i>
-            <input
-                class="gs-input"
-                type="text"
-                [value]="query()"
-                (input)="onInput($any($event.target).value)"
-                (keydown)="onKeydown($event)"
-                placeholder="Search anything..."
-                autocomplete="off"
-                autofocus
+
+            <input class="gs-input" type="text" [value]="query()" (input)="onInput($any($event.target).value)"
+                (keydown)="onKeydown($event)" placeholder="Search anything..." autocomplete="off" autofocus
                 aria-label="Mobile search">
             @if (query()) {
             <button class="gs-clear-btn" (click)="clearQuery()" aria-label="Clear">
@@ -231,14 +240,27 @@
 
     <!-- Mobile filter panel -->
     <div class="gs-mob-filters">
+        <!-- Scope -->
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Scope</span>
+            <div class="gs-fp-pills">
+                <button class="gs-fp-pill" [class.gs-fp-pill--active]="searchScope() === 'global'"
+                    (click)="setScope('global')">
+                    <i class="fas fa-globe"></i> Global
+                </button>
+                <button class="gs-fp-pill" [class.gs-fp-pill--active]="searchScope() === 'local'"
+                    (click)="setScope('local')">
+                    <i class="fas fa-map-marker-alt"></i> Local
+                </button>
+            </div>
+        </div>
         <!-- Category -->
         <div class="gs-fp-row">
             <span class="gs-fp-lbl">Category</span>
             <div class="gs-fp-pills">
                 @for (cat of categoryOptions; track cat.value) {
-                <button class="gs-fp-pill"
-                        [class.gs-fp-pill--active]="activeCategory() === cat.value"
-                        (click)="setCategory(cat.value)">
+                <button class="gs-fp-pill" [class.gs-fp-pill--active]="activeCategory() === cat.value"
+                    (click)="setCategory(cat.value)">
                     {{ cat.label }}
                 </button>
                 }
@@ -250,9 +272,20 @@
             <div class="gs-fp-pills">
                 @for (s of statusOptions; track s.value) {
                 <button class="gs-fp-pill gs-fp-pill--status"
-                        [class.gs-fp-pill--active]="activeStatuses().includes(s.value)"
-                        (click)="toggleStatus(s.value)">
+                    [class.gs-fp-pill--active]="activeStatuses().includes(s.value)" (click)="toggleStatus(s.value)">
                     {{ s.label }}
+                </button>
+                }
+            </div>
+        </div>
+        <!-- Mode -->
+        <div class="gs-fp-row">
+            <span class="gs-fp-lbl">Mode</span>
+            <div class="gs-fp-pills">
+                @for (m of modeOptions; track m.value) {
+                <button class="gs-fp-pill" [class.gs-fp-pill--active]="activeMode() === m.value"
+                    (click)="setMode(m.value)">
+                    {{ m.label }}
                 </button>
                 }
             </div>
@@ -286,10 +319,8 @@
         @for (group of groupedResults(); track group.category) {
         <div class="gs-section-lbl">{{ group.category }}</div>
         @for (result of group.items; track result.id) {
-        <div class="gs-result"
-             [class.gs-result--active]="activeIndex() === flatIndex(result)"
-             (mouseenter)="activeIndex.set(flatIndex(result))"
-             (click)="selectResult(result)">
+        <div class="gs-result" [class.gs-result--active]="activeIndex() === flatIndex(result)"
+            (mouseenter)="activeIndex.set(flatIndex(result))" (click)="selectResult(result)">
             <i class="fas {{ result.icon }} gs-ri"></i>
             <div class="gs-rt">
                 <span class="gs-rt-title" [innerHTML]="highlight(result.title)"></span>

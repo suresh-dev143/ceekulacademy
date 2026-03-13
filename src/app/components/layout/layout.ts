@@ -22,6 +22,7 @@ export class LayoutComponent {
     @Input() showRightSidebar = true;
     @Input() showSearch = true;
     @Input() customLeftSidebar = false;
+    @Input() localPlaceholder = 'Search locally...';
 
     toggleLeft() {
         this.leftCollapsed.set(!this.leftCollapsed());

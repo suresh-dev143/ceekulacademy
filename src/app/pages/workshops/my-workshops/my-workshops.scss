@@ -1,0 +1,250 @@
+.my-ws-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 0;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2.5rem;
+
+    .page-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+
+
+
+    }
+
+    .subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+}
+
+.btn-create {
+    background: var(--accent-primary);
+    color: #000;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(239, 157, 87, 0.3);
+    }
+}
+
+.ws-list-card {
+    background: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ws-table-wrap {
+    overflow-x: auto;
+}
+
+.ws-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+
+    th {
+        padding: 1.2rem 1.5rem;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: rgba(255, 255, 255, 0.4);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-weight: 700;
+    }
+
+    td {
+        padding: 1.2rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover td {
+        background: rgba(255, 255, 255, 0.01);
+    }
+
+    tr.status-cancelled td {
+        opacity: 0.6;
+    }
+}
+
+.ws-title-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+
+    strong {
+        font-size: 0.95rem;
+        color: var(--text-primary);
+    }
+
+    span {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+}
+
+.mode-tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    background: rgba(100, 150, 220, 0.1);
+    color: #6496dc;
+    border-radius: 100px;
+    text-transform: capitalize;
+
+    &.hybrid {
+        background: rgba(239, 157, 87, 0.1);
+        color: var(--accent-primary);
+    }
+}
+
+.status-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 3px;
+
+    &.status--active {
+        background: rgba(80, 200, 120, 0.1);
+        color: #50c878;
+    }
+
+    &.status--published {
+        background: rgba(100, 150, 220, 0.1);
+        color: #6496dc;
+    }
+
+    &.status--draft {
+        background: rgba(255, 255, 255, 0.05);
+        color: #aaa;
+    }
+
+    &.status--cancelled {
+        background: rgba(220, 80, 80, 0.1);
+        color: #dc5050;
+    }
+
+    &.status--completed {
+        background: rgba(160, 160, 160, 0.1);
+        color: #ccc;
+    }
+}
+
+.actions-cell {
+    text-align: right;
+}
+
+.action-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    &.delete:hover {
+        background: rgba(220, 80, 80, 0.1);
+        color: #dc5050;
+        border-color: rgba(220, 80, 80, 0.3);
+    }
+}
+
+.empty-state {
+    padding: 5rem 2rem;
+    text-align: center;
+
+    i {
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+    }
+
+    p {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+}
+
+.loading-state {
+    padding: 4rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+
+    i {
+        margin-right: 0.5rem;
+    }
+}
+
+.edit-overlay {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

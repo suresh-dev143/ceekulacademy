@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, HostListener, DestroyRef, ElementRef } from '@angular/core';
+import { Component, signal, computed, inject, HostListener, DestroyRef, ElementRef, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -8,66 +8,74 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService, UserRole } from '../../services/auth.service';
 import {
     SearchService, SearchResult, SearchCategory,
-    FilterCategory, SearchStatus, DateRange, SearchFilters
+    FilterCategory, SearchStatus, DateRange, WorkshopMode, SearchScope, SearchFilters
 } from '../../services/search.service';
 
 // ── Static option tables (UI-only constants) ────────────────────────────────────
 export const CATEGORY_OPTIONS: { label: string; value: FilterCategory }[] = [
-    { label: 'All',          value: 'all' },
-    { label: 'Programs',     value: 'programs' },
-    { label: 'Courses',      value: 'courses' },
-    { label: 'Sessions',     value: 'sessions' },
-    { label: 'Users',        value: 'users' },
+    { label: 'All', value: 'all' },
+    { label: 'Programs', value: 'programs' },
+    { label: 'Courses', value: 'courses' },
+    { label: 'Sessions', value: 'sessions' },
+    { label: 'Users', value: 'users' },
     { label: 'Institutions', value: 'institutions' },
-    { label: 'Documents',    value: 'documents' },
-    { label: 'Reports',      value: 'reports' },
+    { label: 'Documents', value: 'documents' },
+    { label: 'Reports', value: 'reports' },
 ];
 
 export const STATUS_OPTIONS: { label: string; value: SearchStatus }[] = [
-    { label: 'Active',      value: 'active' },
-    { label: 'Completed',   value: 'completed' },
-    { label: 'Pending',     value: 'pending' },
-    { label: 'Cancelled',   value: 'cancelled' },
-    { label: 'Verified',    value: 'verified' },
-    { label: 'Unverified',  value: 'unverified' },
+    { label: 'Published', value: 'published' },
+    { label: 'Active', value: 'active' },
+    { label: 'Pending', value: 'pending' },
+    { label: 'Completed', value: 'completed' },
+    { label: 'Disabled', value: 'cancelled' },
+    { label: 'Verified', value: 'verified' },
+    { label: 'Unverified', value: 'unverified' },
+    { label: 'Draft', value: 'draft' },
 ];
 
 export const DATE_OPTIONS: { label: string; value: DateRange }[] = [
-    { label: 'Today',       value: 'today' },
-    { label: 'This Week',   value: 'this-week' },
-    { label: 'This Month',  value: 'this-month' },
+    { label: 'Today', value: 'today' },
+    { label: 'This Week', value: 'this-week' },
+    { label: 'This Month', value: 'this-month' },
+];
+
+export const MODE_OPTIONS: { label: string; value: WorkshopMode }[] = [
+    { label: 'All', value: 'all' },
+    { label: 'Online', value: 'online' },
+    { label: 'Hybrid', value: 'hybrid' },
 ];
 
 // ── Role-based quick-filter shortcuts ──────────────────────────────────────────
 const ROLE_QUICK_FILTERS: Partial<Record<UserRole, { label: string; value: FilterCategory; icon: string }[]>> = {
     Student: [
-        { label: 'My Courses',  value: 'courses',   icon: 'fa-book' },
-        { label: 'My Schedule', value: 'sessions',  icon: 'fa-calendar-alt' },
+        { label: 'My Courses', value: 'courses', icon: 'fa-book' },
+        { label: 'My Schedule', value: 'sessions', icon: 'fa-calendar-alt' },
         { label: 'Assignments', value: 'documents', icon: 'fa-tasks' },
     ],
     Teacher: [
-        { label: 'My Batches',  value: 'users',     icon: 'fa-users' },
-        { label: 'Sessions',    value: 'sessions',  icon: 'fa-chalkboard' },
-        { label: 'Materials',   value: 'documents', icon: 'fa-folder-open' },
+        { label: 'My Batches', value: 'users', icon: 'fa-users' },
+        { label: 'Sessions', value: 'sessions', icon: 'fa-chalkboard' },
+        { label: 'Materials', value: 'documents', icon: 'fa-folder-open' },
     ],
     Instructor: [
-        { label: 'My Batches',  value: 'users',     icon: 'fa-users' },
-        { label: 'Sessions',    value: 'sessions',  icon: 'fa-chalkboard' },
+        { label: 'My Batches', value: 'users', icon: 'fa-users' },
+        { label: 'Sessions', value: 'sessions', icon: 'fa-chalkboard' },
     ],
     Partner: [
-        { label: 'Bookings',    value: 'sessions',  icon: 'fa-door-open' },
-        { label: 'Rooms',       value: 'institutions', icon: 'fa-building' },
-        { label: 'Teachers',    value: 'users',     icon: 'fa-user-tie' },
+        { label: 'Bookings', value: 'sessions', icon: 'fa-door-open' },
+        { label: 'Rooms', value: 'institutions', icon: 'fa-building' },
+        { label: 'Teachers', value: 'users', icon: 'fa-user-tie' },
     ],
     Director: [
-        { label: 'District Programs', value: 'programs',     icon: 'fa-project-diagram' },
-        { label: 'Partners',          value: 'institutions', icon: 'fa-university' },
-        { label: 'Reports',           value: 'reports',      icon: 'fa-chart-pie' },
-        { label: 'Documents',         value: 'documents',    icon: 'fa-clipboard-list' },
+        { label: 'District Programs', value: 'programs', icon: 'fa-project-diagram' },
+        { label: 'Partners', value: 'institutions', icon: 'fa-university' },
+        { label: 'Reports', value: 'reports', icon: 'fa-chart-pie' },
+        { label: 'Documents', value: 'documents', icon: 'fa-clipboard-list' },
     ],
     Manager: [
-        { label: 'Programs',    value: 'programs',  icon: 'fa-project-diagram' },
-        { label: 'Reports',     value: 'reports',   icon: 'fa-chart-pie' },
+        { label: 'Programs', value: 'programs', icon: 'fa-project-diagram' },
+        { label: 'Reports', value: 'reports', icon: 'fa-chart-pie' },
     ],
 };
 
@@ -81,29 +89,40 @@ const ROLE_QUICK_FILTERS: Partial<Record<UserRole, { label: string; value: Filte
 export class GlobalSearchComponent {
 
     readonly searchService = inject(SearchService);
-    private authService    = inject(AuthService);
-    private router         = inject(Router);
-    private sanitizer      = inject(DomSanitizer);
-    private destroyRef     = inject(DestroyRef);
-    private elRef          = inject(ElementRef);
+    private authService = inject(AuthService);
+    private router = inject(Router);
+    private sanitizer = inject(DomSanitizer);
+    private destroyRef = inject(DestroyRef);
+    private elRef = inject(ElementRef);
 
     // ── Expose static option tables to template ────────────────────────────────
     readonly categoryOptions = CATEGORY_OPTIONS;
-    readonly statusOptions   = STATUS_OPTIONS;
-    readonly dateOptions     = DATE_OPTIONS;
+    readonly statusOptions = STATUS_OPTIONS;
+    readonly dateOptions = DATE_OPTIONS;
+    readonly modeOptions = MODE_OPTIONS;
 
     // ── Core search state ──────────────────────────────────────────────────────
-    query            = signal<string>('');
-    rawResults       = signal<SearchResult[]>([]);   // all text-matched results
-    isOpen           = signal<boolean>(false);
-    activeIndex      = signal<number>(-1);
+    localPlaceholder = input<string>('Search locally...');
+    query = this.searchService.globalQuery;
+    rawResults = signal<SearchResult[]>([]);   // all text-matched results
+    isOpen = signal<boolean>(false);
+    activeIndex = signal<number>(-1);
     isMobileExpanded = signal<boolean>(false);
 
     // ── Filter state ───────────────────────────────────────────────────────────
-    activeCategory  = signal<FilterCategory>('all');
-    activeStatuses  = signal<SearchStatus[]>([]);
-    activeDateRange = signal<DateRange>('');
-    filtersOpen     = signal<boolean>(false);
+    activeCategory = computed(() => this.searchService.globalFilters().category);
+    activeStatuses = computed(() => this.searchService.globalFilters().status);
+    activeDateRange = computed(() => this.searchService.globalFilters().dateRange);
+    activeMode = computed(() => this.searchService.globalFilters().mode);
+    searchScope = computed(() => this.searchService.globalFilters().scope);
+
+    placeholderText = computed(() => {
+        return this.searchScope() === 'global' ?
+            'Search programs, courses, people...' :
+            this.localPlaceholder();
+    });
+
+    filtersOpen = signal<boolean>(false);
 
     private searchSubject = new Subject<string>();
 
@@ -114,11 +133,7 @@ export class GlobalSearchComponent {
 
     // ── Filtered results (text results → apply category + status) ─────────────
     filteredResults = computed((): SearchResult[] =>
-        this.searchService.applyFilters(this.rawResults(), {
-            category:  this.activeCategory(),
-            status:    this.activeStatuses(),
-            dateRange: this.activeDateRange(),
-        })
+        this.searchService.applyFilters(this.rawResults(), this.searchService.globalFilters())
     );
 
     // ── Grouped for dropdown display ───────────────────────────────────────────
@@ -142,12 +157,13 @@ export class GlobalSearchComponent {
         if (this.activeCategory() !== 'all') n++;
         n += this.activeStatuses().length;
         if (this.activeDateRange()) n++;
+        if (this.activeMode() && this.activeMode() !== 'all') n++;
         return n;
     });
 
     // ── Chips shown inside the search bar ─────────────────────────────────────
-    activeFilterChips = computed((): { label: string; type: 'category' | 'status' | 'date' }[] => {
-        const chips: { label: string; type: 'category' | 'status' | 'date' }[] = [];
+    activeFilterChips = computed((): { label: string; type: 'category' | 'status' | 'date' | 'mode' }[] => {
+        const chips: { label: string; type: 'category' | 'status' | 'date' | 'mode' }[] = [];
         if (this.activeCategory() !== 'all') {
             const opt = CATEGORY_OPTIONS.find(c => c.value === this.activeCategory());
             chips.push({ label: opt?.label ?? this.activeCategory(), type: 'category' });
@@ -160,15 +176,26 @@ export class GlobalSearchComponent {
             const opt = DATE_OPTIONS.find(d => d.value === this.activeDateRange());
             chips.push({ label: opt?.label ?? this.activeDateRange(), type: 'date' });
         }
+        if (this.activeMode() && this.activeMode() !== 'all') {
+            const opt = MODE_OPTIONS.find(m => m.value === this.activeMode());
+            chips.push({ label: opt?.label ?? this.activeMode(), type: 'mode' });
+        }
         return chips;
     });
 
     constructor() {
         // ── Restore persisted filters ──────────────────────────────────────────
         const saved = this.searchService.loadSavedFilters();
-        if (saved.category)  this.activeCategory.set(saved.category);
-        if (saved.status?.length) this.activeStatuses.set(saved.status);
-        if (saved.dateRange) this.activeDateRange.set(saved.dateRange);
+        // Ensure all properties are explicitly set to default if undefined, to satisfy SearchFilters type
+        if (saved.category || saved.status || saved.dateRange || saved.mode || saved.scope) {
+            this.searchService.globalFilters.set({
+                category: saved.category || 'all',
+                status: saved.status || [],
+                dateRange: saved.dateRange || '',
+                mode: saved.mode || 'all',
+                scope: saved.scope || 'global'
+            });
+        }
 
         // ── Search pipeline (debounced) ────────────────────────────────────────
         this.searchSubject.pipe(
@@ -193,12 +220,14 @@ export class GlobalSearchComponent {
 
     // ── Input ─────────────────────────────────────────────────────────────────
     onInput(value: string) {
-        this.query.set(value);
+        this.searchService.globalQuery.set(value);
         this.searchSubject.next(value);
     }
 
     // ── Keyboard navigation ────────────────────────────────────────────────────
     onKeydown(event: KeyboardEvent) {
+        if (this.searchScope() === 'local') return;
+
         const len = this.filteredResults().length;
         switch (event.key) {
             case 'ArrowDown':
@@ -213,7 +242,7 @@ export class GlobalSearchComponent {
                 const idx = this.activeIndex();
                 const res = this.filteredResults();
                 if (idx >= 0 && res[idx]) this.selectResult(res[idx]);
-                else if (res[0])           this.selectResult(res[0]);
+                else if (res[0]) this.selectResult(res[0]);
                 break;
             }
             case 'Escape':
@@ -236,7 +265,7 @@ export class GlobalSearchComponent {
 
     // ── Clear query (keep filters) ─────────────────────────────────────────────
     clearQuery() {
-        this.query.set('');
+        this.searchService.globalQuery.set('');
         this.rawResults.set([]);
         this.isOpen.set(false);
         this.activeIndex.set(-1);
@@ -245,52 +274,76 @@ export class GlobalSearchComponent {
     // ── Filter panel toggle ────────────────────────────────────────────────────
     toggleFilters() {
         this.filtersOpen.update(v => !v);
-        if (this.filtersOpen()) this.isOpen.set(true);
+        if (this.filtersOpen() && this.searchScope() === 'global') this.isOpen.set(true);
+    }
+
+    setScope(scope: SearchScope) {
+        this.searchService.globalFilters.update(f => ({ ...f, scope }));
+        this.persistFilters();
+        if (scope === 'local') {
+            this.isOpen.set(false);
+        } else if (this.query() || this.filtersOpen()) {
+            this.isOpen.set(true);
+        }
+    }
+
+    toggleScope() {
+        const newScope: SearchScope = this.searchScope() === 'global' ? 'local' : 'global';
+        this.setScope(newScope);
     }
 
     // ── Filter mutations ───────────────────────────────────────────────────────
     setCategory(cat: FilterCategory) {
-        this.activeCategory.set(cat);
+        this.searchService.globalFilters.update(f => ({ ...f, category: cat }));
         this.persistFilters();
     }
 
     toggleStatus(status: SearchStatus) {
-        this.activeStatuses.update(list =>
-            list.includes(status) ? list.filter(s => s !== status) : [...list, status]
-        );
+        this.searchService.globalFilters.update(f => ({
+            ...f,
+            status: f.status.includes(status) ? f.status.filter(s => s !== status) : [...f.status, status]
+        }));
         this.persistFilters();
     }
 
     setDateRange(range: DateRange) {
-        this.activeDateRange.update(v => v === range ? '' : range);  // toggle
+        this.searchService.globalFilters.update(f => ({ ...f, dateRange: f.dateRange === range ? '' : range }));
+        this.persistFilters();
+    }
+
+    setMode(mode: WorkshopMode) {
+        this.searchService.globalFilters.update(f => ({ ...f, mode }));
         this.persistFilters();
     }
 
     clearAllFilters() {
-        this.activeCategory.set('all');
-        this.activeStatuses.set([]);
-        this.activeDateRange.set('');
+        this.searchService.globalFilters.update(f => ({
+            ...f,
+            category: 'all',
+            status: [],
+            dateRange: '',
+            mode: 'all',
+            scope: 'global'
+        }));
         this.persistFilters();
     }
 
-    removeChip(chip: { label: string; type: 'category' | 'status' | 'date' }) {
+    removeChip(chip: { label: string; type: 'category' | 'status' | 'date' | 'mode' }) {
         if (chip.type === 'category') {
-            this.activeCategory.set('all');
+            this.searchService.globalFilters.update(f => ({ ...f, category: 'all' }));
         } else if (chip.type === 'status') {
             const val = STATUS_OPTIONS.find(o => o.label === chip.label)?.value;
-            if (val) this.activeStatuses.update(list => list.filter(s => s !== val));
-        } else {
-            this.activeDateRange.set('');
+            if (val) this.searchService.globalFilters.update(f => ({ ...f, status: f.status.filter(s => s !== val) }));
+        } else if (chip.type === 'date') {
+            this.searchService.globalFilters.update(f => ({ ...f, dateRange: '' }));
+        } else if (chip.type === 'mode') {
+            this.searchService.globalFilters.update(f => ({ ...f, mode: 'all' }));
         }
         this.persistFilters();
     }
 
     private persistFilters() {
-        this.searchService.saveFilters({
-            category:  this.activeCategory(),
-            status:    this.activeStatuses(),
-            dateRange: this.activeDateRange(),
-        });
+        this.searchService.saveFilters(this.searchService.globalFilters());
     }
 
     // ── Mobile overlay ─────────────────────────────────────────────────────────

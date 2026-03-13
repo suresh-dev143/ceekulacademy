@@ -1,94 +1,42 @@
-<app-layout [showSearch]="false">
-<div class="workshops-container animate-fade-in">
+<app-layout [showSearch]="true" localPlaceholder="Search workshops & events…">
+    <div class="workshops-container animate-fade-in">
 
-    <!-- ══ Page header ══════════════════════════════════════════════════════ -->
-    <div class="view-header">
-        <h1 class="page-title">Workshops</h1>
-        <p class="section-subtitle">Explore, enroll, create, and manage practical learning sessions.</p>
-    </div>
+        <!-- ══ Page header ══════════════════════════════════════════════════════ -->
+        <div class="view-header">
+            <h1 class="page-title">Workshops</h1>
+            <p class="section-subtitle">Explore, enroll, create, and manage practical learning sessions.</p>
+        </div>
 
-    <!-- ══ Create Workshop (teacher / instructor / admin) ═══════════════════ -->
-    @if (canCreateWorkshop) {
-    <div class="create-workshop-section">
-        @if (!isCreatingWorkshop()) {
-        <button class="btn-create-workshop" (click)="isCreatingWorkshop.set(true)">
-            <i class="fas fa-plus-circle"></i> Create New Workshop
-        </button>
-        }
-    </div>
-    }
-
-    @if (isCreatingWorkshop()) {
-    <app-create-workshop
-        (workshopCreated)="onWorkshopCreated($event)"
-        (cancel)="cancelCreateWorkshop()">
-    </app-create-workshop>
-    }
-
-    <!-- ══ Workshop detail / session management view ═══════════════════════ -->
-    @if (!isCreatingWorkshop()) {
-
-    @if (showWorkshopDetail() && selectedWorkshop()) {
-    <app-workshop-detail
-        [workshop]="selectedWorkshop()!"
-        [userRole]="currentUser()?.role ?? ''"
-        (close)="closeWorkshopDetail()"
-        (sessionAdded)="onSessionAdded()">
-    </app-workshop-detail>
-
-    } @else {
-
-    <!-- ══ Filter bar ════════════════════════════════════════════════════════ -->
-    <div class="ws-filter-bar">
-
-        <!-- Search -->
-        <div class="ws-search-wrap">
-            <i class="fas fa-search ws-search-icon"></i>
-            <input
-                class="ws-search-input"
-                type="text"
-                placeholder="Search by title, description, or expertise…"
-                [value]="searchRaw()"
-                (input)="onSearchInput($any($event.target).value)"
-            />
-            @if (searchRaw()) {
-            <button class="ws-clear-btn" (click)="clearFilters()" title="Clear search">
-                <i class="fas fa-times"></i>
+        <!-- ══ Create Workshop (teacher / instructor / admin) ═══════════════════ -->
+        @if (canCreateWorkshop) {
+        <div class="create-workshop-section">
+            @if (!isCreatingWorkshop()) {
+            <button class="btn-create-workshop" (click)="isCreatingWorkshop.set(true)">
+                Create New Workshop
             </button>
             }
         </div>
+        }
 
-        <!-- Status + Mode filters -->
-        <div class="ws-filter-row">
+        @if (isCreatingWorkshop()) {
+        <app-create-workshop (workshopCreated)="onWorkshopCreated($event)" (cancel)="cancelCreateWorkshop()">
+        </app-create-workshop>
+        }
 
-            <div class="ws-filter-group">
-                <span class="ws-filter-label">Status</span>
-                <div class="ws-toggle-group">
-                    @for (opt of statusOptions; track opt.value) {
-                    <button class="ws-toggle-btn"
-                        [class.active]="statusFilter() === opt.value"
-                        (click)="setStatusFilter(opt.value)">
-                        {{ opt.label }}
-                    </button>
-                    }
-                </div>
-            </div>
+        <!-- ══ Workshop detail / session management view ═══════════════════════ -->
+        @if (!isCreatingWorkshop()) {
 
-            <div class="ws-filter-group">
-                <span class="ws-filter-label">Mode</span>
-                <div class="ws-toggle-group">
-                    @for (opt of modeOptions; track opt.value) {
-                    <button class="ws-toggle-btn"
-                        [class.active]="modeFilter() === opt.value"
-                        (click)="setModeFilter(opt.value)">
-                        {{ opt.label }}
-                    </button>
-                    }
-                </div>
-            </div>
+        @if (showWorkshopDetail() && selectedWorkshop()) {
+        <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="currentUser()?.role ?? ''"
+            [currentUserId]="currentUser()?.id" (close)="closeWorkshopDetail()" (sessionAdded)="onSessionAdded()">
+        </app-workshop-detail>
 
-            <!-- Result count + clear -->
-            <div class="ws-result-meta">
+        } @else {
+
+        <!-- ══ Filter bar ════════════════════════════════════════════════════════ -->
+        <div class="ws-filter-bar">
+            <!-- Result count -->
+            <div class="ws-result-meta" style="margin-left: 0;">
                 @if (!isLoading()) {
                 <span class="ws-result-count">
                     {{ filteredWorkshops().length }}
@@ -96,102 +44,86 @@
                 </span>
                 }
                 @if (activeFilterCount() > 0) {
-                <button class="clear-all-btn" (click)="clearFilters()">
-                    <i class="fas fa-times-circle"></i> Clear filters
-                    <span class="badge">{{ activeFilterCount() }}</span>
+                <button class="clear-all-btn" style="pointer-events: none;">
+                    <i class="fas fa-filter"></i> {{ activeFilterCount() }} active filter{{ activeFilterCount() !== 1 ?
+                    's' : '' }}
                 </button>
                 }
             </div>
-
         </div>
-    </div>
 
-    <!-- ══ Loading — skeleton cards ═════════════════════════════════════════ -->
-    @if (isLoading()) {
-    <div class="course-grid">
-        @for (i of skeletonItems; track i) {
-        <div class="ws-skeleton-card">
-            <div class="ws-sk ws-sk--badge"></div>
-            <div class="ws-sk ws-sk--title"></div>
-            <div class="ws-sk ws-sk--line"></div>
-            <div class="ws-sk ws-sk--line ws-sk--short"></div>
-            <div class="ws-sk ws-sk--meta"></div>
-            <div class="ws-sk ws-sk--bar"></div>
-            <div class="ws-sk ws-sk--footer"></div>
+        <!-- ══ Loading — skeleton cards ═════════════════════════════════════════ -->
+        @if (isLoading()) {
+        <div class="course-grid">
+            @for (i of skeletonItems; track i) {
+            <div class="ws-skeleton-card">
+                <div class="ws-sk ws-sk--badge"></div>
+                <div class="ws-sk ws-sk--title"></div>
+                <div class="ws-sk ws-sk--line"></div>
+                <div class="ws-sk ws-sk--line ws-sk--short"></div>
+                <div class="ws-sk ws-sk--meta"></div>
+                <div class="ws-sk ws-sk--bar"></div>
+                <div class="ws-sk ws-sk--footer"></div>
+            </div>
+            }
         </div>
-        }
-    </div>
 
-    <!-- ══ Workshop cards ════════════════════════════════════════════════════ -->
-    } @else if (paginatedWorkshops().length > 0) {
-    <div class="course-grid">
-        @for (w of paginatedWorkshops(); track w._id) {
-        <app-workshop-card
-            [workshop]="w"
-            [userRole]="currentUser()?.role ?? ''"
-            (view)="onViewWorkshop($event)"
-            (manage)="onManageWorkshop($event)"
-            (book)="onBookWorkshop($event)"
-            (audit)="onAuditWorkshop($event)"
-        />
-        }
-    </div>
+        <!-- ══ Workshop cards ════════════════════════════════════════════════════ -->
+        } @else if (paginatedWorkshops().length > 0) {
+        <div class="course-grid">
+            @for (w of paginatedWorkshops(); track w._id) {
+            <app-workshop-card [workshop]="w" [userRole]="currentUser()?.role ?? ''" [currentUserId]="currentUser()?.id"
+                (view)="onViewWorkshop($event)" (manage)="onManageWorkshop($event)" (book)="onBookWorkshop($event)"
+                (audit)="onAuditWorkshop($event)" />
+            }
+        </div>
 
-    <!-- ══ Pagination ════════════════════════════════════════════════════════ -->
-    @if (totalPages() > 1) {
-    <nav class="ws-pagination" aria-label="Workshop pages">
-        <button class="ws-page-btn ws-page-nav"
-            [disabled]="currentPage() === 1"
-            (click)="goToPage(currentPage() - 1)"
-            aria-label="Previous page">
-            <i class="fas fa-chevron-left"></i>
-        </button>
+        <!-- ══ Pagination ════════════════════════════════════════════════════════ -->
+        @if (totalPages() > 1) {
+        <nav class="ws-pagination" aria-label="Workshop pages">
+            <button class="ws-page-btn ws-page-nav" [disabled]="currentPage() === 1"
+                (click)="goToPage(currentPage() - 1)" aria-label="Previous page">
+                <i class="fas fa-chevron-left"></i>
+            </button>
 
-        @for (item of paginationItems(); track $index) {
+            @for (item of paginationItems(); track $index) {
             @if (item === null) {
             <span class="ws-page-ellipsis">…</span>
             } @else {
-            <button class="ws-page-btn"
-                [class.active]="item === currentPage()"
-                (click)="goToPage(item)"
+            <button class="ws-page-btn" [class.active]="item === currentPage()" (click)="goToPage(item)"
                 [attr.aria-current]="item === currentPage() ? 'page' : null">
                 {{ item }}
             </button>
             }
+            }
+
+            <button class="ws-page-btn ws-page-nav" [disabled]="currentPage() === totalPages()"
+                (click)="goToPage(currentPage() + 1)" aria-label="Next page">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </nav>
         }
 
-        <button class="ws-page-btn ws-page-nav"
-            [disabled]="currentPage() === totalPages()"
-            (click)="goToPage(currentPage() + 1)"
-            aria-label="Next page">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-    </nav>
-    }
+        <!-- ══ Empty state ═══════════════════════════════════════════════════════ -->
+        } @else {
+        <div class="empty-search">
+            <i class="fas fa-chalkboard-teacher" style="font-size:2.5rem; margin-bottom:1rem; opacity:0.3;"></i>
+            @if (activeFilterCount() > 0) {
+            <p><strong>No workshops match your filters.</strong></p>
+            <p>Try clearing filters from the global search bar.</p>
+            } @else {
+            <p><strong>No workshops found.</strong></p>
+            @if (canCreateWorkshop) {
+            <p>Create your first workshop using the button above.</p>
+            } @else {
+            <p>Check back soon — workshops will appear here once available.</p>
+            }
+            }
+        </div>
+        }
 
-    <!-- ══ Empty state ═══════════════════════════════════════════════════════ -->
-    } @else {
-    <div class="empty-search">
-        <i class="fas fa-chalkboard-teacher" style="font-size:2.5rem; margin-bottom:1rem; opacity:0.3;"></i>
-        @if (activeFilterCount() > 0) {
-        <p><strong>No workshops match your filters.</strong></p>
-        <p>Try clearing some filters or changing your search query.</p>
-        <button class="clear-all-btn" style="margin-top:1rem;" (click)="clearFilters()">
-            <i class="fas fa-times-circle"></i> Clear all filters
-        </button>
-        } @else {
-        <p><strong>No workshops found.</strong></p>
-        @if (canCreateWorkshop) {
-        <p>Create your first workshop using the button above.</p>
-        } @else {
-        <p>Check back soon — workshops will appear here once available.</p>
-        }
-        }
+        }<!-- end detail/list check -->
+        }<!-- end create-workshop check -->
+
     </div>
-    }
-
-    }<!-- end detail/list check -->
-    }<!-- end create-workshop check -->
-
-</div>
 </app-layout>

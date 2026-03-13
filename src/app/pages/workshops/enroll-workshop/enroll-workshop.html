@@ -24,8 +24,7 @@
         <div class="form-section">
             <h3>Enrollment Type</h3>
             <div class="radio-group">
-                @if (userRole() === 'Instructor' || userRole() === 'Teacher' ||
-                userRole() === 'Researcher' || userRole() === 'Admin') {
+                @if (userRole()) {
                 <label class="radio-option">
                     <input type="radio" formControlName="enrollmentType" value="support">
                     <span>Practical Hands-on Support (Instructor)</span>
@@ -35,6 +34,85 @@
                     <input type="radio" formControlName="enrollmentType" value="learning">
                     <span>Learn (Student)</span>
                 </label>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>Workshop Mode & Streaming</h3>
+            <div class="form-group">
+                <label class="form-label">Choose Mode *</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" formControlName="modeSelection" value="online">
+                        <span>Online Only</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" formControlName="modeSelection" value="hybrid">
+                        <span>Hybrid (Online + Physical)</span>
+                    </label>
+                </div>
+            </div>
+
+            @if (enrollWorkshopForm.get('modeSelection')?.value === 'hybrid') {
+            <div class="form-group animate-fade-in">
+                <label class="form-label">How will you attend? *</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" formControlName="attendanceMode" value="online">
+                        <span>Online Streaming</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" formControlName="attendanceMode" value="physical">
+                        <span>Attend Physically (Venue fee applies)</span>
+                    </label>
+                </div>
+            </div>
+            }
+
+            <div class="form-group">
+                <label class="form-label">Streaming Quality/Platform *</label>
+                <div class="quality-grid">
+                    @for (tier of qualityTiers; track tier.id) {
+                    <label class="quality-option" [class.selected]="enrollWorkshopForm.get('qualityTier')?.value === tier.id">
+                        <input type="radio" formControlName="qualityTier" [value]="tier.id">
+                        <div class="quality-info">
+                            <span class="quality-label">{{ tier.label }}</span>
+                            <span class="quality-fee">@if(tier.fee > 0){₹{{ tier.fee }}}@else{Free}</span>
+                        </div>
+                    </label>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mobilizer ID (Optional)</label>
+                <input type="text" class="form-control" formControlName="mobilizerId" placeholder="Enter ID if you were referred">
+            </div>
+        </div>
+
+        <div class="form-section payment-summary">
+            <h3>Payment Breakdown</h3>
+            <div class="breakdown-list">
+                <div class="breakdown-item">
+                    <span>Workshop Fee</span>
+                    <span>₹{{ feeBreakdown.workshopFee }}</span>
+                </div>
+                @if (feeBreakdown.streamingFee > 0) {
+                <div class="breakdown-item">
+                    <span>Streaming Fee ({{ enrollWorkshopForm.get('qualityTier')?.value | uppercase }})</span>
+                    <span>₹{{ feeBreakdown.streamingFee }}</span>
+                </div>
+                }
+                @if (feeBreakdown.venueFee > 0) {
+                <div class="breakdown-item">
+                    <span>Venue Fee</span>
+                    <span>₹{{ feeBreakdown.venueFee }}</span>
+                </div>
+                }
+                <div class="breakdown-item total">
+                    <span>Total Amount</span>
+                    <span>₹{{ totalFees }}</span>
+                </div>
             </div>
         </div>
 
@@ -74,8 +152,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Fee (₹) *</label>
-                        <input type="number" class="form-control" [formControl]="$any(row.get('fee'))"
-                            min="0">
+                        <input type="number" class="form-control" [formControl]="$any(row.get('fee'))" min="0">
                     </div>
                     <div class="radio-group">
                         <label class="radio-option">
@@ -124,50 +201,50 @@
             </div>
 
             @for (row of studentSchedule.controls; track $index) {
-                <div class="schedule-grid">
+            <div class="schedule-grid">
                 <div class="form-group">
-                <label class="form-label">Activity Type *</label>
-                <select class="form-control" [formControl]="$any(row.get('activity'))">
-                    <option value="">Choose Activity</option>
-                    <option value="theory">Theory</option>
-                    <option value="practical">Practical</option>
-                    <option value="discussion">Open Discussion</option>
-                </select>
+                    <label class="form-label">Activity Type *</label>
+                    <select class="form-control" [formControl]="$any(row.get('activity'))">
+                        <option value="">Choose Activity</option>
+                        <option value="theory">Theory</option>
+                        <option value="practical">Practical</option>
+                        <option value="discussion">Open Discussion</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Choose Instructor *</label>
+                    <select class="form-control" [formControl]="$any(row.get('instructor'))">
+                        <option value="">Choose</option>
+                        @for (inst of enrolledInstructors; track inst) {
+                        <option [value]="inst">{{ inst }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" [formControl]="$any(row.get('mode'))" value="online">
+                        <span>Online</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" [formControl]="$any(row.get('mode'))" value="hybrid">
+                        <span>Hybrid (Online + In-Person)</span>
+                    </label>
+                </div>
             </div>
-                    <div class="form-group">
-                        <label class="form-label">Choose Instructor *</label>
-                        <select class="form-control" [formControl]="$any(row.get('instructor'))">
-                            <option value="">Choose</option>
-                            @for (inst of enrolledInstructors; track inst) {
-                            <option [value]="inst">{{ inst }}</option>
-                            }
-                        </select>
-                    </div>
-                   
-                   <div class="radio-group">
-                        <label class="radio-option">
-                            <input type="radio" [formControl]="$any(row.get('mode'))" value="online">
-                            <span>Online</span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" [formControl]="$any(row.get('mode'))" value="hybrid">
-                            <span>Hybrid (Online + In-Person)</span>
-                        </label>
-                    </div>
+            <div>
+                @if (row.get('mode')?.value === 'hybrid') {
+                <div class="form-group">
+                    <label class="form-label">Location *</label>
+                    <select class="form-control" [formControl]="$any(row.get('location'))">
+                        <option value="">Choose Location</option>
+                        @for (loc of registeredLocations; track loc) {
+                        <option [value]="loc">{{ loc }}</option>
+                        }
+                    </select>
                 </div>
-                <div >
-                     @if (row.get('mode')?.value === 'hybrid') {
-                    <div class="form-group">
-                        <label class="form-label">Location *</label>
-                        <select class="form-control" [formControl]="$any(row.get('location'))">
-                            <option value="">Choose Location</option>
-                            @for (loc of registeredLocations; track loc) {
-                            <option [value]="loc">{{ loc }}</option>
-                            }
-                        </select>
-                    </div>
-                    }
-                </div>
+                }
+            </div>
             <div class="schedule-row">
                 <div class="schedule-grid">
                     <div class="form-group">
@@ -185,11 +262,11 @@
                 </div>
 
                 <div class="schedule-grid">
-                        
-                     
+
+
                 </div>
 
-                
+
 
                 <button type="button" class="btn-remove-schedule" (click)="removeStudentScheduleRow($index)"
                     [disabled]="studentSchedule.length === 1">

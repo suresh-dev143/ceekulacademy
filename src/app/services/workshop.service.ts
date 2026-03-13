@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
@@ -141,6 +141,7 @@ export interface GetWorkshopsResponse {
 export interface GetWorkshopsParams {
     page?: number;
     limit?: number;
+    skipToast?: boolean;
 }
 
 // ── ADD SESSIONS types ────────────────────────────────────────────────────────
@@ -182,6 +183,44 @@ export class WorkshopService {
     private http = inject(HttpClient);
     private auth = inject(AuthService);
     private readonly base = environment.apiUrl;
+    private readonly STORAGE_KEY = 'gs-local-workshops';
+
+    // ── Local Cache (Signals) ──────────────────────────────────────────────────
+    private _localWorkshops = signal<WorkshopListItem[]>(this.loadFromStorage());
+    readonly localWorkshops = this._localWorkshops.asReadonly();
+
+    private loadFromStorage(): WorkshopListItem[] {
+        try {
+            const raw = localStorage.getItem(this.STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch {
+            return [];
+        }
+    }
+
+    private saveToStorage(list: WorkshopListItem[]): void {
+        try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(list));
+        } catch { /* noop */ }
+    }
+
+    private addToLocalCache(w: CreatedWorkshopData): void {
+        const item: WorkshopListItem = {
+            ...w,
+            workshopMode: w.workshopMode as 'online' | 'hybrid',
+            instructorType: w.instructorType as 'myself' | 'open',
+            status: w.status as WorkshopStatus,
+            sessions: w.sessions.map(s => ({
+                ...s,
+                mode: s.mode as 'online' | 'hybrid'
+            }))
+        };
+        this._localWorkshops.update(list => {
+            const newList = [item, ...list.filter(x => x._id !== item._id)];
+            this.saveToStorage(newList);
+            return newList;
+        });
+    }
 
     getCurrentUserId(): string | undefined {
         return this.auth.currentUserProfile()?.id;
@@ -197,6 +236,12 @@ export class WorkshopService {
         return this.http.post<CreateWorkshopResponse>(
             `${this.base}/api/v1/workshops`,
             payload
+        ).pipe(
+            tap(res => {
+                if (res.status && res.data) {
+                    this.addToLocalCache(res.data);
+                }
+            })
         );
     }
 
@@ -265,11 +310,51 @@ export class WorkshopService {
     // ── Get my workshops ──────────────────────────────────────────────────────
 
     getMyWorkshops(params: GetWorkshopsParams = {}): Observable<GetWorkshopsResponse> {
-        const { page = 1, limit = 100 } = params;
+        const { page = 1, limit = 100, skipToast = false } = params;
+
+        let headers = new HttpHeaders();
+        if (skipToast) {
+            headers = headers.set('X-Skip-Error-Toast', 'true');
+        }
 
         return this.http
             .get<GetWorkshopsResponse>(`${this.base}/api/v1/workshops/my`, {
-                params: { page: String(page), limit: String(limit) }
+                params: { page: String(page), limit: String(limit) },
+                headers
+            })
+            .pipe(
+                map(res => ({
+                    ...res,
+                    data: {
+                        ...res.data,
+                        workshops: res.data.workshops.map(w => ({
+                            ...w,
+                            workshopTitle: decodeHtml(w.workshopTitle),
+                            workshopDescription: decodeHtml(w.workshopDescription),
+                            expertDescription: decodeHtml(w.expertDescription),
+                            sessions: w.sessions.map(s => ({
+                                ...s,
+                                activity: decodeHtml(s.activity),
+                            })),
+                        })),
+                    },
+                }))
+            );
+    }
+
+    // ── Get all public workshops ────────────────────────────────────────────────
+    getPublicWorkshops(params: GetWorkshopsParams = {}): Observable<GetWorkshopsResponse> {
+        const { page = 1, limit = 100, skipToast = false } = params;
+
+        let headers = new HttpHeaders();
+        if (skipToast) {
+            headers = headers.set('X-Skip-Error-Toast', 'true');
+        }
+
+        return this.http
+            .get<GetWorkshopsResponse>(`${this.base}/api/v1/workshops`, {
+                params: { page: String(page), limit: String(limit) },
+                headers
             })
             .pipe(
                 map(res => ({

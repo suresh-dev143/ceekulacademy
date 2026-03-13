@@ -26,11 +26,10 @@ $status: (
     padding: 1.4rem 1.5rem 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
-    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    gap: 0.12rem;
+
 
     &:hover {
-        transform: translateY(-4px);
         border-color: color-mix(in srgb, #fff, transparent 85%);
         box-shadow: 0 8px 28px color-mix(in srgb, #000, transparent 65%);
     }
@@ -114,7 +113,7 @@ $status: (
     line-height: 1.6;
     margin: 0;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -152,6 +151,7 @@ $status: (
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    margin-bottom: 0.5rem
 }
 
 .wc-sessions-head {

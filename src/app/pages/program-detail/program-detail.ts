@@ -4,35 +4,35 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../components/navbar/navbar';
 import { ChatPanelComponent } from '../../components/chat-panel/chat-panel';
 import { ProgramSidebarComponent } from '../../components/program-sidebar/program-sidebar';
+import { GlobalSearchComponent } from '../../components/global-search/global-search';
 import { ProgramNavService, ActiveContent } from '../../services/program-nav.service';
 import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-program-detail',
     standalone: true,
-    imports: [CommonModule, NavbarComponent, ChatPanelComponent, ProgramSidebarComponent],
+    imports: [CommonModule, NavbarComponent, ChatPanelComponent, ProgramSidebarComponent, GlobalSearchComponent],
     templateUrl: './program-detail.html',
     styleUrl: './program-detail.scss'
 })
 export class ProgramDetailComponent implements OnInit, OnDestroy {
 
     private navService = inject(ProgramNavService);
-    private route      = inject(ActivatedRoute);
-    private router     = inject(Router);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
 
-    searchQuery       = signal('');
     mobileSidebarOpen = signal(false);
-    content           = computed((): ActiveContent | null => this.navService.activeContent());
+    content = computed((): ActiveContent | null => this.navService.activeContent());
 
     private sub!: Subscription;
 
     ngOnInit() {
         // Sync route params → service state on every navigation
         this.sub = this.route.paramMap.subscribe(params => {
-            const pid   = params.get('programId')   ?? '';
-            const sid   = params.get('sectionId')   ?? null;
-            const ssid  = params.get('subSectionId') ?? null;
-            const iid   = this.route.snapshot.queryParamMap.get('item') ?? null;
+            const pid = params.get('programId') ?? '';
+            const sid = params.get('sectionId') ?? null;
+            const ssid = params.get('subSectionId') ?? null;
+            const iid = this.route.snapshot.queryParamMap.get('item') ?? null;
 
             if (!pid) { this.router.navigate(['/programs']); return; }
             this.navService.setActive(pid, sid, ssid, iid);

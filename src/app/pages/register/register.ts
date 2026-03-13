@@ -1,22 +1,25 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LayoutComponent } from '../../components/layout/layout';
-import { AuthService, RegisterRequest } from '../../services/auth.service';
+import { AuthService, RegisterRequest, AuthResponse } from '../../services/auth.service';
+import { NavbarComponent } from '../../components/navbar/navbar';
 
 @Component({
     selector: 'app-register',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, LayoutComponent],
+    imports: [CommonModule, ReactiveFormsModule, RouterLink, NavbarComponent],
     templateUrl: './register.html',
     styleUrl: './register.scss'
 })
 export class RegisterComponent {
+    private authService = inject(AuthService);
     registerForm: FormGroup;
     currentStep: number = 1;
     totalSteps: number = 3;
 
     isSubmitting = signal(false);
+    isLoggedIn = this.authService.isLoggedIn;
 
     // Available roles
     roles = [
@@ -56,8 +59,7 @@ export class RegisterComponent {
 
     constructor(
         private fb: FormBuilder,
-        private router: Router,
-        private authService: AuthService
+        private router: Router
     ) {
         this.registerForm = this.fb.group({
             // Step 1: Basic Details
@@ -172,24 +174,50 @@ export class RegisterComponent {
         const v = this.registerForm.value;
 
         const payload: RegisterRequest = {
-            email:        v.email,
-            password:     v.password,
+            email: v.email,
+            password: v.password,
             authProvider: 'EMAIL_PASSWORD',
-            name:         v.name,
-            dateOfBirth:  v.dob,
-            gender:       v.gender,
-            selectedRole: v.selectedRoles[0] ?? '',
+            name: v.name,
+            dateOfBirth: v.dob,
+            gender: v.gender,
             address: {
-                village:  v.village,
-                pincode:  v.pincode,
+                village: v.village,
+                pincode: v.pincode,
                 district: v.district,
             },
         };
 
+        const primaryRole = v.selectedRoles[0] ?? '';
+        
+        // Activity Mapping
+        const activityMap: { [key: string]: string } = {
+            'Student': 'Learning',
+            'Teacher': 'Teaching',
+            'Researcher': 'Research',
+            'Entrepreneur': 'Entrepreneurship',
+            'Director': 'Management',
+            'Manager': 'Management',
+            'Volunteer': 'Volunteering',
+            'Partner': 'Partnership',
+            'Investor': 'Investment',
+            'Beneficiary': 'Benefit',
+            'Any Other': 'Engagement'
+        };
+
+        if (primaryRole === 'Partner') {
+            payload.partnerType = v.partnerType;
+        } else if (primaryRole) {
+            payload.expertTypes = [primaryRole];
+        }
+
+        if (primaryRole && activityMap[primaryRole]) {
+            payload.activityType = [activityMap[primaryRole]];
+        }
+
         this.isSubmitting.set(true);
 
         this.authService.register(payload).subscribe({
-            next: (res) => {
+            next: (res: AuthResponse) => {
                 this.isSubmitting.set(false);
                 const role = res.user.role?.toLowerCase() ?? '';
                 this.router.navigate([`/${role}-dashboard`]).catch(() => {

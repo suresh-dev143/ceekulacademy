@@ -1,5 +1,5 @@
 .registration-page {
-    padding: 0 1rem 2rem;
+    padding: 2rem 1rem 4rem;
     background: #000000;
     min-height: 100vh;
     width: 100%;
@@ -11,6 +11,87 @@
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
+}
+
+/* Already Logged In State */
+.already-logged-in {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4rem 1rem;
+    min-height: 60vh;
+
+    .message-card {
+        background: #050505;
+        border: 1px solid var(--row-border);
+        padding: 3rem 2rem;
+        text-align: center;
+        max-width: 500px;
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+        i {
+            font-size: 4rem;
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            flex-direction: column;
+
+            a {
+                padding: 0.8rem 2rem;
+                border-radius: 4px;
+                text-decoration: none;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 0.9rem;
+                transition: all 0.2s;
+            }
+
+            .btn-dashboard {
+                background: var(--accent-primary);
+                color: #000000;
+                border: 1px solid var(--accent-primary);
+
+                &:hover {
+                    background: transparent;
+                    color: var(--accent-primary);
+                }
+            }
+
+            .btn-profile {
+                background: transparent;
+                border: 1px solid var(--row-border);
+                color: var(--text-secondary);
+
+                &:hover {
+                    border-color: var(--accent-primary);
+                    color: var(--text-primary);
+                }
+            }
+        }
+    }
 }
 
 .reg-info {

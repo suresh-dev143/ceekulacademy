@@ -1,22 +1,29 @@
 <nav class="snav" [class.snav--collapsed]="collapsed">
 
     <!-- ── Identity Strip ── -->
-    <!-- <div class="snav-identity">
+    <div class="snav-identity">
+        <div class="snav-avatar">
+            <i class="fas fa-user"></i>
+        </div>
         @if (!collapsed) {
         <div class="snav-user-info">
-            <div class="snav-username">{{ userProfile().name }}</div>
-            <div class="snav-role">{{ userRole() }}</div>
+            <div class="snav-username">{{ userProfile()?.name }}</div>
+            <div class="snav-role">{{ displayIdentity() }}</div>
         </div>
         }
-    </div> -->
+    </div>
 
     <!-- ── District Banner (Director only) ── -->
     @if (userRole() === 'Director') {
     <div class="snav-district">
         @if (!collapsed) {
-        <div class="snav-district-name">{{ userProfile()?.assignedDistrict | uppercase }}</div>
+        <div class="snav-district-content">
+            <span class="snav-district-label">District</span>
+            <div class="snav-district-name">{{ userProfile()?.assignedDistrict | uppercase }}</div>
+        </div>
+        <i class="fas fa-map-pin snav-district-icon"></i>
         } @else {
-        <!-- <i class="fas fa-map-pin snav-district-icon"></i> -->
+        <i class="fas fa-map-pin snav-district-icon"></i>
         }
     </div>
     }
@@ -26,18 +33,15 @@
         @for (section of allSections(); track $index) {
         <div class="snav-section">
 
-            @if (!collapsed) {
+            @if (!collapsed && section.label) {
             <div class="snav-section-lbl">{{ section.label }}</div>
             }
             @for (item of section.items; track item.label) {
             @if (!item.disabled) {
-            <a class="snav-item"
-               [class.snav-item--active]="item.isActive"
-               [routerLink]="item.route"
-               routerLinkActive="snav-item--active"
-               [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-               [title]="collapsed ? item.label : ''">
-                <!-- <i class="fas {{ item.icon }} snav-item-icon"></i> -->
+            <a class="snav-item" [class.snav-item--active]="item.isActive" [routerLink]="item.route"
+                routerLinkActive="snav-item--active" [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                [title]="collapsed ? item.label : ''">
+
                 @if (!collapsed) {
                 <span class="snav-item-label">{{ item.label }}</span>
                 @if (item.badge) {
@@ -45,12 +49,25 @@
                 }
                 }
             </a>
+
+            <!-- Nested Items -->
+            @if (!collapsed && item.children) {
+            <div class="snav-nested-container">
+                @for (child of item.children; track child.label) {
+                <a class="snav-item snav-item-nested" [routerLink]="child.route" routerLinkActive="snav-item--active"
+                    [routerLinkActiveOptions]="{ exact: child.exact ?? false }">
+                    <span class="snav-item-label">{{ child.label }}</span>
+                </a>
+                }
+            </div>
+            }
+
             } @else {
-            <div class="snav-item snav-item--disabled" [title]="collapsed ? item.label + ' (coming soon)' : ''">
-                <!-- <i class="fas {{ item.icon }} snav-item-icon"></i> -->
+            <div class="snav-item snav-item--disabled" [title]="collapsed ? item.label  : ''">
+
                 @if (!collapsed) {
                 <span class="snav-item-label">{{ item.label }}</span>
-                <span class="snav-item-soon">Soon</span>
+
                 }
             </div>
             }
@@ -60,10 +77,14 @@
         }
     </div>
 
-    <!-- ── Footer: Issues Ticker ── -->
+    <!-- ── Footer: News Ticker & Logout ── -->
     @if (!collapsed) {
     <div class="snav-footer">
-        <app-issues-sidebar-ticker></app-issues-sidebar-ticker>
+        <app-news-sidebar-ticker></app-news-sidebar-ticker>
+        <button class="snav-logout-btn" (click)="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
     </div>
     }
 

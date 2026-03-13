@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { WorkshopListItem, WorkshopApiSession } from '../../../services/workshop.service';
 
@@ -7,17 +7,24 @@ import { WorkshopListItem, WorkshopApiSession } from '../../../services/workshop
     standalone: true,
     imports: [CommonModule, DecimalPipe],
     templateUrl: './workshop-card.html',
-    styleUrl:    './workshop-card.scss',
+    styleUrl: './workshop-card.scss',
 })
 export class WorkshopCardComponent {
 
     workshop = input.required<WorkshopListItem>();
     userRole = input<string>('');
+    currentUserId = input<string | undefined>();
 
-    view   = output<WorkshopListItem>();
+    isOwner = computed(() => {
+        const userId = this.currentUserId();
+        const workshop = this.workshop();
+        return !!userId && workshop.createdBy === userId;
+    });
+
+    view = output<WorkshopListItem>();
     manage = output<WorkshopListItem>();
-    book   = output<WorkshopListItem>();
-    audit  = output<WorkshopListItem>();
+    book = output<WorkshopListItem>();
+    audit = output<WorkshopListItem>();
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -53,10 +60,10 @@ export class WorkshopCardComponent {
 
     get statusLabel(): string {
         const map: Record<string, string> = {
-            draft:     'Draft',
+            draft: 'Draft',
             published: 'Published',
-            active:    'Active',
-            ongoing:   'Ongoing',
+            active: 'Active',
+            ongoing: 'Ongoing',
             completed: 'Completed',
             cancelled: 'Cancelled',
         };
@@ -72,7 +79,7 @@ export class WorkshopCardComponent {
     }
 
     get isTeacherRole(): boolean {
-        return ['Teacher', 'Instructor'].includes(this.userRole());
+        return ['Student', 'Teacher', 'Instructor'].includes(this.userRole());
     }
 
     get isStudentRole(): boolean {

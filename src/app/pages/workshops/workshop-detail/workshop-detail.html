@@ -31,7 +31,7 @@
         <div class="wd-title-row">
             <h1 class="wd-title">{{ currentWorkshop().workshopTitle }}</h1>
             <div class="wd-actions">
-                @if ((isTeacher || isDirector) && currentWorkshop().status !== 'cancelled') {
+                @if (isOwner() && currentWorkshop().status !== 'cancelled') {
                 <button type="button" class="wd-edit-info-btn" (click)="openEditInfoForm()" title="Edit Workshop Info">
                     <i class="fas fa-edit"></i> Edit Info
                 </button>
@@ -90,7 +90,7 @@
                 <i class="fas fa-calendar-day"></i> Sessions
                 <span class="wd-session-count-badge">{{ localSessions().length }}</span>
             </div>
-            @if (isTeacher && !showAddForm()) {
+            @if (isOwner() && !showAddForm()) {
             <button type="button" class="wd-add-btn" (click)="openAddForm()">
                 <i class="fas fa-plus"></i> Add Session
             </button>
@@ -249,7 +249,7 @@
         <div class="wd-empty-sessions">
             <i class="fas fa-calendar-times"></i>
             <p>No sessions have been scheduled yet.</p>
-            @if (isTeacher) {
+            @if (isOwner()) {
             <button type="button" class="wd-add-btn" (click)="openAddForm()">
                 <i class="fas fa-plus"></i> Schedule the First Session
             </button>
@@ -333,7 +333,7 @@
     </section>
 
     <!-- ══ Student action bar ════════════════════════════════════════════════ -->
-    @if (isStudent && localSessions().length > 0) {
+    @if (canEnroll && localSessions().length > 0) {
     <div class="wd-student-bar">
         <div class="wd-student-bar-text">
             <i class="fas fa-info-circle"></i>

@@ -3,7 +3,6 @@
 }
 
 .workshops-container {
-    padding: 0rem 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -565,10 +564,10 @@ textarea {
 // ────────────────────────────────────────────────────────────────
 
 .course-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
 }
 
 .course-card {
@@ -832,7 +831,8 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-bottom: 2rem;
+    justify-content: flex-end;
+    padding: 1rem 1.5rem;
 }
 
 .ws-search-wrap {
@@ -1186,5 +1186,102 @@ textarea {
     .tab-btn {
         padding: 0.7rem 0.9rem;
         font-size: 0.8rem;
+    }
+}
+
+.quality-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.quality-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: color-mix(in srgb, #fff, transparent 95%);
+    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    input {
+        accent-color: #FF6B00;
+        width: 18px;
+        height: 18px;
+    }
+
+    .quality-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .quality-label {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+    }
+
+    .quality-fee {
+        font-size: 0.85rem;
+        color: #FF6B00;
+        font-weight: 700;
+    }
+
+    &:hover {
+        background: color-mix(in srgb, #fff, transparent 92%);
+        border-color: color-mix(in srgb, #FF6B00, transparent 60%);
+    }
+
+    &.selected {
+        background: color-mix(in srgb, #FF6B00, transparent 90%);
+        border-color: #FF6B00;
+    }
+}
+
+.payment-summary {
+    background: color-mix(in srgb, #FF6B00, transparent 96%);
+    border: 1px solid color-mix(in srgb, #FF6B00, transparent 90%);
+    padding: 2rem;
+    border-radius: 16px;
+    margin-top: 2rem;
+
+    h3 {
+        border-bottom-color: color-mix(in srgb, #FF6B00, transparent 80%) !important;
+    }
+}
+
+.breakdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-secondary);
+    font-size: 1rem;
+
+    &.total {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px dashed color-mix(in srgb, #FF6B00, transparent 70%);
+        color: var(--text-primary);
+        font-weight: 800;
+        font-size: 1.4rem;
+
+        span:last-child {
+            color: #FF6B00;
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .quality-grid {
+        grid-template-columns: 1fr;
     }
 }

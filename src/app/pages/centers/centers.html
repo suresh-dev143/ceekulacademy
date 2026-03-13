@@ -16,11 +16,8 @@
 
     <!-- ═══════════════════════════ SEARCH ROW ════════════════════════════ -->
     <div class="search-row">
-        <div class="search-bar">
-            <input type="text" placeholder="Search centers… type a center name to open its full intelligence profile"
-                (input)="onSearch($event)" [value]="searchQuery()">
-            <button class="search-btn"><i class="fas fa-search"></i></button>
-        </div>
+        <app-global-search
+            localPlaceholder="Search centers… type a center name to open its full intelligence profile"></app-global-search>
         @if (selectedCenter()) {
         <button class="back-btn" (click)="clearSearch()">
             <i class="fas fa-arrow-left"></i> ALL CENTERS
@@ -68,8 +65,7 @@
                         }
                         <!-- Axis lines -->
                         @for (ax of [0,1,2,3,4,5]; track ax) {
-                        <line class="r-axis" x1="100" y1="100"
-                            [attr.x2]="radarAxisX(ax, 6, 100, 100, 72)"
+                        <line class="r-axis" x1="100" y1="100" [attr.x2]="radarAxisX(ax, 6, 100, 100, 72)"
                             [attr.y2]="radarAxisY(ax, 6, 100, 100, 72)"></line>
                         }
                         <!-- Data polygon -->
@@ -87,8 +83,7 @@
                         <text class="r-lbl" x="22" y="52" text-anchor="end">HARMONY</text>
                         <!-- Score dots -->
                         @for (ax of [0,1,2,3,4,5]; track ax) {
-                        <circle class="r-dot"
-                            [attr.cx]="radarAxisX(ax, 6, 100, 100,
+                        <circle class="r-dot" [attr.cx]="radarAxisX(ax, 6, 100, 100,
                                 [network6mCIS().womenParticipation, network6mCIS().lowestStrataInclusion,
                                  network6mCIS().originalResearch, network6mCIS().innovationDeployment,
                                  network6mCIS().digitalAdvancement, network6mCIS().globalHarmony][ax] / 100 * 72)"
@@ -103,64 +98,95 @@
 
                 <!-- 6 component scores -->
                 <div class="cis-components">
-                    <div class="cis-comp"><span class="cc-lbl" style="color:#c084fc">WOMEN</span><span class="cc-val">{{ network6mCIS().womenParticipation }}</span></div>
-                    <div class="cis-comp"><span class="cc-lbl" style="color:#c084fc">STRATA</span><span class="cc-val">{{ network6mCIS().lowestStrataInclusion }}</span></div>
-                    <div class="cis-comp"><span class="cc-lbl" style="color:#60a5fa">RESEARCH</span><span class="cc-val">{{ network6mCIS().originalResearch }}</span></div>
-                    <div class="cis-comp"><span class="cc-lbl" style="color:#ef9d57">INNOV.</span><span class="cc-val">{{ network6mCIS().innovationDeployment }}</span></div>
-                    <div class="cis-comp"><span class="cc-lbl" style="color:#22c55e">DIGITAL</span><span class="cc-val">{{ network6mCIS().digitalAdvancement }}</span></div>
-                    <div class="cis-comp"><span class="cc-lbl" style="color:#fbbf24">HARMONY</span><span class="cc-val">{{ network6mCIS().globalHarmony }}</span></div>
+                    <div class="cis-comp"><span class="cc-lbl" style="color:#c084fc">WOMEN</span><span class="cc-val">{{
+                            network6mCIS().womenParticipation }}</span></div>
+                    <div class="cis-comp"><span class="cc-lbl" style="color:#c084fc">STRATA</span><span
+                            class="cc-val">{{ network6mCIS().lowestStrataInclusion }}</span></div>
+                    <div class="cis-comp"><span class="cc-lbl" style="color:#60a5fa">RESEARCH</span><span
+                            class="cc-val">{{ network6mCIS().originalResearch }}</span></div>
+                    <div class="cis-comp"><span class="cc-lbl" style="color:#ef9d57">INNOV.</span><span
+                            class="cc-val">{{ network6mCIS().innovationDeployment }}</span></div>
+                    <div class="cis-comp"><span class="cc-lbl" style="color:#22c55e">DIGITAL</span><span
+                            class="cc-val">{{ network6mCIS().digitalAdvancement }}</span></div>
+                    <div class="cis-comp"><span class="cc-lbl" style="color:#fbbf24">HARMONY</span><span
+                            class="cc-val">{{ network6mCIS().globalHarmony }}</span></div>
                 </div>
             </div>
 
             <!-- Metric sections -->
             <div class="metric-section" style="border-left-color:#c084fc">
-                <div class="ms-head" style="color:#c084fc"><i class="fas fa-hands-holding-child"></i> INCLUSION & EMPOWERMENT</div>
+                <div class="ms-head" style="color:#c084fc"><i class="fas fa-hands-holding-child"></i> INCLUSION &
+                    EMPOWERMENT</div>
                 <div class="ms-grid">
-                    <div class="ms-item"><span class="ms-val">{{ network6mInclusion().avgFemalePct }}%</span><span class="ms-lbl">Female</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mInclusion().avgUnderservedPct }}%</span><span class="ms-lbl">Underserved</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mInclusion().totalScholarships }}</span><span class="ms-lbl">Scholarships</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mInclusion().totalWomenLeaders }}</span><span class="ms-lbl">Women Leaders</span></div>
-                    <div class="ms-item full"><span class="ms-val">{{ network6mInclusion().totalSkillHours | number }}</span><span class="ms-lbl">Skill Hours Delivered</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mInclusion().avgFemalePct }}%</span><span
+                            class="ms-lbl">Female</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mInclusion().avgUnderservedPct }}%</span><span
+                            class="ms-lbl">Underserved</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mInclusion().totalScholarships }}</span><span
+                            class="ms-lbl">Scholarships</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mInclusion().totalWomenLeaders }}</span><span
+                            class="ms-lbl">Women Leaders</span></div>
+                    <div class="ms-item full"><span class="ms-val">{{ network6mInclusion().totalSkillHours | number
+                            }}</span><span class="ms-lbl">Skill Hours Delivered</span></div>
                 </div>
                 @if (network6mInclusion().equityAlerts > 0) {
-                <div class="ms-alert"><i class="fas fa-triangle-exclamation"></i> {{ network6mInclusion().equityAlerts }} equity gap alert(s)</div>
+                <div class="ms-alert"><i class="fas fa-triangle-exclamation"></i> {{ network6mInclusion().equityAlerts
+                    }} equity gap alert(s)</div>
                 }
             </div>
 
             <div class="metric-section" style="border-left-color:#60a5fa">
-                <div class="ms-head" style="color:#60a5fa"><i class="fas fa-flask"></i> RESEARCH & INNOVATION ENGINE</div>
+                <div class="ms-head" style="color:#60a5fa"><i class="fas fa-flask"></i> RESEARCH & INNOVATION ENGINE
+                </div>
                 <div class="ms-grid">
-                    <div class="ms-item"><span class="ms-val">{{ network6mResearch().totalIdeas }}</span><span class="ms-lbl">Ideas</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mResearch().totalPatents }}</span><span class="ms-lbl">Patents</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mResearch().totalPapers }}</span><span class="ms-lbl">Papers</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mResearch().totalPrototypes }}</span><span class="ms-lbl">Prototypes</span></div>
-                    <div class="ms-item full"><span class="ms-val">{{ network6mResearch().avgNovelty }}/100</span><span class="ms-lbl">Avg Novelty Score</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mResearch().totalIdeas }}</span><span
+                            class="ms-lbl">Ideas</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mResearch().totalPatents }}</span><span
+                            class="ms-lbl">Patents</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mResearch().totalPapers }}</span><span
+                            class="ms-lbl">Papers</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mResearch().totalPrototypes }}</span><span
+                            class="ms-lbl">Prototypes</span></div>
+                    <div class="ms-item full"><span class="ms-val">{{ network6mResearch().avgNovelty }}/100</span><span
+                            class="ms-lbl">Avg Novelty Score</span></div>
                 </div>
             </div>
 
             <div class="metric-section" style="border-left-color:#22c55e">
                 <div class="ms-head" style="color:#22c55e"><i class="fas fa-globe"></i> DIGITAL CIVILIZATION INDEX</div>
                 <div class="ms-grid">
-                    <div class="ms-item"><span class="ms-val">{{ network6mDigital().totalAiSystems }}</span><span class="ms-lbl">AI Systems</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mDigital().totalPlatforms }}</span><span class="ms-lbl">Platforms</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mDigital().totalAutomation }}</span><span class="ms-lbl">Automation</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mDigital().totalOpenSource }}</span><span class="ms-lbl">Open-Source</span></div>
-                    <div class="ms-item full"><span class="ms-val">{{ network6mDigital().avgScalability }}/100</span><span class="ms-lbl">Avg Scalability Index</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mDigital().totalAiSystems }}</span><span
+                            class="ms-lbl">AI Systems</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mDigital().totalPlatforms }}</span><span
+                            class="ms-lbl">Platforms</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mDigital().totalAutomation }}</span><span
+                            class="ms-lbl">Automation</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mDigital().totalOpenSource }}</span><span
+                            class="ms-lbl">Open-Source</span></div>
+                    <div class="ms-item full"><span class="ms-val">{{ network6mDigital().avgScalability
+                            }}/100</span><span class="ms-lbl">Avg Scalability Index</span></div>
                 </div>
             </div>
 
             <div class="metric-section" style="border-left-color:#fbbf24">
-                <div class="ms-head" style="color:#fbbf24"><i class="fas fa-globe-americas"></i> GLOBAL HARMONY & IMPACT</div>
+                <div class="ms-head" style="color:#fbbf24"><i class="fas fa-globe-americas"></i> GLOBAL HARMONY & IMPACT
+                </div>
                 <div class="ms-grid">
-                    <div class="ms-item"><span class="ms-val">{{ network6mHarmony().totalWebinars }}</span><span class="ms-lbl">Webinars</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mHarmony().totalEvents }}</span><span class="ms-lbl">Events</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mHarmony().totalService }}</span><span class="ms-lbl">Service Hrs</span></div>
-                    <div class="ms-item"><span class="ms-val">{{ network6mHarmony().avgSentiment }}/100</span><span class="ms-lbl">Harmony Score</span></div>
-                    <div class="ms-item full"><span class="ms-val">{{ network6mHarmony().avgMultiplier }}×</span><span class="ms-lbl">Community Multiplier</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mHarmony().totalWebinars }}</span><span
+                            class="ms-lbl">Webinars</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mHarmony().totalEvents }}</span><span
+                            class="ms-lbl">Events</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mHarmony().totalService }}</span><span
+                            class="ms-lbl">Service Hrs</span></div>
+                    <div class="ms-item"><span class="ms-val">{{ network6mHarmony().avgSentiment }}/100</span><span
+                            class="ms-lbl">Harmony Score</span></div>
+                    <div class="ms-item full"><span class="ms-val">{{ network6mHarmony().avgMultiplier }}×</span><span
+                            class="ms-lbl">Community Multiplier</span></div>
                 </div>
             </div>
 
-            <div class="col-divider">ALL {{ centerProfiles().length }} CENTERS · {{ network6mInclusion().equityAlerts > 0 ? network6mInclusion().equityAlerts + ' ALERTS' : 'NETWORK STABLE' }}</div>
+            <div class="col-divider">ALL {{ centerProfiles().length }} CENTERS · {{ network6mInclusion().equityAlerts >
+                0 ? network6mInclusion().equityAlerts + ' ALERTS' : 'NETWORK STABLE' }}</div>
 
             <!-- Per-center compact CIS cards -->
             <div class="left-list">
@@ -174,15 +200,34 @@
                     </div>
                     <!-- 6-component radar mini bars -->
                     <div class="lc-bars">
-                        <div class="lcb-track"><div class="lcb-fill" style="background:#c084fc" [style.width]="c.cis.womenParticipation + '%'"></div></div>
-                        <div class="lcb-track"><div class="lcb-fill" style="background:#c084fc" [style.width]="c.cis.lowestStrataInclusion + '%'"></div></div>
-                        <div class="lcb-track"><div class="lcb-fill" style="background:#60a5fa" [style.width]="c.cis.originalResearch + '%'"></div></div>
-                        <div class="lcb-track"><div class="lcb-fill" style="background:#ef9d57" [style.width]="c.cis.innovationDeployment + '%'"></div></div>
-                        <div class="lcb-track"><div class="lcb-fill" style="background:#22c55e" [style.width]="c.cis.digitalAdvancement + '%'"></div></div>
-                        <div class="lcb-track"><div class="lcb-fill" style="background:#fbbf24" [style.width]="c.cis.globalHarmony + '%'"></div></div>
+                        <div class="lcb-track">
+                            <div class="lcb-fill" style="background:#c084fc"
+                                [style.width]="c.cis.womenParticipation + '%'"></div>
+                        </div>
+                        <div class="lcb-track">
+                            <div class="lcb-fill" style="background:#c084fc"
+                                [style.width]="c.cis.lowestStrataInclusion + '%'"></div>
+                        </div>
+                        <div class="lcb-track">
+                            <div class="lcb-fill" style="background:#60a5fa"
+                                [style.width]="c.cis.originalResearch + '%'"></div>
+                        </div>
+                        <div class="lcb-track">
+                            <div class="lcb-fill" style="background:#ef9d57"
+                                [style.width]="c.cis.innovationDeployment + '%'"></div>
+                        </div>
+                        <div class="lcb-track">
+                            <div class="lcb-fill" style="background:#22c55e"
+                                [style.width]="c.cis.digitalAdvancement + '%'"></div>
+                        </div>
+                        <div class="lcb-track">
+                            <div class="lcb-fill" style="background:#fbbf24" [style.width]="c.cis.globalHarmony + '%'">
+                            </div>
+                        </div>
                     </div>
                     <div class="lc-primary">
-                        <span [style.color]="'#ef9d57'" style="font-size:0.52rem;letter-spacing:.8px;text-transform:uppercase;">
+                        <span [style.color]="'#ef9d57'"
+                            style="font-size:0.52rem;letter-spacing:.8px;text-transform:uppercase;">
                             {{ getCisPrimaryComponent(c.cis) }} ★
                         </span>
                     </div>
@@ -203,7 +248,9 @@
                     <div class="pv-info">
                         <span class="pv-name">{{ selectedCenter()!.name }}</span>
                         <span class="pv-dir"><i class="fas fa-user-tie"></i> {{ selectedCenter()!.director }}</span>
-                        <span class="pv-meta">Est. {{ selectedCenter()!.established }} · {{ selectedCenter()!.totalEnrolled }} enrolled · {{ selectedCenter()!.totalTeachers }} faculty</span>
+                        <span class="pv-meta">Est. {{ selectedCenter()!.established }} · {{
+                            selectedCenter()!.totalEnrolled }} enrolled · {{ selectedCenter()!.totalTeachers }}
+                            faculty</span>
                     </div>
                 </div>
 
@@ -212,7 +259,8 @@
                     <div class="cis-header">
                         <div class="cis-score-block">
                             <span class="cis-lbl">CIVILIZATION IMPACT SCORE</span>
-                            <span class="cis-big" [style.color]="getCisColor(selectedCenter()!.cis.overall)">{{ selectedCenter()!.cis.overall }}</span>
+                            <span class="cis-big" [style.color]="getCisColor(selectedCenter()!.cis.overall)">{{
+                                selectedCenter()!.cis.overall }}</span>
                             <span class="cis-sub">/100 ·
                                 <i class="fas {{ getTrendIcon(selectedCenter()!.cis.trend) }}"
                                     [style.color]="getTrendColor(selectedCenter()!.cis.trend)"></i>
@@ -226,11 +274,12 @@
                             <polygon class="r-grid" [attr.points]="radarGrid(lvl, 6, 100, 100, 72)"></polygon>
                             }
                             @for (ax of [0,1,2,3,4,5]; track ax) {
-                            <line class="r-axis" x1="100" y1="100"
-                                [attr.x2]="radarAxisX(ax, 6, 100, 100, 72)"
+                            <line class="r-axis" x1="100" y1="100" [attr.x2]="radarAxisX(ax, 6, 100, 100, 72)"
                                 [attr.y2]="radarAxisY(ax, 6, 100, 100, 72)"></line>
                             }
-                            <polygon class="r-data" [attr.points]="radarPoints(getCisRadarValues(selectedCenter()!.cis), 100, 100, 72)"></polygon>
+                            <polygon class="r-data"
+                                [attr.points]="radarPoints(getCisRadarValues(selectedCenter()!.cis), 100, 100, 72)">
+                            </polygon>
                             <text class="r-lbl" x="100" y="16" text-anchor="middle">WOMEN</text>
                             <text class="r-lbl" x="178" y="52" text-anchor="start">STRATA</text>
                             <text class="r-lbl" x="178" y="158" text-anchor="start">RESEARCH</text>
@@ -248,18 +297,27 @@
 
                 <!-- Inclusion -->
                 <div class="metric-section" style="border-left-color:#c084fc">
-                    <div class="ms-head" style="color:#c084fc"><i class="fas fa-hands-holding-child"></i> INCLUSION & EMPOWERMENT</div>
+                    <div class="ms-head" style="color:#c084fc"><i class="fas fa-hands-holding-child"></i> INCLUSION &
+                        EMPOWERMENT</div>
                     <div class="ms-grid">
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.femalePct }}%</span><span class="ms-lbl">Female</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.underservedPct }}%</span><span class="ms-lbl">Underserved</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.scholarshipsGranted }}</span><span class="ms-lbl">Scholarships</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.womenInLeadership }}</span><span class="ms-lbl">Women Leaders</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.skillHoursDelivered | number }}</span><span class="ms-lbl">Skill Hours</span></div>
-                        <div class="ms-item"><span class="ms-val">+{{ selectedCenter()!.inclusion.inclusionGrowthRate }}%</span><span class="ms-lbl">Inclusion Growth</span></div>
-                        <div class="ms-item full"><span class="ms-val">{{ selectedCenter()!.inclusion.socioMobility }}/100</span><span class="ms-lbl">Socioeconomic Mobility Estimate</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.femalePct
+                                }}%</span><span class="ms-lbl">Female</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.underservedPct
+                                }}%</span><span class="ms-lbl">Underserved</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.scholarshipsGranted
+                                }}</span><span class="ms-lbl">Scholarships</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.womenInLeadership
+                                }}</span><span class="ms-lbl">Women Leaders</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.inclusion.skillHoursDelivered |
+                                number }}</span><span class="ms-lbl">Skill Hours</span></div>
+                        <div class="ms-item"><span class="ms-val">+{{ selectedCenter()!.inclusion.inclusionGrowthRate
+                                }}%</span><span class="ms-lbl">Inclusion Growth</span></div>
+                        <div class="ms-item full"><span class="ms-val">{{ selectedCenter()!.inclusion.socioMobility
+                                }}/100</span><span class="ms-lbl">Socioeconomic Mobility Estimate</span></div>
                     </div>
                     @if (selectedCenter()!.inclusion.equityGapAlert) {
-                    <div class="ms-alert"><i class="fas fa-triangle-exclamation"></i> Equity gap detected — female participation below 60% threshold</div>
+                    <div class="ms-alert"><i class="fas fa-triangle-exclamation"></i> Equity gap detected — female
+                        participation below 60% threshold</div>
                     }
                 </div>
 
@@ -267,12 +325,18 @@
                 <div class="metric-section" style="border-left-color:#60a5fa">
                     <div class="ms-head" style="color:#60a5fa"><i class="fas fa-flask"></i> RESEARCH & INNOVATION</div>
                     <div class="ms-grid">
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.ideasGenerated }}</span><span class="ms-lbl">Ideas</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.patentsFiled }}</span><span class="ms-lbl">Patents</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.papersSubmitted }}</span><span class="ms-lbl">Papers</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.prototypes }}</span><span class="ms-lbl">Prototypes</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.noveltyScore }}/100</span><span class="ms-lbl">Novelty</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.crossDomainIndex }}/100</span><span class="ms-lbl">Cross-Domain</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.ideasGenerated
+                                }}</span><span class="ms-lbl">Ideas</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.patentsFiled
+                                }}</span><span class="ms-lbl">Patents</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.papersSubmitted
+                                }}</span><span class="ms-lbl">Papers</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.prototypes
+                                }}</span><span class="ms-lbl">Prototypes</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.noveltyScore
+                                }}/100</span><span class="ms-lbl">Novelty</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.research.crossDomainIndex
+                                }}/100</span><span class="ms-lbl">Cross-Domain</span></div>
                     </div>
                 </div>
 
@@ -280,27 +344,42 @@
                 <div class="metric-section" style="border-left-color:#22c55e">
                     <div class="ms-head" style="color:#22c55e"><i class="fas fa-globe"></i> DIGITAL CIVILIZATION</div>
                     <div class="ms-grid">
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.aiSystemsDeployed }}</span><span class="ms-lbl">AI Systems</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.platformsCreated }}</span><span class="ms-lbl">Platforms</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.openSourceContributions }}</span><span class="ms-lbl">Open-Source</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.scalabilityIndex }}/100</span><span class="ms-lbl">Scalability</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.cyberResilienceScore }}/100</span><span class="ms-lbl">Cyber</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.sophisticationScore }}/100</span><span class="ms-lbl">Sophistication</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.aiSystemsDeployed
+                                }}</span><span class="ms-lbl">AI Systems</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.platformsCreated
+                                }}</span><span class="ms-lbl">Platforms</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.openSourceContributions
+                                }}</span><span class="ms-lbl">Open-Source</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.scalabilityIndex
+                                }}/100</span><span class="ms-lbl">Scalability</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.cyberResilienceScore
+                                }}/100</span><span class="ms-lbl">Cyber</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.digital.sophisticationScore
+                                }}/100</span><span class="ms-lbl">Sophistication</span></div>
                     </div>
                 </div>
 
                 <!-- Infrastructure -->
                 <div class="metric-section" style="border-left-color:#ef9d57">
-                    <div class="ms-head" style="color:#ef9d57"><i class="fas fa-building"></i> INFRASTRUCTURE (ICI)</div>
+                    <div class="ms-head" style="color:#ef9d57"><i class="fas fa-building"></i> INFRASTRUCTURE (ICI)
+                    </div>
                     <div class="ms-grid">
-                        <div class="ms-item"><span class="ms-val" [style.color]="getCisColor(selectedCenter()!.infra.ici)">{{ selectedCenter()!.infra.ici }}/100</span><span class="ms-lbl">ICI Score</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.labs }}</span><span class="ms-lbl">Labs</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.aiComputeLevel }}</span><span class="ms-lbl">AI Compute</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.hybridClassrooms }}</span><span class="ms-lbl">Hybrid Rooms</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.equipmentUtilization }}%</span><span class="ms-lbl">Utilization</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.accessibilityScore }}/100</span><span class="ms-lbl">Accessibility</span></div>
+                        <div class="ms-item"><span class="ms-val"
+                                [style.color]="getCisColor(selectedCenter()!.infra.ici)">{{ selectedCenter()!.infra.ici
+                                }}/100</span><span class="ms-lbl">ICI Score</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.labs }}</span><span
+                                class="ms-lbl">Labs</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.aiComputeLevel
+                                }}</span><span class="ms-lbl">AI Compute</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.hybridClassrooms
+                                }}</span><span class="ms-lbl">Hybrid Rooms</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.equipmentUtilization
+                                }}%</span><span class="ms-lbl">Utilization</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.infra.accessibilityScore
+                                }}/100</span><span class="ms-lbl">Accessibility</span></div>
                         <div class="ms-item full">
-                            <span class="ms-val">{{ selectedCenter()!.infra.cloudInfra ? 'Cloud ✓' : 'On-Premise' }} · {{ selectedCenter()!.infra.serverBandwidth }}</span>
+                            <span class="ms-val">{{ selectedCenter()!.infra.cloudInfra ? 'Cloud ✓' : 'On-Premise' }} ·
+                                {{ selectedCenter()!.infra.serverBandwidth }}</span>
                             <span class="ms-lbl">Infrastructure</span>
                         </div>
                     </div>
@@ -308,13 +387,19 @@
 
                 <!-- Harmony -->
                 <div class="metric-section" style="border-left-color:#fbbf24">
-                    <div class="ms-head" style="color:#fbbf24"><i class="fas fa-globe-americas"></i> GLOBAL HARMONY</div>
+                    <div class="ms-head" style="color:#fbbf24"><i class="fas fa-globe-americas"></i> GLOBAL HARMONY
+                    </div>
                     <div class="ms-grid">
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.harmony.webinarsHosted }}</span><span class="ms-lbl">Webinars</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.harmony.crossCulturalEvents }}</span><span class="ms-lbl">Events</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.harmony.serviceHours }}</span><span class="ms-lbl">Service Hrs</span></div>
-                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.harmony.harmonySentimentScore }}/100</span><span class="ms-lbl">Harmony</span></div>
-                        <div class="ms-item full"><span class="ms-val">{{ selectedCenter()!.harmony.communityMultiplier }}×</span><span class="ms-lbl">Community Multiplier</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.harmony.webinarsHosted
+                                }}</span><span class="ms-lbl">Webinars</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.harmony.crossCulturalEvents
+                                }}</span><span class="ms-lbl">Events</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.harmony.serviceHours
+                                }}</span><span class="ms-lbl">Service Hrs</span></div>
+                        <div class="ms-item"><span class="ms-val">{{ selectedCenter()!.harmony.harmonySentimentScore
+                                }}/100</span><span class="ms-lbl">Harmony</span></div>
+                        <div class="ms-item full"><span class="ms-val">{{ selectedCenter()!.harmony.communityMultiplier
+                                }}×</span><span class="ms-lbl">Community Multiplier</span></div>
                     </div>
                 </div>
             </div>
@@ -338,7 +423,8 @@
             <!-- Network today KPI strip -->
             <div class="today-kpi-strip">
                 <div class="tks-item">
-                    <span class="tks-big">{{ networkToday().openCenters }}<span class="tks-of">/{{ networkToday().totalCenters }}</span></span>
+                    <span class="tks-big">{{ networkToday().openCenters }}<span class="tks-of">/{{
+                            networkToday().totalCenters }}</span></span>
                     <span class="tks-lbl">Centers Active</span>
                 </div>
                 <div class="tks-item tks-accent">
@@ -405,11 +491,16 @@
                     <line class="map-grid" x1="0" [attr.y1]="mapY(lat)" x2="520" [attr.y2]="mapY(lat)"></line>
                     }
                     <!-- Simplified continent shapes -->
-                    <path class="map-land" d="M55,38 L155,28 L168,42 L178,82 L168,118 L142,132 L98,126 L64,100 L52,72 Z"></path>
-                    <path class="map-land" d="M108,128 L165,120 L178,148 L172,196 L142,222 L105,206 L93,174 L98,148 Z"></path>
+                    <path class="map-land"
+                        d="M55,38 L155,28 L168,42 L178,82 L168,118 L142,132 L98,126 L64,100 L52,72 Z"></path>
+                    <path class="map-land" d="M108,128 L165,120 L178,148 L172,196 L142,222 L105,206 L93,174 L98,148 Z">
+                    </path>
                     <path class="map-land" d="M220,18 L274,14 L290,30 L284,54 L262,70 L228,72 L212,54 L214,32 Z"></path>
-                    <path class="map-land" d="M224,72 L282,68 L298,90 L298,132 L286,180 L252,206 L210,190 L198,150 L206,102 L220,82 Z"></path>
-                    <path class="map-land" d="M272,18 L456,12 L464,38 L446,78 L412,100 L378,108 L340,84 L296,72 L278,52 Z"></path>
+                    <path class="map-land"
+                        d="M224,72 L282,68 L298,90 L298,132 L286,180 L252,206 L210,190 L198,150 L206,102 L220,82 Z">
+                    </path>
+                    <path class="map-land"
+                        d="M272,18 L456,12 L464,38 L446,78 L412,100 L378,108 L340,84 L296,72 L278,52 Z"></path>
                     <path class="map-land" d="M296,72 L340,70 L348,108 L322,132 L296,112 L290,88 Z"></path>
                     <path class="map-land" d="M398,148 L474,142 L482,172 L468,200 L418,210 L390,196 L386,170 Z"></path>
                     <!-- Center dots -->
@@ -418,26 +509,19 @@
                     @if (cp) {
                     <!-- Pulse ring for open centers -->
                     @if (d.operationalStatus === 'Open') {
-                    <circle
-                        [attr.cx]="mapX(cp.lng)" [attr.cy]="mapY(cp.lat)"
-                        r="10"
+                    <circle [attr.cx]="mapX(cp.lng)" [attr.cy]="mapY(cp.lat)" r="10"
                         [attr.fill]="getCisColor(cp.cis.overall) + '22'"
-                        [attr.stroke]="getCisColor(cp.cis.overall) + '66'"
-                        stroke-width="1">
+                        [attr.stroke]="getCisColor(cp.cis.overall) + '66'" stroke-width="1">
                     </circle>
                     }
                     <!-- Main dot -->
-                    <circle
-                        [attr.cx]="mapX(cp.lng)" [attr.cy]="mapY(cp.lat)"
-                        [attr.r]="d.operationalStatus === 'Open' ? 5 : 3"
-                        [attr.fill]="getCisColor(cp.cis.overall)"
+                    <circle [attr.cx]="mapX(cp.lng)" [attr.cy]="mapY(cp.lat)"
+                        [attr.r]="d.operationalStatus === 'Open' ? 5 : 3" [attr.fill]="getCisColor(cp.cis.overall)"
                         [attr.opacity]="d.operationalStatus === 'Open' ? 1 : 0.4">
                     </circle>
                     <!-- Label -->
-                    <text class="map-label"
-                        [attr.x]="mapX(cp.lng)"
-                        [attr.y]="mapY(cp.lat) - 8"
-                        text-anchor="middle">{{ cp.countryCode }}</text>
+                    <text class="map-label" [attr.x]="mapX(cp.lng)" [attr.y]="mapY(cp.lat) - 8" text-anchor="middle">{{
+                        cp.countryCode }}</text>
                     }
                     }
                     <!-- Map title -->
@@ -508,7 +592,9 @@
                     </div>
                     <div class="pm-label">
                         <span class="pm-pct" style="color:#ef9d57">{{ civilization2035Progress() }}% COMPLETE</span>
-                        <span class="pm-sub">{{ centerProfiles().length }} centers · {{ network6mInclusion().totalScholarships }} scholars · {{ network6mResearch().totalIdeas }} ideas · Avg CIS {{ network6mCIS().overall }}/100</span>
+                        <span class="pm-sub">{{ centerProfiles().length }} centers · {{
+                            network6mInclusion().totalScholarships }} scholars · {{ network6mResearch().totalIdeas }}
+                            ideas · Avg CIS {{ network6mCIS().overall }}/100</span>
                     </div>
                 </div>
             </div>
@@ -526,7 +612,8 @@
                         <div class="ap-type-row">
                             <span class="ap-type" [style.color]="getInsightColor(ins.type)">{{ ins.type }}</span>
                             <span class="ap-center">{{ ins.center }}</span>
-                            <span class="ap-priority" [style.color]="getPriorityColor(ins.priority)">{{ ins.priority }}</span>
+                            <span class="ap-priority" [style.color]="getPriorityColor(ins.priority)">{{ ins.priority
+                                }}</span>
                         </div>
                         <span class="ap-message">{{ ins.message }}</span>
                     </div>
@@ -547,26 +634,30 @@
                 <!-- Active pillars -->
                 <div class="ctc-pillars">
                     @for (p of selectedCenterToday()!.todayVision.activePillars; track p) {
-                    <span class="ctc-badge" [style.color]="getPillarColor(p)" [style.borderColor]="getPillarColor(p) + '44'">
+                    <span class="ctc-badge" [style.color]="getPillarColor(p)"
+                        [style.borderColor]="getPillarColor(p) + '44'">
                         <i class="fas {{ getPillarIcon(p) }}"></i> {{ p }}
                     </span>
                     }
                 </div>
                 <!-- Primary focus -->
                 <div class="ctc-focus">{{ selectedCenterToday()!.todayVision.primaryFocus }}</div>
-                <div class="ctc-impact"><i class="fas fa-bolt" style="color:#ef9d57"></i> {{ selectedCenterToday()!.todayVision.visionImpact }}</div>
+                <div class="ctc-impact"><i class="fas fa-bolt" style="color:#ef9d57"></i> {{
+                    selectedCenterToday()!.todayVision.visionImpact }}</div>
                 <!-- Vision score bar -->
                 <div class="ctc-score-bar">
-                    <div class="ctc-fill"
-                        [style.width]="selectedCenterToday()!.todayVision.scores.overall + '%'"
+                    <div class="ctc-fill" [style.width]="selectedCenterToday()!.todayVision.scores.overall + '%'"
                         [style.background]="getCisColor(selectedCenterToday()!.todayVision.scores.overall)"></div>
                 </div>
                 <div class="ctc-score-info">
                     <span [style.color]="getCisColor(selectedCenterToday()!.todayVision.scores.overall)">
                         {{ selectedCenterToday()!.todayVision.scores.overall }}/100
                     </span>
-                    <span class="ctc-learners"><i class="fas fa-users"></i> {{ selectedCenterToday()!.todayVision.learnersEngaged }} learners engaged</span>
-                    <span class="ctc-time"><i class="fas fa-clock"></i> {{ getLocalTime(selectedCenterToday()!.utcOffset) }} {{ selectedCenterToday()!.timezoneAbbr }}</span>
+                    <span class="ctc-learners"><i class="fas fa-users"></i> {{
+                        selectedCenterToday()!.todayVision.learnersEngaged }} learners engaged</span>
+                    <span class="ctc-time"><i class="fas fa-clock"></i> {{
+                        getLocalTime(selectedCenterToday()!.utcOffset) }} {{ selectedCenterToday()!.timezoneAbbr
+                        }}</span>
                 </div>
             </div>
 
@@ -584,17 +675,20 @@
                     <span class="uc-lbl">Mentoring Hrs</span>
                 </div>
                 <div class="uc-item" style="color:#fbbf24">
-                    <span class="uc-big">{{ selectedCenterToday()!.todayVision.liveMetrics.scholarshipsAllocatedToday }}</span>
+                    <span class="uc-big">{{ selectedCenterToday()!.todayVision.liveMetrics.scholarshipsAllocatedToday
+                        }}</span>
                     <i class="fas fa-award"></i>
                     <span class="uc-lbl">Scholarships</span>
                 </div>
                 <div class="uc-item" style="color:#22c55e">
-                    <span class="uc-big">{{ selectedCenterToday()!.todayVision.liveMetrics.digitalToolsDeployedToday }}</span>
+                    <span class="uc-big">{{ selectedCenterToday()!.todayVision.liveMetrics.digitalToolsDeployedToday
+                        }}</span>
                     <i class="fas fa-microchip"></i>
                     <span class="uc-lbl">Digital Tools</span>
                 </div>
                 <div class="uc-item" style="color:#ef9d57">
-                    <span class="uc-big">{{ selectedCenterToday()!.todayVision.liveMetrics.beneficiariesReachedToday }}</span>
+                    <span class="uc-big">{{ selectedCenterToday()!.todayVision.liveMetrics.beneficiariesReachedToday
+                        }}</span>
                     <i class="fas fa-people-group"></i>
                     <span class="uc-lbl">Beneficiaries</span>
                 </div>
@@ -611,19 +705,27 @@
             }
 
             <!-- Center comparison mini -->
-            <div class="section-head" style="margin-top:0.5rem"><i class="fas fa-chart-bar"></i> COMPARE — CENTER vs NETWORK</div>
+            <div class="section-head" style="margin-top:0.5rem"><i class="fas fa-chart-bar"></i> COMPARE — CENTER vs
+                NETWORK</div>
             <div class="compare-grid">
                 <div class="cmp-item">
                     <span class="cmp-lbl">CIS Score</span>
                     <div class="cmp-bars">
                         <div class="cmp-bar-row">
                             <span class="cmp-tag">Center</span>
-                            <div class="cmp-track"><div class="cmp-fill" [style.width]="selectedCenter()!.cis.overall + '%'" style="background:#ef9d57"></div></div>
-                            <span [style.color]="getCisColor(selectedCenter()!.cis.overall)">{{ selectedCenter()!.cis.overall }}</span>
+                            <div class="cmp-track">
+                                <div class="cmp-fill" [style.width]="selectedCenter()!.cis.overall + '%'"
+                                    style="background:#ef9d57"></div>
+                            </div>
+                            <span [style.color]="getCisColor(selectedCenter()!.cis.overall)">{{
+                                selectedCenter()!.cis.overall }}</span>
                         </div>
                         <div class="cmp-bar-row">
                             <span class="cmp-tag">Network</span>
-                            <div class="cmp-track"><div class="cmp-fill" [style.width]="network6mCIS().overall + '%'" style="background:#6b7280"></div></div>
+                            <div class="cmp-track">
+                                <div class="cmp-fill" [style.width]="network6mCIS().overall + '%'"
+                                    style="background:#6b7280"></div>
+                            </div>
                             <span style="color:#6b7280">{{ network6mCIS().overall }}</span>
                         </div>
                     </div>
@@ -633,12 +735,18 @@
                     <div class="cmp-bars">
                         <div class="cmp-bar-row">
                             <span class="cmp-tag">Center</span>
-                            <div class="cmp-track"><div class="cmp-fill" [style.width]="selectedCenter()!.inclusion.femalePct + '%'" style="background:#c084fc"></div></div>
+                            <div class="cmp-track">
+                                <div class="cmp-fill" [style.width]="selectedCenter()!.inclusion.femalePct + '%'"
+                                    style="background:#c084fc"></div>
+                            </div>
                             <span style="color:#c084fc">{{ selectedCenter()!.inclusion.femalePct }}%</span>
                         </div>
                         <div class="cmp-bar-row">
                             <span class="cmp-tag">Network</span>
-                            <div class="cmp-track"><div class="cmp-fill" [style.width]="network6mInclusion().avgFemalePct + '%'" style="background:#6b7280"></div></div>
+                            <div class="cmp-track">
+                                <div class="cmp-fill" [style.width]="network6mInclusion().avgFemalePct + '%'"
+                                    style="background:#6b7280"></div>
+                            </div>
                             <span style="color:#6b7280">{{ network6mInclusion().avgFemalePct }}%</span>
                         </div>
                     </div>
@@ -648,20 +756,30 @@
                     <div class="cmp-bars">
                         <div class="cmp-bar-row">
                             <span class="cmp-tag">Center</span>
-                            <div class="cmp-track"><div class="cmp-fill" [style.width]="(selectedCenter()!.research.ideasGenerated / 40 * 100) + '%'" style="background:#60a5fa"></div></div>
+                            <div class="cmp-track">
+                                <div class="cmp-fill"
+                                    [style.width]="(selectedCenter()!.research.ideasGenerated / 40 * 100) + '%'"
+                                    style="background:#60a5fa"></div>
+                            </div>
                             <span style="color:#60a5fa">{{ selectedCenter()!.research.ideasGenerated }}</span>
                         </div>
                         <div class="cmp-bar-row">
                             <span class="cmp-tag">Network</span>
-                            <div class="cmp-track"><div class="cmp-fill" [style.width]="(network6mResearch().totalIdeas / centerProfiles().length / 40 * 100) + '%'" style="background:#6b7280"></div></div>
-                            <span style="color:#6b7280">{{ (network6mResearch().totalIdeas / centerProfiles().length).toFixed(0) }} avg</span>
+                            <div class="cmp-track">
+                                <div class="cmp-fill"
+                                    [style.width]="(network6mResearch().totalIdeas / centerProfiles().length / 40 * 100) + '%'"
+                                    style="background:#6b7280"></div>
+                            </div>
+                            <span style="color:#6b7280">{{ (network6mResearch().totalIdeas /
+                                centerProfiles().length).toFixed(0) }} avg</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- AI Advisor for selected center -->
-            <div class="section-head"><i class="fas fa-brain"></i> AI ADVISOR — {{ selectedCenter()!.shortName.toUpperCase() }}</div>
+            <div class="section-head"><i class="fas fa-brain"></i> AI ADVISOR — {{
+                selectedCenter()!.shortName.toUpperCase() }}</div>
             <div class="ai-summary">{{ selectedCenter()!.cis.aiSummary }}</div>
             <div class="advisor-panel">
                 @for (ins of advisorInsights(); track ins.message) {
@@ -673,7 +791,8 @@
                     <div class="ap-body">
                         <div class="ap-type-row">
                             <span class="ap-type" [style.color]="getInsightColor(ins.type)">{{ ins.type }}</span>
-                            <span class="ap-priority" [style.color]="getPriorityColor(ins.priority)">{{ ins.priority }}</span>
+                            <span class="ap-priority" [style.color]="getPriorityColor(ins.priority)">{{ ins.priority
+                                }}</span>
                         </div>
                         <span class="ap-message">{{ ins.message }}</span>
                     </div>

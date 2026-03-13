@@ -1,0 +1,41 @@
+<div class="news-ticker-container" *ngIf="latestNews().length > 0">
+    <div class="ticker-header">
+        <span class="pulse-dot"></span> Latest News
+    </div>
+
+    <div class="ticker-window">
+        <div class="ticker-track">
+            <!-- First set of items -->
+            <div class="ticker-item" *ngFor="let item of latestNews()" (click)="onNewsClick(item)">
+                <div class="news-card glass-panel">
+                    <div class="news-header">
+                        <span class="badge" [ngClass]="item.type.toLowerCase()">{{ item.type }}</span>
+                        <span class="date">{{ item.date | date:'shortDate' }}</span>
+                    </div>
+                    <div class="news-body">
+                        <p class="news-title">{{ item.title | slice:0:50 }}{{ item.title.length > 50 ? '...' : '' }}</p>
+                    </div>
+                    <div class="news-footer">
+                        <span class="category"><i class="fas fa-tag"></i> {{ item.category }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Duplicate set for seamless loop -->
+            <div class="ticker-item" *ngFor="let item of latestNews()" (click)="onNewsClick(item)">
+                <div class="news-card glass-panel">
+                    <div class="news-header">
+                        <span class="badge" [ngClass]="item.type.toLowerCase()">{{ item.type }}</span>
+                        <span class="date">{{ item.date | date:'shortDate' }}</span>
+                    </div>
+                    <div class="news-body">
+                        <p class="news-title">{{ item.title | slice:0:50 }}{{ item.title.length > 50 ? '...' : '' }}</p>
+                    </div>
+                    <div class="news-footer">
+                        <span class="category"><i class="fas fa-tag"></i> {{ item.category }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

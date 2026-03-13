@@ -27,6 +27,7 @@ import { MyProfileComponent } from './pages/my-profile/my-profile';
 import { ProgramDetailComponent } from './pages/program-detail/program-detail';
 import { ResearchPageComponent } from './pages/research/research';
 import { ResearchNewComponent } from './pages/research/research-new/research-new';
+import { MyWorkshopsComponent } from './pages/workshops/my-workshops/my-workshops';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -38,6 +39,7 @@ export const routes: Routes = [
     { path: 'dashboard/student/nearby', component: StudentNearbyComponent },
     { path: 'dashboard/teacher', component: TeacherDashboardComponent },
     { path: 'dashboard/teacher/workshops', redirectTo: 'workshops', pathMatch: 'full' },
+    { path: 'dashboard/my-workshops', component: MyWorkshopsComponent },
     { path: 'about', component: AboutComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
@@ -60,6 +62,6 @@ export const routes: Routes = [
     { path: 'my-schedule', component: MyScheduleComponent },
     { path: 'my-profile', component: MyProfileComponent },
     { path: 'research/new', component: ResearchNewComponent },
-    { path: 'research',     component: ResearchPageComponent },
+    { path: 'research', component: ResearchPageComponent },
     { path: '**', redirectTo: '' }
 ];

@@ -14,6 +14,9 @@ export interface UserProfile {
     name: string;
     email: string;
     role: UserRole | 'Director';
+    partnerType?: string;
+    expertTypes?: string[];
+    activityType?: string[];
     assignedState?: string;
     assignedDistrict?: string;
 }
@@ -24,12 +27,14 @@ export interface UserProfile {
 export interface RegisterRequest {
     email: string;
     password: string;
-    authProvider: 'EMAIL_PASSWORD';
+    authProvider: 'EMAIL_PASSWORD' | 'MOBILE_OTP';
     name: string;
-    dateOfBirth: string;
-    gender: string;
-    selectedRole: string;
-    address: {
+    dateOfBirth?: string;
+    gender?: string;
+    partnerType?: string;
+    expertTypes?: string[];
+    activityType?: string[];
+    address?: {
         village: string;
         pincode: string;
         district: string;
@@ -50,7 +55,8 @@ export interface UpdateProfileRequest {
     name?: string;
     dateOfBirth?: string;
     gender?: string;
-    selectedRole?: string;
+    partnerType?: string;
+    expertTypes?: string[];
     address?: {
         village: string;
         pincode: string;
@@ -64,7 +70,10 @@ interface ApiUser {
     name: string;
     email: string;
     authProvider: string;
-    selectedRole: string;
+    selectedRole?: string; // Kept as optional for backward compatibility if any API still sends it
+    partnerType?: string;
+    expertTypes?: string[];
+    activityType?: string[];
     verificationStatus: string;
     status: string;
     profileImage: string;
@@ -88,6 +97,9 @@ interface ApiProfileUpdateResponse {
         name: string;
         email: string;
         selectedRole: string;
+        partnerType?: string;
+        expertTypes?: string[];
+        activityType?: string[];
         verificationStatus: string;
         status: string;
         profileImage: string;
@@ -132,11 +144,28 @@ export class AuthService {
 
     // ── State ─────────────────────────────────────────────────────────────────
 
-    private _currentUser = signal<UserProfile | null>(this.loadUserFromStorage());
-    private _token = signal<string | null>(this.isBrowser ? localStorage.getItem('auth_token') : null);
+    private _currentUser = signal<UserProfile | null>(null);
+    private _token = signal<string | null>(null);
 
     currentUserProfile = this._currentUser.asReadonly();
     isLoggedIn = computed(() => !!this._token() && !!this._currentUser());
+
+    displayIdentity = computed(() => {
+        const user = this._currentUser();
+        if (!user) return null;
+        if (user.role === 'Director') return 'Director';
+        if (user.activityType && user.activityType.length > 0) {
+            return user.activityType[0];
+        }
+        return user.role || 'Candidate';
+    });
+
+    constructor() {
+        if (this.isBrowser) {
+            this._token.set(localStorage.getItem('auth_token'));
+            this._currentUser.set(this.loadUserFromStorage());
+        }
+    }
 
     // ── HTTP API ──────────────────────────────────────────────────────────────
 
@@ -144,15 +173,24 @@ export class AuthService {
         return this.http
             .post<ApiAuthResponse>(`${this.base}/users/signup`, payload)
             .pipe(
-                map(res => ({
-                    token: res.result.token,
-                    user: {
-                        id: res.result.user._id,
-                        name: res.result.user.name,
-                        email: res.result.user.email,
-                        role: res.result.user.selectedRole as UserRole,
-                    } satisfies UserProfile,
-                })),
+                map(res => {
+                    const user = res.result.user;
+                    // Derive role if selectedRole is missing
+                    const role = user.selectedRole || (user.partnerType ? 'Partner' : (user.expertTypes && user.expertTypes.length > 0 ? user.expertTypes[0] : 'Student'));
+                    
+                    return {
+                        token: res.result.token,
+                        user: {
+                            id: user._id,
+                            name: user.name,
+                            email: user.email,
+                            role: role as UserRole,
+                            partnerType: user.partnerType,
+                            expertTypes: user.expertTypes,
+                            activityType: user.activityType,
+                        } satisfies UserProfile,
+                    };
+                }),
                 tap(res => this.storeSession(res))
             );
     }
@@ -161,15 +199,23 @@ export class AuthService {
         return this.http
             .post<ApiLoginResponse>(`${this.base}/users/login`, payload)
             .pipe(
-                map(res => ({
-                    token: res.token,
-                    user: {
-                        id: res.user._id,
-                        name: res.user.name,
-                        email: res.user.email,
-                        role: res.user.selectedRole as UserRole,
-                    } satisfies UserProfile,
-                })),
+                map(res => {
+                    const user = res.user;
+                    const role = user.selectedRole || (user.partnerType ? 'Partner' : (user.expertTypes && user.expertTypes.length > 0 ? user.expertTypes[0] : 'Student'));
+                    
+                    return {
+                        token: res.token,
+                        user: {
+                            id: user._id,
+                            name: user.name,
+                            email: user.email,
+                            role: role as UserRole,
+                            partnerType: user.partnerType,
+                            expertTypes: user.expertTypes,
+                            activityType: user.activityType,
+                        } satisfies UserProfile,
+                    };
+                }),
                 tap(res => this.storeSession(res))
             );
     }
@@ -185,12 +231,20 @@ export class AuthService {
         return this.http
             .put<ApiProfileUpdateResponse>(`${this.base}/users/${userId}/profile`, payload)
             .pipe(
-                map(res => ({
-                    id: res.user._id,
-                    name: res.user.name,
-                    email: res.user.email,
-                    role: res.user.selectedRole as UserRole,
-                } satisfies UserProfile)),
+                map(res => {
+                    const user = res.user;
+                    const role = user.selectedRole || (user.partnerType ? 'Partner' : (user.expertTypes && user.expertTypes.length > 0 ? user.expertTypes[0] : 'Student'));
+
+                    return {
+                        id: user._id,
+                        name: user.name,
+                        email: user.email,
+                        role: role as UserRole,
+                        partnerType: user.partnerType,
+                        expertTypes: user.expertTypes,
+                        activityType: user.activityType,
+                    } satisfies UserProfile;
+                }),
                 tap(updated => {
                     const merged = { ...this._currentUser()!, ...updated };
                     this._currentUser.set(merged);
@@ -208,7 +262,23 @@ export class AuthService {
         }
         this._token.set(null);
         this._currentUser.set(null);
-        this.router.navigate(['/login']);
+        
+        // Use navigateByUrl to avoid issues with current route state
+        this.router.navigateByUrl('/login');
+    }
+
+    getToken(): string | null {
+        const token = this._token();
+        if (token) return token;
+        
+        if (this.isBrowser) {
+            const storedToken = localStorage.getItem('auth_token');
+            if (storedToken) {
+                this._token.set(storedToken);
+                return storedToken;
+            }
+        }
+        return null;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -223,7 +293,7 @@ export class AuthService {
     }
 
     private loadUserFromStorage(): UserProfile | null {
-        if (!isPlatformBrowser(inject(PLATFORM_ID))) return null;
+        if (!this.isBrowser) return null;
         try {
             const raw = localStorage.getItem('auth_user');
             return raw ? JSON.parse(raw) : null;
@@ -249,7 +319,7 @@ export class AuthService {
 
     isAuthorized(): boolean {
         const role = this._currentUser()?.role;
-        return !!role && ['Teacher', 'Researcher', 'Entrepreneur', 'Admin', 'Director'].includes(role);
+        return !!role && ['Student', 'Teacher', 'Researcher', 'Entrepreneur', 'Admin', 'Director'].includes(role);
     }
 
     // ── Dev helpers ───────────────────────────────────────────────────────────

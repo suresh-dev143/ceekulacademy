@@ -1,0 +1,92 @@
+<app-layout>
+    <div class="my-ws-container">
+        <div class="header-row">
+            <div>
+                <h1 class="page-title">My Workshops</h1>
+                <p class="subtitle">Manage the sessions you've created and track their status.</p>
+            </div>
+            <button class="btn-create" (click)="router.navigate(['/workshops'])">
+                <i class="fas fa-plus"></i> Create New
+            </button>
+        </div>
+
+        @if (showDetail() && selectedWorkshop()) {
+        <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="'Teacher'" (close)="closeDetail()">
+        </app-workshop-detail>
+        } @else if (showEdit() && workshopToEdit()) {
+        <div class="edit-overlay">
+            <app-create-workshop [workshopToEdit]="workshopToEdit()" (workshopCreated)="onWorkshopUpdated()"
+                (cancel)="closeEdit()">
+            </app-create-workshop>
+        </div>
+        } @else {
+        <div class="ws-list-card">
+            @if (isLoading()) {
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i> Loading workshops...
+            </div>
+            } @else if (workshops().length === 0) {
+            <div class="empty-state">
+                <i class="fas fa-tools"></i>
+                <h3>No workshops found</h3>
+                <p>You haven't created any workshops yet.</p>
+                <button class="btn-primary" (click)="router.navigate(['/workshops'])">Create your first
+                    workshop</button>
+            </div>
+            } @else {
+            <div class="ws-table-wrap">
+                <table class="ws-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Mode</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th class="actions-cell">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (w of workshops(); track w._id) {
+                        <tr [class.status-cancelled]="w.status === 'cancelled'">
+                            <td>
+                                <div class="ws-title-cell">
+                                    <strong>{{ w.workshopTitle }}</strong>
+                                    <span>{{ w.sessions.length }} sessions</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="mode-tag" [class.hybrid]="w.workshopMode === 'hybrid'">
+                                    {{ w.workshopMode }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge" [class]="'status--' + w.status">
+                                    {{ w.status }}
+                                </span>
+                            </td>
+                            <td>{{ w.createdAt | date:'shortDate' }}</td>
+                            <td class="actions-cell">
+                                <div class="action-btns">
+                                    <button class="icon-btn" (click)="onView(w)" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    @if (w.status !== 'cancelled' && w.status !== 'completed') {
+                                    <button class="icon-btn" (click)="onEdit(w)" title="Edit Workshop">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="icon-btn delete" (click)="onDelete(w)" title="Cancel Workshop">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
+        </div>
+        }
+    </div>
+</app-layout>

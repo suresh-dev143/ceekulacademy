@@ -17,7 +17,6 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
 // ── Wrapper ──────────────────────────────────────────────────────────────────
 
 .cwf-wrap {
-    max-width: 860px;
     margin: 0 auto;
     padding: 2rem 0 3rem;
     animation: cwfFadeIn 0.3s ease-out;
@@ -41,7 +40,6 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 2.5rem;
 }
 
 .cwf-eyebrow {

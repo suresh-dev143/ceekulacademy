@@ -8,7 +8,7 @@
     </a>
 
     <button class="menu-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen">
-    <span>&#x2B24;</span>
+      <span>&#x2B24;</span>
 
     </button>
 
@@ -26,9 +26,12 @@
       <a routerLink="/about" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
         About
       </a>
-
+      <a routerLink="/programs" routerLinkActive="active" class="nav-link dropdown-toggle"
+        (click)="togglePrograms($event)">
+        Programs
+      </a>
       <!-- Programs Dropdown (Hover-based/Click for mobile) -->
-      <div class="nav-dropdown" [class.active]="isProgramsOpen">
+      <!-- <div class="nav-dropdown" [class.active]="isProgramsOpen">
         <a routerLink="/programs" routerLinkActive="active" class="nav-link dropdown-toggle"
           (click)="togglePrograms($event)">
           Programs
@@ -49,14 +52,16 @@
           </a>
           <a href="#" class="dropdown-item" (click)="closeMenu()">Global Harmony & Peace</a>
         </div>
-      </div>
+      </div> -->
 
       <a routerLink="/centers" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
         Centers
       </a>
+      @if (!isLoggedIn()) {
       <a routerLink="/register" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
         Register
       </a>
+      }
       <!-- Search Bar -->
       <!-- <div class="nav-search">
         <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search..."

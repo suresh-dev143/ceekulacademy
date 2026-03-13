@@ -97,7 +97,7 @@ export class IssueService {
             status: 'System Reviewed',
             createdAt: new Date().toISOString(),
             history: [
-                { status: 'Submitted', timestamp: new Date().toISOString(), byRole: 'User' },
+                { status: 'Submitted', timestamp: new Date().toISOString(), byRole: 'Student' },
                 { status: 'System Reviewed', timestamp: new Date().toISOString(), byRole: 'System' }
             ]
         };

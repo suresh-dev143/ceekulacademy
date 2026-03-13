@@ -4,164 +4,166 @@ import { ChatPanelComponent } from '../../components/chat-panel/chat-panel';
 import { interval } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavbarComponent } from '../../components/navbar/navbar';
+import { GlobalSearchComponent } from '../../components/global-search/global-search';
+import { SearchService } from '../../services/search.service';
 
 // ── Civilization Impact Score (6-component composite) ─────────
 export interface CivilizationImpactScore {
-    overall:              number;  // 0–100 weighted composite
-    womenParticipation:   number;  // 0–100
+    overall: number;  // 0–100 weighted composite
+    womenParticipation: number;  // 0–100
     lowestStrataInclusion: number; // 0–100
-    originalResearch:     number;  // 0–100
+    originalResearch: number;  // 0–100
     innovationDeployment: number;  // 0–100
-    digitalAdvancement:   number;  // 0–100
-    globalHarmony:        number;  // 0–100
+    digitalAdvancement: number;  // 0–100
+    globalHarmony: number;  // 0–100
     trend: 'Rising' | 'Stable' | 'Declining';
     aiSummary: string;
 }
 
 // ── 6-Month Metric Layers ─────────────────────────────────────
 export interface InclusionMetrics {
-    femalePct:           number;
-    underservedPct:      number;
+    femalePct: number;
+    underservedPct: number;
     scholarshipsGranted: number;
-    womenInLeadership:   number;
+    womenInLeadership: number;
     skillHoursDelivered: number;
     inclusionGrowthRate: number;   // % vs prior 6m
-    equityGapAlert:      boolean;
-    socioMobility:       number;   // 0–100 AI estimate
+    equityGapAlert: boolean;
+    socioMobility: number;   // 0–100 AI estimate
 }
 
 export interface ResearchMetrics {
     ideasGenerated: number;
-    patentsFiled:   number;
+    patentsFiled: number;
     papersSubmitted: number;
-    prototypes:     number;
+    prototypes: number;
     collaborations: number;
-    noveltyScore:      number;   // 0–100
-    crossDomainIndex:  number;   // 0–100
-    futureRelevance:   number;   // 0–100
+    noveltyScore: number;   // 0–100
+    crossDomainIndex: number;   // 0–100
+    futureRelevance: number;   // 0–100
 }
 
 export interface DigitalMetrics {
-    aiSystemsDeployed:      number;
-    platformsCreated:       number;
-    automationPipelines:    number;
+    aiSystemsDeployed: number;
+    platformsCreated: number;
+    automationPipelines: number;
     openSourceContributions: number;
     globalTechCollaborations: number;
-    scalabilityIndex:    number;   // 0–100
+    scalabilityIndex: number;   // 0–100
     cyberResilienceScore: number;  // 0–100
     sophisticationScore: number;   // 0–100
 }
 
 export interface HarmonyMetrics {
-    webinarsHosted:            number;
-    crossCulturalEvents:       number;
-    serviceHours:              number;
-    wellnessInitiatives:       number;
+    webinarsHosted: number;
+    crossCulturalEvents: number;
+    serviceHours: number;
+    wellnessInitiatives: number;
     conflictResolutionPrograms: number;
     harmonySentimentScore: number;  // 0–100
-    communityMultiplier:   number;  // 1.0–3.0×
+    communityMultiplier: number;  // 1.0–3.0×
 }
 
 export interface InfrastructureProfile {
-    ici:                  number;   // 0–100 Infrastructure Capability Index
-    labs:                 number;
-    aiComputeLevel:       'High' | 'Medium' | 'Basic';
-    cloudInfra:           boolean;
-    hybridClassrooms:     number;
-    accessibilityScore:   number;   // 0–100
-    sustainabilityScore:  number;   // 0–100
+    ici: number;   // 0–100 Infrastructure Capability Index
+    labs: number;
+    aiComputeLevel: 'High' | 'Medium' | 'Basic';
+    cloudInfra: boolean;
+    hybridClassrooms: number;
+    accessibilityScore: number;   // 0–100
+    sustainabilityScore: number;   // 0–100
     equipmentUtilization: number;   // %
-    serverBandwidth:      string;
+    serverBandwidth: string;
 }
 
 // ── Center Profile (full) ─────────────────────────────────────
 export interface CenterProfile {
-    id:           string;
-    name:         string;
-    shortName:    string;
-    country:      string;
-    countryCode:  string;
-    utcOffset:    number;
+    id: string;
+    name: string;
+    shortName: string;
+    country: string;
+    countryCode: string;
+    utcOffset: number;
     timezoneAbbr: string;
-    director:     string;
-    established:  number;
+    director: string;
+    established: number;
     totalEnrolled: number;
     totalTeachers: number;
-    lat:          number;    // for world map
-    lng:          number;
-    cis:          CivilizationImpactScore;
-    inclusion:    InclusionMetrics;
-    research:     ResearchMetrics;
-    digital:      DigitalMetrics;
-    harmony:      HarmonyMetrics;
-    infra:        InfrastructureProfile;
+    lat: number;    // for world map
+    lng: number;
+    cis: CivilizationImpactScore;
+    inclusion: InclusionMetrics;
+    research: ResearchMetrics;
+    digital: DigitalMetrics;
+    harmony: HarmonyMetrics;
+    infra: InfrastructureProfile;
 }
 
 // ── Today's Vision Focus (per center, live) ───────────────────
 export type CisPillar = 'Inclusion' | 'Research' | 'Innovation' | 'Digital' | 'Civilization';
 
 export interface TodayVision {
-    activePillars:   CisPillar[];
-    primaryFocus:    string;
-    visionImpact:    string;
+    activePillars: CisPillar[];
+    primaryFocus: string;
+    visionImpact: string;
     learnersEngaged: number;
     scores: { inclusion: number; research: number; innovation: number; digital: number; civilization: number; overall: number };
     liveMetrics: {
-        womenTrainedToday:           number;
-        mentoringHoursToday:         number;
-        scholarshipsAllocatedToday:  number;
-        digitalToolsDeployedToday:   number;
-        beneficiariesReachedToday:   number;
+        womenTrainedToday: number;
+        mentoringHoursToday: number;
+        scholarshipsAllocatedToday: number;
+        digitalToolsDeployedToday: number;
+        beneficiariesReachedToday: number;
     };
 }
 
 // ── Center Day Status ─────────────────────────────────────────
 export interface CenterDayStatus {
-    centerId:          string;
-    centerName:        string;
-    shortName:         string;
-    country:           string;
-    countryCode:       string;
-    utcOffset:         number;
-    timezoneAbbr:      string;
+    centerId: string;
+    centerName: string;
+    shortName: string;
+    country: string;
+    countryCode: string;
+    utcOffset: number;
+    timezoneAbbr: string;
     operationalStatus: 'Open' | 'Closed' | 'Holiday' | 'Maintenance';
-    studentsPresent:   number;
-    totalEnrolled:     number;
-    teachersOnDuty:    number;
-    totalTeachers:     number;
-    dutyOfficer:       string;
-    alerts:            string[];
-    todayVision:       TodayVision;
+    studentsPresent: number;
+    totalEnrolled: number;
+    teachersOnDuty: number;
+    totalTeachers: number;
+    dutyOfficer: string;
+    alerts: string[];
+    todayVision: TodayVision;
 }
 
 // ── Live Feed Types ───────────────────────────────────────────
 export interface LiveActivity {
-    id:             string;
-    type:           'Course' | 'Workshop' | 'Research' | 'Mentoring' | 'Innovation';
-    title:          string;
-    center:         string;
-    centerCode:     string;
-    participants:   number;
-    femalePct:      number;
+    id: string;
+    type: 'Course' | 'Workshop' | 'Research' | 'Mentoring' | 'Innovation';
+    title: string;
+    center: string;
+    centerCode: string;
+    participants: number;
+    femalePct: number;
     inclusionLevel: 'High' | 'Medium' | 'Low';
-    domain:         string;
-    minutesAgo:     number;
+    domain: string;
+    minutesAgo: number;
 }
 
 export interface ResearchEntry {
-    id:          string;
-    title:       string;
-    center:      string;
-    centerCode:  string;
-    category:    string;
-    minutesAgo:  number;
+    id: string;
+    title: string;
+    center: string;
+    centerCode: string;
+    category: string;
+    minutesAgo: number;
     noveltyScore: number;
 }
 
 export interface AdvisorInsight {
-    type:     'Alert' | 'Opportunity' | 'Action' | 'Recognition';
-    center:   string;
-    message:  string;
+    type: 'Alert' | 'Opportunity' | 'Action' | 'Recognition';
+    center: string;
+    message: string;
     priority: 'High' | 'Medium' | 'Low';
 }
 
@@ -170,16 +172,17 @@ export interface AdvisorInsight {
 // ═══════════════════════════════════════════════════════════════
 @Component({
     selector: 'app-centers',
-    imports: [CommonModule, ChatPanelComponent, NavbarComponent],
+    imports: [CommonModule, ChatPanelComponent, NavbarComponent, GlobalSearchComponent],
     templateUrl: './centers.html',
     styleUrl: './centers.scss'
 })
 export class CentersComponent {
     private destroyRef = inject(DestroyRef);
+    private searchService = inject(SearchService);
 
     lastUpdated = signal<Date>(new Date());
     currentTime = signal<Date>(new Date());
-    searchQuery  = signal('');
+    searchQuery = this.searchService.globalQuery;
 
     // ── Center Profiles ─────────────────────────────────────────
     centerProfiles = signal<CenterProfile[]>([
@@ -188,160 +191,256 @@ export class CentersComponent {
             country: 'India', countryCode: 'IN', utcOffset: 5.5, timezoneAbbr: 'IST',
             director: 'Mr. Keshan Verma', established: 2018, totalEnrolled: 150, totalTeachers: 12,
             lat: 26.2, lng: 81.2,
-            cis: { overall: 74, womenParticipation: 82, lowestStrataInclusion: 85, originalResearch: 58,
-                   innovationDeployment: 70, digitalAdvancement: 65, globalHarmony: 78,
-                   trend: 'Rising',
-                   aiSummary: 'Strong inclusion champion with 72% underserved participation. 3 research projects active. Rural digital literacy push driving consistent CIS growth over 6 months.' },
-            inclusion: { femalePct: 61, underservedPct: 72, scholarshipsGranted: 89, womenInLeadership: 8,
-                         skillHoursDelivered: 2840, inclusionGrowthRate: 18, equityGapAlert: false, socioMobility: 68 },
-            research: { ideasGenerated: 12, patentsFiled: 0, papersSubmitted: 1, prototypes: 3, collaborations: 4,
-                        noveltyScore: 62, crossDomainIndex: 55, futureRelevance: 70 },
-            digital: { aiSystemsDeployed: 2, platformsCreated: 1, automationPipelines: 3, openSourceContributions: 1,
-                       globalTechCollaborations: 2, scalabilityIndex: 55, cyberResilienceScore: 60, sophisticationScore: 58 },
-            harmony: { webinarsHosted: 8, crossCulturalEvents: 5, serviceHours: 340, wellnessInitiatives: 3,
-                       conflictResolutionPrograms: 1, harmonySentimentScore: 78, communityMultiplier: 1.8 },
-            infra: { ici: 68, labs: 2, aiComputeLevel: 'Basic', cloudInfra: false, hybridClassrooms: 2,
-                     accessibilityScore: 82, sustainabilityScore: 70, equipmentUtilization: 76, serverBandwidth: '100 Mbps' }
+            cis: {
+                overall: 74, womenParticipation: 82, lowestStrataInclusion: 85, originalResearch: 58,
+                innovationDeployment: 70, digitalAdvancement: 65, globalHarmony: 78,
+                trend: 'Rising',
+                aiSummary: 'Strong inclusion champion with 72% underserved participation. 3 research projects active. Rural digital literacy push driving consistent CIS growth over 6 months.'
+            },
+            inclusion: {
+                femalePct: 61, underservedPct: 72, scholarshipsGranted: 89, womenInLeadership: 8,
+                skillHoursDelivered: 2840, inclusionGrowthRate: 18, equityGapAlert: false, socioMobility: 68
+            },
+            research: {
+                ideasGenerated: 12, patentsFiled: 0, papersSubmitted: 1, prototypes: 3, collaborations: 4,
+                noveltyScore: 62, crossDomainIndex: 55, futureRelevance: 70
+            },
+            digital: {
+                aiSystemsDeployed: 2, platformsCreated: 1, automationPipelines: 3, openSourceContributions: 1,
+                globalTechCollaborations: 2, scalabilityIndex: 55, cyberResilienceScore: 60, sophisticationScore: 58
+            },
+            harmony: {
+                webinarsHosted: 8, crossCulturalEvents: 5, serviceHours: 340, wellnessInitiatives: 3,
+                conflictResolutionPrograms: 1, harmonySentimentScore: 78, communityMultiplier: 1.8
+            },
+            infra: {
+                ici: 68, labs: 2, aiComputeLevel: 'Basic', cloudInfra: false, hybridClassrooms: 2,
+                accessibilityScore: 82, sustainabilityScore: 70, equipmentUtilization: 76, serverBandwidth: '100 Mbps'
+            }
         },
         {
             id: 'usa-alabama', name: 'Alabama Innovation Center', shortName: 'Alabama',
             country: 'USA', countryCode: 'US', utcOffset: -6, timezoneAbbr: 'CST',
             director: 'Dr. Sarah Mitchell', established: 2019, totalEnrolled: 200, totalTeachers: 18,
             lat: 33.5, lng: -86.8,
-            cis: { overall: 91, womenParticipation: 78, lowestStrataInclusion: 65, originalResearch: 88,
-                   innovationDeployment: 92, digitalAdvancement: 95, globalHarmony: 82,
-                   trend: 'Rising',
-                   aiSummary: 'Global innovation powerhouse with highest CIS in the network (91/100). 8 research projects, 5 publications, 11 solutions deployed. Scaling digital systems to 1,800+ users.' },
-            inclusion: { femalePct: 54, underservedPct: 48, scholarshipsGranted: 62, womenInLeadership: 12,
-                         skillHoursDelivered: 4200, inclusionGrowthRate: 22, equityGapAlert: false, socioMobility: 82 },
-            research: { ideasGenerated: 28, patentsFiled: 3, papersSubmitted: 5, prototypes: 8, collaborations: 9,
-                        noveltyScore: 88, crossDomainIndex: 82, futureRelevance: 90 },
-            digital: { aiSystemsDeployed: 6, platformsCreated: 4, automationPipelines: 8, openSourceContributions: 5,
-                       globalTechCollaborations: 7, scalabilityIndex: 90, cyberResilienceScore: 88, sophisticationScore: 92 },
-            harmony: { webinarsHosted: 15, crossCulturalEvents: 12, serviceHours: 680, wellnessInitiatives: 6,
-                       conflictResolutionPrograms: 2, harmonySentimentScore: 82, communityMultiplier: 2.4 },
-            infra: { ici: 92, labs: 6, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 8,
-                     accessibilityScore: 88, sustainabilityScore: 85, equipmentUtilization: 88, serverBandwidth: '10 Gbps' }
+            cis: {
+                overall: 91, womenParticipation: 78, lowestStrataInclusion: 65, originalResearch: 88,
+                innovationDeployment: 92, digitalAdvancement: 95, globalHarmony: 82,
+                trend: 'Rising',
+                aiSummary: 'Global innovation powerhouse with highest CIS in the network (91/100). 8 research projects, 5 publications, 11 solutions deployed. Scaling digital systems to 1,800+ users.'
+            },
+            inclusion: {
+                femalePct: 54, underservedPct: 48, scholarshipsGranted: 62, womenInLeadership: 12,
+                skillHoursDelivered: 4200, inclusionGrowthRate: 22, equityGapAlert: false, socioMobility: 82
+            },
+            research: {
+                ideasGenerated: 28, patentsFiled: 3, papersSubmitted: 5, prototypes: 8, collaborations: 9,
+                noveltyScore: 88, crossDomainIndex: 82, futureRelevance: 90
+            },
+            digital: {
+                aiSystemsDeployed: 6, platformsCreated: 4, automationPipelines: 8, openSourceContributions: 5,
+                globalTechCollaborations: 7, scalabilityIndex: 90, cyberResilienceScore: 88, sophisticationScore: 92
+            },
+            harmony: {
+                webinarsHosted: 15, crossCulturalEvents: 12, serviceHours: 680, wellnessInitiatives: 6,
+                conflictResolutionPrograms: 2, harmonySentimentScore: 82, communityMultiplier: 2.4
+            },
+            infra: {
+                ici: 92, labs: 6, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 8,
+                accessibilityScore: 88, sustainabilityScore: 85, equipmentUtilization: 88, serverBandwidth: '10 Gbps'
+            }
         },
         {
             id: 'uk-london', name: 'London Global Hub', shortName: 'London',
             country: 'United Kingdom', countryCode: 'GB', utcOffset: 0, timezoneAbbr: 'GMT',
             director: 'Prof. James Whitfield', established: 2020, totalEnrolled: 300, totalTeachers: 25,
             lat: 51.5, lng: -0.1,
-            cis: { overall: 87, womenParticipation: 75, lowestStrataInclusion: 60, originalResearch: 91,
-                   innovationDeployment: 78, digitalAdvancement: 85, globalHarmony: 88,
-                   trend: 'Stable',
-                   aiSummary: 'Premier research and civilization center. 12 research projects, 8 papers. Global Summit hub reaching 18 communities. Highest harmony score in the network.' },
-            inclusion: { femalePct: 57, underservedPct: 43, scholarshipsGranted: 71, womenInLeadership: 15,
-                         skillHoursDelivered: 5100, inclusionGrowthRate: 15, equityGapAlert: false, socioMobility: 78 },
-            research: { ideasGenerated: 35, patentsFiled: 2, papersSubmitted: 8, prototypes: 7, collaborations: 14,
-                        noveltyScore: 91, crossDomainIndex: 88, futureRelevance: 88 },
-            digital: { aiSystemsDeployed: 5, platformsCreated: 4, automationPipelines: 6, openSourceContributions: 7,
-                       globalTechCollaborations: 12, scalabilityIndex: 85, cyberResilienceScore: 90, sophisticationScore: 88 },
-            harmony: { webinarsHosted: 22, crossCulturalEvents: 18, serviceHours: 920, wellnessInitiatives: 8,
-                       conflictResolutionPrograms: 5, harmonySentimentScore: 88, communityMultiplier: 2.8 },
-            infra: { ici: 90, labs: 5, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 10,
-                     accessibilityScore: 85, sustainabilityScore: 88, equipmentUtilization: 82, serverBandwidth: '5 Gbps' }
+            cis: {
+                overall: 87, womenParticipation: 75, lowestStrataInclusion: 60, originalResearch: 91,
+                innovationDeployment: 78, digitalAdvancement: 85, globalHarmony: 88,
+                trend: 'Stable',
+                aiSummary: 'Premier research and civilization center. 12 research projects, 8 papers. Global Summit hub reaching 18 communities. Highest harmony score in the network.'
+            },
+            inclusion: {
+                femalePct: 57, underservedPct: 43, scholarshipsGranted: 71, womenInLeadership: 15,
+                skillHoursDelivered: 5100, inclusionGrowthRate: 15, equityGapAlert: false, socioMobility: 78
+            },
+            research: {
+                ideasGenerated: 35, patentsFiled: 2, papersSubmitted: 8, prototypes: 7, collaborations: 14,
+                noveltyScore: 91, crossDomainIndex: 88, futureRelevance: 88
+            },
+            digital: {
+                aiSystemsDeployed: 5, platformsCreated: 4, automationPipelines: 6, openSourceContributions: 7,
+                globalTechCollaborations: 12, scalabilityIndex: 85, cyberResilienceScore: 90, sophisticationScore: 88
+            },
+            harmony: {
+                webinarsHosted: 22, crossCulturalEvents: 18, serviceHours: 920, wellnessInitiatives: 8,
+                conflictResolutionPrograms: 5, harmonySentimentScore: 88, communityMultiplier: 2.8
+            },
+            infra: {
+                ici: 90, labs: 5, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 10,
+                accessibilityScore: 85, sustainabilityScore: 88, equipmentUtilization: 82, serverBandwidth: '5 Gbps'
+            }
         },
         {
             id: 'nigeria-lagos', name: 'Lagos Mission Center', shortName: 'Lagos',
             country: 'Nigeria', countryCode: 'NG', utcOffset: 1, timezoneAbbr: 'WAT',
             director: 'Dr. Adaeze Okonkwo', established: 2021, totalEnrolled: 180, totalTeachers: 14,
             lat: 6.5, lng: 3.4,
-            cis: { overall: 79, womenParticipation: 88, lowestStrataInclusion: 90, originalResearch: 62,
-                   innovationDeployment: 75, digitalAdvancement: 68, globalHarmony: 80,
-                   trend: 'Rising',
-                   aiSummary: 'Strongest inclusion center globally. 78% underserved, 98 scholarships. Women entrepreneurship incubation driving community upliftment in underserved Lagos.' },
-            inclusion: { femalePct: 65, underservedPct: 78, scholarshipsGranted: 98, womenInLeadership: 9,
-                         skillHoursDelivered: 3200, inclusionGrowthRate: 28, equityGapAlert: false, socioMobility: 72 },
-            research: { ideasGenerated: 14, patentsFiled: 0, papersSubmitted: 2, prototypes: 4, collaborations: 5,
-                        noveltyScore: 65, crossDomainIndex: 58, futureRelevance: 75 },
-            digital: { aiSystemsDeployed: 3, platformsCreated: 2, automationPipelines: 4, openSourceContributions: 2,
-                       globalTechCollaborations: 3, scalabilityIndex: 62, cyberResilienceScore: 65, sophisticationScore: 60 },
-            harmony: { webinarsHosted: 12, crossCulturalEvents: 9, serviceHours: 480, wellnessInitiatives: 5,
-                       conflictResolutionPrograms: 3, harmonySentimentScore: 80, communityMultiplier: 2.2 },
-            infra: { ici: 72, labs: 3, aiComputeLevel: 'Medium', cloudInfra: true, hybridClassrooms: 4,
-                     accessibilityScore: 88, sustainabilityScore: 72, equipmentUtilization: 79, serverBandwidth: '500 Mbps' }
+            cis: {
+                overall: 79, womenParticipation: 88, lowestStrataInclusion: 90, originalResearch: 62,
+                innovationDeployment: 75, digitalAdvancement: 68, globalHarmony: 80,
+                trend: 'Rising',
+                aiSummary: 'Strongest inclusion center globally. 78% underserved, 98 scholarships. Women entrepreneurship incubation driving community upliftment in underserved Lagos.'
+            },
+            inclusion: {
+                femalePct: 65, underservedPct: 78, scholarshipsGranted: 98, womenInLeadership: 9,
+                skillHoursDelivered: 3200, inclusionGrowthRate: 28, equityGapAlert: false, socioMobility: 72
+            },
+            research: {
+                ideasGenerated: 14, patentsFiled: 0, papersSubmitted: 2, prototypes: 4, collaborations: 5,
+                noveltyScore: 65, crossDomainIndex: 58, futureRelevance: 75
+            },
+            digital: {
+                aiSystemsDeployed: 3, platformsCreated: 2, automationPipelines: 4, openSourceContributions: 2,
+                globalTechCollaborations: 3, scalabilityIndex: 62, cyberResilienceScore: 65, sophisticationScore: 60
+            },
+            harmony: {
+                webinarsHosted: 12, crossCulturalEvents: 9, serviceHours: 480, wellnessInitiatives: 5,
+                conflictResolutionPrograms: 3, harmonySentimentScore: 80, communityMultiplier: 2.2
+            },
+            infra: {
+                ici: 72, labs: 3, aiComputeLevel: 'Medium', cloudInfra: true, hybridClassrooms: 4,
+                accessibilityScore: 88, sustainabilityScore: 72, equipmentUtilization: 79, serverBandwidth: '500 Mbps'
+            }
         },
         {
             id: 'australia-sydney', name: 'Sydney Pacific Center', shortName: 'Sydney',
             country: 'Australia', countryCode: 'AU', utcOffset: 11, timezoneAbbr: 'AEDT',
             director: 'Dr. Emma Clarke', established: 2020, totalEnrolled: 220, totalTeachers: 20,
             lat: -33.9, lng: 151.2,
-            cis: { overall: 88, womenParticipation: 78, lowestStrataInclusion: 68, originalResearch: 80,
-                   innovationDeployment: 82, digitalAdvancement: 90, globalHarmony: 82,
-                   trend: 'Rising',
-                   aiSummary: 'Pacific digital excellence hub. 7 systems deployed, 7 platforms created. Strong research output with 4 publications. All vision targets met today.' },
-            inclusion: { femalePct: 58, underservedPct: 52, scholarshipsGranted: 65, womenInLeadership: 11,
-                         skillHoursDelivered: 3800, inclusionGrowthRate: 12, equityGapAlert: false, socioMobility: 80 },
-            research: { ideasGenerated: 22, patentsFiled: 2, papersSubmitted: 4, prototypes: 6, collaborations: 8,
-                        noveltyScore: 80, crossDomainIndex: 75, futureRelevance: 85 },
-            digital: { aiSystemsDeployed: 7, platformsCreated: 5, automationPipelines: 7, openSourceContributions: 4,
-                       globalTechCollaborations: 6, scalabilityIndex: 88, cyberResilienceScore: 85, sophisticationScore: 86 },
-            harmony: { webinarsHosted: 11, crossCulturalEvents: 8, serviceHours: 520, wellnessInitiatives: 5,
-                       conflictResolutionPrograms: 2, harmonySentimentScore: 82, communityMultiplier: 2.0 },
-            infra: { ici: 88, labs: 5, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 7,
-                     accessibilityScore: 82, sustainabilityScore: 90, equipmentUtilization: 84, serverBandwidth: '5 Gbps' }
+            cis: {
+                overall: 88, womenParticipation: 78, lowestStrataInclusion: 68, originalResearch: 80,
+                innovationDeployment: 82, digitalAdvancement: 90, globalHarmony: 82,
+                trend: 'Rising',
+                aiSummary: 'Pacific digital excellence hub. 7 systems deployed, 7 platforms created. Strong research output with 4 publications. All vision targets met today.'
+            },
+            inclusion: {
+                femalePct: 58, underservedPct: 52, scholarshipsGranted: 65, womenInLeadership: 11,
+                skillHoursDelivered: 3800, inclusionGrowthRate: 12, equityGapAlert: false, socioMobility: 80
+            },
+            research: {
+                ideasGenerated: 22, patentsFiled: 2, papersSubmitted: 4, prototypes: 6, collaborations: 8,
+                noveltyScore: 80, crossDomainIndex: 75, futureRelevance: 85
+            },
+            digital: {
+                aiSystemsDeployed: 7, platformsCreated: 5, automationPipelines: 7, openSourceContributions: 4,
+                globalTechCollaborations: 6, scalabilityIndex: 88, cyberResilienceScore: 85, sophisticationScore: 86
+            },
+            harmony: {
+                webinarsHosted: 11, crossCulturalEvents: 8, serviceHours: 520, wellnessInitiatives: 5,
+                conflictResolutionPrograms: 2, harmonySentimentScore: 82, communityMultiplier: 2.0
+            },
+            infra: {
+                ici: 88, labs: 5, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 7,
+                accessibilityScore: 82, sustainabilityScore: 90, equipmentUtilization: 84, serverBandwidth: '5 Gbps'
+            }
         },
         {
             id: 'brazil-saopaulo', name: 'São Paulo Center', shortName: 'São Paulo',
             country: 'Brazil', countryCode: 'BR', utcOffset: -3, timezoneAbbr: 'BRT',
             director: 'Dr. Carlos Mendes', established: 2022, totalEnrolled: 160, totalTeachers: 13,
             lat: -23.5, lng: -46.6,
-            cis: { overall: 72, womenParticipation: 82, lowestStrataInclusion: 80, originalResearch: 55,
-                   innovationDeployment: 68, digitalAdvancement: 62, globalHarmony: 72,
-                   trend: 'Stable',
-                   aiSummary: 'Strong inclusion with 63% female and 69% underserved. Hackathon culture emerging. Needs research infrastructure investment to reach next CIS tier.' },
-            inclusion: { femalePct: 63, underservedPct: 69, scholarshipsGranted: 78, womenInLeadership: 7,
-                         skillHoursDelivered: 2600, inclusionGrowthRate: 20, equityGapAlert: false, socioMobility: 65 },
-            research: { ideasGenerated: 10, patentsFiled: 0, papersSubmitted: 1, prototypes: 3, collaborations: 4,
-                        noveltyScore: 58, crossDomainIndex: 52, futureRelevance: 65 },
-            digital: { aiSystemsDeployed: 3, platformsCreated: 2, automationPipelines: 3, openSourceContributions: 2,
-                       globalTechCollaborations: 3, scalabilityIndex: 58, cyberResilienceScore: 60, sophisticationScore: 55 },
-            harmony: { webinarsHosted: 10, crossCulturalEvents: 7, serviceHours: 380, wellnessInitiatives: 4,
-                       conflictResolutionPrograms: 2, harmonySentimentScore: 72, communityMultiplier: 1.9 },
-            infra: { ici: 70, labs: 3, aiComputeLevel: 'Medium', cloudInfra: true, hybridClassrooms: 3,
-                     accessibilityScore: 80, sustainabilityScore: 68, equipmentUtilization: 75, serverBandwidth: '1 Gbps' }
+            cis: {
+                overall: 72, womenParticipation: 82, lowestStrataInclusion: 80, originalResearch: 55,
+                innovationDeployment: 68, digitalAdvancement: 62, globalHarmony: 72,
+                trend: 'Stable',
+                aiSummary: 'Strong inclusion with 63% female and 69% underserved. Hackathon culture emerging. Needs research infrastructure investment to reach next CIS tier.'
+            },
+            inclusion: {
+                femalePct: 63, underservedPct: 69, scholarshipsGranted: 78, womenInLeadership: 7,
+                skillHoursDelivered: 2600, inclusionGrowthRate: 20, equityGapAlert: false, socioMobility: 65
+            },
+            research: {
+                ideasGenerated: 10, patentsFiled: 0, papersSubmitted: 1, prototypes: 3, collaborations: 4,
+                noveltyScore: 58, crossDomainIndex: 52, futureRelevance: 65
+            },
+            digital: {
+                aiSystemsDeployed: 3, platformsCreated: 2, automationPipelines: 3, openSourceContributions: 2,
+                globalTechCollaborations: 3, scalabilityIndex: 58, cyberResilienceScore: 60, sophisticationScore: 55
+            },
+            harmony: {
+                webinarsHosted: 10, crossCulturalEvents: 7, serviceHours: 380, wellnessInitiatives: 4,
+                conflictResolutionPrograms: 2, harmonySentimentScore: 72, communityMultiplier: 1.9
+            },
+            infra: {
+                ici: 70, labs: 3, aiComputeLevel: 'Medium', cloudInfra: true, hybridClassrooms: 3,
+                accessibilityScore: 80, sustainabilityScore: 68, equipmentUtilization: 75, serverBandwidth: '1 Gbps'
+            }
         },
         {
             id: 'japan-tokyo', name: 'Tokyo East Asia Hub', shortName: 'Tokyo',
             country: 'Japan', countryCode: 'JP', utcOffset: 9, timezoneAbbr: 'JST',
             director: 'Prof. Hiroshi Tanaka', established: 2021, totalEnrolled: 250, totalTeachers: 22,
             lat: 35.7, lng: 139.7,
-            cis: { overall: 89, womenParticipation: 68, lowestStrataInclusion: 62, originalResearch: 90,
-                   innovationDeployment: 88, digitalAdvancement: 92, globalHarmony: 86,
-                   trend: 'Rising',
-                   aiSummary: 'Asia-Pacific research powerhouse. Highest novelty score (91/100). 10 projects, 7 publications. Civilization Forum driving ethical AI governance at continental scale.' },
-            inclusion: { femalePct: 52, underservedPct: 45, scholarshipsGranted: 58, womenInLeadership: 10,
-                         skillHoursDelivered: 4100, inclusionGrowthRate: 20, equityGapAlert: true, socioMobility: 78 },
-            research: { ideasGenerated: 32, patentsFiled: 4, papersSubmitted: 7, prototypes: 10, collaborations: 12,
-                        noveltyScore: 91, crossDomainIndex: 88, futureRelevance: 92 },
-            digital: { aiSystemsDeployed: 8, platformsCreated: 6, automationPipelines: 9, openSourceContributions: 6,
-                       globalTechCollaborations: 10, scalabilityIndex: 92, cyberResilienceScore: 90, sophisticationScore: 94 },
-            harmony: { webinarsHosted: 18, crossCulturalEvents: 15, serviceHours: 740, wellnessInitiatives: 7,
-                       conflictResolutionPrograms: 3, harmonySentimentScore: 86, communityMultiplier: 2.5 },
-            infra: { ici: 94, labs: 7, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 9,
-                     accessibilityScore: 80, sustainabilityScore: 88, equipmentUtilization: 90, serverBandwidth: '10 Gbps' }
+            cis: {
+                overall: 89, womenParticipation: 68, lowestStrataInclusion: 62, originalResearch: 90,
+                innovationDeployment: 88, digitalAdvancement: 92, globalHarmony: 86,
+                trend: 'Rising',
+                aiSummary: 'Asia-Pacific research powerhouse. Highest novelty score (91/100). 10 projects, 7 publications. Civilization Forum driving ethical AI governance at continental scale.'
+            },
+            inclusion: {
+                femalePct: 52, underservedPct: 45, scholarshipsGranted: 58, womenInLeadership: 10,
+                skillHoursDelivered: 4100, inclusionGrowthRate: 20, equityGapAlert: true, socioMobility: 78
+            },
+            research: {
+                ideasGenerated: 32, patentsFiled: 4, papersSubmitted: 7, prototypes: 10, collaborations: 12,
+                noveltyScore: 91, crossDomainIndex: 88, futureRelevance: 92
+            },
+            digital: {
+                aiSystemsDeployed: 8, platformsCreated: 6, automationPipelines: 9, openSourceContributions: 6,
+                globalTechCollaborations: 10, scalabilityIndex: 92, cyberResilienceScore: 90, sophisticationScore: 94
+            },
+            harmony: {
+                webinarsHosted: 18, crossCulturalEvents: 15, serviceHours: 740, wellnessInitiatives: 7,
+                conflictResolutionPrograms: 3, harmonySentimentScore: 86, communityMultiplier: 2.5
+            },
+            infra: {
+                ici: 94, labs: 7, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 9,
+                accessibilityScore: 80, sustainabilityScore: 88, equipmentUtilization: 90, serverBandwidth: '10 Gbps'
+            }
         },
         {
             id: 'southafrica-capetown', name: 'Cape Town Center', shortName: 'Cape Town',
             country: 'South Africa', countryCode: 'ZA', utcOffset: 2, timezoneAbbr: 'SAST',
             director: 'Dr. Nomsa Dlamini', established: 2023, totalEnrolled: 120, totalTeachers: 9,
             lat: -33.9, lng: 18.4,
-            cis: { overall: 63, womenParticipation: 82, lowestStrataInclusion: 88, originalResearch: 45,
-                   innovationDeployment: 58, digitalAdvancement: 55, globalHarmony: 65,
-                   trend: 'Rising',
-                   aiSummary: 'Newest center with strongest inclusion trajectory. 82 scholarships from underserved communities. Rapid growth (+35%). Needs research and digital investment to accelerate CIS.' },
-            inclusion: { femalePct: 68, underservedPct: 74, scholarshipsGranted: 82, womenInLeadership: 5,
-                         skillHoursDelivered: 1800, inclusionGrowthRate: 35, equityGapAlert: false, socioMobility: 58 },
-            research: { ideasGenerated: 6, patentsFiled: 0, papersSubmitted: 0, prototypes: 2, collaborations: 2,
-                        noveltyScore: 48, crossDomainIndex: 42, futureRelevance: 60 },
-            digital: { aiSystemsDeployed: 2, platformsCreated: 1, automationPipelines: 2, openSourceContributions: 1,
-                       globalTechCollaborations: 2, scalabilityIndex: 48, cyberResilienceScore: 52, sophisticationScore: 45 },
-            harmony: { webinarsHosted: 7, crossCulturalEvents: 4, serviceHours: 280, wellnessInitiatives: 3,
-                       conflictResolutionPrograms: 1, harmonySentimentScore: 65, communityMultiplier: 1.5 },
-            infra: { ici: 60, labs: 1, aiComputeLevel: 'Basic', cloudInfra: false, hybridClassrooms: 2,
-                     accessibilityScore: 85, sustainabilityScore: 65, equipmentUtilization: 70, serverBandwidth: '100 Mbps' }
+            cis: {
+                overall: 63, womenParticipation: 82, lowestStrataInclusion: 88, originalResearch: 45,
+                innovationDeployment: 58, digitalAdvancement: 55, globalHarmony: 65,
+                trend: 'Rising',
+                aiSummary: 'Newest center with strongest inclusion trajectory. 82 scholarships from underserved communities. Rapid growth (+35%). Needs research and digital investment to accelerate CIS.'
+            },
+            inclusion: {
+                femalePct: 68, underservedPct: 74, scholarshipsGranted: 82, womenInLeadership: 5,
+                skillHoursDelivered: 1800, inclusionGrowthRate: 35, equityGapAlert: false, socioMobility: 58
+            },
+            research: {
+                ideasGenerated: 6, patentsFiled: 0, papersSubmitted: 0, prototypes: 2, collaborations: 2,
+                noveltyScore: 48, crossDomainIndex: 42, futureRelevance: 60
+            },
+            digital: {
+                aiSystemsDeployed: 2, platformsCreated: 1, automationPipelines: 2, openSourceContributions: 1,
+                globalTechCollaborations: 2, scalabilityIndex: 48, cyberResilienceScore: 52, sophisticationScore: 45
+            },
+            harmony: {
+                webinarsHosted: 7, crossCulturalEvents: 4, serviceHours: 280, wellnessInitiatives: 3,
+                conflictResolutionPrograms: 1, harmonySentimentScore: 65, communityMultiplier: 1.5
+            },
+            infra: {
+                ici: 60, labs: 1, aiComputeLevel: 'Basic', cloudInfra: false, hybridClassrooms: 2,
+                accessibilityScore: 85, sustainabilityScore: 65, equipmentUtilization: 70, serverBandwidth: '100 Mbps'
+            }
         }
     ]);
 
@@ -497,114 +596,114 @@ export class CentersComponent {
         const avg = (fn: (c: CenterProfile) => number) =>
             Math.round(p.reduce((s, c) => s + fn(c), 0) / n);
         return {
-            overall:              avg(c => c.cis.overall),
-            womenParticipation:   avg(c => c.cis.womenParticipation),
+            overall: avg(c => c.cis.overall),
+            womenParticipation: avg(c => c.cis.womenParticipation),
             lowestStrataInclusion: avg(c => c.cis.lowestStrataInclusion),
-            originalResearch:     avg(c => c.cis.originalResearch),
+            originalResearch: avg(c => c.cis.originalResearch),
             innovationDeployment: avg(c => c.cis.innovationDeployment),
-            digitalAdvancement:   avg(c => c.cis.digitalAdvancement),
-            globalHarmony:        avg(c => c.cis.globalHarmony),
+            digitalAdvancement: avg(c => c.cis.digitalAdvancement),
+            globalHarmony: avg(c => c.cis.globalHarmony),
         };
     });
 
     network6mInclusion = computed(() => {
         const p = this.centerProfiles();
         return {
-            avgFemalePct:      Math.round(p.reduce((s, c) => s + c.inclusion.femalePct, 0) / p.length),
+            avgFemalePct: Math.round(p.reduce((s, c) => s + c.inclusion.femalePct, 0) / p.length),
             avgUnderservedPct: Math.round(p.reduce((s, c) => s + c.inclusion.underservedPct, 0) / p.length),
             totalScholarships: p.reduce((s, c) => s + c.inclusion.scholarshipsGranted, 0),
             totalWomenLeaders: p.reduce((s, c) => s + c.inclusion.womenInLeadership, 0),
-            totalSkillHours:   p.reduce((s, c) => s + c.inclusion.skillHoursDelivered, 0),
-            avgSocioMobility:  Math.round(p.reduce((s, c) => s + c.inclusion.socioMobility, 0) / p.length),
-            equityAlerts:      p.filter(c => c.inclusion.equityGapAlert).length,
+            totalSkillHours: p.reduce((s, c) => s + c.inclusion.skillHoursDelivered, 0),
+            avgSocioMobility: Math.round(p.reduce((s, c) => s + c.inclusion.socioMobility, 0) / p.length),
+            equityAlerts: p.filter(c => c.inclusion.equityGapAlert).length,
         };
     });
 
     network6mResearch = computed(() => {
         const p = this.centerProfiles();
         return {
-            totalIdeas:       p.reduce((s, c) => s + c.research.ideasGenerated, 0),
-            totalPatents:     p.reduce((s, c) => s + c.research.patentsFiled, 0),
-            totalPapers:      p.reduce((s, c) => s + c.research.papersSubmitted, 0),
-            totalPrototypes:  p.reduce((s, c) => s + c.research.prototypes, 0),
-            totalCollabs:     p.reduce((s, c) => s + c.research.collaborations, 0),
-            avgNovelty:       Math.round(p.reduce((s, c) => s + c.research.noveltyScore, 0) / p.length),
+            totalIdeas: p.reduce((s, c) => s + c.research.ideasGenerated, 0),
+            totalPatents: p.reduce((s, c) => s + c.research.patentsFiled, 0),
+            totalPapers: p.reduce((s, c) => s + c.research.papersSubmitted, 0),
+            totalPrototypes: p.reduce((s, c) => s + c.research.prototypes, 0),
+            totalCollabs: p.reduce((s, c) => s + c.research.collaborations, 0),
+            avgNovelty: Math.round(p.reduce((s, c) => s + c.research.noveltyScore, 0) / p.length),
         };
     });
 
     network6mDigital = computed(() => {
         const p = this.centerProfiles();
         return {
-            totalAiSystems:   p.reduce((s, c) => s + c.digital.aiSystemsDeployed, 0),
-            totalPlatforms:   p.reduce((s, c) => s + c.digital.platformsCreated, 0),
-            totalAutomation:  p.reduce((s, c) => s + c.digital.automationPipelines, 0),
-            totalOpenSource:  p.reduce((s, c) => s + c.digital.openSourceContributions, 0),
+            totalAiSystems: p.reduce((s, c) => s + c.digital.aiSystemsDeployed, 0),
+            totalPlatforms: p.reduce((s, c) => s + c.digital.platformsCreated, 0),
+            totalAutomation: p.reduce((s, c) => s + c.digital.automationPipelines, 0),
+            totalOpenSource: p.reduce((s, c) => s + c.digital.openSourceContributions, 0),
             totalGlobalCollab: p.reduce((s, c) => s + c.digital.globalTechCollaborations, 0),
-            avgScalability:   Math.round(p.reduce((s, c) => s + c.digital.scalabilityIndex, 0) / p.length),
+            avgScalability: Math.round(p.reduce((s, c) => s + c.digital.scalabilityIndex, 0) / p.length),
         };
     });
 
     network6mHarmony = computed(() => {
         const p = this.centerProfiles();
         return {
-            totalWebinars:   p.reduce((s, c) => s + c.harmony.webinarsHosted, 0),
-            totalEvents:     p.reduce((s, c) => s + c.harmony.crossCulturalEvents, 0),
-            totalService:    p.reduce((s, c) => s + c.harmony.serviceHours, 0),
-            totalWellness:   p.reduce((s, c) => s + c.harmony.wellnessInitiatives, 0),
-            avgSentiment:    Math.round(p.reduce((s, c) => s + c.harmony.harmonySentimentScore, 0) / p.length),
-            avgMultiplier:   Math.round(p.reduce((s, c) => s + c.harmony.communityMultiplier, 0) / p.length * 10) / 10,
+            totalWebinars: p.reduce((s, c) => s + c.harmony.webinarsHosted, 0),
+            totalEvents: p.reduce((s, c) => s + c.harmony.crossCulturalEvents, 0),
+            totalService: p.reduce((s, c) => s + c.harmony.serviceHours, 0),
+            totalWellness: p.reduce((s, c) => s + c.harmony.wellnessInitiatives, 0),
+            avgSentiment: Math.round(p.reduce((s, c) => s + c.harmony.harmonySentimentScore, 0) / p.length),
+            avgMultiplier: Math.round(p.reduce((s, c) => s + c.harmony.communityMultiplier, 0) / p.length * 10) / 10,
         };
     });
 
     // ── Network today aggregates ────────────────────────────────
     networkToday = computed(() => {
-        const d    = this.centerDayStatus();
+        const d = this.centerDayStatus();
         const open = d.filter(c => c.operationalStatus === 'Open');
-        const n    = open.length;
-        const avg  = (fn: (c: CenterDayStatus) => number) =>
+        const n = open.length;
+        const avg = (fn: (c: CenterDayStatus) => number) =>
             n === 0 ? 0 : Math.round(open.reduce((s, c) => s + fn(c), 0) / n);
         return {
-            openCenters:          open.length,
-            totalCenters:         d.length,
+            openCenters: open.length,
+            totalCenters: d.length,
             totalLearnersEngaged: d.reduce((s, c) => s + c.todayVision.learnersEngaged, 0),
-            onVision:             open.filter(c => c.todayVision.scores.overall >= 80).length,
-            needsPush:            open.filter(c => c.todayVision.scores.overall >= 65 && c.todayVision.scores.overall < 80).length,
-            critical:             open.filter(c => c.todayVision.scores.overall < 65).length,
-            totalAlerts:          d.reduce((s, c) => s + c.alerts.length, 0),
-            avgVisionScore:       avg(c => c.todayVision.scores.overall),
+            onVision: open.filter(c => c.todayVision.scores.overall >= 80).length,
+            needsPush: open.filter(c => c.todayVision.scores.overall >= 65 && c.todayVision.scores.overall < 80).length,
+            critical: open.filter(c => c.todayVision.scores.overall < 65).length,
+            totalAlerts: d.reduce((s, c) => s + c.alerts.length, 0),
+            avgVisionScore: avg(c => c.todayVision.scores.overall),
         };
     });
 
     networkLiveCounters = computed(() => {
         const d = this.centerDayStatus();
         return {
-            womenTrainedToday:          d.reduce((s, c) => s + c.todayVision.liveMetrics.womenTrainedToday, 0),
-            mentoringHoursToday:        d.reduce((s, c) => s + c.todayVision.liveMetrics.mentoringHoursToday, 0),
+            womenTrainedToday: d.reduce((s, c) => s + c.todayVision.liveMetrics.womenTrainedToday, 0),
+            mentoringHoursToday: d.reduce((s, c) => s + c.todayVision.liveMetrics.mentoringHoursToday, 0),
             scholarshipsAllocatedToday: d.reduce((s, c) => s + c.todayVision.liveMetrics.scholarshipsAllocatedToday, 0),
-            digitalToolsDeployedToday:  d.reduce((s, c) => s + c.todayVision.liveMetrics.digitalToolsDeployedToday, 0),
-            beneficiariesReachedToday:  d.reduce((s, c) => s + c.todayVision.liveMetrics.beneficiariesReachedToday, 0),
+            digitalToolsDeployedToday: d.reduce((s, c) => s + c.todayVision.liveMetrics.digitalToolsDeployedToday, 0),
+            beneficiariesReachedToday: d.reduce((s, c) => s + c.todayVision.liveMetrics.beneficiariesReachedToday, 0),
         };
     });
 
     // ── Civilization 2035 Progress ──────────────────────────────
     civilization2035Progress = computed(() => {
-        const p        = this.centerProfiles();
-        const avgCis   = p.reduce((s, c) => s + c.cis.overall, 0) / p.length;
+        const p = this.centerProfiles();
+        const avgCis = p.reduce((s, c) => s + c.cis.overall, 0) / p.length;
         const countries = new Set(p.map(c => c.country)).size;
         // Targets: 100 centers in 100 countries with avg CIS 90
-        const centerScore   = (p.length / 100)   * 30;
-        const countryScore  = (countries / 100)   * 20;
-        const cisScore      = (avgCis / 90)        * 35;
-        const leaderScore   = Math.min(1, this.network6mInclusion().totalWomenLeaders / 500) * 15;
+        const centerScore = (p.length / 100) * 30;
+        const countryScore = (countries / 100) * 20;
+        const cisScore = (avgCis / 90) * 35;
+        const leaderScore = Math.min(1, this.network6mInclusion().totalWomenLeaders / 500) * 15;
         return Math.min(100, Math.round(centerScore + countryScore + cisScore + leaderScore));
     });
 
     // ── AI Strategic Summary ────────────────────────────────────
     aiStrategicSummary = computed(() => {
-        const inc  = this.network6mInclusion();
-        const res  = this.network6mResearch();
-        const dig  = this.network6mDigital();
-        const n    = this.centerProfiles().length;
+        const inc = this.network6mInclusion();
+        const res = this.network6mResearch();
+        const dig = this.network6mDigital();
+        const n = this.centerProfiles().length;
         const countries = new Set(this.centerProfiles().map(c => c.country)).size;
         return `In the last 6 months, ${n} centers across ${countries} countries granted ${inc.totalScholarships} scholarships, trained ${inc.totalSkillHours.toLocaleString()} skill-hours, generated ${res.totalIdeas} original research ideas with avg novelty ${res.avgNovelty}/100, and deployed ${dig.totalAiSystems} AI systems plus ${dig.totalPlatforms} platforms globally. Overall Civilization Impact Score: ${this.network6mCIS().overall}/100.`;
     });
@@ -642,7 +741,7 @@ export class CentersComponent {
     // ── Filtered lists ──────────────────────────────────────────
     filteredLeft = computed(() => {
         const q = this.searchQuery().toLowerCase();
-        if (!q) return this.centerProfiles();
+        if (this.searchService.globalFilters().scope === 'global' || !q) return this.centerProfiles();
         return this.centerProfiles().filter(c =>
             c.name.toLowerCase().includes(q) ||
             c.country.toLowerCase().includes(q) ||
@@ -652,7 +751,7 @@ export class CentersComponent {
 
     filteredToday = computed(() => {
         const q = this.searchQuery().toLowerCase();
-        if (!q) return this.centerDayStatus();
+        if (this.searchService.globalFilters().scope === 'global' || !q) return this.centerDayStatus();
         return this.centerDayStatus().filter(c =>
             c.centerName.toLowerCase().includes(q) ||
             c.country.toLowerCase().includes(q) ||
@@ -674,6 +773,9 @@ export class CentersComponent {
 
     // ── Constructor ─────────────────────────────────────────────
     constructor() {
+        this.searchService.globalQuery.set('');
+        this.searchService.globalFilters.update(f => ({ ...f, scope: 'local' }));
+
         interval(1000).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
             this.currentTime.set(new Date());
         });
@@ -687,7 +789,7 @@ export class CentersComponent {
         this.centerDayStatus.update(centers =>
             centers.map(c => {
                 if (c.operationalStatus !== 'Open') return c;
-                const delta   = Math.floor(Math.random() * 4) - 1;
+                const delta = Math.floor(Math.random() * 4) - 1;
                 const engaged = Math.max(0, Math.min(c.totalEnrolled, c.todayVision.learnersEngaged + delta));
                 return { ...c, studentsPresent: engaged, todayVision: { ...c.todayVision, learnersEngaged: engaged } };
             })
@@ -697,11 +799,8 @@ export class CentersComponent {
         this.researchStream.update(rs => rs.map(r => ({ ...r, minutesAgo: r.minutesAgo + 0.5 })));
     }
 
-    onSearch(e: Event) {
-        this.searchQuery.set((e.target as HTMLInputElement).value);
-    }
-
-    clearSearch() { this.searchQuery.set(''); }
+    // Search is handled internally by app-global-search now
+    clearSearch() { this.searchService.globalQuery.set(''); }
 
     // ── SVG Radar Chart Helpers ─────────────────────────────────
     radarPoints(values: number[], cx: number, cy: number, r: number): string {
@@ -729,7 +828,7 @@ export class CentersComponent {
 
     getCisRadarValues(cis: CivilizationImpactScore): number[] {
         return [cis.womenParticipation, cis.lowestStrataInclusion, cis.originalResearch,
-                cis.innovationDeployment, cis.digitalAdvancement, cis.globalHarmony];
+        cis.innovationDeployment, cis.digitalAdvancement, cis.globalHarmony];
     }
 
     // ── World Map Helpers ───────────────────────────────────────
@@ -743,7 +842,7 @@ export class CentersComponent {
 
     // ── Style Helpers ───────────────────────────────────────────
     getLocalTime(utcOffset: number): string {
-        const now   = this.currentTime();
+        const now = this.currentTime();
         const local = new Date(now.getTime() + now.getTimezoneOffset() * 60000 + utcOffset * 3600000);
         return `${local.getHours().toString().padStart(2, '0')}:${local.getMinutes().toString().padStart(2, '0')}:${local.getSeconds().toString().padStart(2, '0')}`;
     }
@@ -810,12 +909,12 @@ export class CentersComponent {
 
     getCisPrimaryComponent(cis: CivilizationImpactScore): string {
         const scores: [string, number][] = [
-            ['Women',      cis.womenParticipation],
-            ['Inclusion',  cis.lowestStrataInclusion],
-            ['Research',   cis.originalResearch],
+            ['Women', cis.womenParticipation],
+            ['Inclusion', cis.lowestStrataInclusion],
+            ['Research', cis.originalResearch],
             ['Innovation', cis.innovationDeployment],
-            ['Digital',    cis.digitalAdvancement],
-            ['Harmony',    cis.globalHarmony],
+            ['Digital', cis.digitalAdvancement],
+            ['Harmony', cis.globalHarmony],
         ];
         return scores.reduce((best, cur) => cur[1] > best[1] ? cur : best, scores[0])[0];
     }

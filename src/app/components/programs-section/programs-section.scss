@@ -119,20 +119,19 @@
     background: var(--bg-card);
     padding: 1.5rem;
     cursor: pointer;
-    // transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     height: 6rem;
-    // box-shadow: 0 4px 12px color-mix(in srgb, #000, transparent 80%);
+    box-shadow: 0 4px 12px color-mix(in srgb, #000, transparent 80%);
     border: none;
 
-    &:hover {
-        background: #0c0c0c;
-        transform: translateY(-8px);
-        box-shadow: 0 16px 32px color-mix(in srgb, #000, transparent 60%);
+    // &:hover {
+    //     background: #0c0c0c;
+    //     box-shadow: 0 16px 32px color-mix(in srgb, #000, transparent 60%);
 
-        .view-more i {
-            transform: translateX(5px);
-        }
-    }
+    //     .view-more i {
+    //         transform: translateX(5px);
+    //     }
+    // }
 
     h3 {
         font-size: 1.2rem;

@@ -1,6 +1,7 @@
-import { Component, signal, Input } from '@angular/core';
+import { Component, signal, Input, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-navbar',
@@ -9,6 +10,8 @@ import { CommonModule } from '@angular/common';
     styleUrl: './navbar.scss'
 })
 export class NavbarComponent {
+    private authService = inject(AuthService);
+    isLoggedIn = this.authService.isLoggedIn;
     isMenuOpen = false;
     isProgramsOpen = false;
     mobileSidebarOpen = signal(false);

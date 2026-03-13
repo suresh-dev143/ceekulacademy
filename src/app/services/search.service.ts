@@ -13,66 +13,82 @@ export type FilterCategory =
     | 'users' | 'institutions' | 'documents' | 'reports';
 
 export type SearchStatus =
-    | 'active' | 'completed' | 'pending' | 'cancelled' | 'verified' | 'unverified';
+    | 'active' | 'completed' | 'pending' | 'cancelled' | 'verified' | 'unverified'
+    | 'draft' | 'published';
 
 export type DateRange = 'today' | 'this-week' | 'this-month' | '';
+export type WorkshopMode = 'online' | 'hybrid' | 'all';
+export type SearchScope = 'global' | 'local';
 
 export interface SearchFilters {
-    category:  FilterCategory;
-    status:    SearchStatus[];
+    category: FilterCategory;
+    status: SearchStatus[];
     dateRange: DateRange;
+    mode: WorkshopMode;
+    scope: SearchScope;
 }
 
 export interface SearchResult {
-    id:       string;
-    title:    string;
+    id: string;
+    title: string;
     subtitle: string;
     category: SearchCategory;
-    icon:     string;
-    route:    string;
-    status?:  SearchStatus;
+    icon: string;
+    route: string;
+    status?: SearchStatus;
+    mode?: WorkshopMode;
 }
 
 // ── Static page index ──────────────────────────────────────────────────────────
 const PAGES: SearchResult[] = [
-    { id: 'p-home',       title: 'Home',               subtitle: 'Go to home page',                    category: 'Page', icon: 'fa-home',              route: '/home' },
-    { id: 'p-about',      title: 'About',              subtitle: 'Learn about Ceekul Mission',          category: 'Page', icon: 'fa-info-circle',        route: '/about' },
-    { id: 'p-centers',    title: 'Centers',            subtitle: 'Find learning centers near you',      category: 'Page', icon: 'fa-map-marker-alt',     route: '/centers' },
-    { id: 'p-programs',   title: 'Programs',           subtitle: 'Browse all educational programs',     category: 'Page', icon: 'fa-graduation-cap',     route: '/programs' },
-    { id: 'p-workshops',  title: 'Workshops',          subtitle: 'Public workshops and events',         category: 'Page', icon: 'fa-chalkboard-teacher', route: '/workshops' },
-    { id: 'p-donate',     title: 'Donate',             subtitle: 'Support Ceekul Mission',              category: 'Page', icon: 'fa-heart',              route: '/donate' },
-    { id: 'p-invest',     title: 'Invest',             subtitle: 'Investment opportunities',            category: 'Page', icon: 'fa-chart-line',         route: '/invest' },
-    { id: 'p-contact',    title: 'Contact',            subtitle: 'Get in touch with us',                category: 'Page', icon: 'fa-envelope',           route: '/contact' },
-    { id: 'p-transform',  title: 'Transformation',     subtitle: 'Socio-economic transformation',       category: 'Page', icon: 'fa-exchange-alt',       route: '/transformation' },
-    { id: 'p-health',     title: 'Health Connect',     subtitle: 'Health services and resources',       category: 'Page', icon: 'fa-heartbeat',          route: '/health-connect' },
-    { id: 'p-profile',    title: 'My Profile',         subtitle: 'Your identity and account governance',category: 'Page', icon: 'fa-user-circle',        route: '/my-profile' },
-    { id: 'p-schedule',   title: 'My Schedule',        subtitle: 'Your daily operational schedule',     category: 'Page', icon: 'fa-calendar-alt',       route: '/my-schedule' },
-    { id: 'p-innovative', title: 'Innovative Courses', subtitle: 'Explore the innovative curriculum',   category: 'Page', icon: 'fa-lightbulb',          route: '/innovative' },
-    { id: 'p-register',   title: 'Register',           subtitle: 'Join Ceekul Mission',                 category: 'Page', icon: 'fa-user-plus',          route: '/register' },
-    { id: 'p-district',   title: 'District',           subtitle: 'District-level information',          category: 'Page', icon: 'fa-map',                route: '/district' },
-    { id: 'p-issues',     title: 'Issues',             subtitle: 'Community issues tracker',            category: 'Page', icon: 'fa-exclamation-circle', route: '/issues' },
+    { id: 'p-home', title: 'Home', subtitle: 'Go to home page', category: 'Page', icon: 'fa-home', route: '/home' },
+    { id: 'p-about', title: 'About', subtitle: 'Learn about Ceekul Mission', category: 'Page', icon: 'fa-info-circle', route: '/about' },
+    { id: 'p-centers', title: 'Centers', subtitle: 'Find learning centers near you', category: 'Page', icon: 'fa-map-marker-alt', route: '/centers' },
+    { id: 'p-programs', title: 'Programs', subtitle: 'Browse all educational programs', category: 'Page', icon: 'fa-graduation-cap', route: '/programs' },
+    { id: 'p-workshops', title: 'Workshops', subtitle: 'Public workshops and events', category: 'Page', icon: 'fa-chalkboard-teacher', route: '/workshops' },
+    { id: 'p-donate', title: 'Donate', subtitle: 'Support Ceekul Mission', category: 'Page', icon: 'fa-heart', route: '/donate' },
+    { id: 'p-invest', title: 'Invest', subtitle: 'Investment opportunities', category: 'Page', icon: 'fa-chart-line', route: '/invest' },
+    { id: 'p-contact', title: 'Contact', subtitle: 'Get in touch with us', category: 'Page', icon: 'fa-envelope', route: '/contact' },
+    { id: 'p-transform', title: 'Transformation', subtitle: 'Socio-economic transformation', category: 'Page', icon: 'fa-exchange-alt', route: '/transformation' },
+    { id: 'p-health', title: 'Health Connect', subtitle: 'Health services and resources', category: 'Page', icon: 'fa-heartbeat', route: '/health-connect' },
+    { id: 'p-profile', title: 'My Profile', subtitle: 'Your identity and account governance', category: 'Page', icon: 'fa-user-circle', route: '/my-profile' },
+    { id: 'p-schedule', title: 'My Schedule', subtitle: 'Your daily operational schedule', category: 'Page', icon: 'fa-calendar-alt', route: '/my-schedule' },
+    { id: 'p-innovative', title: 'Innovative Courses', subtitle: 'Explore the innovative curriculum', category: 'Page', icon: 'fa-lightbulb', route: '/innovative' },
+    { id: 'p-register', title: 'Register', subtitle: 'Join Ceekul Mission', category: 'Page', icon: 'fa-user-plus', route: '/register' },
+    { id: 'p-district', title: 'District', subtitle: 'District-level information', category: 'Page', icon: 'fa-map', route: '/district' },
+    { id: 'p-issues', title: 'Issues', subtitle: 'Community issues tracker', category: 'Page', icon: 'fa-exclamation-circle', route: '/issues' },
 ];
 
 // ── Mapping: FilterCategory → SearchCategory[] ─────────────────────────────────
 const FILTER_MAP: Record<FilterCategory, SearchCategory[]> = {
-    all:          [],
-    programs:     ['Program'],
-    courses:      ['Course'],
-    sessions:     ['Schedule', 'Session'],
-    users:        ['Person'],
+    all: [],
+    programs: ['Program'],
+    courses: ['Course'],
+    sessions: ['Schedule', 'Session'],
+    users: ['Person'],
     institutions: ['Facility', 'Institution'],
-    documents:    ['Document'],
-    reports:      ['Report'],
+    documents: ['Document'],
+    reports: ['Report'],
 };
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
-    private authService     = inject(AuthService);
+    private authService = inject(AuthService);
     private scheduleService = inject(ScheduleService);
-    private profileService  = inject(ProfileService);
+    private profileService = inject(ProfileService);
 
     private _recent = signal<string[]>([]);
     readonly recentSearches = this._recent.asReadonly();
+
+    // ── Global Search State (for shared reactive usage) ───────────────────
+    globalQuery = signal<string>('');
+    globalFilters = signal<SearchFilters>({
+        category: 'all',
+        status: [],
+        dateRange: '',
+        mode: 'all',
+        scope: 'global'
+    });
 
     // ── Full text search (returns ALL matching, before filter narrowing) ────────
     search(query: string): SearchResult[] {
@@ -88,9 +104,9 @@ export class SearchService {
 
         for (const item of todayItems) {
             const typeIcon =
-                item.type === 'class'   ? 'fa-chalkboard'  :
-                item.type === 'exam'    ? 'fa-pen-square'   :
-                item.type === 'meeting' ? 'fa-users'        : 'fa-clock';
+                item.type === 'class' ? 'fa-chalkboard' :
+                    item.type === 'exam' ? 'fa-pen-square' :
+                        item.type === 'meeting' ? 'fa-users' : 'fa-clock';
             all.push({
                 id: 'sch-' + item.scheduleId,
                 title: item.title,
@@ -190,20 +206,20 @@ export class SearchService {
         // ── Director-specific data ─────────────────────────────────────────────
         if (role === 'Director') {
             const dirPrograms: SearchResult[] = [
-                { id: 'dprog-youth',    title: 'Youth Leadership Program',    subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-project-diagram', route: '/dashboard/director', status: 'active' },
-                { id: 'dprog-women',    title: 'Women Empowerment Initiative', subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-venus',            route: '/dashboard/director', status: 'active' },
-                { id: 'dprog-digital',  title: 'Digital Literacy Drive',       subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-laptop',           route: '/dashboard/director', status: 'pending' },
-                { id: 'dprog-rural',    title: 'Rural Education Outreach',     subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-school',           route: '/dashboard/director', status: 'completed' },
+                { id: 'dprog-youth', title: 'Youth Leadership Program', subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-project-diagram', route: '/dashboard/director', status: 'active' },
+                { id: 'dprog-women', title: 'Women Empowerment Initiative', subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-venus', route: '/dashboard/director', status: 'active' },
+                { id: 'dprog-digital', title: 'Digital Literacy Drive', subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-laptop', route: '/dashboard/director', status: 'pending' },
+                { id: 'dprog-rural', title: 'Rural Education Outreach', subtitle: 'District Program · Raebareli', category: 'Program', icon: 'fa-school', route: '/dashboard/director', status: 'completed' },
             ];
             const dirInstitutions: SearchResult[] = [
-                { id: 'inst-mary', title: "St. Mary's College",      subtitle: 'Partner Institution · Raebareli', category: 'Institution', icon: 'fa-university', route: '/district', status: 'verified' },
-                { id: 'inst-poly', title: 'Raebareli Polytechnic',   subtitle: 'Partner Institution · Raebareli', category: 'Institution', icon: 'fa-university', route: '/district', status: 'active' },
-                { id: 'inst-govt', title: 'Govt. Inter College',     subtitle: 'Partner Institution · Raebareli', category: 'Institution', icon: 'fa-school',     route: '/district', status: 'verified' },
+                { id: 'inst-mary', title: "St. Mary's College", subtitle: 'Partner Institution · Raebareli', category: 'Institution', icon: 'fa-university', route: '/district', status: 'verified' },
+                { id: 'inst-poly', title: 'Raebareli Polytechnic', subtitle: 'Partner Institution · Raebareli', category: 'Institution', icon: 'fa-university', route: '/district', status: 'active' },
+                { id: 'inst-govt', title: 'Govt. Inter College', subtitle: 'Partner Institution · Raebareli', category: 'Institution', icon: 'fa-school', route: '/district', status: 'verified' },
             ];
             const dirReports: SearchResult[] = [
-                { id: 'rep-q1',  title: 'Q1 Progress Report',      subtitle: 'Compliance Report · Raebareli', category: 'Report', icon: 'fa-file-alt',      route: '/dashboard/director', status: 'completed' },
-                { id: 'rep-enr', title: 'Enrollment Summary',      subtitle: 'District Report · Raebareli',   category: 'Report', icon: 'fa-chart-pie',     route: '/dashboard/director', status: 'active' },
-                { id: 'rep-com', title: 'Compliance Audit Log',    subtitle: 'Audit Document · Raebareli',    category: 'Document', icon: 'fa-clipboard-list', route: '/dashboard/director', status: 'pending' },
+                { id: 'rep-q1', title: 'Q1 Progress Report', subtitle: 'Compliance Report · Raebareli', category: 'Report', icon: 'fa-file-alt', route: '/dashboard/director', status: 'completed' },
+                { id: 'rep-enr', title: 'Enrollment Summary', subtitle: 'District Report · Raebareli', category: 'Report', icon: 'fa-chart-pie', route: '/dashboard/director', status: 'active' },
+                { id: 'rep-com', title: 'Compliance Audit Log', subtitle: 'Audit Document · Raebareli', category: 'Document', icon: 'fa-clipboard-list', route: '/dashboard/director', status: 'pending' },
             ];
             all.push(...dirPrograms, ...dirInstitutions, ...dirReports);
         }
@@ -236,6 +252,11 @@ export class SearchService {
         // Status filter (multi-select OR logic)
         if (filters.status.length > 0) {
             out = out.filter(r => r.status && filters.status.includes(r.status));
+        }
+
+        // Mode filter (Workshop specific)
+        if (filters.mode && filters.mode !== 'all') {
+            out = out.filter(r => r.mode === filters.mode);
         }
 
         return out;

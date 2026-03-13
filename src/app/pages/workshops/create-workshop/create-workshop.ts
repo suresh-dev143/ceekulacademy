@@ -1,24 +1,24 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, output, signal, input, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
     AbstractControl, FormArray, FormBuilder, FormGroup,
     ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators
 } from '@angular/forms';
-import { WorkshopService, CreateWorkshopRequest, CreatedWorkshopData } from '../../../services/workshop.service';
+import { WorkshopService, CreateWorkshopRequest, CreatedWorkshopData, WorkshopListItem } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 
 // ── Timezone helpers ──────────────────────────────────────────────────────────
 
 const TZ_IANA: Record<string, string> = {
-    UTC:  'UTC',
-    IST:  'Asia/Kolkata',
-    EST:  'America/New_York',
-    CST:  'America/Chicago',
-    PST:  'America/Los_Angeles',
-    GMT:  'Europe/London',
-    CET:  'Europe/Paris',
-    JST:  'Asia/Tokyo',
+    UTC: 'UTC',
+    IST: 'Asia/Kolkata',
+    EST: 'America/New_York',
+    CST: 'America/Chicago',
+    PST: 'America/Los_Angeles',
+    GMT: 'Europe/London',
+    CET: 'Europe/Paris',
+    JST: 'Asia/Tokyo',
     AEST: 'Australia/Sydney',
 };
 
@@ -26,7 +26,7 @@ interface TzNow { dateStr: string; hours: number; minutes: number }
 
 function nowInTz(tzKey: string): TzNow {
     const zone = TZ_IANA[tzKey] ?? 'UTC';
-    const now  = new Date();
+    const now = new Date();
 
     const dp = new Intl.DateTimeFormat('en-US', {
         timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit'
@@ -38,7 +38,7 @@ function nowInTz(tzKey: string): TzNow {
     const tp = new Intl.DateTimeFormat('en-US', {
         timeZone: zone, hour: '2-digit', minute: '2-digit', hour12: false
     }).formatToParts(now);
-    const hours   = parseInt(tp.find(p => p.type === 'hour')!.value,   10) % 24;
+    const hours = parseInt(tp.find(p => p.type === 'hour')!.value, 10) % 24;
     const minutes = parseInt(tp.find(p => p.type === 'minute')!.value, 10);
 
     return { dateStr: `${y}-${m}-${d}`, hours, minutes };
@@ -63,9 +63,9 @@ function pastDateValidator(getTz: () => string): ValidatorFn {
 function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
     return (group: AbstractControl): ValidationErrors | null => {
         const errs: ValidationErrors = {};
-        const date  = (group.get('date')?.value      as string) ?? '';
+        const date = (group.get('date')?.value as string) ?? '';
         const start = (group.get('startTime')?.value as string) ?? '';
-        const end   = (group.get('endTime')?.value   as string) ?? '';
+        const end = (group.get('endTime')?.value as string) ?? '';
 
         if (start && end && end <= start) errs['endBeforeStart'] = true;
 
@@ -90,44 +90,48 @@ function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
     templateUrl: './create-workshop.html',
     styleUrl: './create-workshop.scss',
 })
-export class CreateWorkshop {
+export class CreateWorkshop implements OnInit {
 
-    private fb    = inject(FormBuilder);
-    private ws    = inject(WorkshopService);
-    private auth  = inject(AuthService);
+    private fb = inject(FormBuilder);
+    private ws = inject(WorkshopService);
+    private auth = inject(AuthService);
     private toast = inject(ToastService);
 
     workshopForm!: FormGroup;
-    isSubmitting  = signal(false);
+    isSubmitting = signal(false);
 
     workshopCreated = output<CreatedWorkshopData>();
-    cancel          = output<void>();
+    cancel = output<void>();
+
+    // ── Edit Mode Support ──────────────────────────────────────────────────
+    workshopToEdit = input<WorkshopListItem | null>(null);
+    isEditMode = computed(() => !!this.workshopToEdit());
 
     readonly registeredLocations = [
         'Central Library', 'Innovation Hub', 'Community Center', 'Tech Park'
     ];
 
     readonly timezones = [
-        { key: 'UTC',  label: 'UTC  — Coordinated Universal Time' },
-        { key: 'IST',  label: 'IST  — Indian Standard Time (UTC+5:30)' },
-        { key: 'EST',  label: 'EST  — Eastern Standard Time (UTC−5)' },
-        { key: 'CST',  label: 'CST  — Central Standard Time (UTC−6)' },
-        { key: 'PST',  label: 'PST  — Pacific Standard Time (UTC−8)' },
-        { key: 'GMT',  label: 'GMT  — Greenwich Mean Time (UTC+0)' },
-        { key: 'CET',  label: 'CET  — Central European Time (UTC+1)' },
-        { key: 'JST',  label: 'JST  — Japan Standard Time (UTC+9)' },
+        { key: 'UTC', label: 'UTC  — Coordinated Universal Time' },
+        { key: 'IST', label: 'IST  — Indian Standard Time (UTC+5:30)' },
+        { key: 'EST', label: 'EST  — Eastern Standard Time (UTC−5)' },
+        { key: 'CST', label: 'CST  — Central Standard Time (UTC−6)' },
+        { key: 'PST', label: 'PST  — Pacific Standard Time (UTC−8)' },
+        { key: 'GMT', label: 'GMT  — Greenwich Mean Time (UTC+0)' },
+        { key: 'CET', label: 'CET  — Central European Time (UTC+1)' },
+        { key: 'JST', label: 'JST  — Japan Standard Time (UTC+9)' },
         { key: 'AEST', label: 'AEST — Australian Eastern Time (UTC+10)' },
     ];
 
     constructor() {
         this.workshopForm = this.fb.group({
-            workshopTitle:       ['', [Validators.required, Validators.minLength(5),  Validators.maxLength(100)]],
+            workshopTitle: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
             workshopDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
-            expertDescription:   ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
-            workshopMode:        ['online', Validators.required],
-            timezone:            ['IST',    Validators.required],
-            instructorType:      ['myself', Validators.required],
-            sessions:            this.fb.array([]),
+            expertDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
+            workshopMode: ['online', Validators.required],
+            timezone: ['IST', Validators.required],
+            instructorType: ['myself', Validators.required],
+            sessions: this.fb.array([]),
         });
 
         this.addSession();
@@ -141,6 +145,39 @@ export class CreateWorkshop {
         this.workshopForm.get('workshopMode')!.valueChanges.subscribe(mode => {
             this.sessions.controls.forEach(c => this.syncLocationValidator(c as FormGroup, mode));
         });
+    }
+
+    ngOnInit() {
+        const editData = this.workshopToEdit();
+        if (editData) {
+            this.workshopForm.patchValue({
+                workshopTitle: editData.workshopTitle,
+                workshopDescription: editData.workshopDescription,
+                expertDescription: editData.expertDescription,
+                workshopMode: editData.workshopMode,
+                timezone: editData.timezone,
+                instructorType: editData.instructorType,
+            });
+
+            // Populate sessions
+            if (editData.sessions && editData.sessions.length > 0) {
+                this.sessions.clear();
+                editData.sessions.forEach(s => {
+                    const row = this.fb.group({
+                        date: s.date.split('T')[0],
+                        startTime: s.startTime,
+                        endTime: s.endTime,
+                        activity: s.activity,
+                        fee: s.fee,
+                        mode: s.mode,
+                        location: s.location || '',
+                    }, { validators: sessionConstraintsValidator(() => this.tz) });
+
+                    this.syncLocationValidator(row, s.mode);
+                    this.sessions.push(row);
+                });
+            }
+        }
     }
 
     // ── Getters ───────────────────────────────────────────────────────────────
@@ -175,13 +212,13 @@ export class CreateWorkshop {
     sessionDuration(index: number): string {
         const g = this.sessions.at(index);
         const s = g.get('startTime')?.value as string;
-        const e = g.get('endTime')?.value   as string;
+        const e = g.get('endTime')?.value as string;
         if (!s || !e) return '';
         const [sh, sm] = s.split(':').map(Number);
         const [eh, em] = e.split(':').map(Number);
         const diff = (eh * 60 + em) - (sh * 60 + sm);
         if (diff <= 0) return '';
-        const hrs  = Math.floor(diff / 60);
+        const hrs = Math.floor(diff / 60);
         const mins = diff % 60;
         if (hrs && mins) return `${hrs}h ${mins}m`;
         return hrs ? `${hrs}h` : `${mins}m`;
@@ -192,13 +229,13 @@ export class CreateWorkshop {
     addSession() {
         const getTz = () => this.tz;
         const row = this.fb.group({
-            date:      ['', [Validators.required, pastDateValidator(getTz)]],
+            date: ['', [Validators.required, pastDateValidator(getTz)]],
             startTime: ['', Validators.required],
-            endTime:   ['', Validators.required],
-            activity:  ['', [Validators.required, Validators.minLength(3)]],
-            fee:       [0,  [Validators.required, Validators.min(0)]],
-            mode:      ['online', Validators.required],
-            location:  [''],
+            endTime: ['', Validators.required],
+            activity: ['', [Validators.required, Validators.minLength(3)]],
+            fee: [0, [Validators.required, Validators.min(0)]],
+            mode: ['online', Validators.required],
+            location: [''],
         }, { validators: sessionConstraintsValidator(getTz) });
 
         row.get('mode')!.valueChanges.subscribe(m => this.syncLocationValidator(row, m ?? 'online'));
@@ -251,38 +288,63 @@ export class CreateWorkshop {
         if (this.workshopForm.invalid || this.isSubmitting()) return;
 
         const userId = this.auth.currentUserProfile()?.id;
-        if (!userId) {
+        if (!userId && !this.isEditMode()) {
             this.toast.error('You must be logged in to create a workshop.');
             return;
         }
 
         const v = this.workshopForm.getRawValue();
-        const payload: CreateWorkshopRequest = {
-            workshopTitle:       v.workshopTitle.trim(),
-            workshopDescription: v.workshopDescription.trim(),
-            expertDescription:   v.expertDescription.trim(),
-            workshopMode:        v.workshopMode,
-            timezone:            v.timezone,
-            instructorType:      v.instructorType,
-            sessions: v.sessions.map((s: any) => ({
-                date:      s.date,
-                startTime: s.startTime,
-                endTime:   s.endTime,
-                activity:  s.activity.trim(),
-                fee:       Number(s.fee),
-                mode:      s.mode,
-                location:  s.mode === 'hybrid' ? (s.location || null) : null,
-            })),
-        };
+        const editData = this.workshopToEdit();
 
         this.isSubmitting.set(true);
-        this.ws.create(payload).subscribe({
-            next: (res) => {
-                this.isSubmitting.set(false);
-                this.workshopCreated.emit(res.data);
-            },
-            error: () => this.isSubmitting.set(false),
-        });
+
+        if (this.isEditMode() && editData) {
+            // Update Basic Info
+            const updatePayload = {
+                workshopTitle: v.workshopTitle.trim(),
+                workshopDescription: v.workshopDescription.trim(),
+                expertDescription: v.expertDescription.trim(),
+                workshopMode: v.workshopMode,
+                timezone: v.timezone,
+                instructorType: v.instructorType,
+            };
+
+            this.ws.updateWorkshop(editData._id, updatePayload).subscribe({
+                next: (res) => {
+                    this.isSubmitting.set(false);
+                    this.toast.success('Workshop updated successfully!');
+                    this.workshopCreated.emit(res.data as unknown as CreatedWorkshopData);
+                },
+                error: () => this.isSubmitting.set(false),
+            });
+        } else {
+            // Create New
+            const payload: CreateWorkshopRequest = {
+                workshopTitle: v.workshopTitle.trim(),
+                workshopDescription: v.workshopDescription.trim(),
+                expertDescription: v.expertDescription.trim(),
+                workshopMode: v.workshopMode,
+                timezone: v.timezone,
+                instructorType: v.instructorType,
+                sessions: v.sessions.map((s: any) => ({
+                    date: s.date,
+                    startTime: s.startTime,
+                    endTime: s.endTime,
+                    activity: s.activity.trim(),
+                    fee: Number(s.fee),
+                    mode: s.mode,
+                    location: s.mode === 'hybrid' ? (s.location || null) : null,
+                })),
+            };
+
+            this.ws.create(payload).subscribe({
+                next: (res) => {
+                    this.isSubmitting.set(false);
+                    this.workshopCreated.emit(res.data);
+                },
+                error: () => this.isSubmitting.set(false),
+            });
+        }
     }
 
     onCancel() { this.cancel.emit(); }

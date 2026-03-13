@@ -141,6 +141,13 @@ export class WorkshopDetailComponent {
 
     workshop = input.required<WorkshopListItem>();
     userRole = input<string>('');
+    currentUserId = input<string | undefined>();
+
+    isOwner = computed(() => {
+        const userId = this.currentUserId();
+        const workshop = this.currentWorkshop();
+        return !!userId && workshop.createdBy === userId;
+    });
 
     close = output<void>();
     sessionAdded = output<void>();
@@ -196,11 +203,14 @@ export class WorkshopDetailComponent {
     // ── Role helpers ──────────────────────────────────────────────────────────
 
     get isTeacher(): boolean {
-        return ['Teacher', 'Instructor', 'Expert'].includes(this.userRole());
+        return ['Student', 'Teacher', 'Instructor', 'Expert'].includes(this.userRole());
     }
     get isStudent(): boolean { return this.userRole() === 'Student'; }
     get isDirector(): boolean {
         return ['Director', 'Admin', 'Manager'].includes(this.userRole());
+    }
+    get canEnroll(): boolean {
+        return !!this.userRole();
     }
 
     canDeleteSession(session: WorkshopApiSession): boolean {
@@ -208,8 +218,8 @@ export class WorkshopDetailComponent {
         const userId = this.ws.getCurrentUserId(); // I need to check if this exists or use AuthService
 
         // Role-based controls:
-        // 1. Teacher/Expert can delete any session in their workshop
-        if (['Teacher', 'Expert', 'Admin', 'Director'].includes(role)) return true;
+        // 1. Teacher/Expert/Student can delete any session in their workshop
+        if (['Student', 'Teacher', 'Expert', 'Admin', 'Director'].includes(role)) return true;
 
         // 2. Instructor can only delete if they created the workshop (assumption based on prompt)
         if (role === 'Instructor') {

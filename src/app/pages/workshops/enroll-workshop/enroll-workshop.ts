@@ -1,6 +1,8 @@
-import { Component, inject, input, output, OnInit } from '@angular/core';
+import { Component, inject, input, output, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RazorpayService } from '../../../services/razorpay.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
     selector: 'app-enroll-workshop',
@@ -11,6 +13,8 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 })
 export class EnrollWorkshop implements OnInit {
     private fb = inject(FormBuilder);
+    private razorpay = inject(RazorpayService);
+    private toast = inject(ToastService);
 
     workshop = input.required<any>();
     userRole = input<string>('');
@@ -22,10 +26,22 @@ export class EnrollWorkshop implements OnInit {
     registeredLocations = ['Central Library', 'Innovation Hub', 'Community Center', 'Tech Park'];
     enrolledInstructors = ['Dr. Rashmi Chandra', 'Keshan', 'Dr. Arjun Mehta', 'Priya Singh', 'Dr. Anil Kumar'];
 
+    // Platform and Quality options
+    qualityTiers = [
+        { id: 'free', label: 'Free Live (YouTube)', fee: 0, platform: 'youtube' },
+        { id: 'hd', label: 'HD (Vimeo)', fee: 100, platform: 'vimeo' },
+        { id: '2k', label: '2K (Vimeo)', fee: 200, platform: 'vimeo' },
+        { id: '4k', label: '4K (Vimeo)', fee: 400, platform: 'vimeo' }
+    ];
+
     ngOnInit() {
         this.enrollWorkshopForm = this.fb.group({
             organization: [''],
             enrollmentType: ['learning', Validators.required],
+            modeSelection: ['online', Validators.required], // online or hybrid
+            attendanceMode: ['online'], // online or physical (for hybrid)
+            qualityTier: ['free', Validators.required],
+            mobilizerId: [''],
             schedule: this.fb.array([]),
             studentSchedule: this.fb.array([]),
             acceptTerms: [false, Validators.requiredTrue]
@@ -47,6 +63,57 @@ export class EnrollWorkshop implements OnInit {
                 }
             }
         });
+
+        // Watch mode selection to handle attendance mode
+        this.enrollWorkshopForm.get('modeSelection')?.valueChanges.subscribe(mode => {
+            if (mode === 'online') {
+                this.enrollWorkshopForm.get('attendanceMode')?.setValue('online');
+            }
+        });
+    }
+
+    // --- Fee Calculation ---
+
+    get totalFees(): number {
+        let total = 0;
+        const type = this.enrollWorkshopForm.get('enrollmentType')?.value;
+        const mode = this.enrollWorkshopForm.get('modeSelection')?.value;
+        const attendance = this.enrollWorkshopForm.get('attendanceMode')?.value;
+        const tierId = this.enrollWorkshopForm.get('qualityTier')?.value;
+
+        // streaming fee
+        const tier = this.qualityTiers.find(t => t.id === tierId);
+        if (tier) total += tier.fee;
+
+        // venue fee (hybrid + physical)
+        if (mode === 'hybrid' && attendance === 'physical') {
+            total += 500; // Mock venue fee
+        }
+
+        // session fees
+        if (type === 'support') {
+            this.schedule.controls.forEach(ctrl => {
+                total += ctrl.get('fee')?.value || 0;
+            });
+        } else {
+            // Student fee might be based on workshop base fee
+            total += this.workshop().sessions[0]?.fee || 0;
+        }
+
+        return total;
+    }
+
+    get feeBreakdown() {
+        const tierId = this.enrollWorkshopForm.get('qualityTier')?.value;
+        const tier = this.qualityTiers.find(t => t.id === tierId);
+        const mode = this.enrollWorkshopForm.get('modeSelection')?.value;
+        const attendance = this.enrollWorkshopForm.get('attendanceMode')?.value;
+
+        return {
+            workshopFee: this.workshop().sessions[0]?.fee || 0,
+            streamingFee: tier?.fee || 0,
+            venueFee: (mode === 'hybrid' && attendance === 'physical') ? 500 : 0
+        };
     }
 
     // --- Instructor schedule ---
@@ -123,12 +190,57 @@ export class EnrollWorkshop implements OnInit {
         }
     }
 
+    isSubmitting = signal(false);
+
     onSubmit() {
-        if (this.enrollWorkshopForm.valid) {
-            this.enrolled.emit(this.enrollWorkshopForm.value);
-        } else {
+        if (this.enrollWorkshopForm.invalid || this.isSubmitting()) {
             this.enrollWorkshopForm.markAllAsTouched();
+            return;
         }
+
+        const fees = this.totalFees;
+        if (fees === 0) {
+            this.proceedWithEnrollment();
+            return;
+        }
+
+        this.isSubmitting.set(true);
+        this.razorpay.createOrder(fees).subscribe({
+            next: (order) => {
+                this.razorpay.openCheckout(order, (response) => {
+                    this.verifyAndComplete(response);
+                });
+            },
+            error: (err) => {
+                this.isSubmitting.set(false);
+                this.toast.error('Failed to initiate payment. Please try again.');
+            }
+        });
+    }
+
+    private verifyAndComplete(paymentResponse: any) {
+        const payload = {
+            ...paymentResponse,
+            amount: this.totalFees,
+            mode: this.enrollWorkshopForm.get('modeSelection')?.value,
+            mobilizerId: this.enrollWorkshopForm.get('mobilizerId')?.value
+        };
+
+        this.razorpay.verifyPayment(payload).subscribe({
+            next: (res) => {
+                this.toast.success('Payment verified successfully!');
+                this.proceedWithEnrollment();
+            },
+            error: (err) => {
+                this.isSubmitting.set(false);
+                this.toast.error('Payment verification failed.');
+            }
+        });
+    }
+
+    private proceedWithEnrollment() {
+        this.enrolled.emit(this.enrollWorkshopForm.value);
+        this.isSubmitting.set(false);
     }
 
     onCancel() {

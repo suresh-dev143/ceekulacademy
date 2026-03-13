@@ -109,53 +109,29 @@ $borderA: color-mix(in srgb, #ef9d57, transparent 82%);
     background: color-mix(in srgb, #0a0a0a, transparent 10%);
     border-bottom: 1px solid $borderA;
     display: flex;
-    align-items: center;
+    align-items: stretch;
+    /* Prevents center alignment pushing taller children upwards */
     gap: 0;
 
-    .search-bar {
+    app-global-search {
         flex: 1;
-        display: flex;
-        align-items: center;
-        height: 100%;
+        min-width: 0;
+        display: block;
+        width: 100%;
 
-        input {
-            flex: 1;
-            height: 100%;
+        ::ng-deep .gs-bar {
+            border: none;
             background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 0.78rem;
-            font-family: inherit;
+            height: 44px;
+            /* lock to exact row height */
             padding: 0 1.25rem;
-            outline: none;
-
-            &::placeholder {
-                color: color-mix(in srgb, #fff, transparent 80%);
-            }
-        }
-
-        .search-btn {
-            height: 100%;
-            padding: 0 1.25rem;
-            background: $accent;
-            border: none;
-            color: #000;
-            font-size: 0.8rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-
-            &:hover {
-                background: #d9864a;
-            }
         }
     }
 
     .back-btn {
         padding: 0 1rem;
-        height: 100%;
+        align-self: flex-start;
+        height: 44px;
         background: color-mix(in srgb, $accent, transparent 90%);
         border: none;
         border-left: 1px solid $borderA;

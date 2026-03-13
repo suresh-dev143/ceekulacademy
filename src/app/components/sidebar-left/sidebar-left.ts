@@ -1,17 +1,20 @@
-import { Component, inject, Input, computed } from '@angular/core';
+import { Component, inject, Input, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService, UserRole } from '../../services/auth.service';
-import { IssuesSidebarTickerComponent } from '../issues-sidebar-ticker/issues-sidebar-ticker';
+import { WorkshopService } from '../../services/workshop.service';
+import { NewsSidebarTickerComponent } from '../news-sidebar-ticker/news-sidebar-ticker';
+import { take } from 'rxjs';
 
 export interface NavItem {
     label: string;
-    icon: string;
     route: string;
     exact?: boolean;
     badge?: number;
     disabled?: boolean;
     isActive?: boolean;  // programmatic highlight (no router match needed)
+    hidden?: boolean;    // dynamically hide items
+    children?: NavItem[]; // Nested subtitles support
 }
 
 export interface NavSection {
@@ -23,137 +26,127 @@ export interface NavSection {
 @Component({
     selector: 'app-sidebar-left',
     standalone: true,
-    imports: [CommonModule, RouterLink, RouterLinkActive, IssuesSidebarTickerComponent],
+    imports: [CommonModule, RouterLink, RouterLinkActive, NewsSidebarTickerComponent],
     templateUrl: './sidebar-left.html',
     styleUrl: './sidebar-left.scss'
 })
-export class SidebarLeftComponent {
+export class SidebarLeftComponent implements OnInit {
 
     private authService = inject(AuthService);
+    private workshopService = inject(WorkshopService);
 
     @Input() collapsed = false;
 
     userProfile = this.authService.currentUserProfile;
-    userRole    = this.authService.currentUserRole;
+    userRole = this.authService.currentUserRole;
+    displayIdentity = this.authService.displayIdentity;
 
-    // ── Common sections (all roles) ────────────────────────────────────
-    
-    // ── Institutional sections (role-specific) ─────────────────────────
-      allSections = computed((): NavSection[] => {
+    // Engagement flags
+    hasWorkshops = computed(() => this.engagementHasWorkshops() || this.workshopService.localWorkshops().length > 0);
+    private engagementHasWorkshops = signal(false);
+    hasResearch = signal(false); // Placeholder until ResearchAPI exists
+    hasCourses = signal(false);  // Placeholder until CourseAPI exists
+
+    ngOnInit() {
+        this.checkUserEngagements();
+
+        // Listen for new workshop creations
+        this.workshopService.refresh$.subscribe(() => {
+            this.checkUserEngagements();
+        });
+    }
+
+    private checkUserEngagements() {
+        if (!this.authService.isLoggedIn()) return;
+
+        this.workshopService.getMyWorkshops({ limit: 1, skipToast: true }).pipe(take(1)).subscribe({
+            next: (res) => {
+                this.engagementHasWorkshops.set(res.data.pagination.total > 0);
+            },
+            error: () => this.engagementHasWorkshops.set(false)
+        });
+    }
+
+    // ── All Sections Computation ───────────────────────────────────────
+    allSections = computed((): NavSection[] => {
         const role = this.userRole();
 
-        if (role === 'Director') {
-            return [
-                ...this.commonSections,
-                {
-                    label: 'Leadership',
-                    items: [
-                        { label: 'Advisor',   icon: 'fa-user-tie',      route: '#', disabled: true },
-                        { label: 'Director',  icon: 'fa-crown',         route: '/dashboard/director', isActive: true },
-                        { label: 'Manager',   icon: 'fa-user-cog',      route: '#', disabled: true },
-                        { label: 'Volunteer', icon: 'fa-hands-helping', route: '#', disabled: true },
-                    ]
-                },
-            ];
+        // Determine dynamic route for "My Profile"
+        let profileRoute = '/my-profile';
+        if (role === 'Student') {
+            profileRoute = '/dashboard/student';
+        } else if (role === 'Teacher' || role === 'Instructor') {
+            profileRoute = '/dashboard/teacher';
+        } else if (role === 'Partner') {
+            profileRoute = '/dashboard/partner';
+        } else if (role === 'Director') {
+            profileRoute = '/dashboard/director';
         }
 
-        const institutional = role ? (this.institutionalMap[role] ?? null) : null;
+        const coreSections: NavSection[] = [
+            {
+                label: '',
+                items: [
+                    { label: 'My Profile', route: profileRoute, isActive: true } // Highlight as main
+                ]
+            },
+            {
+                label: 'My Initiatives',
+                items: [
+                    { label: 'Health & Fitness', route: '#', disabled: true },
+                    { label: 'Self Improvement', route: '#', disabled: true },
+                    { label: 'Family Growth & Care', route: '#', disabled: true },
+                ]
+            },
+            {
+                label: 'My Contributions',
+                items: [
+                    { label: 'My Schedule', icon: 'fa-calendar-alt', route: '/my-schedule' },
+                    {
+                        label: 'My Workshop',
+                        icon: 'fa-tools',
+                        route: '/dashboard/my-workshops',
+                        hidden: !this.hasWorkshops() && role !== 'Student',
+                        children: [
+                            { label: 'Manage Workshops', route: '/dashboard/my-workshops' },
+                            { label: 'Create New', route: '/dashboard/my-workshops' }
+                        ]
+                    },
+                    {
+                        label: 'Research',
+                        icon: 'fa-flask',
+                        route: '#',
+                        hidden: !this.hasResearch()
+                    },
+                    {
+                        label: 'My Course',
+                        icon: 'fa-book-open',
+                        route: '#',
+                        hidden: !this.hasCourses(),
+                        children: [
+                            { label: 'Enrolled Courses', route: '#' },
+                            { label: 'Browse New', route: '#' }
+                        ]
+                    },
+                ].filter(item => !item.hidden) // Filter out hidden items
+            },
+            {
+                label: 'My Networks',
+                items: [
+                    { label: 'Mentors', route: '#', disabled: true },
+                    { label: 'Friends', route: '#', disabled: true },
+                ]
+            }
+        ];
+
         return [
-            ...this.commonSections,
-            ...(institutional ? [institutional] : []),
-            this.communitySection,
+            ...coreSections,
         ];
     });
-    private readonly institutionalMap: Partial<Record<UserRole, NavSection>> = {
-        Student: {
-            label: 'Academic',
-            items: [
-                { label: 'Student Home',    icon: 'fa-tachometer-alt', route: '/dashboard/student' },
-                { label: 'Nearby Learning', icon: 'fa-map-marker-alt', route: '/dashboard/student/nearby' },
-                { label: 'Assignments',     icon: 'fa-tasks',          route: '#', disabled: true },
-                { label: 'Results',         icon: 'fa-chart-bar',      route: '#', disabled: true },
-            ]
-        },
-        Teacher: {
-            label: 'Teaching',
-            items: [
-                { label: 'Teacher Hub',     icon: 'fa-chalkboard-teacher', route: '/dashboard/teacher' },
-                { label: 'Workshops',       icon: 'fa-tools',              route: '/dashboard/teacher/workshops' },
-                { label: 'My Batches',      icon: 'fa-users',              route: '#', disabled: true },
-                { label: 'Attendance',      icon: 'fa-clipboard-check',    route: '#', disabled: true },
-                { label: 'Content Manager', icon: 'fa-folder-open',        route: '#', disabled: true },
-            ]
-        },
-        Instructor: {
-            label: 'Teaching',
-            items: [
-                { label: 'Teacher Hub', icon: 'fa-chalkboard-teacher', route: '/dashboard/teacher' },
-                { label: 'Workshops',   icon: 'fa-tools',              route: '/dashboard/teacher/workshops' },
-                { label: 'My Batches',  icon: 'fa-users',              route: '#', disabled: true },
-                { label: 'Attendance',  icon: 'fa-clipboard-check',    route: '#', disabled: true },
-            ]
-        },
-        Partner: {
-            label: 'Partner',
-            items: [
-                { label: 'Partner Hub',      icon: 'fa-building',  route: '/dashboard/partner' },
-                { label: 'Current Activity', icon: 'fa-bolt',      route: '#', disabled: true },
-                { label: 'Room Bookings',    icon: 'fa-door-open', route: '#', disabled: true },
-                { label: 'Resource Mgmt',    icon: 'fa-boxes',     route: '#', disabled: true },
-            ]
-        },
-        Admin: {
-            label: 'Administration',
-            items: [
-                { label: 'Users',        icon: 'fa-users-cog', route: '#', disabled: true },
-                { label: 'Institutions', icon: 'fa-university', route: '#', disabled: true },
-                { label: 'Reports',      icon: 'fa-chart-pie',  route: '#', disabled: true },
-            ]
-        },
-        Manager: {
-            label: 'Management',
-            items: [
-                { label: 'Director Hub', icon: 'fa-crown', route: '/dashboard/director' },
-                { label: 'District',     icon: 'fa-map',   route: '/district' },
-            ]
-        },
-    };
-    private readonly commonSections: NavSection[] = [
-        {
-            label: '',
-            items: [
-                { label: 'My Profile', icon: 'fa-user-circle', route: '/my-profile' },
-            ]
-        },
-        {
-            label: 'My Initiatives',
-            items: [
-                { label: 'Health & Personality',          icon: 'fa-heart',     route: '#', disabled: true },
-                { label: 'Innovation & Entrepreneurship', icon: 'fa-lightbulb', route: '#', disabled: true },
-                { label: 'Family Growth & Care',          icon: 'fa-home',      route: '#', disabled: true },
-                { label: 'Community Development',         icon: 'fa-users',     route: '#', disabled: true },
-            ]
-        },
-        {
-            label: '',
-            items: [
-                { label: 'My Schedule', icon: 'fa-calendar-alt', route: '/my-schedule', exact: true },
-                { label: 'Research',    icon: 'fa-flask',        route: '/research' },
-            ]
-        },
-    ];
-
-
-    // ── Community section (all roles) ──────────────────────────────────
-    private readonly communitySection: NavSection = {
-        label: 'Community',
-        items: [
-            { label: 'Issues',         icon: 'fa-exclamation-circle', route: '/issues' },
-            { label: 'Health Connect', icon: 'fa-heartbeat',          route: '/health-connect' },
-            { label: 'Donate',         icon: 'fa-heart',              route: '/donate' },
-        ]
-    };
 
     // ── All sections computed from current role ────────────────────────
-  
+
+    logout(): void {
+        this.authService.logout();
+    }
 }
