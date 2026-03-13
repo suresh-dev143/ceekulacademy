@@ -7,6 +7,7 @@ import {
 import { WorkshopService, CreateWorkshopRequest, CreatedWorkshopData, WorkshopListItem } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { RazorpayService } from '../../../services/razorpay.service';
 
 // ── Timezone helpers ──────────────────────────────────────────────────────────
 
@@ -69,7 +70,15 @@ function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
 
         if (start && end && end <= start) errs['endBeforeStart'] = true;
 
+        if (start && end) {
+            const [sh, sm] = start.split(':').map(Number);
+            const [eh, em] = end.split(':').map(Number);
+            const diff = (eh * 60 + em) - (sh * 60 + sm);
+            if (diff !== 60) errs['invalidDuration'] = true;
+        }
+
         if (date && start) {
+
             const { dateStr, hours: nh, minutes: nm } = nowInTz(getTz());
             if (date === dateStr) {
                 const [sh, sm] = start.split(':').map(Number);
@@ -96,12 +105,18 @@ export class CreateWorkshop implements OnInit {
     private ws = inject(WorkshopService);
     private auth = inject(AuthService);
     private toast = inject(ToastService);
+    private razorpay = inject(RazorpayService);
 
     workshopForm!: FormGroup;
     isSubmitting = signal(false);
 
     workshopCreated = output<CreatedWorkshopData>();
     cancel = output<void>();
+
+    get totalCommission(): number {
+        const sessionCount = this.sessions.length;
+        return sessionCount * 25;
+    }
 
     // ── Edit Mode Support ──────────────────────────────────────────────────
     workshopToEdit = input<WorkshopListItem | null>(null);
@@ -236,6 +251,7 @@ export class CreateWorkshop implements OnInit {
             fee: [0, [Validators.required, Validators.min(0)]],
             mode: ['online', Validators.required],
             location: [''],
+            resources: [''],
         }, { validators: sessionConstraintsValidator(getTz) });
 
         row.get('mode')!.valueChanges.subscribe(m => this.syncLocationValidator(row, m ?? 'online'));
@@ -296,9 +312,39 @@ export class CreateWorkshop implements OnInit {
         const v = this.workshopForm.getRawValue();
         const editData = this.workshopToEdit();
 
+        if (this.isEditMode() && editData) {
+            this.proceedWithSave(v, editData);
+        } else {
+            // New workshop - require dynamic commission (50 portal base + 25 per session)
+            const fee = this.totalCommission;
+            this.isSubmitting.set(true);
+            this.razorpay.createOrder(fee).subscribe({
+                next: (order) => {
+                    this.razorpay.openCheckout(order, (paymentRes) => {
+                        this.razorpay.verifyPayment(paymentRes).subscribe({
+                            next: () => {
+                                this.toast.success('Commission payment verified!');
+                                this.proceedWithSave(v);
+                            },
+                            error: () => {
+                                this.isSubmitting.set(false);
+                                this.toast.error('Payment verification failed.');
+                            }
+                        });
+                    });
+                },
+                error: () => {
+                    this.isSubmitting.set(false);
+                    this.toast.error('Failed to initiate commission payment.');
+                }
+            });
+        }
+    }
+
+    private proceedWithSave(v: any, editData?: WorkshopListItem) {
         this.isSubmitting.set(true);
 
-        if (this.isEditMode() && editData) {
+        if (editData) {
             // Update Basic Info
             const updatePayload = {
                 workshopTitle: v.workshopTitle.trim(),
@@ -334,6 +380,7 @@ export class CreateWorkshop implements OnInit {
                     fee: Number(s.fee),
                     mode: s.mode,
                     location: s.mode === 'hybrid' ? (s.location || null) : null,
+                    resources: s.resources?.trim() || null,
                 })),
             };
 

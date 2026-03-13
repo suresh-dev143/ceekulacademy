@@ -145,7 +145,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
 })
 export class PublicWorkshopsPageComponent {
 
-    private ws = inject(WorkshopService);
+    ws = inject(WorkshopService);
     private toast = inject(ToastService);
     authService = inject(AuthService);
     private globalSearch = inject(SearchService);
@@ -187,7 +187,7 @@ export class PublicWorkshopsPageComponent {
                 !w.workshopDescription.toLowerCase().includes(q) &&
                 !w.expertDescription.toLowerCase().includes(q)) return false;
 
-            if (statuses.length > 0 && !statuses.includes(w.status as unknown as SearchStatus)) return false;
+            if (statuses.length > 0 && !statuses.includes(w.status as unknown as any)) return false;
             if (mode !== 'all' && w.workshopMode !== mode) return false;
             return true;
         });

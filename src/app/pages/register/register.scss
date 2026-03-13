@@ -155,101 +155,16 @@
     width: 100%;
 }
 
-/* Step Progress */
-.step-progress {
-    margin-bottom: 3rem;
-}
+/* Form Sections */
+.form-section {
+    margin-bottom: 4rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--row-border);
 
-.step-indicator {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    position: relative;
-    gap: 0.5rem;
-}
-
-.step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 2;
-    flex: 1;
-
-    .step-number {
-        width: 36px;
-        height: 36px;
-        border-radius: 0;
-        background: #000000;
-        border: 1px solid var(--row-border);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: var(--text-secondary);
-        transition: all 0.3s ease;
+    &:last-of-type {
+        border-bottom: none;
+        margin-bottom: 2rem;
     }
-
-    .step-label {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--text-secondary);
-        text-align: center;
-    }
-
-    &.active {
-        .step-number {
-            border-color: var(--accent-primary);
-            color: var(--accent-primary);
-        }
-
-        .step-label {
-            color: var(--text-primary);
-        }
-    }
-
-    &.completed {
-        .step-number {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
-            color: #000000;
-        }
-    }
-}
-
-.step-line {
-    flex: 1;
-    height: 2px;
-    background: var(--row-border);
-    margin-bottom: 1.5rem;
-    /* Aligned with circle */
-    position: relative;
-    top: -10px;
-    /* Adjusting for labels */
-
-    &.completed {
-        background: var(--accent-primary);
-    }
-
-    @media (max-width: 600px) {
-        display: none;
-    }
-}
-
-.progress-bar {
-    height: 4px;
-    background: var(--row-border);
-    border-radius: 0;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: var(--accent-primary);
-    transition: width 0.3s ease;
 }
 
 /* Form Styles */

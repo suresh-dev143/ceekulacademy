@@ -15,9 +15,6 @@ import { NavbarComponent } from '../../components/navbar/navbar';
 export class RegisterComponent {
     private authService = inject(AuthService);
     registerForm: FormGroup;
-    currentStep: number = 1;
-    totalSteps: number = 3;
-
     isSubmitting = signal(false);
     isLoggedIn = this.authService.isLoggedIn;
 
@@ -25,6 +22,7 @@ export class RegisterComponent {
     roles = [
         'Student',
         'Teacher',
+        'Instructor',
         'Researcher',
         'Entrepreneur',
         'Director',
@@ -62,7 +60,7 @@ export class RegisterComponent {
         private router: Router
     ) {
         this.registerForm = this.fb.group({
-            // Step 1: Basic Details
+            // Section 1: Basic Details
             name: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             phone: [''],
@@ -72,11 +70,11 @@ export class RegisterComponent {
             gender: ['', Validators.required],
             dob: ['', Validators.required],
 
-            // Step 2: Role Selection
+            // Section 2: Role Selection
             selectedRoles: this.fb.array([], Validators.required),
             partnerType: [''],
 
-            // Step 3: Account Security
+            // Section 3: Account Security
             password: ['', [Validators.required, Validators.minLength(6)]],
             confirmPassword: ['', Validators.required]
         }, { validators: this.passwordMatchValidator });
@@ -119,52 +117,6 @@ export class RegisterComponent {
         return null;
     }
 
-    // Navigation Logic
-    nextStep() {
-        this.currentStep++;
-    }
-
-    prevStep() {
-        this.currentStep--;
-    }
-
-    validateCurrentStep(): boolean {
-        switch (this.currentStep) {
-            case 1:
-                const step1Fields = ['name', 'email', 'district', 'village', 'pincode', 'gender', 'dob'];
-                let step1Valid = true;
-                step1Fields.forEach(field => {
-                    const control = this.registerForm.get(field);
-                    control?.markAsTouched();
-                    if (control?.invalid) step1Valid = false;
-                });
-                return step1Valid;
-
-            case 2:
-                this.selectedRoles.markAllAsTouched();
-                const partnerTypeValid = this.isRoleSelected('Partner')
-                    ? (this.registerForm.get('partnerType')?.valid ?? false)
-                    : true;
-                return this.selectedRoles.valid && partnerTypeValid;
-
-            case 3:
-                const password = this.registerForm.get('password');
-                const confirmPassword = this.registerForm.get('confirmPassword');
-                password?.markAsTouched();
-                confirmPassword?.markAsTouched();
-                return (this.registerForm.get('password')?.valid ?? false) &&
-                    (this.registerForm.get('confirmPassword')?.valid ?? false) &&
-                    !this.registerForm.hasError('passwordMismatch');
-
-            default:
-                return false;
-        }
-    }
-
-    getStepProgress(): number {
-        return (this.currentStep / this.totalSteps) * 100;
-    }
-
     onSubmit() {
         if (this.registerForm.invalid) {
             this.registerForm.markAllAsTouched();
@@ -188,7 +140,7 @@ export class RegisterComponent {
         };
 
         const primaryRole = v.selectedRoles[0] ?? '';
-        
+
         // Activity Mapping
         const activityMap: { [key: string]: string } = {
             'Student': 'Learning',

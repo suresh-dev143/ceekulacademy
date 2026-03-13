@@ -340,6 +340,20 @@
     }
 }
 
+.wc-badge--offline {
+    background: color-mix(in srgb, #22c55e, transparent 88%);
+    border: 1px solid color-mix(in srgb, #22c55e, transparent 70%);
+    color: #4ade80;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    letter-spacing: 0.5px;
+}
+
 .availability-tag {
     font-size: 0.65rem;
     font-weight: 700;
@@ -375,46 +389,7 @@
 
 // ────────────────────────────────────────────────────────────────
 
-// ── Workshop Tabs ────────────────────────────────────────────────
-.workshop-tabs {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    border-bottom: 2px solid color-mix(in srgb, #fff, transparent 90%);
-}
 
-.tab-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    padding: 1rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    position: relative;
-    transition: color 0.2s;
-
-    &:hover {
-        color: var(--text-primary);
-    }
-
-    &.active {
-        color: #FF6B00;
-
-        &::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #FF6B00;
-        }
-    }
-}
 
 // ── Create Workshop Section ──────────────────────────────────────
 .create-workshop-section {

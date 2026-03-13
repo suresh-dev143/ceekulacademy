@@ -9,6 +9,11 @@
             <span class="wc-mode" [class.wc-mode--hybrid]="workshop().workshopMode === 'hybrid'">
                 <i class="fas" [class]="modeIcon"></i> {{ modeLabel }}
             </span>
+            @if (isSavedOffline()) {
+            <span class="wc-badge wc-badge--offline" title="Saved for Offline Access">
+                <i class="fas fa-cloud-download-alt"></i> SAVED
+            </span>
+            }
         </div>
         <h3 class="wc-title">{{ workshop().workshopTitle }}</h3>
     </div>
@@ -60,7 +65,7 @@
         <button class="wc-btn wc-btn--manage" (click)="manage.emit(workshop())">
             <i class="fas fa-cog"></i> Manage
         </button>
-        } @else if (isStudentRole) {
+        } @else if (canBook()) {
         <button class="wc-btn wc-btn--book" (click)="book.emit(workshop())">
             <i class="fas fa-bookmark"></i> Book
         </button>

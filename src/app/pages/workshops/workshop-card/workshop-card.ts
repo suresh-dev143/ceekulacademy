@@ -1,6 +1,7 @@
 import { Component, input, output, computed } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { WorkshopListItem, WorkshopApiSession } from '../../../services/workshop.service';
+import { inject } from '@angular/core';
+import { WorkshopListItem, WorkshopApiSession, WorkshopService } from '../../../services/workshop.service';
 
 @Component({
     selector: 'app-workshop-card',
@@ -10,15 +11,22 @@ import { WorkshopListItem, WorkshopApiSession } from '../../../services/workshop
     styleUrl: './workshop-card.scss',
 })
 export class WorkshopCardComponent {
+    private ws = inject(WorkshopService);
 
     workshop = input.required<WorkshopListItem>();
     userRole = input<string>('');
     currentUserId = input<string | undefined>();
 
+    isSavedOffline = computed(() => this.ws.isLocallySaved(this.workshop()._id));
+
     isOwner = computed(() => {
         const userId = this.currentUserId();
         const workshop = this.workshop();
         return !!userId && workshop.createdBy === userId;
+    });
+
+    canBook = computed(() => {
+        return !!this.currentUserId() && !this.isOwner();
     });
 
     view = output<WorkshopListItem>();
@@ -83,7 +91,7 @@ export class WorkshopCardComponent {
     }
 
     get isStudentRole(): boolean {
-        return this.userRole() === 'Student';
+        return this.userRole() === 'Student' || this.canBook();
     }
 
     get isDirectorRole(): boolean {

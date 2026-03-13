@@ -30,6 +30,7 @@ export interface WorkshopSession {
     fee: number;
     mode: 'online' | 'hybrid';
     location: string | null;
+    resources?: string | null;
 }
 
 export interface CreateWorkshopRequest {
@@ -104,6 +105,7 @@ export interface WorkshopApiSession {
     fee: number;
     mode: 'online' | 'hybrid';
     location: string | null;
+    resources?: string | null;
 }
 
 export interface WorkshopListItem {
@@ -154,6 +156,7 @@ export interface AddSessionPayload {
     fee: number;
     mode: 'online' | 'hybrid';
     location: string | null;
+    resources?: string | null;
 }
 
 export interface AddSessionsResponse {
@@ -174,6 +177,38 @@ export interface DeleteSessionResponse {
         totalSessions: number;
         totalRevenuePotential: number;
     };
+}
+
+// ── ENROLLMENT types ──────────────────────────────────────────────────────────
+
+export interface EnrollStudentRequest {
+    workshopId: string;
+    sessionId: string;
+    userId: string;
+    fee: number;
+}
+
+export interface EnrollInstructorRequest {
+    workshopId: string;
+    userId: string;
+}
+
+export interface EnrollResponse {
+    status: boolean;
+    orderId?: string;
+    amount?: number;
+    currency?: string;
+    message: string;
+}
+
+export interface EnrolVerifyRequest {
+    razorpay_payment_id: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
+    workshopId: string;
+    userId: string;
+    role: 'student' | 'instructor';
+    sessionId?: string;
 }
 
 // ── Service ───────────────────────────────────────────────────────────────────
@@ -204,22 +239,33 @@ export class WorkshopService {
         } catch { /* noop */ }
     }
 
-    private addToLocalCache(w: CreatedWorkshopData): void {
-        const item: WorkshopListItem = {
-            ...w,
-            workshopMode: w.workshopMode as 'online' | 'hybrid',
-            instructorType: w.instructorType as 'myself' | 'open',
-            status: w.status as WorkshopStatus,
-            sessions: w.sessions.map(s => ({
-                ...s,
-                mode: s.mode as 'online' | 'hybrid'
-            }))
-        };
+    toggleLocalCache(w: WorkshopListItem | CreatedWorkshopData): void {
         this._localWorkshops.update(list => {
-            const newList = [item, ...list.filter(x => x._id !== item._id)];
+            const exists = list.some(x => x._id === w._id);
+            let newList: WorkshopListItem[];
+
+            if (exists) {
+                newList = list.filter(x => x._id !== w._id);
+            } else {
+                const item: WorkshopListItem = {
+                    ...w,
+                    workshopMode: w.workshopMode as 'online' | 'hybrid',
+                    instructorType: w.instructorType as 'myself' | 'open',
+                    status: w.status as WorkshopStatus,
+                    sessions: w.sessions.map(s => ({
+                        ...s,
+                        mode: s.mode as 'online' | 'hybrid'
+                    }))
+                };
+                newList = [item, ...list];
+            }
             this.saveToStorage(newList);
             return newList;
         });
+    }
+
+    isLocallySaved(id: string): boolean {
+        return this._localWorkshops().some(x => x._id === id);
     }
 
     getCurrentUserId(): string | undefined {
@@ -239,7 +285,7 @@ export class WorkshopService {
         ).pipe(
             tap(res => {
                 if (res.status && res.data) {
-                    this.addToLocalCache(res.data);
+                    this.toggleLocalCache(res.data);
                 }
             })
         );
@@ -262,6 +308,7 @@ export class WorkshopService {
                     sessions: res.data.sessions.map(s => ({
                         ...s,
                         activity: decodeHtml(s.activity),
+                        resources: s.resources ? decodeHtml(s.resources) : s.resources,
                     })),
                 }
             }))
@@ -301,6 +348,7 @@ export class WorkshopService {
                     sessions: res.data.sessions.map(s => ({
                         ...s,
                         activity: decodeHtml(s.activity),
+                        resources: s.resources ? decodeHtml(s.resources) : s.resources,
                     })),
                 }
             }))
@@ -335,6 +383,7 @@ export class WorkshopService {
                             sessions: w.sessions.map(s => ({
                                 ...s,
                                 activity: decodeHtml(s.activity),
+                                resources: s.resources ? decodeHtml(s.resources) : s.resources,
                             })),
                         })),
                     },
@@ -369,6 +418,7 @@ export class WorkshopService {
                             sessions: w.sessions.map(s => ({
                                 ...s,
                                 activity: decodeHtml(s.activity),
+                                resources: s.resources ? decodeHtml(s.resources) : s.resources,
                             })),
                         })),
                     },
@@ -395,6 +445,7 @@ export class WorkshopService {
                         addedSessions: res.data.addedSessions.map(s => ({
                             ...s,
                             activity: decodeHtml(s.activity),
+                            resources: s.resources ? decodeHtml(s.resources) : s.resources,
                         })),
                     },
                 }))
@@ -406,6 +457,29 @@ export class WorkshopService {
     deleteSession(workshopId: string, sessionId: string): Observable<DeleteSessionResponse> {
         return this.http.delete<DeleteSessionResponse>(
             `${this.base}/api/v1/workshops/${workshopId}/sessions/${sessionId}`
+        );
+    }
+
+    // ── Enrollment ───────────────────────────────────────────────────────────
+
+    enrolStudent(payload: EnrollStudentRequest): Observable<EnrollResponse> {
+        return this.http.post<EnrollResponse>(
+            `${this.base}/api/v1/enrol/student`,
+            payload
+        );
+    }
+
+    enrolInstructor(payload: EnrollInstructorRequest): Observable<EnrollResponse> {
+        return this.http.post<EnrollResponse>(
+            `${this.base}/api/v1/enrol/instructor`,
+            payload
+        );
+    }
+
+    verifyEnrollment(payload: EnrolVerifyRequest): Observable<{ status: boolean; message: string }> {
+        return this.http.post<{ status: boolean; message: string }>(
+            `${this.base}/api/v1/enrol/verify`,
+            payload
         );
     }
 

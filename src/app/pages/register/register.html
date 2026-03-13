@@ -13,33 +13,9 @@
         </div>
 
         <div class="reg-form-container">
-            <!-- Step Progress Indicator -->
-            <div class="step-progress">
-                <div class="step-indicator">
-                    <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
-                        <div class="step-number">1</div>
-                        <div class="step-label">Basic Details</div>
-                    </div>
-                    <div class="step-line" [class.completed]="currentStep > 1"></div>
-                    <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
-                        <div class="step-number">2</div>
-                        <div class="step-label">Select Role</div>
-                    </div>
-                    <div class="step-line" [class.completed]="currentStep > 2"></div>
-                    <div class="step" [class.active]="currentStep >= 3">
-                        <div class="step-number">3</div>
-                        <div class="step-label">Role Details</div>
-                    </div>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" [style.width.%]="getStepProgress()"></div>
-                </div>
-            </div>
-
             <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-                <!-- Step 1: Basic Details -->
-                @if (currentStep === 1) {
-                <div class="step-content">
+                <!-- Section 1: Basic Details -->
+                <div class="form-section">
                     <h3 class="step-title">Basic Information</h3>
                     <p class="step-description">Please provide your basic contact information.</p>
 
@@ -87,7 +63,6 @@
                         </div>
                     </div>
 
-                    <!-- Address Fields -->
                     <div class="form-group">
                         <label class="form-label">Local Address</label>
                         <div class="form-group">
@@ -99,7 +74,6 @@
                             }
                         </div>
 
-                        <!-- Address Line 1 -->
                         <div class="form-group" style="margin-bottom: 0.75rem;">
                             <label class="form-label" style="font-size: 0.9rem; opacity: 0.9;">Village/Ward
                                 *</label>
@@ -111,24 +85,19 @@
                             }
                         </div>
 
-                        <!-- Postal Code -->
                         <div class="form-group" style="margin-bottom: 0.75rem;">
                             <label class="form-label" style="font-size: 0.9rem; opacity: 0.9;">Pin Code</label>
                             <input type="text" class="form-control" formControlName="pincode"
                                 placeholder="Enter postal code">
                         </div>
                     </div>
-
                 </div>
-                }
 
-                <!-- Step 2: Role Selection & Activities -->
-                @if (currentStep === 2) {
-                <div class="step-content">
+                <!-- Section 2: Role Selection & Activities -->
+                <div class="form-section">
                     <h3 class="step-title">Select Your Roles & Activities</h3>
                     <p class="step-description">Choose your roles and define your engagement activities.</p>
 
-                    <!-- Role Selection -->
                     <div class="role-selection-container">
                         <label class="form-label">Select at least one role *</label>
                         <div class="role-selection">
@@ -147,7 +116,6 @@
                         }
                     </div>
 
-                    <!-- Partner Type (Conditional) -->
                     @if (isRoleSelected('Partner')) {
                     <div class="form-group partner-type-field">
                         <label class="form-label">Which type of partner? *</label>
@@ -162,13 +130,10 @@
                         }
                     </div>
                     }
-
                 </div>
-                }
 
-                <!-- Step 3: Account Security -->
-                @if (currentStep === 3) {
-                <div class="step-content">
+                <!-- Section 3: Account Security -->
+                <div class="form-section">
                     <h3 class="step-title">Account Security</h3>
                     <p class="step-description">Set a password to secure your candidate profile.</p>
 
@@ -198,30 +163,16 @@
                         </div>
                     </div>
                 </div>
-                }
 
-                <!-- Navigation Buttons -->
-                <div class="form-navigation">
-                    @if (currentStep > 1) {
-                    <button type="button" class="btn-prev" (click)="prevStep()">
-                        <i class="fas fa-arrow-left"></i> Previous
+                <!-- Registration Buttons -->
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
+                        @if (isSubmitting()) {
+                        Registering... <i class="fas fa-spinner fa-spin"></i>
+                        } @else {
+                        Complete Registration <i class="fas fa-rocket"></i>
+                        }
                     </button>
-                    }
-
-                    @if (currentStep < totalSteps) { <button type="button" class="btn-next" (click)="nextStep()">
-                        Next <i class="fas fa-arrow-right"></i>
-                        </button>
-                        }
-
-                        @if (currentStep === totalSteps) {
-                        <button type="submit" class="submit-btn" [disabled]="isSubmitting()">
-                            @if (isSubmitting()) {
-                            Registering... <i class="fas fa-spinner fa-spin"></i>
-                            } @else {
-                            Complete Registration <i class="fas fa-rocket"></i>
-                            }
-                        </button>
-                        }
                 </div>
             </form>
         </div>

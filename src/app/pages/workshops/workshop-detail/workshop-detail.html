@@ -31,6 +31,12 @@
         <div class="wd-title-row">
             <h1 class="wd-title">{{ currentWorkshop().workshopTitle }}</h1>
             <div class="wd-actions">
+                <button type="button" class="wd-offline-btn" (click)="toggleOffline()"
+                    [title]="isSavedOffline() ? 'Remove from Offline' : 'Save for Offline'">
+                    <i class="fas" [class.fa-cloud-download-alt]="!isSavedOffline()"
+                        [class.fa-check-circle]="isSavedOffline()"></i>
+                    {{ isSavedOffline() ? 'Saved Offline' : 'Save Offline' }}
+                </button>
                 @if (isOwner() && currentWorkshop().status !== 'cancelled') {
                 <button type="button" class="wd-edit-info-btn" (click)="openEditInfoForm()" title="Edit Workshop Info">
                     <i class="fas fa-edit"></i> Edit Info
@@ -163,6 +169,8 @@
                         <div class="wd-error">End time is required.</div>
                         } @else if (formError('endBeforeStart')) {
                         <div class="wd-error">End time must be after start time.</div>
+                        } @else if (formError('invalidDuration')) {
+                        <div class="wd-error">Session duration must be exactly 1 hour.</div>
                         }
                     </div>
 
@@ -225,6 +233,17 @@
                     }
                 </div>
                 }
+
+                <div class="wd-field" style="margin-top: 1rem;">
+                    <label class="wd-label">Resources (Links/Materials)</label>
+                    <input type="text" class="wd-input" formControlName="resources"
+                        placeholder="Optional: Google Drive links, materials, etc.">
+                </div>
+
+                <div class="wd-charge-info">
+                    <i class="fas fa-info-circle"></i>
+                    Portal Charge: <strong>₹25</strong> per session applies.
+                </div>
 
                 <!-- Form actions -->
                 <div class="wd-form-actions">

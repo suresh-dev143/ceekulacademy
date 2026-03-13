@@ -24,7 +24,7 @@
         <div class="form-section">
             <h3>Enrollment Type</h3>
             <div class="radio-group">
-                @if (userRole()) {
+                @if (userRole() && workshop().instructorType !== 'myself') {
                 <label class="radio-option">
                     <input type="radio" formControlName="enrollmentType" value="support">
                     <span>Practical Hands-on Support (Instructor)</span>

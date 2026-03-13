@@ -408,6 +408,20 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     white-space: nowrap;
 }
 
+.cwf-charge-badge {
+    background: color-mix(in srgb, $accent, transparent 92%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 80%);
+    color: $accent;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.28rem 0.65rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
 .cwf-remove-btn {
     background: color-mix(in srgb, $error-color, transparent 92%);
     border: 1px solid color-mix(in srgb, $error-color, transparent 80%);
@@ -472,8 +486,30 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
 .cwf-submit-row {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
+    align-items: center;
+    gap: 1.25rem;
     margin-top: 2rem;
+}
+
+.cwf-charge-notice {
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    span:first-child {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: $text-dim;
+    }
+}
+
+.cwf-charge-amount {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: $accent;
 }
 
 .cwf-btn-secondary {

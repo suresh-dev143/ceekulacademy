@@ -108,6 +108,7 @@ export class EnrollWorkshop implements OnInit {
         const tier = this.qualityTiers.find(t => t.id === tierId);
         const mode = this.enrollWorkshopForm.get('modeSelection')?.value;
         const attendance = this.enrollWorkshopForm.get('attendanceMode')?.value;
+        const type = this.enrollWorkshopForm.get('enrollmentType')?.value;
 
         return {
             workshopFee: this.workshop().sessions[0]?.fee || 0,

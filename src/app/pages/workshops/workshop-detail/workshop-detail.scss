@@ -160,6 +160,37 @@ $status-colors: (
     align-items: center;
 }
 
+.wd-offline-btn {
+    background: color-mix(in srgb, $accent, transparent 94%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 85%);
+    color: $accent;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+
+    &:hover {
+        background: color-mix(in srgb, $accent, transparent 88%);
+        border-color: $accent;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px color-mix(in srgb, $accent, transparent 85%);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    i {
+        font-size: 0.82rem;
+    }
+}
+
 .wd-edit-info-btn {
     background: color-mix(in srgb, $accent, transparent 92%);
     border: 1px solid color-mix(in srgb, $accent, transparent 80%);

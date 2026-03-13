@@ -14,6 +14,7 @@ import {
     CancelWorkshopResponse,
 } from '../../../services/workshop.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { RazorpayService } from '../../../services/razorpay.service';
 import { EnrollWorkshop } from '../enroll-workshop/enroll-workshop';
 
 // ── Timezone helpers (same as create-workshop) ────────────────────────────────
@@ -71,7 +72,15 @@ function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
 
         if (start && end && end <= start) errs['endBeforeStart'] = true;
 
+        if (start && end) {
+            const [sh, sm] = start.split(':').map(Number);
+            const [eh, em] = end.split(':').map(Number);
+            const diff = (eh * 60 + em) - (sh * 60 + sm);
+            if (diff !== 60) errs['invalidDuration'] = true;
+        }
+
         if (date && start) {
+
             const { dateStr, hours: nh, minutes: nm } = nowInTz(getTz());
             if (date === dateStr) {
                 const [sh, sm] = start.split(':').map(Number);
@@ -136,6 +145,7 @@ export class WorkshopDetailComponent {
     private fb = inject(FormBuilder);
     private ws = inject(WorkshopService);
     private toast = inject(ToastService);
+    private razorpay = inject(RazorpayService);
 
     // ── Inputs / Outputs ──────────────────────────────────────────────────────
 
@@ -166,10 +176,19 @@ export class WorkshopDetailComponent {
     // ── Edit Info state ───────────────────────────────────────────────────────
 
     isEditingInfo = signal(false);
+    isSavedOffline = computed(() => this.ws.isLocallySaved(this.currentWorkshop()._id));
     isSavingInfo = signal(false);
     isCancelling = signal(false);
     isRefreshing = signal(false);
     editInfoForm!: FormGroup;
+
+    toggleOffline(): void {
+        this.ws.toggleLocalCache(this.currentWorkshop());
+        const msg = this.isSavedOffline() 
+            ? 'Workshop saved for offline access' 
+            : 'Workshop removed from offline storage';
+        this.toast.success(msg);
+    }
 
     // ── Internal data (starts from input, can be refreshed from API) ─────────────
 
@@ -210,7 +229,7 @@ export class WorkshopDetailComponent {
         return ['Director', 'Admin', 'Manager'].includes(this.userRole());
     }
     get canEnroll(): boolean {
-        return !!this.userRole();
+        return !!this.currentUserId() && !this.isOwner();
     }
 
     canDeleteSession(session: WorkshopApiSession): boolean {
@@ -369,6 +388,7 @@ export class WorkshopDetailComponent {
             fee: [0, [Validators.required, Validators.min(0)]],
             mode: ['online', Validators.required],
             location: [''],
+            resources: [''],
         }, {
             validators: [
                 sessionConstraintsValidator(getTz),
@@ -524,6 +544,32 @@ export class WorkshopDetailComponent {
         if (this.addForm.invalid || this.isSubmitting()) return;
 
         const v = this.addForm.getRawValue();
+
+        // Session charge - require ₹25
+        this.isSubmitting.set(true);
+        this.razorpay.createOrder(25).subscribe({
+            next: (order) => {
+                this.razorpay.openCheckout(order, (paymentRes) => {
+                    this.razorpay.verifyPayment(paymentRes).subscribe({
+                        next: () => {
+                            this.toast.success('Session charge verified!');
+                            this.proceedWithAddSession(v);
+                        },
+                        error: () => {
+                            this.isSubmitting.set(false);
+                            this.toast.error('Payment verification failed.');
+                        }
+                    });
+                });
+            },
+            error: () => {
+                this.isSubmitting.set(false);
+                this.toast.error('Failed to initiate session payment.');
+            }
+        });
+    }
+
+    private proceedWithAddSession(v: any): void {
         const payload: AddSessionPayload[] = [{
             date: v.date,
             startTime: v.startTime,
@@ -532,6 +578,7 @@ export class WorkshopDetailComponent {
             fee: Number(v.fee),
             mode: v.mode,
             location: v.mode === 'hybrid' ? (v.location || null) : null,
+            resources: v.resources?.trim() || null,
         }];
 
         this.isSubmitting.set(true);
