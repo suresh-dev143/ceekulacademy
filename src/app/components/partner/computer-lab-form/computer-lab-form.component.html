@@ -1,0 +1,106 @@
+<div class="form-container">
+    <div class="form-header">
+      <h2 class="section-title" style="margin: 0;">{{ editData ? 'Edit Computer Lab' : 'Add New Computer Lab' }}</h2>
+      <button class="btn-outline" (click)="close.emit()" type="button"><i class="fas fa-times"></i> Close</button>
+    </div>
+  
+    <form [formGroup]="labForm" (ngSubmit)="onSubmit()">
+      
+      <div class="form-group grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label class="form-label">Lab Name *</label>
+          <input type="text" class="form-control" formControlName="name" placeholder="e.g., AI Research Lab" [class.is-invalid]="labForm.get('name')?.invalid && labForm.get('name')?.touched">
+          <app-form-validation-error [control]="labForm.get('name')" label="Lab Name"></app-form-validation-error>
+        </div>
+        <div>
+          <label class="form-label">Internal ID / Code *</label>
+          <input type="text" class="form-control" formControlName="id" placeholder="e.g., lab-203" [class.is-invalid]="labForm.get('id')?.invalid && labForm.get('id')?.touched">
+          <app-form-validation-error [control]="labForm.get('id')" label="Internal ID"></app-form-validation-error>
+        </div>
+      </div>
+  
+      <div class="form-group grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label class="form-label">Internet Speed *</label>
+          <input type="text" class="form-control" formControlName="internetSpeed" placeholder="e.g., 10 Gbps Fiber" [class.is-invalid]="labForm.get('internetSpeed')?.invalid && labForm.get('internetSpeed')?.touched">
+          <app-form-validation-error [control]="labForm.get('internetSpeed')" label="Internet Speed"></app-form-validation-error>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+                <label class="form-label">Workstations *</label>
+                <input type="number" class="form-control" formControlName="workstations" placeholder="15" [class.is-invalid]="labForm.get('workstations')?.invalid && labForm.get('workstations')?.touched">
+                <app-form-validation-error [control]="labForm.get('workstations')" label="Workstations"></app-form-validation-error>
+            </div>
+            <div>
+                <label class="form-label">Capacity *</label>
+                <input type="number" class="form-control" formControlName="capacity" placeholder="15" [class.is-invalid]="labForm.get('capacity')?.invalid && labForm.get('capacity')?.touched">
+                <app-form-validation-error [control]="labForm.get('capacity')" label="Capacity"></app-form-validation-error>
+            </div>
+        </div>
+      </div>
+  
+      <h3 class="section-title" style="font-size: 1rem; margin-top: 1.5rem;">Software Available (Comma separated)</h3>
+      <div class="nested-section">
+        <div class="form-group">
+          <label class="form-label">Software List</label>
+          <input type="text" class="form-control" formControlName="softwareAvailable" placeholder="TensorFlow, PyTorch, Jupyter Notebooks">
+        </div>
+      </div>
+  
+      <h3 class="section-title" style="font-size: 1rem; margin-top: 1.5rem; display: flex; justify-content: space-between;">
+        Availability Schedule
+        <button type="button" class="btn-outline" (click)="addScheduleSlot()">+ Add Time Slot</button>
+      </h3>
+      <div class="nested-section" formArrayName="availabilitySchedule">
+        <div class="schedule-grid" style="margin-bottom: 0.5rem;" *ngIf="availabilitySchedule.length > 0">
+          <div class="grid-header">Day</div>
+          <div class="grid-header">Start</div>
+          <div class="grid-header">End</div>
+          <div class="grid-header">Status</div>
+          <div class="grid-header">Notes</div>
+          <div></div>
+        </div>
+        
+        <div *ngFor="let slot of availabilitySchedule.controls; let i=index" [formGroupName]="i" class="schedule-grid">
+          <div>
+            <select class="form-control" formControlName="day" [class.is-invalid]="slot.get('day')?.invalid && slot.get('day')?.touched">
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
+            <app-form-validation-error [control]="slot.get('day')" label="Day"></app-form-validation-error>
+          </div>
+          <div>
+            <input type="time" class="form-control" formControlName="startTime" [class.is-invalid]="slot.get('startTime')?.invalid && slot.get('startTime')?.touched">
+            <app-form-validation-error [control]="slot.get('startTime')" label="Start Time"></app-form-validation-error>
+          </div>
+          <div>
+            <input type="time" class="form-control" formControlName="endTime" [class.is-invalid]="slot.get('endTime')?.invalid && slot.get('endTime')?.touched">
+            <app-form-validation-error [control]="slot.get('endTime')" label="End Time"></app-form-validation-error>
+          </div>
+          <div>
+            <select class="form-control" formControlName="status" [class.is-invalid]="slot.get('status')?.invalid && slot.get('status')?.touched">
+              <option value="Available">Available</option>
+              <option value="Booked">Booked</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Closed">Closed</option>
+            </select>
+            <app-form-validation-error [control]="slot.get('status')" label="Status"></app-form-validation-error>
+          </div>
+          <input type="text" class="form-control" formControlName="notes" placeholder="Notes (optional)">
+          <button type="button" class="btn-danger" (click)="removeScheduleSlot(i)" title="Remove Slot"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+  
+      <div style="margin-top: 2rem; border-top: 1px solid #333; padding-top: 1rem; text-align: right;">
+        <button type="submit" class="btn-primary" [disabled]="isLoading() || labForm.invalid">
+          <i class="fas fa-spinner fa-spin" *ngIf="isLoading()"></i>
+          <span *ngIf="!isLoading()">{{ editData ? 'Save Changes' : 'Add Computer Lab' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>

@@ -143,7 +143,6 @@ export class CreateWorkshop implements OnInit {
             workshopTitle: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
             workshopDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
             expertDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
-            workshopMode: ['online', Validators.required],
             timezone: ['IST', Validators.required],
             instructorType: ['myself', Validators.required],
             sessions: this.fb.array([]),
@@ -156,10 +155,6 @@ export class CreateWorkshop implements OnInit {
             this.sessions.controls.forEach(c => c.updateValueAndValidity());
         });
 
-        // Propagate location requirement when workshop-level mode changes
-        this.workshopForm.get('workshopMode')!.valueChanges.subscribe(mode => {
-            this.sessions.controls.forEach(c => this.syncLocationValidator(c as FormGroup, mode));
-        });
     }
 
     ngOnInit() {
@@ -169,7 +164,6 @@ export class CreateWorkshop implements OnInit {
                 workshopTitle: editData.workshopTitle,
                 workshopDescription: editData.workshopDescription,
                 expertDescription: editData.expertDescription,
-                workshopMode: editData.workshopMode,
                 timezone: editData.timezone,
                 instructorType: editData.instructorType,
             });
@@ -183,6 +177,7 @@ export class CreateWorkshop implements OnInit {
                         startTime: s.startTime,
                         endTime: s.endTime,
                         activity: s.activity,
+                        description: s.description || '',
                         fee: s.fee,
                         mode: s.mode,
                         location: s.location || '',
@@ -248,6 +243,7 @@ export class CreateWorkshop implements OnInit {
             startTime: ['', Validators.required],
             endTime: ['', Validators.required],
             activity: ['', [Validators.required, Validators.minLength(3)]],
+            description: ['', [Validators.maxLength(1000)]],
             fee: [0, [Validators.required, Validators.min(0)]],
             mode: ['online', Validators.required],
             location: [''],
@@ -323,12 +319,12 @@ export class CreateWorkshop implements OnInit {
                     this.razorpay.openCheckout(order, (paymentRes) => {
                         this.razorpay.verifyPayment(paymentRes).subscribe({
                             next: () => {
-                                this.toast.success('Commission payment verified!');
+                                // this.toast.success('Commission payment verified!');
                                 this.proceedWithSave(v);
                             },
                             error: () => {
                                 this.isSubmitting.set(false);
-                                this.toast.error('Payment verification failed.');
+                                // this.toast.error('Payment verification failed.');
                             }
                         });
                     });
@@ -350,7 +346,6 @@ export class CreateWorkshop implements OnInit {
                 workshopTitle: v.workshopTitle.trim(),
                 workshopDescription: v.workshopDescription.trim(),
                 expertDescription: v.expertDescription.trim(),
-                workshopMode: v.workshopMode,
                 timezone: v.timezone,
                 instructorType: v.instructorType,
             };
@@ -369,7 +364,6 @@ export class CreateWorkshop implements OnInit {
                 workshopTitle: v.workshopTitle.trim(),
                 workshopDescription: v.workshopDescription.trim(),
                 expertDescription: v.expertDescription.trim(),
-                workshopMode: v.workshopMode,
                 timezone: v.timezone,
                 instructorType: v.instructorType,
                 sessions: v.sessions.map((s: any) => ({
@@ -377,6 +371,7 @@ export class CreateWorkshop implements OnInit {
                     startTime: s.startTime,
                     endTime: s.endTime,
                     activity: s.activity.trim(),
+                    description: s.description?.trim() || '',
                     fee: Number(s.fee),
                     mode: s.mode,
                     location: s.mode === 'hybrid' ? (s.location || null) : null,

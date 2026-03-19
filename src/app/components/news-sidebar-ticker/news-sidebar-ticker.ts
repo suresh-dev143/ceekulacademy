@@ -51,7 +51,7 @@ export class NewsSidebarTickerComponent {
                 type: 'Workshop',
                 date: w.createdAt,
                 description: w.workshopDescription,
-                category: w.workshopMode
+                category: w.sessions?.length > 0 ? w.sessions[0].mode : 'Online'
             });
         });
 

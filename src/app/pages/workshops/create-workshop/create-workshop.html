@@ -80,22 +80,6 @@
 
             <div class="cwf-config-grid">
 
-                <!-- Workshop Mode -->
-                <div class="cwf-field">
-                    <label class="cwf-label">Workshop Mode *</label>
-                    <div class="cwf-radio-group">
-                        <label class="cwf-radio">
-                            <input type="radio" formControlName="workshopMode" value="online">
-                            <span class="cwf-radio-mark"></span>
-                            <span>Online</span>
-                        </label>
-                        <label class="cwf-radio">
-                            <input type="radio" formControlName="workshopMode" value="hybrid">
-                            <span class="cwf-radio-mark"></span>
-                            <span>Hybrid (Online + In-Person)</span>
-                        </label>
-                    </div>
-                </div>
 
                 <!-- Timezone -->
                 <div class="cwf-field">
@@ -227,6 +211,15 @@
                         @if (sessionFieldError($index, 'activity', 'required')) {
                         <div class="cwf-error">Activity description is required.</div>
                         }
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Description (Optional)</label>
+                        <textarea class="cwf-input cwf-textarea" [formControl]="$any(session.get('description'))"
+                            placeholder="Provide more details for this session..." rows="2" maxlength="1000"></textarea>
+                        <span class="cwf-char">
+                            {{ session.get('description')?.value?.length ?? 0 }}/1000
+                        </span>
                     </div>
 
                     <div class="cwf-field">

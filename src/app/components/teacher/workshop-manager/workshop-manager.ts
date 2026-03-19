@@ -53,17 +53,12 @@ export class WorkshopManagerComponent implements OnInit {
             workshopTitle: ['', Validators.required],
             workshopDescription: ['', Validators.required],
             schedule: this.fb.array([]),
-            workshopMode: ['online', Validators.required],
             instructorType: ['myself', Validators.required], // myself or open
         });
 
         // Initialize with one schedule row
         this.addScheduleRow();
 
-        // Handle mode changes to toggle location validator
-        this.workshopForm.get('workshopMode')?.valueChanges.subscribe(mode => {
-            this.updateScheduleValidators(mode);
-        });
     }
 
     get schedule(): FormArray {
@@ -71,17 +66,29 @@ export class WorkshopManagerComponent implements OnInit {
     }
 
     addScheduleRow() {
-        const currentMode = this.workshopForm?.get('workshopMode')?.value || 'online';
-        const isHybrid = currentMode === 'hybrid';
-
         const row = this.fb.group({
             date: ['', Validators.required],
             startTime: ['', Validators.required],
             endTime: ['', Validators.required],
             activity: ['', Validators.required],
+            description: ['', []],
             fee: [0, [Validators.required, Validators.min(0)]],
-            location: ['', isHybrid ? Validators.required : []]
+            location: ['', []],
+            mode: ['online', Validators.required]
         });
+
+        // Toggle location validator on row mode change
+        row.get('mode')?.valueChanges.subscribe(mode => {
+            const locControl = row.get('location');
+            if (mode === 'hybrid') {
+                locControl?.setValidators(Validators.required);
+            } else {
+                locControl?.clearValidators();
+                locControl?.setValue('');
+            }
+            locControl?.updateValueAndValidity();
+        });
+
         this.schedule.push(row);
     }
 
@@ -91,19 +98,6 @@ export class WorkshopManagerComponent implements OnInit {
         }
     }
 
-    updateScheduleValidators(mode: string) {
-        const controls = this.schedule.controls;
-        controls.forEach(control => {
-            const locControl = control.get('location');
-            if (mode === 'hybrid') {
-                locControl?.setValidators(Validators.required);
-            } else {
-                locControl?.clearValidators();
-                locControl?.setValue('');
-            }
-            locControl?.updateValueAndValidity();
-        });
-    }
 
     toggleWorkshopCreation() {
         this.isCreatingWorkshop.set(!this.isCreatingWorkshop());
@@ -132,14 +126,13 @@ export class WorkshopManagerComponent implements OnInit {
                 instructor: formValue.instructorType === 'myself' ? (this.currentUser()?.name ?? 'Unknown') : 'Open to All',
                 date: startDate,
                 duration: duration,
-                type: formValue.workshopMode === 'online' ? 'Online' : 'Hybrid',
+                type: formValue.schedule.some((s: any) => s.mode === 'hybrid') ? 'Hybrid' : 'Online',
                 fee: totalFee
             };
 
             this.workshopsList.update(list => [newWorkshop, ...list]);
             this.isCreatingWorkshop.set(false);
             this.workshopForm.reset({
-                workshopMode: 'online',
                 instructorType: 'myself'
             });
             this.schedule.clear();

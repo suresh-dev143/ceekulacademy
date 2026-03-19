@@ -1,6 +1,7 @@
 <div class="form-container animate-fade-in">
     <div class="form-header">
-        <h3 class="section-title" style="margin: 0; color: #fff;">Add Infrastructure Details</h3>
+        <h3 class="section-title" style="margin: 0; color: #fff;">{{ isEditMode() ? 'Edit' : 'Add' }} Infrastructure
+            Details</h3>
         <button class="btn-outline" (click)="close.emit()" style="border: none; color: #888;">
             <i class="fas fa-times"></i> Cancel
         </button>
@@ -10,35 +11,46 @@
 
         <!-- SECTION 1: GENERAL INFO -->
         <h4 class="section-title">General Information</h4>
+        <div class="form-group">
+            <label class="form-label">Site Title / Label *</label>
+            <input type="text" class="form-control" formControlName="title"
+                placeholder="e.g. Main Campus / South Branch" [class.is-invalid]="infraForm.get('title')?.invalid && infraForm.get('title')?.touched">
+            <app-form-validation-error [control]="infraForm.get('title')" label="Site Title"></app-form-validation-error>
+        </div>
+
         <div class="form-group" formGroupName="generalInfo">
             <label class="form-label">School / Institution Name *</label>
-            <input type="text" class="form-control" formControlName="schoolName" placeholder="e.g. XYZ Public School">
+            <input type="text" class="form-control" formControlName="schoolName" placeholder="e.g. XYZ Public School" [class.is-invalid]="infraForm.get('generalInfo.schoolName')?.invalid && infraForm.get('generalInfo.schoolName')?.touched">
+            <app-form-validation-error [control]="infraForm.get('generalInfo.schoolName')" label="School Name"></app-form-validation-error>
 
             <label class="form-label" style="margin-top: 1rem;">Address *</label>
-            <textarea class="form-control" formControlName="address" rows="2"></textarea>
+            <textarea class="form-control" formControlName="address" rows="2" [class.is-invalid]="infraForm.get('generalInfo.address')?.invalid && infraForm.get('generalInfo.address')?.touched"></textarea>
+            <app-form-validation-error [control]="infraForm.get('generalInfo.address')" label="Address"></app-form-validation-error>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                 <div>
                     <label class="form-label">Contact Person Name *</label>
-                    <input type="text" class="form-control" formControlName="contactName">
+                    <input type="text" class="form-control" formControlName="contactName" [class.is-invalid]="infraForm.get('generalInfo.contactName')?.invalid && infraForm.get('generalInfo.contactName')?.touched">
+                    <app-form-validation-error [control]="infraForm.get('generalInfo.contactName')" label="Contact Name"></app-form-validation-error>
                 </div>
                 <div>
                     <label class="form-label">Contact Email *</label>
-                    <input type="email" class="form-control" formControlName="contactEmail">
+                    <input type="email" class="form-control" formControlName="contactEmail" [class.is-invalid]="infraForm.get('generalInfo.contactEmail')?.invalid && infraForm.get('generalInfo.contactEmail')?.touched">
+                    <app-form-validation-error [control]="infraForm.get('generalInfo.contactEmail')" label="Contact Email"></app-form-validation-error>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                 <div>
                     <label class="form-label">Contact Phone *</label>
-                    <input type="tel" class="form-control" formControlName="contactPhone">
+                    <input type="tel" class="form-control" formControlName="contactPhone" [class.is-invalid]="infraForm.get('generalInfo.contactPhone')?.invalid && infraForm.get('generalInfo.contactPhone')?.touched">
+                    <app-form-validation-error [control]="infraForm.get('generalInfo.contactPhone')" label="Contact Phone"></app-form-validation-error>
                 </div>
                 <div>
                     <label class="form-label">Time Zone</label>
                     <select class="form-control" formControlName="timeZone">
                         <option value="Asia/Kolkata">Asia/Kolkata</option>
                         <option value="America/New_York">America/New_York</option>
-                        <!-- Add more as needed or make dynamic -->
                     </select>
                 </div>
             </div>
@@ -62,24 +74,41 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
-                        <label class="form-label">Classroom ID (e.g. C101) *</label>
-                        <input type="text" class="form-control" formControlName="id">
+                        <label class="form-label">ID (e.g. classroom-101) *</label>
+                        <input type="text" class="form-control" formControlName="id" [class.is-invalid]="classroom.get('id')?.invalid && classroom.get('id')?.touched">
+                        <app-form-validation-error [control]="classroom.get('id')" label="ID"></app-form-validation-error>
                     </div>
                     <div>
-                        <label class="form-label">Capacity (Max Students) *</label>
-                        <input type="number" class="form-control" formControlName="capacity">
+                        <label class="form-label">Classroom Name (e.g. Room 101) *</label>
+                        <input type="text" class="form-control" formControlName="name" [class.is-invalid]="classroom.get('name')?.invalid && classroom.get('name')?.touched">
+                        <app-form-validation-error [control]="classroom.get('name')" label="Name"></app-form-validation-error>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                     <div>
-                        <label class="form-label">Length (m)</label>
-                        <input type="number" class="form-control" formControlName="length">
+                        <label class="form-label">Capacity *</label>
+                        <input type="number" class="form-control" formControlName="capacity" [class.is-invalid]="classroom.get('capacity')?.invalid && classroom.get('capacity')?.touched">
+                        <app-form-validation-error [control]="classroom.get('capacity')" label="Capacity"></app-form-validation-error>
                     </div>
                     <div>
-                        <label class="form-label">Width (m)</label>
-                        <input type="number" class="form-control" formControlName="width">
+                        <label class="form-label">Length (m) *</label>
+                        <input type="number" class="form-control" formControlName="length" [class.is-invalid]="classroom.get('length')?.invalid && classroom.get('length')?.touched">
+                        <app-form-validation-error [control]="classroom.get('length')" label="Length"></app-form-validation-error>
                     </div>
+                    <div>
+                        <label class="form-label">Width (m) *</label>
+                        <input type="number" class="form-control" formControlName="width" [class.is-invalid]="classroom.get('width')?.invalid && classroom.get('width')?.touched">
+                        <app-form-validation-error [control]="classroom.get('width')" label="Width"></app-form-validation-error>
+                    </div>
+                    <div>
+                        <label class="form-label">Area (sq m) *</label>
+                        <input type="number" class="form-control" formControlName="area" [class.is-invalid]="classroom.get('area')?.invalid && classroom.get('area')?.touched">
+                        <app-form-validation-error [control]="classroom.get('area')" label="Area"></app-form-validation-error>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                     <div>
                         <label class="form-label">Type</label>
                         <select class="form-control" formControlName="type">
@@ -89,12 +118,47 @@
                             <option>Activity Room</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="form-label">Primary Usage *</label>
+                        <input type="text" class="form-control" formControlName="primaryUsage" placeholder="e.g. Science Lab" [class.is-invalid]="classroom.get('primaryUsage')?.invalid && classroom.get('primaryUsage')?.touched">
+                        <app-form-validation-error [control]="classroom.get('primaryUsage')" label="Primary Usage"></app-form-validation-error>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div>
+                        <label class="form-label">Technology</label>
+                        <input type="text" class="form-control" formControlName="technology" placeholder="Comma separated">
+                    </div>
+                    <div>
+                        <label class="form-label">Furniture</label>
+                        <input type="text" class="form-control" formControlName="furniture" placeholder="Comma separated">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div>
+                        <label class="form-label">Lighting</label>
+                        <input type="text" class="form-control" formControlName="lighting" placeholder="Comma separated">
+                    </div>
+                    <div>
+                        <label class="form-label">Ventilation</label>
+                        <input type="text" class="form-control" formControlName="ventilation" placeholder="Comma separated">
+                    </div>
+                    <div>
+                        <label class="form-label">Accessibility</label>
+                        <input type="text" class="form-control" formControlName="accessibility" placeholder="Comma separated">
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <label class="form-label">Specialized Equipment</label>
+                    <textarea class="form-control" formControlName="specializedEquipment" rows="1" placeholder="e.g. Microscopes"></textarea>
                 </div>
 
                 <!-- Availability Schedule Block -->
                 <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
                     <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
-
                     <div formArrayName="availabilitySchedule">
                         @for (slot of getSchedule(classroom).controls; track $index) {
                         <div [formGroupName]="$index" class="schedule-grid">
@@ -107,26 +171,21 @@
                                 <option>Saturday</option>
                                 <option>Sunday</option>
                             </select>
-                            <input type="time" class="form-control" formControlName="startTime"
-                                style="padding: 0.4rem;">
+                            <input type="time" class="form-control" formControlName="startTime" style="padding: 0.4rem;">
                             <input type="time" class="form-control" formControlName="endTime" style="padding: 0.4rem;">
                             <select class="form-control" formControlName="status" style="padding: 0.4rem;">
                                 <option>Available</option>
                                 <option>Booked</option>
                                 <option>Maintenance</option>
                             </select>
-                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..."
-                                style="padding: 0.4rem;">
-
-                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;"
-                                (click)="removeScheduleSlot(getSchedule(classroom), $index)">
+                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..." style="padding: 0.4rem;">
+                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;" (click)="removeScheduleSlot(getSchedule(classroom), $index)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                         }
                     </div>
-                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;"
-                        (click)="addScheduleSlot(getSchedule(classroom))">
+                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;" (click)="addScheduleSlot(getSchedule(classroom))">
                         + Add Time Slot
                     </button>
                 </div>
@@ -153,21 +212,41 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
-                        <label class="form-label">Lab ID *</label>
-                        <input type="text" class="form-control" formControlName="id">
+                        <label class="form-label">Lab ID (e.g. lab-201) *</label>
+                        <input type="text" class="form-control" formControlName="id" [class.is-invalid]="lab.get('id')?.invalid && lab.get('id')?.touched">
+                        <app-form-validation-error [control]="lab.get('id')" label="ID"></app-form-validation-error>
                     </div>
                     <div>
-                        <label class="form-label">Workstations (Count) *</label>
-                        <input type="number" class="form-control" formControlName="workstations">
+                        <label class="form-label">Lab Name *</label>
+                        <input type="text" class="form-control" formControlName="name" [class.is-invalid]="lab.get('name')?.invalid && lab.get('name')?.touched">
+                        <app-form-validation-error [control]="lab.get('name')" label="Name"></app-form-validation-error>
                     </div>
                 </div>
-                <div style="margin-top: 1rem;">
-                    <label class="form-label">Software Available</label>
-                    <textarea class="form-control" formControlName="software" rows="2"
-                        placeholder="e.g. Python, Adobe Suite"></textarea>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div>
+                        <label class="form-label">Workstations *</label>
+                        <input type="number" class="form-control" formControlName="workstations" [class.is-invalid]="lab.get('workstations')?.invalid && lab.get('workstations')?.touched">
+                        <app-form-validation-error [control]="lab.get('workstations')" label="Workstations"></app-form-validation-error>
+                    </div>
+                    <div>
+                        <label class="form-label">Total Capacity *</label>
+                        <input type="number" class="form-control" formControlName="capacity" [class.is-invalid]="lab.get('capacity')?.invalid && lab.get('capacity')?.touched">
+                        <app-form-validation-error [control]="lab.get('capacity')" label="Capacity"></app-form-validation-error>
+                    </div>
+                    <div>
+                        <label class="form-label">Internet Speed *</label>
+                        <input type="text" class="form-control" formControlName="internetSpeed" placeholder="e.g. 100 Mbps" [class.is-invalid]="lab.get('internetSpeed')?.invalid && lab.get('internetSpeed')?.touched">
+                        <app-form-validation-error [control]="lab.get('internetSpeed')" label="Internet Speed"></app-form-validation-error>
+                    </div>
                 </div>
 
-                <!-- Availability Schedule Block (Reused logic) -->
+                <div style="margin-top: 1rem;">
+                    <label class="form-label">Software Available (Comma separated)</label>
+                    <textarea class="form-control" formControlName="softwareAvailable" rows="2" placeholder="e.g. Python, Adobe Suite"></textarea>
+                </div>
+
+                <!-- Availability Schedule Block -->
                 <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
                     <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
                     <div formArrayName="availabilitySchedule">
@@ -182,25 +261,21 @@
                                 <option>Saturday</option>
                                 <option>Sunday</option>
                             </select>
-                            <input type="time" class="form-control" formControlName="startTime"
-                                style="padding: 0.4rem;">
+                            <input type="time" class="form-control" formControlName="startTime" style="padding: 0.4rem;">
                             <input type="time" class="form-control" formControlName="endTime" style="padding: 0.4rem;">
                             <select class="form-control" formControlName="status" style="padding: 0.4rem;">
                                 <option>Available</option>
                                 <option>Booked</option>
                                 <option>Maintenance</option>
                             </select>
-                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..."
-                                style="padding: 0.4rem;">
-                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;"
-                                (click)="removeScheduleSlot(getSchedule(lab), $index)">
+                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..." style="padding: 0.4rem;">
+                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;" (click)="removeScheduleSlot(getSchedule(lab), $index)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                         }
                     </div>
-                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;"
-                        (click)="addScheduleSlot(getSchedule(lab))">
+                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;" (click)="addScheduleSlot(getSchedule(lab))">
                         + Add Time Slot
                     </button>
                 </div>
@@ -226,29 +301,43 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div>
-                        <label class="form-label">Facility ID *</label>
-                        <input type="text" class="form-control" formControlName="id">
+                        <label class="form-label">Facility ID (e.g. facility-301) *</label>
+                        <input type="text" class="form-control" formControlName="id" [class.is-invalid]="fac.get('id')?.invalid && fac.get('id')?.touched">
+                        <app-form-validation-error [control]="fac.get('id')" label="ID"></app-form-validation-error>
                     </div>
                     <div>
+                        <label class="form-label">Facility Name *</label>
+                        <input type="text" class="form-control" formControlName="name" [class.is-invalid]="fac.get('name')?.invalid && fac.get('name')?.touched">
+                        <app-form-validation-error [control]="fac.get('name')" label="Name"></app-form-validation-error>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div>
                         <label class="form-label">Type *</label>
-                        <select class="form-control" formControlName="type">
+                        <select class="form-control" formControlName="type" [class.is-invalid]="fac.get('type')?.invalid && fac.get('type')?.touched">
                             <option>Auditorium</option>
                             <option>Conference Hall</option>
                             <option>Sports Ground</option>
                             <option>Cafeteria</option>
                         </select>
+                        <app-form-validation-error [control]="fac.get('type')" label="Type"></app-form-validation-error>
                     </div>
                 </div>
+
                 <div style="margin-top: 1rem; display: flex; gap: 2rem;">
-                    <label class="checkbox-item"><input type="checkbox" formControlName="soundSystem"> Sound
-                        System</label>
-                    <label class="checkbox-item"><input type="checkbox" formControlName="lightingSystem">
-                        Lighting</label>
-                    <label class="checkbox-item"><input type="checkbox" formControlName="projectorScreen">
-                        Projector</label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" formControlName="soundSystem"> Sound System
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" formControlName="lightingSystem"> Lighting
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" formControlName="projectorScreen"> Projector
+                    </label>
                 </div>
 
-                <!-- Availability Schedule Block (Reused logic) -->
+                <!-- Availability Schedule Block -->
                 <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
                     <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
                     <div formArrayName="availabilitySchedule">
@@ -263,25 +352,21 @@
                                 <option>Saturday</option>
                                 <option>Sunday</option>
                             </select>
-                            <input type="time" class="form-control" formControlName="startTime"
-                                style="padding: 0.4rem;">
+                            <input type="time" class="form-control" formControlName="startTime" style="padding: 0.4rem;">
                             <input type="time" class="form-control" formControlName="endTime" style="padding: 0.4rem;">
                             <select class="form-control" formControlName="status" style="padding: 0.4rem;">
                                 <option>Available</option>
                                 <option>Booked</option>
                                 <option>Maintenance</option>
                             </select>
-                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..."
-                                style="padding: 0.4rem;">
-                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;"
-                                (click)="removeScheduleSlot(getSchedule(fac), $index)">
+                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..." style="padding: 0.4rem;">
+                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;" (click)="removeScheduleSlot(getSchedule(fac), $index)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                         }
                     </div>
-                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;"
-                        (click)="addScheduleSlot(getSchedule(fac))">
+                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;" (click)="addScheduleSlot(getSchedule(fac))">
                         + Add Time Slot
                     </button>
                 </div>
@@ -290,7 +375,14 @@
         </div>
 
         <div style="margin-top: 2rem; border-top: 1px solid #333; padding-top: 1rem;">
-            <button type="submit" class="btn-primary" [disabled]="infraForm.invalid">Save Details</button>
+            <button type="submit" class="btn-primary" [disabled]="infraForm.invalid || isLoading()"
+                style="display: flex; align-items: center; gap: 10px;">
+                @if (isLoading()) {
+                <i class="fas fa-spinner fa-spin"></i> {{ isEditMode() ? 'Updating' : 'Saving' }}...
+                } @else {
+                {{ isEditMode() ? 'Update' : 'Save' }} Details
+                }
+            </button>
         </div>
 
     </form>

@@ -39,8 +39,7 @@ import { PartnerService } from '../../services/partner.service';
         <div class="dashboard-grid">
           <div class="main-content">
             <!-- Discovery Tabs/Toggle could go here, currently vertical sections -->
-              <app-infrastructure-manager
-              [infrastructure]="infrastructure()">
+              <app-infrastructure-manager>
             </app-infrastructure-manager>
           </div>
             <app-nearby-teachers 
@@ -89,7 +88,7 @@ import { PartnerService } from '../../services/partner.service';
     </app-layout>
   `,
   styles: [`
-    .partner-dashboard-container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+    .partner-dashboard-container { padding: 1rem 0; margin: 0 auto; }
     @media (max-width: 768px) { .partner-dashboard-container { padding: 1rem; } }
     @media (max-width: 480px) { .partner-dashboard-container { padding: 0.75rem; } }
     

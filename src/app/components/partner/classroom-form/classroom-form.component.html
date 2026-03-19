@@ -1,0 +1,157 @@
+<div class="form-container">
+    <div class="form-header">
+      <h2 class="section-title" style="margin: 0;">{{ editData ? 'Edit Classroom' : 'Add New Classroom' }}</h2>
+      <button class="btn-outline" (click)="close.emit()" type="button"><i class="fas fa-times"></i> Close</button>
+    </div>
+  
+    <form [formGroup]="classroomForm" (ngSubmit)="onSubmit()">
+      
+      <div class="form-group grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label class="form-label">Classroom Name *</label>
+          <input type="text" class="form-control" formControlName="name" placeholder="e.g., Science Lab Room 103" [class.is-invalid]="classroomForm.get('name')?.invalid && classroomForm.get('name')?.touched">
+          <app-form-validation-error [control]="classroomForm.get('name')" label="Classroom Name"></app-form-validation-error>
+        </div>
+        <div>
+          <label class="form-label">Internal ID / Code *</label>
+          <input type="text" class="form-control" formControlName="id" placeholder="e.g., classroom-103" [class.is-invalid]="classroomForm.get('id')?.invalid && classroomForm.get('id')?.touched">
+          <app-form-validation-error [control]="classroomForm.get('id')" label="Internal ID"></app-form-validation-error>
+        </div>
+      </div>
+  
+      <div class="form-group grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label class="form-label">Primary Usage *</label>
+          <input type="text" class="form-control" formControlName="primaryUsage" placeholder="e.g., Biology and Chemistry Labs" [class.is-invalid]="classroomForm.get('primaryUsage')?.invalid && classroomForm.get('primaryUsage')?.touched">
+          <app-form-validation-error [control]="classroomForm.get('primaryUsage')" label="Primary Usage"></app-form-validation-error>
+        </div>
+        <div>
+          <label class="form-label">Classroom Type *</label>
+          <select class="form-control" formControlName="type">
+            <option value="Standard Classroom">Standard Classroom</option>
+            <option value="Lecture Hall">Lecture Hall</option>
+            <option value="Laboratory">Laboratory</option>
+            <option value="Workshop">Workshop</option>
+          </select>
+        </div>
+      </div>
+  
+      <h3 class="section-title" style="font-size: 1rem; margin-top: 1.5rem;">Dimensions & Capacity</h3>
+      <div class="nested-section" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem;">
+        <div>
+          <label class="form-label">Capacity *</label>
+          <input type="number" class="form-control" formControlName="capacity" placeholder="24" [class.is-invalid]="classroomForm.get('capacity')?.invalid && classroomForm.get('capacity')?.touched">
+          <app-form-validation-error [control]="classroomForm.get('capacity')" label="Capacity"></app-form-validation-error>
+        </div>
+        <div>
+          <label class="form-label">Length (m) *</label>
+          <input type="number" class="form-control" step="0.1" formControlName="length" placeholder="9.0" [class.is-invalid]="classroomForm.get('length')?.invalid && classroomForm.get('length')?.touched">
+          <app-form-validation-error [control]="classroomForm.get('length')" label="Length"></app-form-validation-error>
+        </div>
+        <div>
+          <label class="form-label">Width (m) *</label>
+          <input type="number" class="form-control" step="0.1" formControlName="width" placeholder="7.0" [class.is-invalid]="classroomForm.get('width')?.invalid && classroomForm.get('width')?.touched">
+          <app-form-validation-error [control]="classroomForm.get('width')" label="Width"></app-form-validation-error>
+        </div>
+        <div>
+          <label class="form-label">Area (sq m) *</label>
+          <input type="number" class="form-control" step="0.1" formControlName="area" placeholder="63.0" [class.is-invalid]="classroomForm.get('area')?.invalid && classroomForm.get('area')?.touched">
+          <app-form-validation-error [control]="classroomForm.get('area')" label="Area"></app-form-validation-error>
+        </div>
+      </div>
+  
+      <h3 class="section-title" style="font-size: 1rem; margin-top: 1.5rem;">Facilities & Equipment (Comma separated)</h3>
+      <div class="nested-section">
+        <div class="form-group grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label class="form-label">Technology</label>
+            <input type="text" class="form-control" formControlName="technology" placeholder="Smart Board, Microscope Cameras">
+          </div>
+          <div>
+            <label class="form-label">Furniture</label>
+            <input type="text" class="form-control" formControlName="furniture" placeholder="Lab Tables, Stools">
+          </div>
+        </div>
+        <div class="form-group grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label class="form-label">Lighting</label>
+            <input type="text" class="form-control" formControlName="lighting" placeholder="Bright LED, UV Lights">
+          </div>
+          <div>
+            <label class="form-label">Ventilation</label>
+            <input type="text" class="form-control" formControlName="ventilation" placeholder="Fume Hood, Exhaust Fans">
+          </div>
+        </div>
+        <div class="form-group grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label class="form-label">Accessibility</label>
+              <input type="text" class="form-control" formControlName="accessibility" placeholder="Wheelchair Accessible Stations">
+            </div>
+            <div>
+              <label class="form-label">Specialized Equipment</label>
+              <input type="text" class="form-control" formControlName="specializedEquipment" placeholder="Bunsen Burners">
+            </div>
+        </div>
+      </div>
+  
+      <h3 class="section-title" style="font-size: 1rem; margin-top: 1.5rem; display: flex; justify-content: space-between;">
+        Availability Schedule
+        <button type="button" class="btn-outline" (click)="addScheduleSlot()">+ Add Time Slot</button>
+      </h3>
+      <div class="nested-section" formArrayName="availabilitySchedule">
+        <div class="schedule-grid" style="margin-bottom: 0.5rem;" *ngIf="availabilitySchedule.length > 0">
+          <div class="grid-header">Day</div>
+          <div class="grid-header">Start</div>
+          <div class="grid-header">End</div>
+          <div class="grid-header">Status</div>
+          <div class="grid-header">Notes</div>
+          <div></div>
+        </div>
+        
+        <div *ngFor="let slot of availabilitySchedule.controls; let i=index" [formGroupName]="i" class="schedule-grid">
+          <div>
+            <select class="form-control" formControlName="day" [class.is-invalid]="slot.get('day')?.invalid && slot.get('day')?.touched">
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
+            <app-form-validation-error [control]="slot.get('day')" label="Day"></app-form-validation-error>
+          </div>
+          <div>
+            <input type="time" class="form-control" formControlName="startTime" [class.is-invalid]="slot.get('startTime')?.invalid && slot.get('startTime')?.touched">
+            <app-form-validation-error [control]="slot.get('startTime')" label="Start Time"></app-form-validation-error>
+          </div>
+          <div>
+            <input type="time" class="form-control" formControlName="endTime" [class.is-invalid]="slot.get('endTime')?.invalid && slot.get('endTime')?.touched">
+            <app-form-validation-error [control]="slot.get('endTime')" label="End Time"></app-form-validation-error>
+          </div>
+          <div>
+            <select class="form-control" formControlName="status" [class.is-invalid]="slot.get('status')?.invalid && slot.get('status')?.touched">
+              <option value="Available">Available</option>
+              <option value="Booked">Booked</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="Closed">Closed</option>
+            </select>
+            <app-form-validation-error [control]="slot.get('status')" label="Status"></app-form-validation-error>
+          </div>
+          <div>
+            <input type="text" class="form-control" formControlName="notes" placeholder="Notes (optional)">
+          </div>
+          <div>
+            <button type="button" class="btn-danger" (click)="removeScheduleSlot(i)" title="Remove Slot"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+      </div>
+  
+      <div style="margin-top: 2rem; border-top: 1px solid #333; padding-top: 1rem; text-align: right;">
+        <button type="submit" class="btn-primary" [disabled]="isLoading() || classroomForm.invalid">
+          <i class="fas fa-spinner fa-spin" *ngIf="isLoading()"></i>
+          <span *ngIf="!isLoading()">{{ editData ? 'Save Changes' : 'Add Classroom' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>

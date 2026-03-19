@@ -8,7 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService, UserRole } from '../../services/auth.service';
 import {
     SearchService, SearchResult, SearchCategory,
-    FilterCategory, SearchStatus, DateRange, WorkshopMode, SearchScope, SearchFilters
+    FilterCategory, SearchStatus, DateRange, SearchScope, SearchFilters
 } from '../../services/search.service';
 
 // ── Static option tables (UI-only constants) ────────────────────────────────────
@@ -40,11 +40,6 @@ export const DATE_OPTIONS: { label: string; value: DateRange }[] = [
     { label: 'This Month', value: 'this-month' },
 ];
 
-export const MODE_OPTIONS: { label: string; value: WorkshopMode }[] = [
-    { label: 'All', value: 'all' },
-    { label: 'Online', value: 'online' },
-    { label: 'Hybrid', value: 'hybrid' },
-];
 
 // ── Role-based quick-filter shortcuts ──────────────────────────────────────────
 const ROLE_QUICK_FILTERS: Partial<Record<UserRole, { label: string; value: FilterCategory; icon: string }[]>> = {
@@ -99,7 +94,7 @@ export class GlobalSearchComponent {
     readonly categoryOptions = CATEGORY_OPTIONS;
     readonly statusOptions = STATUS_OPTIONS;
     readonly dateOptions = DATE_OPTIONS;
-    readonly modeOptions = MODE_OPTIONS;
+    // modeOptions removed
 
     // ── Core search state ──────────────────────────────────────────────────────
     localPlaceholder = input<string>('Search locally...');
@@ -113,7 +108,6 @@ export class GlobalSearchComponent {
     activeCategory = computed(() => this.searchService.globalFilters().category);
     activeStatuses = computed(() => this.searchService.globalFilters().status);
     activeDateRange = computed(() => this.searchService.globalFilters().dateRange);
-    activeMode = computed(() => this.searchService.globalFilters().mode);
     searchScope = computed(() => this.searchService.globalFilters().scope);
 
     placeholderText = computed(() => {
@@ -157,13 +151,12 @@ export class GlobalSearchComponent {
         if (this.activeCategory() !== 'all') n++;
         n += this.activeStatuses().length;
         if (this.activeDateRange()) n++;
-        if (this.activeMode() && this.activeMode() !== 'all') n++;
         return n;
     });
 
     // ── Chips shown inside the search bar ─────────────────────────────────────
-    activeFilterChips = computed((): { label: string; type: 'category' | 'status' | 'date' | 'mode' }[] => {
-        const chips: { label: string; type: 'category' | 'status' | 'date' | 'mode' }[] = [];
+    activeFilterChips = computed((): { label: string; type: 'category' | 'status' | 'date' }[] => {
+        const chips: { label: string; type: 'category' | 'status' | 'date' }[] = [];
         if (this.activeCategory() !== 'all') {
             const opt = CATEGORY_OPTIONS.find(c => c.value === this.activeCategory());
             chips.push({ label: opt?.label ?? this.activeCategory(), type: 'category' });
@@ -176,10 +169,6 @@ export class GlobalSearchComponent {
             const opt = DATE_OPTIONS.find(d => d.value === this.activeDateRange());
             chips.push({ label: opt?.label ?? this.activeDateRange(), type: 'date' });
         }
-        if (this.activeMode() && this.activeMode() !== 'all') {
-            const opt = MODE_OPTIONS.find(m => m.value === this.activeMode());
-            chips.push({ label: opt?.label ?? this.activeMode(), type: 'mode' });
-        }
         return chips;
     });
 
@@ -187,12 +176,11 @@ export class GlobalSearchComponent {
         // ── Restore persisted filters ──────────────────────────────────────────
         const saved = this.searchService.loadSavedFilters();
         // Ensure all properties are explicitly set to default if undefined, to satisfy SearchFilters type
-        if (saved.category || saved.status || saved.dateRange || saved.mode || saved.scope) {
+        if (saved.category || saved.status || saved.dateRange || saved.scope) {
             this.searchService.globalFilters.set({
                 category: saved.category || 'all',
                 status: saved.status || [],
                 dateRange: saved.dateRange || '',
-                mode: saved.mode || 'all',
                 scope: saved.scope || 'global'
             });
         }
@@ -311,10 +299,6 @@ export class GlobalSearchComponent {
         this.persistFilters();
     }
 
-    setMode(mode: WorkshopMode) {
-        this.searchService.globalFilters.update(f => ({ ...f, mode }));
-        this.persistFilters();
-    }
 
     clearAllFilters() {
         this.searchService.globalFilters.update(f => ({
@@ -322,13 +306,12 @@ export class GlobalSearchComponent {
             category: 'all',
             status: [],
             dateRange: '',
-            mode: 'all',
             scope: 'global'
         }));
         this.persistFilters();
     }
 
-    removeChip(chip: { label: string; type: 'category' | 'status' | 'date' | 'mode' }) {
+    removeChip(chip: { label: string; type: 'category' | 'status' | 'date' }) {
         if (chip.type === 'category') {
             this.searchService.globalFilters.update(f => ({ ...f, category: 'all' }));
         } else if (chip.type === 'status') {
@@ -336,8 +319,6 @@ export class GlobalSearchComponent {
             if (val) this.searchService.globalFilters.update(f => ({ ...f, status: f.status.filter(s => s !== val) }));
         } else if (chip.type === 'date') {
             this.searchService.globalFilters.update(f => ({ ...f, dateRange: '' }));
-        } else if (chip.type === 'mode') {
-            this.searchService.globalFilters.update(f => ({ ...f, mode: 'all' }));
         }
         this.persistFilters();
     }

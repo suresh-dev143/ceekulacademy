@@ -24,7 +24,6 @@ export interface SearchFilters {
     category: FilterCategory;
     status: SearchStatus[];
     dateRange: DateRange;
-    mode: WorkshopMode;
     scope: SearchScope;
 }
 
@@ -36,7 +35,6 @@ export interface SearchResult {
     icon: string;
     route: string;
     status?: SearchStatus;
-    mode?: WorkshopMode;
 }
 
 // ── Static page index ──────────────────────────────────────────────────────────
@@ -86,7 +84,6 @@ export class SearchService {
         category: 'all',
         status: [],
         dateRange: '',
-        mode: 'all',
         scope: 'global'
     });
 
@@ -254,10 +251,6 @@ export class SearchService {
             out = out.filter(r => r.status && filters.status.includes(r.status));
         }
 
-        // Mode filter (Workshop specific)
-        if (filters.mode && filters.mode !== 'all') {
-            out = out.filter(r => r.mode === filters.mode);
-        }
 
         return out;
     }

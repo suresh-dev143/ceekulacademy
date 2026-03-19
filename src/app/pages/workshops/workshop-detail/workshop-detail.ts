@@ -12,6 +12,7 @@ import {
     UpdateWorkshopRequest,
     UpdatedWorkshopResponse,
     CancelWorkshopResponse,
+    Enrollee,
 } from '../../../services/workshop.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { RazorpayService } from '../../../services/razorpay.service';
@@ -156,7 +157,23 @@ export class WorkshopDetailComponent {
     isOwner = computed(() => {
         const userId = this.currentUserId();
         const workshop = this.currentWorkshop();
-        return !!userId && workshop.createdBy === userId;
+        if (!userId || !workshop) return false;
+
+        // Robust comparison: handle string IDs and potential populated objects
+        const createdById = (typeof workshop.createdBy === 'object' && workshop.createdBy !== null)
+            ? (workshop.createdBy as any)._id || (workshop.createdBy as any).id
+            : workshop.createdBy;
+
+        const res = String(createdById) === String(userId);
+        
+        console.log('WorkshopDetail: isOwner check (robust)', {
+            currentUserId: userId,
+            workshopCreatedBy: workshop.createdBy,
+            derivedCreatedById: createdById,
+            isMatch: res,
+            workshopTitle: workshop.workshopTitle
+        });
+        return res;
     });
 
     close = output<void>();
@@ -180,7 +197,19 @@ export class WorkshopDetailComponent {
     isSavingInfo = signal(false);
     isCancelling = signal(false);
     isRefreshing = signal(false);
+    isEnrolledAsInstructor = signal(false);
     editInfoForm!: FormGroup;
+
+    // ── Enrollees state (Experts only) ──────────────────────────────────────────
+    enrollees = signal<Enrollee[]>([]);
+    isLoadingEnrollees = signal(false);
+
+    enrolledInstructorsList = computed(() => 
+        this.enrollees().filter(e => e.role?.toLowerCase() === 'instructor')
+    );
+    enrolledStudentsList = computed(() => 
+        this.enrollees().filter(e => e.role?.toLowerCase() === 'student' || e.role?.toLowerCase() === 'learner')
+    );
 
     toggleOffline(): void {
         this.ws.toggleLocalCache(this.currentWorkshop());
@@ -232,20 +261,33 @@ export class WorkshopDetailComponent {
         return !!this.currentUserId() && !this.isOwner();
     }
 
-    canDeleteSession(session: WorkshopApiSession): boolean {
+    /**
+     * Users who can manage sessions (add/delete):
+     * 1. Workshop Owner (Expert)
+     * 2. Users enrolled as 'Instructor' (Session Manager)
+     * 3. Admins/Directors (Audit/Management)
+     */
+    get canManageSessions(): boolean {
+        const userId = this.currentUserId();
         const role = this.userRole();
-        const userId = this.ws.getCurrentUserId(); // I need to check if this exists or use AuthService
+        const workshop = this.currentWorkshop();
 
-        // Role-based controls:
-        // 1. Teacher/Expert/Student can delete any session in their workshop
-        if (['Student', 'Teacher', 'Expert', 'Admin', 'Director'].includes(role)) return true;
+        if (!userId) return false;
 
-        // 2. Instructor can only delete if they created the workshop (assumption based on prompt)
-        if (role === 'Instructor') {
-            return this.currentWorkshop().createdBy === userId;
-        }
+        // 1. Owner
+        if (this.isOwner()) return true;
+
+        // 2. Admin/Director
+        if (['Admin', 'Director'].includes(role)) return true;
+
+        // 3. Enrolled as Instructor for this workshop
+        if (role === 'Instructor' || this.isEnrolledAsInstructor()) return true;
 
         return false;
+    }
+
+    canDeleteSession(session: WorkshopApiSession): boolean {
+        return this.canManageSessions;
     }
 
     // ── Workshop display helpers ──────────────────────────────────────────────
@@ -258,13 +300,6 @@ export class WorkshopDetailComponent {
         return m[this.currentWorkshop().status] ?? this.currentWorkshop().status;
     }
 
-    get modeLabel(): string {
-        return this.currentWorkshop().workshopMode === 'hybrid' ? 'Hybrid' : 'Online';
-    }
-
-    get modeIcon(): string {
-        return this.currentWorkshop().workshopMode === 'hybrid' ? 'fa-map-marker-alt' : 'fa-wifi';
-    }
 
     get instructorLabel(): string {
         return this.currentWorkshop().instructorType === 'myself' ? 'Solo instructor' : 'Open to instructors';
@@ -369,6 +404,14 @@ export class WorkshopDetailComponent {
         effect(() => {
             this.workshop(); // track
             this.internalWorkshop.set(null);
+            this.isEnrolledAsInstructor.set(false);
+            
+            // Auto-fetch enrollees if owner
+            if (this.isOwner()) {
+                this.fetchEnrollees();
+            } else {
+                this.enrollees.set([]);
+            }
         }, { allowSignalWrites: true });
 
         this.buildForm();
@@ -385,6 +428,7 @@ export class WorkshopDetailComponent {
             startTime: ['', Validators.required],
             endTime: ['', Validators.required],
             activity: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
+            description: ['', [Validators.maxLength(1000)]],
             fee: [0, [Validators.required, Validators.min(0)]],
             mode: ['online', Validators.required],
             location: [''],
@@ -407,7 +451,6 @@ export class WorkshopDetailComponent {
             workshopTitle: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
             workshopDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
             expertDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
-            workshopMode: ['online', Validators.required],
             timezone: ['IST', Validators.required],
             instructorType: ['myself', Validators.required],
             status: ['draft', Validators.required],
@@ -445,7 +488,6 @@ export class WorkshopDetailComponent {
             workshopTitle: w.workshopTitle,
             workshopDescription: w.workshopDescription,
             expertDescription: w.expertDescription,
-            workshopMode: w.workshopMode,
             timezone: w.timezone,
             instructorType: w.instructorType,
             status: w.status,
@@ -466,7 +508,6 @@ export class WorkshopDetailComponent {
             workshopTitle: val.workshopTitle.trim(),
             workshopDescription: val.workshopDescription.trim(),
             expertDescription: val.expertDescription.trim(),
-            workshopMode: val.workshopMode,
             timezone: val.timezone,
             instructorType: val.instructorType,
             status: val.status,
@@ -529,10 +570,30 @@ export class WorkshopDetailComponent {
             next: (res) => {
                 this.internalWorkshop.set(res.data);
                 this.isRefreshing.set(false);
+                // If owner, refresh enrollees too
+                if (this.isOwner()) this.fetchEnrollees();
             },
             error: (err) => {
                 this.isRefreshing.set(false);
                 console.error('Failed to refresh workshop data:', err);
+            }
+        });
+    }
+
+    fetchEnrollees(): void {
+        const id = this.workshop()._id;
+        if (!id || this.isLoadingEnrollees()) return;
+
+        this.isLoadingEnrollees.set(true);
+        this.ws.getWorkshopEnrollees(id).subscribe({
+            next: (res) => {
+                this.enrollees.set(res.data);
+                this.isLoadingEnrollees.set(false);
+            },
+            error: (err) => {
+                this.isLoadingEnrollees.set(false);
+                console.error('Failed to fetch enrollees:', err);
+                // Do not toast error here to avoid noise if it's a minor check
             }
         });
     }
@@ -575,6 +636,7 @@ export class WorkshopDetailComponent {
             startTime: v.startTime,
             endTime: v.endTime,
             activity: v.activity.trim(),
+            description: v.description?.trim() || '',
             fee: Number(v.fee),
             mode: v.mode,
             location: v.mode === 'hybrid' ? (v.location || null) : null,
@@ -630,8 +692,25 @@ export class WorkshopDetailComponent {
 
     // ── Enrollment ────────────────────────────────────────────────────────────
 
-    onEnrolled(_formValue: any): void {
-        this.showEnrollForm.set(false);
-        this.toast.success('Enrollment submitted successfully!');
+    onEnrolled(formValue: any): void {
+        const enrollmentType = formValue.enrollmentType;
+        const workshopId = this.currentWorkshop()._id;
+        const role = enrollmentType === 'support' ? 'Instructor' : 'Student';
+
+        this.ws.enrollInWorkshop(workshopId, role).subscribe({
+            next: (res) => {
+                this.toast.success(res.message);
+                if (role === 'Instructor') {
+                    this.isEnrolledAsInstructor.set(true);
+                }
+                this.showEnrollForm.set(false);
+                this.refreshWorkshopData();
+                this.sessionAdded.emit();
+            },
+            error: (err: any) => {
+                const msg = err.error?.message || `Failed to enroll as ${role.toLowerCase()}`;
+                this.toast.error(msg);
+            }
+        });
     }
 }

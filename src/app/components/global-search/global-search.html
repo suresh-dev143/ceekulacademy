@@ -98,18 +98,6 @@
             </div>
         </div>
 
-        <!-- Mode row (Workshop specifics) -->
-        <div class="gs-fp-row">
-            <span class="gs-fp-lbl">Mode</span>
-            <div class="gs-fp-pills">
-                @for (m of modeOptions; track m.value) {
-                <button class="gs-fp-pill" [class.gs-fp-pill--active]="activeMode() === m.value"
-                    (click)="setMode(m.value)">
-                    {{ m.label }}
-                </button>
-                }
-            </div>
-        </div>
 
         <!-- Role-based quick filters -->
         @if (roleFilterOptions().length > 0) {
@@ -274,18 +262,6 @@
                 <button class="gs-fp-pill gs-fp-pill--status"
                     [class.gs-fp-pill--active]="activeStatuses().includes(s.value)" (click)="toggleStatus(s.value)">
                     {{ s.label }}
-                </button>
-                }
-            </div>
-        </div>
-        <!-- Mode -->
-        <div class="gs-fp-row">
-            <span class="gs-fp-lbl">Mode</span>
-            <div class="gs-fp-pills">
-                @for (m of modeOptions; track m.value) {
-                <button class="gs-fp-pill" [class.gs-fp-pill--active]="activeMode() === m.value"
-                    (click)="setMode(m.value)">
-                    {{ m.label }}
                 </button>
                 }
             </div>

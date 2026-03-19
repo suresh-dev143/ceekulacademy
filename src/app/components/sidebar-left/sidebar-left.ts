@@ -109,6 +109,7 @@ export class SidebarLeftComponent implements OnInit {
                         hidden: !this.hasWorkshops() && role !== 'Student',
                         children: [
                             { label: 'Manage Workshops', route: '/dashboard/my-workshops' },
+                            { label: 'Enrolled Workshops', route: '/dashboard/enrolled-workshops' },
                             { label: 'Create New', route: '/dashboard/my-workshops' }
                         ]
                     },
@@ -117,6 +118,11 @@ export class SidebarLeftComponent implements OnInit {
                         icon: 'fa-flask',
                         route: '#',
                         hidden: !this.hasResearch()
+                    },
+                    {
+                        label: 'Infrastructure',
+                        icon: 'fa-flask',
+                        route: '/dashboard/partner',
                     },
                     {
                         label: 'My Course',

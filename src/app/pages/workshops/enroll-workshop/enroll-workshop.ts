@@ -42,41 +42,15 @@ export class EnrollWorkshop implements OnInit {
             attendanceMode: ['online'], // online or physical (for hybrid)
             qualityTier: ['free', Validators.required],
             mobilizerId: [''],
-            schedule: this.fb.array([]),
-            studentSchedule: this.fb.array([]),
             acceptTerms: [false, Validators.requiredTrue]
         });
 
-        // Seed initial student session since default type is 'learning'
-        this.addStudentScheduleRow();
-
-        this.enrollWorkshopForm.get('enrollmentType')?.valueChanges.subscribe(type => {
-            if (type === 'support') {
-                this.studentSchedule.clear();
-                if (this.schedule.length === 0) {
-                    this.addScheduleRow();
-                }
-            } else {
-                this.schedule.clear();
-                if (this.studentSchedule.length === 0) {
-                    this.addStudentScheduleRow();
-                }
-            }
-        });
-
-        // Watch mode selection to handle attendance mode
-        this.enrollWorkshopForm.get('modeSelection')?.valueChanges.subscribe(mode => {
-            if (mode === 'online') {
-                this.enrollWorkshopForm.get('attendanceMode')?.setValue('online');
-            }
-        });
     }
 
     // --- Fee Calculation ---
 
     get totalFees(): number {
         let total = 0;
-        const type = this.enrollWorkshopForm.get('enrollmentType')?.value;
         const mode = this.enrollWorkshopForm.get('modeSelection')?.value;
         const attendance = this.enrollWorkshopForm.get('attendanceMode')?.value;
         const tierId = this.enrollWorkshopForm.get('qualityTier')?.value;
@@ -90,15 +64,8 @@ export class EnrollWorkshop implements OnInit {
             total += 500; // Mock venue fee
         }
 
-        // session fees
-        if (type === 'support') {
-            this.schedule.controls.forEach(ctrl => {
-                total += ctrl.get('fee')?.value || 0;
-            });
-        } else {
-            // Student fee might be based on workshop base fee
-            total += this.workshop().sessions[0]?.fee || 0;
-        }
+        // workshop base fee (for simplicity, always add the first session's fee if any)
+        total += this.workshop().sessions[0]?.fee || 0;
 
         return total;
     }
@@ -119,77 +86,6 @@ export class EnrollWorkshop implements OnInit {
 
     // --- Instructor schedule ---
 
-    get schedule(): FormArray {
-        return this.enrollWorkshopForm.get('schedule') as FormArray;
-    }
-
-    addScheduleRow() {
-        const row = this.fb.group({
-            date: ['', Validators.required],
-            startTime: ['', Validators.required],
-            endTime: ['', Validators.required],
-            activity: ['', Validators.required],
-            fee: [0, [Validators.required, Validators.min(0)]],
-            mode: ['online', Validators.required],
-            location: ['']
-        });
-
-        row.get('mode')?.valueChanges.subscribe(mode => {
-            const locControl = row.get('location');
-            if (mode === 'hybrid') {
-                locControl?.setValidators(Validators.required);
-            } else {
-                locControl?.clearValidators();
-                locControl?.setValue('');
-            }
-            locControl?.updateValueAndValidity();
-        });
-
-        this.schedule.push(row);
-    }
-
-    removeScheduleRow(index: number) {
-        if (this.schedule.length > 1) {
-            this.schedule.removeAt(index);
-        }
-    }
-
-    // --- Student schedule ---
-
-    get studentSchedule(): FormArray {
-        return this.enrollWorkshopForm.get('studentSchedule') as FormArray;
-    }
-
-    addStudentScheduleRow() {
-        const row = this.fb.group({
-            date: ['', Validators.required],
-            startTime: ['', Validators.required],
-            endTime: ['', Validators.required],
-            activity: ['', Validators.required],
-            mode: ['online', Validators.required],
-            location: [''],
-            instructor: ['', Validators.required]
-        });
-
-        row.get('mode')?.valueChanges.subscribe(mode => {
-            const locControl = row.get('location');
-            if (mode === 'hybrid') {
-                locControl?.setValidators(Validators.required);
-            } else {
-                locControl?.clearValidators();
-                locControl?.setValue('');
-            }
-            locControl?.updateValueAndValidity();
-        });
-
-        this.studentSchedule.push(row);
-    }
-
-    removeStudentScheduleRow(index: number) {
-        if (this.studentSchedule.length > 1) {
-            this.studentSchedule.removeAt(index);
-        }
-    }
 
     isSubmitting = signal(false);
 

@@ -27,6 +27,7 @@ export interface WorkshopSession {
     startTime: string;       // HH:mm
     endTime: string;       // HH:mm
     activity: string;
+    description?: string;
     fee: number;
     mode: 'online' | 'hybrid';
     location: string | null;
@@ -37,7 +38,6 @@ export interface CreateWorkshopRequest {
     workshopTitle: string;
     workshopDescription: string;
     expertDescription: string;
-    workshopMode: 'online' | 'hybrid';
     timezone: string;
     instructorType: 'myself' | 'open';
     sessions: WorkshopSession[];
@@ -47,7 +47,6 @@ export interface UpdateWorkshopRequest {
     workshopTitle: string;
     workshopDescription: string;
     expertDescription: string;
-    workshopMode: 'online' | 'hybrid';
     timezone: string;
     instructorType: 'myself' | 'open';
     status?: WorkshopStatus;
@@ -64,7 +63,6 @@ export interface CreatedWorkshopData {
     workshopTitle: string;
     workshopDescription: string;
     expertDescription: string;
-    workshopMode: string;
     timezone: string;
     instructorType: string;
     createdBy: string;
@@ -102,6 +100,7 @@ export interface WorkshopApiSession {
     startTime: string;   // HH:mm
     endTime: string;   // HH:mm
     activity: string;
+    description?: string;
     fee: number;
     mode: 'online' | 'hybrid';
     location: string | null;
@@ -113,7 +112,6 @@ export interface WorkshopListItem {
     workshopTitle: string;
     workshopDescription: string;
     expertDescription: string;
-    workshopMode: 'online' | 'hybrid';
     timezone: string;
     instructorType: 'myself' | 'open';
     createdBy: string;
@@ -153,6 +151,7 @@ export interface AddSessionPayload {
     startTime: string;        // HH:mm
     endTime: string;        // HH:mm
     activity: string;
+    description: string;
     fee: number;
     mode: 'online' | 'hybrid';
     location: string | null;
@@ -211,6 +210,89 @@ export interface EnrolVerifyRequest {
     sessionId?: string;
 }
 
+export interface EnrollWorkshopResponse {
+    status: boolean;
+    message: string;
+    data: {
+        workshopId: string;
+        userId: string;
+        role: 'Instructor';
+        status: string;
+        _id: string;
+        enrolledAt: string;
+        createdAt: string;
+        updatedAt: string;
+    };
+}
+
+// ── GET ENROLLEES (Experts only) ─────────────────────────────────────────────
+
+export interface Enrollee {
+    _id: string;
+    userId: {
+        _id: string;
+        name: string;
+        email: string;
+        profileImage: string;
+    };
+    role: string;
+    status: string;
+    enrolledAt: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface GetWorkshopEnrolleesResponse {
+    status: boolean;
+    message: string;
+    count: number;
+    data: Enrollee[];
+}
+
+// ── GET ENROLLED types ───────────────────────────────────────────────────────
+
+export interface EnrolledWorkshopSession {
+    date: string;
+    startTime: string;
+    endTime: string;
+    activity: string;
+    description?: string;
+    fee: number;
+    mode: string;
+    location: string | null;
+    _id: string;
+}
+
+export interface EnrolledWorkshop {
+    _id: string;
+    workshopTitle: string;
+    workshopDescription: string;
+    expertDescription: string;
+    timezone: string;
+    instructorType: string;
+    createdBy: string;
+    status: string;
+    sessions: EnrolledWorkshopSession[];
+    totalRevenuePotential: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface EnrollmentRecord {
+    enrollmentId: string;
+    role: string;
+    status: string;
+    enrolledAt: string;
+    workshop: EnrolledWorkshop;
+}
+
+export interface GetEnrolledWorkshopsResponse {
+    status: boolean;
+    message: string;
+    count: number;
+    data: EnrollmentRecord[];
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
@@ -249,7 +331,6 @@ export class WorkshopService {
             } else {
                 const item: WorkshopListItem = {
                     ...w,
-                    workshopMode: w.workshopMode as 'online' | 'hybrid',
                     instructorType: w.instructorType as 'myself' | 'open',
                     status: w.status as WorkshopStatus,
                     sessions: w.sessions.map(s => ({
@@ -308,6 +389,7 @@ export class WorkshopService {
                     sessions: res.data.sessions.map(s => ({
                         ...s,
                         activity: decodeHtml(s.activity),
+                        description: s.description ? decodeHtml(s.description) : s.description,
                         resources: s.resources ? decodeHtml(s.resources) : s.resources,
                     })),
                 }
@@ -348,6 +430,7 @@ export class WorkshopService {
                     sessions: res.data.sessions.map(s => ({
                         ...s,
                         activity: decodeHtml(s.activity),
+                        description: s.description ? decodeHtml(s.description) : s.description,
                         resources: s.resources ? decodeHtml(s.resources) : s.resources,
                     })),
                 }
@@ -480,6 +563,47 @@ export class WorkshopService {
         return this.http.post<{ status: boolean; message: string }>(
             `${this.base}/api/v1/enrol/verify`,
             payload
+        );
+    }
+
+    enrollInWorkshop(workshopId: string, role: 'Instructor' | 'Student'): Observable<EnrollWorkshopResponse> {
+        return this.http.post<EnrollWorkshopResponse>(
+            `${this.base}/api/v1/workshops/${workshopId}/enroll`,
+            { role }
+        );
+    }
+
+    // ── Get Workshop Enrollees (Experts only) ─────────────────────────────────
+
+    getWorkshopEnrollees(workshopId: string): Observable<GetWorkshopEnrolleesResponse> {
+        return this.http.get<GetWorkshopEnrolleesResponse>(
+            `${this.base}/api/v1/workshops/${workshopId}/enrollees`
+        );
+    }
+
+    // ── Get my enrolled workshops ─────────────────────────────────────────────
+
+    getMyEnrolledWorkshops(): Observable<GetEnrolledWorkshopsResponse> {
+        return this.http.get<GetEnrolledWorkshopsResponse>(
+            `${this.base}/api/v1/workshops/enrolled/my`
+        ).pipe(
+            map(res => ({
+                ...res,
+                data: res.data.map(enrollment => ({
+                    ...enrollment,
+                    workshop: {
+                        ...enrollment.workshop,
+                        workshopTitle: decodeHtml(enrollment.workshop.workshopTitle),
+                        workshopDescription: decodeHtml(enrollment.workshop.workshopDescription),
+                        expertDescription: decodeHtml(enrollment.workshop.expertDescription),
+                        sessions: enrollment.workshop.sessions.map(s => ({
+                            ...s,
+                            activity: decodeHtml(s.activity),
+                            description: s.description ? decodeHtml(s.description) : s.description
+                        }))
+                    }
+                }))
+            }))
         );
     }
 

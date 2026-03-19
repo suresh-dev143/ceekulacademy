@@ -1,5 +1,5 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, computed, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { WorkshopService, WorkshopListItem, CreatedWorkshopData } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
@@ -17,9 +17,11 @@ import { WorkshopDetailComponent } from '../workshop-detail/workshop-detail';
 })
 export class MyWorkshopsComponent implements OnInit {
     private ws = inject(WorkshopService);
-    private auth = inject(AuthService);
+    public auth = inject(AuthService);
     private toast = inject(ToastService);
     public router = inject(Router);
+    private platformId = inject(PLATFORM_ID);
+    private isBrowser = isPlatformBrowser(this.platformId);
 
     workshops = signal<WorkshopListItem[]>([]);
     isLoading = signal<boolean>(true);
@@ -30,9 +32,13 @@ export class MyWorkshopsComponent implements OnInit {
     showEdit = signal<boolean>(false);
 
     ngOnInit() {
+        if (!this.isBrowser) return;
+
         // Only load in the browser to ensure localStorage (token) is accessible
         if (this.auth.isLoggedIn()) {
             this.loadMyWorkshops();
+        } else {
+            this.isLoading.set(false);
         }
     }
 

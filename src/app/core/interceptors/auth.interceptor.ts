@@ -15,8 +15,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         req = req.clone({
             setHeaders: { Authorization: `Bearer ${token}` }
         });
-    } else if (isBrowser) {
-        console.warn(`[AuthInterceptor] No token found for request: ${req.url}`);
     }
 
     return next(req);

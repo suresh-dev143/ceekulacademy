@@ -1,5 +1,5 @@
-import { Component, signal, computed, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs/operators';
@@ -34,7 +34,6 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'Quantum Machine Learning',
         workshopDescription: 'Explore the intersection of quantum computing and machine learning. Learn how quantum bits (qubits) can revolutionize pattern recognition and optimization algorithms.',
         expertDescription: 'Lead by Dr. Julian Voss, Senior Researcher in Quantum AI.',
-        workshopMode: 'hybrid',
         timezone: 'GMT+5:30',
         instructorType: 'myself',
         createdBy: 'system',
@@ -51,7 +50,6 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'Agentic Quantum Engineering',
         workshopDescription: 'Building autonomous quantum agents that can self-correct and optimize quantum gates in real-time. A deep dive into agentic workflows for quantum hardware.',
         expertDescription: 'Advanced workshop for Quantum Engineers.',
-        workshopMode: 'online',
         timezone: 'UTC',
         instructorType: 'myself',
         createdBy: 'system',
@@ -68,7 +66,6 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'AI for Everyone',
         workshopDescription: 'A comprehensive introduction to Artificial Intelligence for non-technical professionals. Understand LLMs, diffusion models, and how to leverage AI in your daily workflow.',
         expertDescription: 'Suitable for all backgrounds. No coding required.',
-        workshopMode: 'online',
         timezone: 'UTC',
         instructorType: 'open',
         createdBy: 'system',
@@ -85,7 +82,6 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'AI for Healthcare',
         workshopDescription: 'Implementing AI solutions in clinical environments. Focus on diagnostic imaging, predictive patient analytics, and ethical AI in medicine.',
         expertDescription: 'Jointly certified by HealthTech Institute.',
-        workshopMode: 'hybrid',
         timezone: 'GMT+5:30',
         instructorType: 'myself',
         createdBy: 'system',
@@ -102,7 +98,6 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'AI for Film Education',
         workshopDescription: 'Revolutionizing cinema through AI-driven scriptwriting, storyboarding, and virtual production. Learn how to use Generative Video for independent filmmaking.',
         expertDescription: 'Explore the future of storytelling.',
-        workshopMode: 'online',
         timezone: 'PST',
         instructorType: 'myself',
         createdBy: 'system',
@@ -119,7 +114,6 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'AI for Space Automation',
         workshopDescription: 'Autonomous navigation and resource management for deep-space missions. Focus on edge-AI deployment on satellite constellations.',
         expertDescription: 'Advanced research session.',
-        workshopMode: 'hybrid',
         timezone: 'Greenwich',
         instructorType: 'myself',
         createdBy: 'system',
@@ -149,6 +143,8 @@ export class PublicWorkshopsPageComponent {
     private toast = inject(ToastService);
     authService = inject(AuthService);
     private globalSearch = inject(SearchService);
+    private platformId = inject(PLATFORM_ID);
+    private isBrowser = isPlatformBrowser(this.platformId);
 
     currentUser = this.authService.currentUserProfile;
 
@@ -175,7 +171,6 @@ export class PublicWorkshopsPageComponent {
         const q = this.globalSearch.globalQuery().toLowerCase().trim();
         const filters = this.globalSearch.globalFilters();
         const statuses = filters.status;
-        const mode = filters.mode;
         const scope = filters.scope;
 
         return this.workshops().filter(w => {
@@ -188,7 +183,6 @@ export class PublicWorkshopsPageComponent {
                 !w.expertDescription.toLowerCase().includes(q)) return false;
 
             if (statuses.length > 0 && !statuses.includes(w.status as unknown as any)) return false;
-            if (mode !== 'all' && w.workshopMode !== mode) return false;
             return true;
         });
     });
@@ -225,7 +219,6 @@ export class PublicWorkshopsPageComponent {
         let n = 0;
         if (this.globalSearch.globalQuery().trim()) n++;
         if (this.globalSearch.globalFilters().status.length > 0) n++;
-        if (this.globalSearch.globalFilters().mode !== 'all') n++;
         return n;
     });
 
@@ -244,9 +237,13 @@ export class PublicWorkshopsPageComponent {
         this.ws.refresh$.pipe(
             skip(1),
             takeUntilDestroyed()
-        ).subscribe(() => this.loadWorkshops());
+        ).subscribe(() => {
+            if (this.isBrowser) {
+                this.loadWorkshops();
+            }
+        });
 
-        if (this.authService.isLoggedIn()) {
+        if (this.isBrowser) {
             this.loadWorkshops();
         }
     }
@@ -265,7 +262,6 @@ export class PublicWorkshopsPageComponent {
                 // Fallback to default mocks on error
                 this.workshops.set([...DEFAULT_WORKSHOPS]);
                 this.isLoading.set(false);
-                this.toast.error('Failed to load latest public workshops. Showing default data.');
             },
         });
     }

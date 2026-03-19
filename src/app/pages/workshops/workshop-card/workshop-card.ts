@@ -25,8 +25,25 @@ export class WorkshopCardComponent {
         return !!userId && workshop.createdBy === userId;
     });
 
+    canManage = computed(() => {
+        const userId = this.currentUserId();
+        const role = this.userRole();
+        if (!userId) return false;
+
+        // 1. Owner
+        if (this.isOwner()) return true;
+
+        // 2. Admin/Director
+        if (['Admin', 'Director'].includes(role)) return true;
+
+        // 3. Instructor (likely enrolled)
+        if (role === 'Instructor') return true;
+
+        return false;
+    });
+
     canBook = computed(() => {
-        return !!this.currentUserId() && !this.isOwner();
+        return !!this.currentUserId() && !this.canManage();
     });
 
     view = output<WorkshopListItem>();
@@ -78,13 +95,6 @@ export class WorkshopCardComponent {
         return map[this.workshop().status] ?? this.workshop().status;
     }
 
-    get modeLabel(): string {
-        return this.workshop().workshopMode === 'hybrid' ? 'Hybrid' : 'Online';
-    }
-
-    get modeIcon(): string {
-        return this.workshop().workshopMode === 'hybrid' ? 'fa-map-marker-alt' : 'fa-wifi';
-    }
 
     get isTeacherRole(): boolean {
         return ['Student', 'Teacher', 'Instructor'].includes(this.userRole());

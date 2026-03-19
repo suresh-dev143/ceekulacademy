@@ -1,4 +1,8 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject, PLATFORM_ID, effect } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { InfrastructureService } from '../core/services/infrastructure.service';
+import { InfrastructureResponse } from '../core/models/infrastructure.model';
+import { AuthService } from './auth.service';
 
 export interface NearbyUser {
     id: number;
@@ -53,21 +57,85 @@ export interface ResourceStats {
     providedIn: 'root'
 })
 export class PartnerService {
-    private partnerProfile = signal({
-        name: 'Innovation Hub Noida',
+    private infraService = inject(InfrastructureService);
+    private authService = inject(AuthService);
+    private platformId = inject(PLATFORM_ID);
+
+    private partnerProfile = signal<{
+        name: string;
+        type: string;
+        address: string;
+        coordinates?: { lat: number; lng: number };
+    }>({
+        name: 'Loading...',
         type: 'Infrastructure Provider',
-        address: 'Sector 62, Noida, UP',
+        address: 'Fetching address...',
         coordinates: { lat: 28.6273, lng: 77.3725 }
     });
 
-    private infra = signal<Infrastructure[]>([
-        { id: 1, name: 'Seminar Hall 1',  type: 'Auditorium',    capacity: 40,  tags: ['Workshops', 'Webinars'] },
-        { id: 2, name: 'AI Lab 1',        type: 'Lab',           capacity: 20,  tags: ['Research', 'Learning'] },
-        { id: 3, name: 'Design Studio',   type: 'Classroom',     capacity: 25,  tags: ['Design', 'Creative'] },
-        { id: 4, name: 'Computer Lab 2',  type: 'Lab',           capacity: 20,  tags: ['Programming', 'Research'] },
-        { id: 5, name: 'Computer Lab 1',  type: 'Lab',           capacity: 30,  tags: ['Programming', 'Cloud'] },
-        { id: 6, name: 'Smart Lab',       type: 'Lab',           capacity: 15,  tags: ['Cybersecurity', 'IoT'] }
-    ]);
+    private infra = signal<Infrastructure[]>([]);
+
+    constructor() {
+        // Reactively fetch when logged in
+        effect(() => {
+            if (isPlatformBrowser(this.platformId) && this.authService.isLoggedIn()) {
+                this.fetchInfrastructure();
+            }
+        });
+    }
+
+    fetchInfrastructure() {
+        if (!isPlatformBrowser(this.platformId)) return;
+
+        this.infraService.getInfrastructure().subscribe({
+            next: (res: InfrastructureResponse) => {
+                if (res.status && res.data) {
+                    const mapped: Infrastructure[] = [];
+                    const dataArray = Array.isArray(res.data) ? res.data : [res.data];
+                    
+                    dataArray.forEach(data => {
+                        data.classrooms?.forEach(c => mapped.push({
+                            id: Number(c.name.replace(/\D/g, '')) || mapped.length + 1,
+                            name: c.name,
+                            type: c.type || 'Classroom',
+                            capacity: c.capacity,
+                            tags: c.technology || []
+                        }));
+
+                        data.computerLabs?.forEach(c => mapped.push({
+                            id: Number(c.name.replace(/\D/g, '')) || mapped.length + 1,
+                            name: c.name,
+                            type: 'Lab',
+                            capacity: c.capacity,
+                            tags: [...(c.softwareAvailable || []), c.internetSpeed].filter(x => x)
+                        }));
+
+                        data.otherFacilities?.forEach(c => mapped.push({
+                            id: Number(c.name.replace(/\D/g, '')) || mapped.length + 1,
+                            name: c.name,
+                            type: c.type,
+                            capacity: c.capacity || 0,
+                            tags: []
+                        }));
+
+                        if (data.generalInfo && !this.partnerProfile().name.includes(data.generalInfo.schoolName)) {
+                            // Optionally handle multiple profile names if needed, 
+                            // but for now, we just update with the first one or keep it as is.
+                            this.partnerProfile.set({
+                                name: data.generalInfo.schoolName,
+                                type: 'Infrastructure Provider',
+                                address: data.generalInfo.address,
+                                coordinates: { lat: 28.6273, lng: 77.3725 }
+                            });
+                        }
+                    });
+
+                    this.infra.set(mapped);
+                }
+            },
+            error: (err) => console.error('PartnerService failed to fetch infrastructure:', err)
+        });
+    }
 
     private radius = signal<number>(10);
 

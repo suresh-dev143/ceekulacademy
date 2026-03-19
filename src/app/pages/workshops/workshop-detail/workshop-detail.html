@@ -18,10 +18,6 @@
             <span class="wd-badge wd-badge--status" [class]="'wd-badge--' + currentWorkshop().status">
                 {{ statusLabel }}
             </span>
-            <span class="wd-badge wd-badge--mode"
-                [class.wd-badge--hybrid]="currentWorkshop().workshopMode === 'hybrid'">
-                <i class="fas" [class]="modeIcon"></i> {{ modeLabel }}
-            </span>
             <span class="wd-badge wd-badge--tz">
                 <i class="fas fa-globe"></i> {{ currentWorkshop().timezone }}
             </span>
@@ -96,7 +92,7 @@
                 <i class="fas fa-calendar-day"></i> Sessions
                 <span class="wd-session-count-badge">{{ localSessions().length }}</span>
             </div>
-            @if (isOwner() && !showAddForm()) {
+            @if (canManageSessions && !showAddForm()) {
             <button type="button" class="wd-add-btn" (click)="openAddForm()">
                 <i class="fas fa-plus"></i> Add Session
             </button>
@@ -188,6 +184,15 @@
                         } @else if (fieldHasError('activity','minlength')) {
                         <div class="wd-error">Minimum 3 characters.</div>
                         }
+                    </div>
+
+                    <div class="wd-field">
+                        <label class="wd-label">Description (Optional)</label>
+                        <textarea class="wd-input wd-textarea" formControlName="description"
+                            placeholder="Provide more details for this session..." rows="2" maxlength="1000"></textarea>
+                        <span class="wd-char">
+                            {{ addForm.get('description')?.value?.length ?? 0 }}/1000
+                        </span>
                     </div>
 
                     <div class="wd-field">
@@ -286,7 +291,12 @@
                 <div class="wd-session-body">
 
                     <div class="wd-session-top">
-                        <span class="wd-session-activity">{{ s.activity }}</span>
+                        <div class="wd-session-title-wrap">
+                            <span class="wd-session-activity">{{ s.activity }}</span>
+                            @if (s.description) {
+                                <p class="wd-session-desc">{{ s.description }}</p>
+                            }
+                        </div>
                         <div class="wd-session-tags">
                             @if (sessionDuration(s)) {
                             <span class="wd-tag wd-tag--duration">
@@ -350,6 +360,70 @@
         }
 
     </section>
+    
+    <!-- ══ Enrollees section (Experts only) ══════════════════════════════════ -->
+    @if (isOwner()) {
+    <section class="wd-enrollees-section animate-fade-in">
+        <div class="wd-section-header">
+            <div class="wd-section-title">
+                <i class="fas fa-users"></i> Enrolled Participants
+                <button type="button" class="wd-refresh-mini" (click)="fetchEnrollees()" [disabled]="isLoadingEnrollees()" title="Refresh Enrollees">
+                    <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingEnrollees()"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="wd-enrollees-grid">
+            <!-- Instructors -->
+            <div class="wd-enrollee-column">
+                <h4 class="wd-column-title">
+                    <i class="fas fa-chalkboard-teacher"></i> Instructors 
+                    <span class="wd-count-pill">{{ enrolledInstructorsList().length }}</span>
+                </h4>
+                @if (enrolledInstructorsList().length === 0) {
+                    <div class="wd-column-empty">No instructors enrolled yet.</div>
+                } @else {
+                    <div class="wd-enrollee-list">
+                        @for (e of enrolledInstructorsList(); track e._id) {
+                        <div class="wd-enrollee-card">
+                            <img [src]="e.userId.profileImage || 'assets/default-avatar.png'" alt="avatar" class="wd-enrollee-avatar">
+                            <div class="wd-enrollee-info">
+                                <span class="wd-enrollee-name">{{ e.userId.name }}</span>
+                                <span class="wd-enrollee-email">{{ e.userId.email }}</span>
+                            </div>
+                            <span class="wd-enrollee-status" [attr.data-status]="e.status">{{ e.status }}</span>
+                        </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Students -->
+            <div class="wd-enrollee-column">
+                <h4 class="wd-column-title">
+                    <i class="fas fa-user-graduate"></i> Learners
+                    <span class="wd-count-pill">{{ enrolledStudentsList().length }}</span>
+                </h4>
+                @if (enrolledStudentsList().length === 0) {
+                    <div class="wd-column-empty">No learners enrolled yet.</div>
+                } @else {
+                    <div class="wd-enrollee-list">
+                        @for (e of enrolledStudentsList(); track e._id) {
+                        <div class="wd-enrollee-card">
+                            <img [src]="e.userId.profileImage || 'assets/default-avatar.png'" alt="avatar" class="wd-enrollee-avatar">
+                            <div class="wd-enrollee-info">
+                                <span class="wd-enrollee-name">{{ e.userId.name }}</span>
+                                <span class="wd-enrollee-email">{{ e.userId.email }}</span>
+                            </div>
+                            <span class="wd-enrollee-status" [attr.data-status]="e.status">{{ e.status }}</span>
+                        </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+    }
 
     <!-- ══ Student action bar ════════════════════════════════════════════════ -->
     @if (canEnroll && localSessions().length > 0) {
@@ -413,13 +487,6 @@
                 </div>
 
                 <div class="wd-form-grid wd-form-grid--2">
-                    <div class="wd-field">
-                        <label class="wd-label">Workshop Mode *</label>
-                        <select class="wd-input wd-select" formControlName="workshopMode">
-                            <option value="online">Online</option>
-                            <option value="hybrid">Hybrid</option>
-                        </select>
-                    </div>
                     <div class="wd-field">
                         <label class="wd-label">Timezone *</label>
                         <select class="wd-input wd-select" formControlName="timezone">

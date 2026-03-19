@@ -11,7 +11,8 @@
         </div>
 
         @if (showDetail() && selectedWorkshop()) {
-        <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="'Teacher'" (close)="closeDetail()">
+        <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="auth.currentUserProfile()?.role ?? ''"
+            [currentUserId]="auth.currentUserProfile()?.id" (close)="closeDetail()">
         </app-workshop-detail>
         } @else if (showEdit() && workshopToEdit()) {
         <div class="edit-overlay">
@@ -39,7 +40,6 @@
                     <thead>
                         <tr>
                             <th>Title</th>
-                            <th>Mode</th>
                             <th>Status</th>
                             <th>Created</th>
                             <th class="actions-cell">Actions</th>
@@ -53,11 +53,6 @@
                                     <strong>{{ w.workshopTitle }}</strong>
                                     <span>{{ w.sessions.length }} sessions</span>
                                 </div>
-                            </td>
-                            <td>
-                                <span class="mode-tag" [class.hybrid]="w.workshopMode === 'hybrid'">
-                                    {{ w.workshopMode }}
-                                </span>
                             </td>
                             <td>
                                 <span class="status-badge" [class]="'status--' + w.status">

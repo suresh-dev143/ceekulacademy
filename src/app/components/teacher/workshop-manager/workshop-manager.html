@@ -41,19 +41,6 @@
                     <textarea class="form-control" formControlName="workshopDescription" rows="3"
                         placeholder="Describe what participants will learn..."></textarea>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Mode *</label>
-                    <div class="radio-group" style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                        <label class="radio-option"
-                            style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #eee;">
-                            <input type="radio" formControlName="workshopMode" value="online"> Online
-                        </label>
-                        <label class="radio-option"
-                            style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: #eee;">
-                            <input type="radio" formControlName="workshopMode" value="hybrid"> Hybrid
-                        </label>
-                    </div>
-                </div>
                 <div class="form-group flex-1">
                     <label class="form-label">Instructor *</label>
                     <!-- <label for="myself"> Self ({{ currentUser().name }})</label>
@@ -103,8 +90,17 @@
                                 <input type="number" class="form-control" formControlName="fee" min="0">
                             </div>
 
+                            <!-- Mode selection -->
+                            <div>
+                                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.3rem;">Mode</label>
+                                <select class="form-control" formControlName="mode">
+                                    <option value="online">Online</option>
+                                    <option value="hybrid">Hybrid</option>
+                                </select>
+                            </div>
+
                             <!-- Location (Only if Hybrid) -->
-                            @if (workshopForm.get('workshopMode')?.value === 'hybrid') {
+                            @if (item.get('mode')?.value === 'hybrid') {
                             <div>
                                 <label class="form-label"
                                     style="font-size: 0.8rem; margin-bottom: 0.3rem;">Location</label>
@@ -118,20 +114,29 @@
                             }
                         </div>
 
-                        <!-- Activity -->
-                        <div style="display: flex; gap: 1rem; align-items: center;">
+                        <!-- Activity & Description -->
+                        <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                            <div style="display: flex; gap: 1rem; align-items: center;">
+                                <div style="flex: 1;">
+                                    <label class="form-label"
+                                        style="font-size: 0.8rem; margin-bottom: 0.3rem;">Activity *</label>
+                                    <input type="text" class="form-control" formControlName="activity"
+                                        placeholder="Activity title...">
+                                </div>
+
+                                <button type="button" (click)="removeScheduleRow($index)"
+                                    style="background: transparent; border: none; color: #ef4444; cursor: pointer; margin-top: 1.5rem;"
+                                    title="Remove Session">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            
                             <div style="flex: 1;">
                                 <label class="form-label"
-                                    style="font-size: 0.8rem; margin-bottom: 0.3rem;">Activity</label>
-                                <input type="text" class="form-control" formControlName="activity"
-                                    placeholder="Activity description...">
+                                    style="font-size: 0.8rem; margin-bottom: 0.3rem;">Session Description (Optional)</label>
+                                <textarea class="form-control" formControlName="description" rows="2"
+                                    placeholder="Provide more details for this session..."></textarea>
                             </div>
-
-                            <button type="button" (click)="removeScheduleRow($index)"
-                                style="background: transparent; border: none; color: #ef4444; cursor: pointer; margin-top: 1.5rem;"
-                                title="Remove Session">
-                                <i class="fas fa-trash"></i>
-                            </button>
                         </div>
 
                     </div>
