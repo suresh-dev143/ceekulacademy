@@ -1,15 +1,25 @@
+import { Address, GeoLocation } from './address.model';
+
+export interface InfrastructurePricing {
+  type: 'Free' | 'Share' | 'Fixed';
+  amount: number;
+  unit: 'Hourly' | 'Session';
+}
+
 export interface AvailabilitySchedule {
     day: string;
     startTime: string;
     endTime: string;
     status: 'Available' | 'Booked' | 'Maintenance' | 'Closed';
+    pricing: InfrastructurePricing;
     notes?: string;
     _id?: string;
 }
 
 export interface GeneralInfo {
     schoolName: string;
-    address: string;
+    address: Address;
+    location?: GeoLocation;
     contactName: string;
     contactEmail: string;
     contactPhone: string;
@@ -29,9 +39,9 @@ export interface Classroom {
     lighting: string[];
     ventilation: string[];
     specializedEquipment?: string;
-    accessibility: string[];
-    primaryUsage: string;
-    availabilitySchedule: AvailabilitySchedule[];
+    accessibility?: string[];
+    primaryUsage?: string;
+    availabilitySchedule?: AvailabilitySchedule[];
     _id?: string;
 }
 
@@ -40,9 +50,9 @@ export interface ComputerLab {
     id: string;
     workstations: number;
     capacity: number;
-    softwareAvailable: string[];
-    internetSpeed: string;
-    availabilitySchedule: AvailabilitySchedule[];
+    softwareAvailable?: string[];
+    internetSpeed?: string;
+    availabilitySchedule?: AvailabilitySchedule[];
     _id?: string;
 }
 
@@ -53,9 +63,9 @@ export interface OtherFacility {
     capacity?: number;
     dimensions?: string;
     soundSystem: boolean;
-    lightingSystem: boolean;
-    projectorScreen: boolean;
-    availabilitySchedule: AvailabilitySchedule[];
+    lightingSystem?: boolean;
+    projectorScreen?: boolean;
+    availabilitySchedule?: AvailabilitySchedule[];
     _id?: string;
 }
 
@@ -95,7 +105,7 @@ export interface ClassroomResponse {
     data: Classroom;
 }
 
-export interface UpdateClassroomPayload extends Partial<Classroom> {}
+export interface UpdateClassroomPayload extends Partial<Omit<Classroom, '_id' | 'id'>> {}
 
 export interface ComputerLabResponse {
     status: boolean;
@@ -103,7 +113,7 @@ export interface ComputerLabResponse {
     data: ComputerLab;
 }
 
-export interface UpdateComputerLabPayload extends Partial<ComputerLab> {}
+export interface UpdateComputerLabPayload extends Partial<Omit<ComputerLab, '_id' | 'id'>> {}
 
 export interface OtherFacilityResponse {
     status: boolean;
@@ -111,4 +121,4 @@ export interface OtherFacilityResponse {
     data: OtherFacility;
 }
 
-export interface UpdateFacilityPayload extends Partial<OtherFacility> {}
+export interface UpdateFacilityPayload extends Partial<Omit<OtherFacility, '_id' | 'id'>> {}

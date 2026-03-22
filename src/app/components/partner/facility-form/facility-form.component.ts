@@ -94,6 +94,11 @@ export class FacilityFormComponent implements OnInit {
           startTime: [slot.startTime, Validators.required],
           endTime: [slot.endTime, Validators.required],
           status: [slot.status, Validators.required],
+          pricing: this.fb.group({
+            type: [slot.pricing?.type || 'Free', Validators.required],
+            amount: [slot.pricing?.amount || 0, [Validators.required, Validators.min(0)]],
+            unit: [slot.pricing?.unit || 'Hourly', Validators.required]
+          }),
           notes: [slot.notes || '']
         }));
       });
@@ -112,12 +117,21 @@ export class FacilityFormComponent implements OnInit {
       startTime: ['', Validators.required],
       endTime: ['', Validators.required],
       status: ['Available', Validators.required],
+      pricing: this.fb.group({
+        type: ['Free', Validators.required],
+        amount: [0, [Validators.required, Validators.min(0)]],
+        unit: ['Hourly', Validators.required]
+      }),
       notes: ['']
     }));
   }
 
   removeScheduleSlot(index: number) {
     this.availabilitySchedule.removeAt(index);
+  }
+
+  getPricingType(index: number): string {
+    return this.availabilitySchedule.at(index).get('pricing.type')?.value;
   }
 
   private getDirtyValues(formItem: FormGroup | FormArray | AbstractControl): any {
@@ -187,7 +201,10 @@ export class FacilityFormComponent implements OnInit {
 
     } else {
       // Add Mode
-      const payload: OtherFacility = formVals;
+      const payload: OtherFacility = {
+        ...formVals,
+        pricing: formVals.pricing
+      };
 
       this.infraService.addFacility(this.infraId, payload)
         .pipe(finalize(() => this.isLoading.set(false)))

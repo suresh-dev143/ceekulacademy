@@ -250,21 +250,31 @@
 
                 </div>
 
-                <!-- Conditional: Venue (hybrid only) -->
+                <!-- Facility Booking Summary (hybrid only) -->
                 @if (session.get('mode')?.value === 'hybrid') {
-                <div class="cwf-field cwf-field--venue">
-                    <label class="cwf-label">Venue / Location *</label>
-                    <select class="cwf-input cwf-select" [formControl]="$any(session.get('location'))"
-                        [class.is-error]="sessionFieldError($index, 'location', 'required')">
-                        <option value="">— Select a venue —</option>
-                        @for (loc of registeredLocations; track loc) {
-                        <option [value]="loc">{{ loc }}</option>
+                    <div class="cwf-facility-booking">
+                        @if (session.get('facilityId')?.value) {
+                            <div class="booked-facility-card">
+                                <div class="facility-main">
+                                    <div class="facility-icon"><i class="fas fa-building"></i></div>
+                                    <div class="facility-meta">
+                                        <div class="facility-name">{{ session.get('partnerName')?.value }} - {{ session.get('location')?.value.split(',')[0] }}</div>
+                                        <div class="facility-type">{{ session.get('facilityType')?.value }}</div>
+                                    </div>
+                                    <button type="button" class="btn-remove-facility" (click)="removeFacility($index)" title="Remove booking">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        } @else {
+                            <div class="empty-facility-box">
+                                <p>No facility booked yet.</p>
+                                <button type="button" class="btn-search-nearby" (click)="openDiscovery($index)">
+                                    <i class="fas fa-search-location"></i> Search Nearby Facilities
+                                </button>
+                            </div>
                         }
-                    </select>
-                    @if (sessionFieldError($index, 'location', 'required')) {
-                    <div class="cwf-error">Venue is required for hybrid sessions.</div>
-                    }
-                </div>
+                    </div>
                 }
 
                 <div class="cwf-field" style="margin-top: 1rem;">
@@ -299,3 +309,15 @@
 
     </form>
 </div>
+
+<!-- Facility Discovery Modal -->
+@if (showDiscovery()) {
+    <app-facility-discovery
+        [sessionDate]="sessions.at(activeSessionIndex()!).get('date')?.value"
+        [sessionStartTime]="sessions.at(activeSessionIndex()!).get('startTime')?.value"
+        [sessionEndTime]="sessions.at(activeSessionIndex()!).get('endTime')?.value"
+        [requiredCapacity]="30" 
+        (facilitySelected)="onFacilitySelected($event)"
+        (close)="closeDiscovery()">
+    </app-facility-discovery>
+}

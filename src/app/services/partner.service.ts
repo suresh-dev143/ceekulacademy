@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { InfrastructureService } from '../core/services/infrastructure.service';
 import { InfrastructureResponse } from '../core/models/infrastructure.model';
 import { AuthService } from './auth.service';
+import { Address } from '../core/models/address.model';
 
 export interface NearbyUser {
     id: number;
@@ -64,12 +65,19 @@ export class PartnerService {
     private partnerProfile = signal<{
         name: string;
         type: string;
-        address: string;
+        address: Address;
         coordinates?: { lat: number; lng: number };
     }>({
         name: 'Loading...',
         type: 'Infrastructure Provider',
-        address: 'Fetching address...',
+        address: {
+            addressLine1: 'Fetching address...',
+            city: '',
+            district: '',
+            state: '',
+            country: '',
+            pincode: ''
+        },
         coordinates: { lat: 28.6273, lng: 77.3725 }
     });
 
@@ -107,7 +115,7 @@ export class PartnerService {
                             name: c.name,
                             type: 'Lab',
                             capacity: c.capacity,
-                            tags: [...(c.softwareAvailable || []), c.internetSpeed].filter(x => x)
+                            tags: [...(c.softwareAvailable || []), c.internetSpeed].filter((x): x is string => !!x)
                         }));
 
                         data.otherFacilities?.forEach(c => mapped.push({

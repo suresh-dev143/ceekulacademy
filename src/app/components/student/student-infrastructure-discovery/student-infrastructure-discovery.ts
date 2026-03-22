@@ -19,6 +19,9 @@ import { NearbyInfrastructure } from '../../../services/student-discovery.servic
             <div class="infra-info">
               <h4 class="infra-name">{{ infra.name }}</h4>
               <span class="infra-type">{{ infra.type }}</span>
+              <div *ngIf="infra.distance < 5" class="near-you-pill">
+                <i class="fas fa-bolt"></i> Nearby Hub
+              </div>
             </div>
             <div class="dist-tag">{{ infra.distance }} km</div>
           </div>
@@ -67,6 +70,11 @@ import { NearbyInfrastructure } from '../../../services/student-discovery.servic
     .infra-info { flex: 1; }
     .infra-name { font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.5px; }
     .infra-type { font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .near-you-pill {
+      font-size: 0.6rem; font-weight: 800; color: #fff; background: #10b981;
+      padding: 0.1rem 0.4rem; border-radius: 4px; display: inline-flex;
+      align-items: center; gap: 0.3rem; margin-top: 0.3rem; text-transform: uppercase;
+    }
 
     .dist-tag { font-size: 0.7rem; font-weight: 900; color: #10b981; border: 1px solid #10b981; padding: 0.2rem 0.6rem; border-radius: 0; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
 

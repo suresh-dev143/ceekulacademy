@@ -89,7 +89,6 @@ export class EnrolledWorkshopsComponent implements OnInit {
             status: w.status as any,
             sessions: w.sessions.map(s => ({
                 ...s,
-                mode: s.mode as 'online' | 'hybrid',
                 location: s.location || null
             }))
         };

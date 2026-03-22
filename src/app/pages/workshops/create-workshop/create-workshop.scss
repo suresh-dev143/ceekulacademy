@@ -557,6 +557,82 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     }
 }
 
+// ── Facility Booking ────────────────────────────────────────────────────────
+.cwf-facility-booking {
+    margin: 1.5rem 0;
+    padding: 1.25rem;
+    background: color-mix(in srgb, #000, transparent 40%);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.empty-facility-box {
+    text-align: center;
+    p { color: $text-dim; font-size: 0.85rem; margin-bottom: 1rem; }
+    
+    .btn-search-nearby {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: #10b981;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        &:hover { background: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+    }
+}
+
+.booked-facility-card {
+    background: #161a21;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 10px;
+    padding: 1rem;
+    
+    .facility-main {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .facility-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #10b981;
+        font-size: 1.1rem;
+    }
+
+    .facility-meta {
+        flex: 1;
+        .facility-name { color: #fff; font-size: 0.95rem; font-weight: 600; margin-bottom: 2px; }
+        .facility-type { color: #6b7280; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    }
+
+    .btn-remove-facility {
+        background: rgba(239, 68, 68, 0.1);
+        border: none;
+        color: #ef4444;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        &:hover { background: rgba(239, 68, 68, 0.2); }
+    }
+}
+
 // ── Responsive ───────────────────────────────────────────────────────────────
 
 @media (max-width: 768px) {
@@ -619,5 +695,68 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     .cwf-radio-group--inline {
         flex-direction: column;
         gap: 0.5rem;
+    }
+}
+
+/* Facility Booking Styles */
+.cwf-facility-booking {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #252525;
+    border: 1px dashed #444;
+    border-radius: 12px;
+}
+
+.empty-facility-box {
+    text-align: center;
+    p { color: #888; font-size: 0.9rem; margin-bottom: 12px; }
+    .btn-search-nearby {
+        background: #111;
+        color: #4CAF50;
+        border: 1px solid #4CAF50;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        &:hover { background: #4CAF50; color: white; }
+    }
+}
+
+.booked-facility-card {
+    background: #111;
+    border: 1px solid #4CAF50;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    
+    .facility-main {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .facility-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(76, 175, 80, 0.1);
+        color: #4CAF50;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .facility-meta {
+        flex: 1;
+        .facility-name { color: #fff; font-size: 0.95rem; font-weight: 500; }
+        .facility-type { color: #888; font-size: 0.75rem; text-transform: uppercase; }
+    }
+
+    .btn-remove-facility {
+        background: transparent;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        &:hover { color: #f44336; }
     }
 }

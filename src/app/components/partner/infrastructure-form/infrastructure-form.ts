@@ -7,6 +7,7 @@ import { InfrastructurePayload, InfrastructureData, InfrastructureResponse } fro
 import { finalize } from 'rxjs';
 import { AppValidationErrorComponent } from '../../shared/validation-error/validation-error.component';
 import { ValidationService } from '../../../core/services/validation.service';
+import { LocationService } from '../../../core/services/location.service';
 
 @Component({
   selector: 'app-infrastructure-form',
@@ -59,6 +60,7 @@ export class InfrastructureFormComponent implements OnInit {
   private infraService = inject(InfrastructureService);
   private toastService = inject(ToastService);
   private validationService = inject(ValidationService);
+  private locationService = inject(LocationService);
 
   isLoading = signal(false);
   isEditMode = signal(false);
@@ -67,7 +69,20 @@ export class InfrastructureFormComponent implements OnInit {
     title: ['', Validators.required],
     generalInfo: this.fb.group({
       schoolName: ['', Validators.required],
-      address: ['', Validators.required],
+      address: this.fb.group({
+        addressLine1: ['', Validators.required],
+        addressLine2: [''],
+        landmark: [''],
+        city: ['', Validators.required],
+        district: ['', Validators.required],
+        state: ['', Validators.required],
+        country: ['India', Validators.required],
+        pincode: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]]
+      }),
+      location: this.fb.group({
+        type: ['Point'],
+        coordinates: [[0, 0]] // [lng, lat]
+      }),
       contactName: ['', Validators.required],
       contactEmail: ['', [Validators.required, Validators.email]],
       contactPhone: ['', Validators.required],
@@ -104,6 +119,22 @@ export class InfrastructureFormComponent implements OnInit {
     if (data.otherFacilities) {
       data.otherFacilities.forEach(f => this.addFacility(f));
     }
+  }
+
+  useCurrentLocation() {
+    this.isLoading.set(true);
+    this.locationService.getCurrentLocation().subscribe({
+      next: (loc) => {
+        this.infraForm.get('generalInfo.location')?.patchValue(loc);
+        this.toastService.success('Location detected successfully!');
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to get location:', err);
+        this.toastService.error('Could not detect your location. Please enter it manually.');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   // --- GETTERS ---

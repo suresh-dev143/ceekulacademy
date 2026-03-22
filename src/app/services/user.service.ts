@@ -1,4 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
+import { Address, GeoLocation } from '../core/models/address.model';
 
 export interface UserProfile {
     name: string;
@@ -9,13 +10,8 @@ export interface UserProfile {
     avatar: string;
     role: string;
     joinDate: string;
-    address: {
-        country: string;
-        state: string;
-        city: string;
-        street: string;
-        pincode: string;
-    };
+    address: Address;
+    location?: GeoLocation;
     professional: {
         specializations: string[];
         experience: string;
@@ -50,8 +46,13 @@ export class UserService {
             country: 'India',
             state: 'Uttar Pradesh',
             city: 'Noida',
-            street: 'Sector 62, High Street',
+            addressLine1: 'Sector 62, High Street',
+            district: 'Gautam Buddha Nagar',
             pincode: '201301'
+        },
+        location: {
+            type: 'Point',
+            coordinates: [77.3673, 28.6219]
         },
         professional: {
             specializations: ['AI Strategy', 'Product Leadership', 'Angular Development'],

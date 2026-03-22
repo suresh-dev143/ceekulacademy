@@ -1,4 +1,7 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map, of } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface NearbyTeacher {
     id: number;
@@ -25,8 +28,29 @@ export interface NearbyInfrastructure {
     providedIn: 'root'
 })
 export class StudentDiscoveryService {
+    private http = inject(HttpClient);
+    private apiUrl = environment.apiUrl;
     private userLocation = signal('Sector 18, Noida, Uttar Pradesh');
     private radius = signal<number>(10);
+
+    constructor() {
+        this.loadNearbyData();
+    }
+
+    getNearbyPartners(lat: number, lng: number, radius: number = 20): Observable<any[]> {
+        return this.http.get<any>(`${this.apiUrl}/api/nearby/partners?lat=${lat}&lng=${lng}&radius=${radius}`)
+            .pipe(map(res => res.data));
+    }
+
+    getNearbyWorkshops(lat: number, lng: number, radius: number = 20): Observable<any[]> {
+        return this.http.get<any>(`${this.apiUrl}/api/nearby/workshops?lat=${lat}&lng=${lng}&radius=${radius}`)
+            .pipe(map(res => res.data));
+    }
+
+    getNearbyInstructors(lat: number, lng: number, radius: number = 20): Observable<any[]> {
+        return this.http.get<any>(`${this.apiUrl}/api/nearby/instructors?lat=${lat}&lng=${lng}&radius=${radius}`)
+            .pipe(map(res => res.data));
+    }
 
     // Mock data for teachers
     private teachersData = signal<NearbyTeacher[]>([
@@ -67,6 +91,53 @@ export class StudentDiscoveryService {
 
     setRadius(r: number) {
         this.radius.set(r);
+        this.loadNearbyData();
+    }
+
+    loadNearbyData() {
+        // In a real app, we'd get the actual lat/lng from a location signal
+        // For now, we'll use a fixed point in Noida
+        const lat = 28.5355;
+        const lng = 77.3910;
+        const currentRadius = this.radius();
+
+        this.getNearbyPartners(lat, lng, currentRadius).subscribe({
+            next: (data) => {
+                if (data && data.length > 0) {
+                    const formattedInfra = data.map(item => ({
+                        id: item._id,
+                        name: item.title || item.generalInfo?.schoolName,
+                        type: item.generalInfo?.type || 'Infrastructure',
+                        facilities: [
+                            ...(item.classrooms?.length ? ['Classrooms'] : []),
+                            ...(item.computerLabs?.length ? ['Labs'] : [])
+                        ],
+                        distance: item.dist?.calculated ? parseFloat((item.dist.calculated / 1000).toFixed(1)) : 0.5,
+                        activePrograms: 0,
+                        verified: true
+                    }));
+                    this.infraData.set(formattedInfra);
+                }
+            }
+        });
+
+        this.getNearbyInstructors(lat, lng, currentRadius).subscribe({
+            next: (data) => {
+                if (data && data.length > 0) {
+                    const formattedTeachers = data.map(item => ({
+                        id: item._id,
+                        name: item.name,
+                        specialization: item.teacherProfile?.specializations?.[0] || 'Expert',
+                        activityType: 'Learning' as 'Learning' | 'Research',
+                        mode: 'Offline' as 'Online' | 'Offline' | 'Hybrid',
+                        distance: 0.8, // Mock distance since it's hard to derive from User model directly without $near
+                        availability: 'Flexible',
+                        verified: item.status === 'Active'
+                    }));
+                    this.teachersData.set(formattedTeachers);
+                }
+            }
+        });
     }
 
     requestToJoin(teacherId: number) {

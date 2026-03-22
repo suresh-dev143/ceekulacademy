@@ -8,6 +8,8 @@ import { WorkshopService, CreateWorkshopRequest, CreatedWorkshopData, WorkshopLi
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { RazorpayService } from '../../../services/razorpay.service';
+import { FacilityDiscoveryComponent } from '../../../components/workshops/facility-discovery/facility-discovery.component';
+import { FacilityBookingService } from '../../../services/facility-booking.service';
 
 // ── Timezone helpers ──────────────────────────────────────────────────────────
 
@@ -95,7 +97,7 @@ function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
 @Component({
     selector: 'app-create-workshop',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FacilityDiscoveryComponent],
     templateUrl: './create-workshop.html',
     styleUrl: './create-workshop.scss',
 })
@@ -109,9 +111,12 @@ export class CreateWorkshop implements OnInit {
 
     workshopForm!: FormGroup;
     isSubmitting = signal(false);
-
     workshopCreated = output<CreatedWorkshopData>();
     cancel = output<void>();
+
+    // Booking State
+    showDiscovery = signal(false);
+    activeSessionIndex = signal<number | null>(null);
 
     get totalCommission(): number {
         const sessionCount = this.sessions.length;
@@ -121,10 +126,6 @@ export class CreateWorkshop implements OnInit {
     // ── Edit Mode Support ──────────────────────────────────────────────────
     workshopToEdit = input<WorkshopListItem | null>(null);
     isEditMode = computed(() => !!this.workshopToEdit());
-
-    readonly registeredLocations = [
-        'Central Library', 'Innovation Hub', 'Community Center', 'Tech Park'
-    ];
 
     readonly timezones = [
         { key: 'UTC', label: 'UTC  — Coordinated Universal Time' },
@@ -171,7 +172,7 @@ export class CreateWorkshop implements OnInit {
             // Populate sessions
             if (editData.sessions && editData.sessions.length > 0) {
                 this.sessions.clear();
-                editData.sessions.forEach(s => {
+                editData.sessions.forEach((s: any) => {
                     const row = this.fb.group({
                         date: s.date.split('T')[0],
                         startTime: s.startTime,
@@ -181,6 +182,11 @@ export class CreateWorkshop implements OnInit {
                         fee: s.fee,
                         mode: s.mode,
                         location: s.location || '',
+                        facilityId: s.facilityId || '',
+                        facilityType: s.facilityType || '',
+                        partnerId: s.partnerId || '',
+                        partnerName: s.partnerName || '',
+                        facilityDetails: s.facilityDetails || null,
                     }, { validators: sessionConstraintsValidator(() => this.tz) });
 
                     this.syncLocationValidator(row, s.mode);
@@ -248,6 +254,11 @@ export class CreateWorkshop implements OnInit {
             mode: ['online', Validators.required],
             location: [''],
             resources: [''],
+            facilityId: [''],
+            facilityType: [''],
+            partnerId: [''],
+            partnerName: [''],
+            facilityDetails: [null],
         }, { validators: sessionConstraintsValidator(getTz) });
 
         row.get('mode')!.valueChanges.subscribe(m => this.syncLocationValidator(row, m ?? 'online'));
@@ -260,13 +271,60 @@ export class CreateWorkshop implements OnInit {
 
     private syncLocationValidator(row: FormGroup, mode: string) {
         const loc = row.get('location')!;
+        const facId = row.get('facilityId')!;
+
         if (mode === 'hybrid') {
             loc.setValidators(Validators.required);
+            facId.setValidators(Validators.required);
         } else {
             loc.clearValidators();
+            facId.clearValidators();
             loc.setValue('');
+            facId.setValue('');
         }
         loc.updateValueAndValidity();
+        facId.updateValueAndValidity();
+    }
+
+    // ── Facility Booking logic ──────────────────────────────────────────────
+
+    openDiscovery(index: number) {
+        this.activeSessionIndex.set(index);
+        this.showDiscovery.set(true);
+    }
+
+    closeDiscovery() {
+        this.showDiscovery.set(false);
+        this.activeSessionIndex.set(null);
+    }
+
+    onFacilitySelected(selection: any) {
+        const index = this.activeSessionIndex();
+        if (index === null) return;
+
+        const sessionGroup = this.sessions.at(index);
+        sessionGroup.patchValue({
+            facilityId: selection.facilityId,
+            facilityType: selection.facilityType,
+            partnerId: selection.partnerId,
+            partnerName: selection.partnerName,
+            location: `${selection.facilityName}, ${selection.partnerName}`,
+            facilityDetails: selection
+        });
+
+        this.closeDiscovery();
+    }
+
+    removeFacility(index: number) {
+        const sessionGroup = this.sessions.at(index);
+        sessionGroup.patchValue({
+            facilityId: '',
+            facilityType: '',
+            partnerId: '',
+            partnerName: '',
+            location: '',
+            facilityDetails: null
+        });
     }
 
     // ── Error helpers (called from template) ─────────────────────────────────
@@ -317,11 +375,11 @@ export class CreateWorkshop implements OnInit {
             this.razorpay.createOrder(fee).subscribe({
                 next: (order) => {
                     this.razorpay.openCheckout(order, (paymentRes) => {
-                        this.razorpay.verifyPayment(paymentRes).subscribe({
-                            next: () => {
-                                // this.toast.success('Commission payment verified!');
-                                this.proceedWithSave(v);
-                            },
+                                this.razorpay.verifyPayment(paymentRes).subscribe({
+                                    next: () => {
+                                        // this.toast.success('Commission payment verified!');
+                                        this.proceedWithSave(v);
+                                    },
                             error: () => {
                                 this.isSubmitting.set(false);
                                 // this.toast.error('Payment verification failed.');
@@ -351,7 +409,7 @@ export class CreateWorkshop implements OnInit {
             };
 
             this.ws.updateWorkshop(editData._id, updatePayload).subscribe({
-                next: (res) => {
+                next: (res: any) => {
                     this.isSubmitting.set(false);
                     this.toast.success('Workshop updated successfully!');
                     this.workshopCreated.emit(res.data as unknown as CreatedWorkshopData);
@@ -376,11 +434,16 @@ export class CreateWorkshop implements OnInit {
                     mode: s.mode,
                     location: s.mode === 'hybrid' ? (s.location || null) : null,
                     resources: s.resources?.trim() || null,
+                    facilityId: s.facilityId || null,
+                    facilityType: s.facilityType || null,
+                    partnerId: s.partnerId || null,
+                    partnerName: s.partnerName || null,
+                    facilityDetails: s.facilityDetails || null,
                 })),
             };
 
             this.ws.create(payload).subscribe({
-                next: (res) => {
+                next: (res: any) => {
                     this.isSubmitting.set(false);
                     this.workshopCreated.emit(res.data);
                 },

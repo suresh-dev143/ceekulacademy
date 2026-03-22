@@ -23,9 +23,45 @@
             <input type="text" class="form-control" formControlName="schoolName" placeholder="e.g. XYZ Public School" [class.is-invalid]="infraForm.get('generalInfo.schoolName')?.invalid && infraForm.get('generalInfo.schoolName')?.touched">
             <app-form-validation-error [control]="infraForm.get('generalInfo.schoolName')" label="School Name"></app-form-validation-error>
 
-            <label class="form-label" style="margin-top: 1rem;">Address *</label>
-            <textarea class="form-control" formControlName="address" rows="2" [class.is-invalid]="infraForm.get('generalInfo.address')?.invalid && infraForm.get('generalInfo.address')?.touched"></textarea>
-            <app-form-validation-error [control]="infraForm.get('generalInfo.address')" label="Address"></app-form-validation-error>
+            <label class="form-label" style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                Address *
+                <button type="button" class="btn-outline" style="font-size: 0.65rem; padding: 0.3rem 0.6rem;" (click)="useCurrentLocation()">
+                    <i class="fas fa-location-arrow"></i> Detect My Location
+                </button>
+            </label>
+            
+            <div formGroupName="address">
+                <div class="form-group">
+                    <input type="text" class="form-control" formControlName="addressLine1" placeholder="Address Line 1" [class.is-invalid]="infraForm.get('generalInfo.address.addressLine1')?.invalid && infraForm.get('generalInfo.address.addressLine1')?.touched">
+                    <app-form-validation-error [control]="infraForm.get('generalInfo.address.addressLine1')" label="Address Line 1"></app-form-validation-error>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" formControlName="addressLine2" placeholder="Address Line 2 (Optional)">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <input type="text" class="form-control" formControlName="city" placeholder="City" [class.is-invalid]="infraForm.get('generalInfo.address.city')?.invalid && infraForm.get('generalInfo.address.city')?.touched">
+                        <app-form-validation-error [control]="infraForm.get('generalInfo.address.city')" label="City"></app-form-validation-error>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" formControlName="district" placeholder="District" [class.is-invalid]="infraForm.get('generalInfo.address.district')?.invalid && infraForm.get('generalInfo.address.district')?.touched">
+                        <app-form-validation-error [control]="infraForm.get('generalInfo.address.district')" label="District"></app-form-validation-error>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 1rem;">
+                    <div class="form-group">
+                        <input type="text" class="form-control" formControlName="state" placeholder="State" [class.is-invalid]="infraForm.get('generalInfo.address.state')?.invalid && infraForm.get('generalInfo.address.state')?.touched">
+                        <app-form-validation-error [control]="infraForm.get('generalInfo.address.state')" label="State"></app-form-validation-error>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" formControlName="pincode" placeholder="PIN Code" [class.is-invalid]="infraForm.get('generalInfo.address.pincode')?.invalid && infraForm.get('generalInfo.address.pincode')?.touched">
+                        <app-form-validation-error [control]="infraForm.get('generalInfo.address.pincode')" label="PIN Code"></app-form-validation-error>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" formControlName="country" placeholder="Country">
+                    </div>
+                </div>
+            </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                 <div>

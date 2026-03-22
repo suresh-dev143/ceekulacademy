@@ -64,31 +64,33 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Local Address</label>
-                        <div class="form-group">
-                            <label class="form-label">Your District</label>
-                            <input type="text" class="form-control" formControlName="district"
-                                placeholder="e.g. Central District">
-                            @if (registerForm.get('district')?.invalid && registerForm.get('district')?.touched) {
-                            <div class="error-message">District is required</div>
-                            }
-                        </div>
-
-                        <div class="form-group" style="margin-bottom: 0.75rem;">
-                            <label class="form-label" style="font-size: 0.9rem; opacity: 0.9;">Village/Ward
-                                *</label>
-                            <input type="text" class="form-control" formControlName="village"
-                                placeholder="Village/Ward">
-                            @if (registerForm.get('village')?.invalid &&
-                            registerForm.get('village')?.touched) {
-                            <div class="error-message">Village/Ward is required</div>
-                            }
-                        </div>
-
-                        <div class="form-group" style="margin-bottom: 0.75rem;">
-                            <label class="form-label" style="font-size: 0.9rem; opacity: 0.9;">Pin Code</label>
-                            <input type="text" class="form-control" formControlName="pincode"
-                                placeholder="Enter postal code">
+                        <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                            Local Address *
+                            <button type="button" class="btn-detect" (click)="useCurrentLocation()">
+                                <i class="fas fa-location-arrow"></i> Detect Location
+                            </button>
+                        </label>
+                        
+                        <div formGroupName="address">
+                            <div class="form-group">
+                                <input type="text" class="form-control" formControlName="addressLine1" placeholder="Address Line 1" [class.is-invalid]="registerForm.get('address.addressLine1')?.invalid && registerForm.get('address.addressLine1')?.touched">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <input type="text" class="form-control" formControlName="city" placeholder="City" [class.is-invalid]="registerForm.get('address.city')?.invalid && registerForm.get('address.city')?.touched">
+                                </div>
+                                <div class="form-group flex-1">
+                                    <input type="text" class="form-control" formControlName="district" placeholder="District" [class.is-invalid]="registerForm.get('address.district')?.invalid && registerForm.get('address.district')?.touched">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <input type="text" class="form-control" formControlName="state" placeholder="State" [class.is-invalid]="registerForm.get('address.state')?.invalid && registerForm.get('address.state')?.touched">
+                                </div>
+                                <div class="form-group flex-1">
+                                    <input type="text" class="form-control" formControlName="pincode" placeholder="PIN Code" [class.is-invalid]="registerForm.get('address.pincode')?.invalid && registerForm.get('address.pincode')?.touched">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

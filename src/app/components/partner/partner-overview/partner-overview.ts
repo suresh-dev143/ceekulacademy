@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Address } from '../../../core/models/address.model';
 
 @Component({
   selector: 'app-partner-overview',
@@ -13,7 +14,7 @@ import { FormsModule } from '@angular/forms';
           <div class="org-logo">🏢</div>
           <div class="org-info">
             <h1 class="org-name">{{ orgName }} <span class="type-badge">{{ orgType }}</span></h1>
-            <p class="org-address"><i class="fas fa-map-marker-alt"></i> {{ address }}</p>
+            <p class="org-address"><i class="fas fa-map-marker-alt"></i> {{ formattedAddress }}</p>
           </div>
         </div>
         
@@ -128,7 +129,7 @@ import { FormsModule } from '@angular/forms';
 export class PartnerOverviewComponent {
   @Input() orgName: string = '';
   @Input() orgType: string = '';
-  @Input() address: string = '';
+  @Input() address: Address | string = '';
   @Input() radius: number = 10;
   @Input() stats: any = {};
   @Output() radiusChange = new EventEmitter<number>();
@@ -137,6 +138,13 @@ export class PartnerOverviewComponent {
 
   ngOnChanges() {
     this.selectedRadius = this.radius;
+  }
+
+  get formattedAddress(): string {
+    if (typeof this.address === 'string') return this.address;
+    if (!this.address) return '';
+    const a = this.address;
+    return [a.addressLine1, a.city, a.district, a.state].filter(x => x).join(', ') + (a.pincode ? ` — ${a.pincode}` : '');
   }
 
   onRadiusChange() {

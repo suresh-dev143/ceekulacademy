@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, map, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Address, GeoLocation } from '../core/models/address.model';
 
 export type UserRole =
     | 'Student' | 'Teacher' | 'Researcher' | 'Entrepreneur'
@@ -34,11 +35,8 @@ export interface RegisterRequest {
     partnerType?: string;
     expertTypes?: string[];
     activityType?: string[];
-    address?: {
-        village: string;
-        pincode: string;
-        district: string;
-    };
+    address?: Address;
+    location?: GeoLocation;
 }
 
 export interface LoginRequest {
@@ -57,11 +55,8 @@ export interface UpdateProfileRequest {
     gender?: string;
     partnerType?: string;
     expertTypes?: string[];
-    address?: {
-        village: string;
-        pincode: string;
-        district: string;
-    };
+    address?: Address;
+    location?: GeoLocation;
 }
 
 /** Raw shape returned by the backend */

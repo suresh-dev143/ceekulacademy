@@ -32,6 +32,11 @@ export interface WorkshopSession {
     mode: 'online' | 'hybrid';
     location: string | null;
     resources?: string | null;
+    facilityId?: string;
+    facilityType?: 'Classroom' | 'Lab' | 'Other';
+    partnerId?: string;
+    partnerName?: string;
+    facilityDetails?: any;
 }
 
 export interface CreateWorkshopRequest {
@@ -105,6 +110,11 @@ export interface WorkshopApiSession {
     mode: 'online' | 'hybrid';
     location: string | null;
     resources?: string | null;
+    facilityId?: string;
+    facilityType?: 'Classroom' | 'Lab' | 'Other';
+    partnerId?: string;
+    partnerName?: string;
+    facilityDetails?: any;
 }
 
 export interface WorkshopListItem {
@@ -156,6 +166,11 @@ export interface AddSessionPayload {
     mode: 'online' | 'hybrid';
     location: string | null;
     resources?: string | null;
+    facilityId?: string;
+    facilityType?: 'Classroom' | 'Lab' | 'Other';
+    partnerId?: string;
+    partnerName?: string;
+    facilityDetails?: any;
 }
 
 export interface AddSessionsResponse {
@@ -258,9 +273,14 @@ export interface EnrolledWorkshopSession {
     activity: string;
     description?: string;
     fee: number;
-    mode: string;
+    mode: 'online' | 'hybrid';
     location: string | null;
     _id: string;
+    facilityId?: string;
+    facilityType?: 'Classroom' | 'Lab' | 'Other';
+    partnerId?: string;
+    partnerName?: string;
+    facilityDetails?: any;
 }
 
 export interface EnrolledWorkshop {

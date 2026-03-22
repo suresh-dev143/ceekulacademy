@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { LayoutComponent } from '../../components/layout/layout';
 import { AuthService, RegisterRequest, AuthResponse } from '../../services/auth.service';
 import { NavbarComponent } from '../../components/navbar/navbar';
+import { LocationService } from '../../core/services/location.service';
 
 @Component({
     selector: 'app-register',
@@ -14,6 +15,7 @@ import { NavbarComponent } from '../../components/navbar/navbar';
 })
 export class RegisterComponent {
     private authService = inject(AuthService);
+    private locationService = inject(LocationService);
     registerForm: FormGroup;
     isSubmitting = signal(false);
     isLoggedIn = this.authService.isLoggedIn;
@@ -64,9 +66,19 @@ export class RegisterComponent {
             name: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             phone: [''],
-            village: ['', Validators.required],
-            pincode: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]],
-            district: ['', Validators.required],
+            address: this.fb.group({
+                addressLine1: ['', Validators.required],
+                addressLine2: [''],
+                city: ['', Validators.required],
+                district: ['', Validators.required],
+                state: ['', Validators.required],
+                country: ['India', Validators.required],
+                pincode: ['', [Validators.required, Validators.pattern('^[0-9]{6}$')]]
+            }),
+            location: this.fb.group({
+                type: ['Point'],
+                coordinates: [[0, 0]]
+            }),
             gender: ['', Validators.required],
             dob: ['', Validators.required],
 
@@ -117,6 +129,20 @@ export class RegisterComponent {
         return null;
     }
 
+    useCurrentLocation() {
+        this.isSubmitting.set(true);
+        this.locationService.getCurrentLocation().subscribe({
+            next: (loc) => {
+                this.registerForm.get('location')?.patchValue(loc);
+                this.isSubmitting.set(false);
+            },
+            error: (err) => {
+                console.error('Failed to get location:', err);
+                this.isSubmitting.set(false);
+            }
+        });
+    }
+
     onSubmit() {
         if (this.registerForm.invalid) {
             this.registerForm.markAllAsTouched();
@@ -132,11 +158,8 @@ export class RegisterComponent {
             name: v.name,
             dateOfBirth: v.dob,
             gender: v.gender,
-            address: {
-                village: v.village,
-                pincode: v.pincode,
-                district: v.district,
-            },
+            address: v.address,
+            location: v.location
         };
 
         const primaryRole = v.selectedRoles[0] ?? '';

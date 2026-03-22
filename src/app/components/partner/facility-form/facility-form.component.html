@@ -61,47 +61,70 @@
         <button type="button" class="btn-outline" (click)="addScheduleSlot()">+ Add Time Slot</button>
       </h3>
       <div class="nested-section" formArrayName="availabilitySchedule">
-        <div class="schedule-grid" style="margin-bottom: 0.5rem;" *ngIf="availabilitySchedule.length > 0">
-          <div class="grid-header">Day</div>
-          <div class="grid-header">Start</div>
-          <div class="grid-header">End</div>
-          <div class="grid-header">Status</div>
-          <div class="grid-header">Notes</div>
-          <div></div>
-        </div>
-        
-        <div *ngFor="let slot of availabilitySchedule.controls; let i=index" [formGroupName]="i" class="schedule-grid">
-          <div>
-            <select class="form-control" formControlName="day" [class.is-invalid]="slot.get('day')?.invalid && slot.get('day')?.touched">
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
-              <option value="Sunday">Sunday</option>
-            </select>
-            <app-form-validation-error [control]="slot.get('day')" label="Day"></app-form-validation-error>
-          </div>
-          <div>
-            <input type="time" class="form-control" formControlName="startTime" [class.is-invalid]="slot.get('startTime')?.invalid && slot.get('startTime')?.touched">
-            <app-form-validation-error [control]="slot.get('startTime')" label="Start Time"></app-form-validation-error>
-          </div>
-          <div>
-            <input type="time" class="form-control" formControlName="endTime" [class.is-invalid]="slot.get('endTime')?.invalid && slot.get('endTime')?.touched">
-            <app-form-validation-error [control]="slot.get('endTime')" label="End Time"></app-form-validation-error>
-          </div>
-          <div>
-            <select class="form-control" formControlName="status" [class.is-invalid]="slot.get('status')?.invalid && slot.get('status')?.touched">
-              <option value="Available">Available</option>
-              <option value="Booked">Booked</option>
-              <option value="Maintenance">Maintenance</option>
-              <option value="Closed">Closed</option>
-            </select>
-            <app-form-validation-error [control]="slot.get('status')" label="Status"></app-form-validation-error>
-          </div>
-          <input type="text" class="form-control" formControlName="notes" placeholder="Notes (optional)">
-          <button type="button" class="btn-danger" (click)="removeScheduleSlot(i)" title="Remove Slot"><i class="fas fa-trash"></i></button>
+        <div *ngFor="let slot of availabilitySchedule.controls; let i=index" [formGroupName]="i" class="schedule-slot-group" style="border: 1px solid #222; padding: 1rem; margin-bottom: 1rem; background: #080808;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #222; padding-bottom: 0.5rem;">
+                <span style="color: #ef9d57; font-weight: bold; font-size: 0.8rem;">SLOT #{{ i + 1 }}</span>
+                <button type="button" class="btn-danger" (click)="removeScheduleSlot(i)" title="Remove Slot" style="margin: 0; padding: 0.2rem 0.5rem;"><i class="fas fa-trash"></i> Remove</button>
+            </div>
+    
+            <div class="schedule-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1.5fr; gap: 1rem;">
+                <div>
+                  <label class="form-label">Day *</label>
+                  <select class="form-control" formControlName="day" [class.is-invalid]="slot.get('day')?.invalid && slot.get('day')?.touched">
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                  </select>
+                  <app-form-validation-error [control]="slot.get('day')" label="Day"></app-form-validation-error>
+                </div>
+                <div>
+                  <label class="form-label">Start Time *</label>
+                  <input type="time" class="form-control" formControlName="startTime" [class.is-invalid]="slot.get('startTime')?.invalid && slot.get('startTime')?.touched">
+                  <app-form-validation-error [control]="slot.get('startTime')" label="Start Time"></app-form-validation-error>
+                </div>
+                <div>
+                  <label class="form-label">End Time *</label>
+                  <input type="time" class="form-control" formControlName="endTime" [class.is-invalid]="slot.get('endTime')?.invalid && slot.get('endTime')?.touched">
+                  <app-form-validation-error [control]="slot.get('endTime')" label="End Time"></app-form-validation-error>
+                </div>
+                <div>
+                  <label class="form-label">Status *</label>
+                  <select class="form-control" formControlName="status" [class.is-invalid]="slot.get('status')?.invalid && slot.get('status')?.touched">
+                    <option value="Available">Available</option>
+                    <option value="Booked">Booked</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                  <app-form-validation-error [control]="slot.get('status')" label="Status"></app-form-validation-error>
+                </div>
+            </div>
+    
+            <!-- Per-slot Pricing -->
+            <div formGroupName="pricing" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; border-top: 1px dashed #333; padding-top: 1rem;">
+                <div>
+                  <label class="form-label">Pricing Type *</label>
+                  <select class="form-control" formControlName="type">
+                    <option value="Free">Free</option>
+                    <option value="Share">Share (%)</option>
+                    <option value="Fixed">Fixed Amount</option>
+                  </select>
+                  <p class="form-label" style="font-size: 0.7rem; margin-top: 0.3rem;" *ngIf="getPricingType(i) === 'Share'">* Example: 40% of student's fees</p>
+                  <p class="form-label" style="font-size: 0.7rem; margin-top: 0.3rem;" *ngIf="getPricingType(i) === 'Fixed'">* Example: Fixed charges per hour/session</p>
+                </div>
+                <div *ngIf="getPricingType(i) !== 'Free'">
+                  <label class="form-label">{{ getPricingType(i) === 'Share' ? 'Share % *' : 'Rate (₹/hr) *' }}</label>
+                  <input type="number" class="form-control" formControlName="amount" [placeholder]="getPricingType(i) === 'Share' ? 'e.g. 40' : 'e.g. 500'">
+                  <app-form-validation-error [control]="slot.get('pricing.amount')" [label]="getPricingType(i) === 'Share' ? 'Share Percentage' : 'Fixed Amount'"></app-form-validation-error>
+                </div>
+            </div>
+            <div style="margin-top: 1rem;">
+                <label class="form-label">Slot Notes</label>
+                <input type="text" class="form-control" formControlName="notes" placeholder="Notes (optional)">
+            </div>
         </div>
       </div>
   

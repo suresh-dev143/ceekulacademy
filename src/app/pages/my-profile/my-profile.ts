@@ -111,9 +111,14 @@ export class MyProfileComponent {
             placeOfBirth: [pi.placeOfBirth],
             gender:       [pi.gender,       Validators.required],
             address: this.fb.group({
-                village:  [pi.address.village,  Validators.required],
-                pincode:  [pi.address.pincode,  [Validators.required, Validators.pattern(/^\d{6}$/)]],
-                district: [pi.address.district, Validators.required],
+                addressLine1: [pi.address.addressLine1, Validators.required],
+                addressLine2: [pi.address.addressLine2],
+                landmark:     [pi.address.landmark],
+                city:         [pi.address.city, Validators.required],
+                district:     [pi.address.district, Validators.required],
+                state:        [pi.address.state, Validators.required],
+                country:      [pi.address.country, Validators.required],
+                pincode:      [pi.address.pincode, [Validators.required, Validators.pattern(/^\d{6}$/)]],
             })
         });
 
@@ -144,7 +149,7 @@ export class MyProfileComponent {
         this.personalForm.patchValue({
             fullName: pi.fullName, mobile: pi.mobile, email: pi.email,
             dob: pi.dob, placeOfBirth: pi.placeOfBirth, gender: pi.gender,
-            address: { village: pi.address.village, pincode: pi.address.pincode, district: pi.address.district }
+            address: { ...pi.address }
         });
         this.editingPersonal.set(true);
     }
@@ -172,11 +177,7 @@ export class MyProfileComponent {
             name:        v.fullName,
             dateOfBirth,
             gender:      v.gender,
-            address: {
-                village:  v.address.village,
-                pincode:  v.address.pincode,
-                district: v.address.district,
-            },
+            address:     v.address
         };
 
         this.isSavingPersonal.set(true);

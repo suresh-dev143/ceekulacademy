@@ -25,6 +25,9 @@ import { NearbyTeacher } from '../../../services/student-discovery.service';
             <div class="teacher-info">
               <h4 class="name">{{ teacher.name }}</h4>
               <span class="specialization">{{ teacher.specialization }}</span>
+              <div *ngIf="teacher.distance < 5" class="near-you-badge">
+                <i class="fas fa-map-marker-alt"></i> Near You
+              </div>
             </div>
             <div class="distance-badge">{{ teacher.distance }} km</div>
           </div>
@@ -80,6 +83,11 @@ import { NearbyTeacher } from '../../../services/student-discovery.service';
     .teacher-info { flex: 1; }
     .name { font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
     .specialization { font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .near-you-badge { 
+      font-size: 0.6rem; font-weight: 800; color: #fff; background: #8b5cf6; 
+      padding: 0.1rem 0.4rem; border-radius: 4px; display: inline-flex; 
+      align-items: center; gap: 0.3rem; margin-top: 0.3rem; text-transform: uppercase;
+    }
 
     .distance-badge { font-size: 0.7rem; font-weight: 900; color: #10b981; border: 1px solid #10b981; padding: 0.3rem 0.6rem; border-radius: 0; text-transform: uppercase; letter-spacing: 0.5px; }
 

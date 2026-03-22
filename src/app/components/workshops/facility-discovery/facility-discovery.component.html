@@ -1,0 +1,149 @@
+<div class="fd-overlay" (click)="onClose()">
+    <div class="fd-container" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <header class="fd-header">
+            <div class="header-main">
+                <i class="fas fa-map-marked-alt"></i>
+                <div class="header-text">
+                    <h2>Discover Nearby Facilities</h2>
+                    <p>Select a partner location and facility for your session</p>
+                </div>
+            </div>
+            <button class="btn-close" (click)="onClose()" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </header>
+
+        <div class="fd-content">
+            <!-- Sidebar / Filters -->
+            <aside class="fd-sidebar">
+                <div class="sidebar-section">
+                    <h3>Quick Filters</h3>
+                    
+                    <div class="filter-group">
+                        <label>Facility Type</label>
+                        <select [(ngModel)]="filters().type" (change)="onFilterChange()">
+                            <option value="All">All Types</option>
+                            <option value="Classroom">Classroom</option>
+                            <option value="Lab">Computer Lab</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Search Radius: {{ filters().maxDistance }}km</label>
+                        <input type="range" min="1" max="50" [(ngModel)]="filters().maxDistance" (change)="onFilterChange()">
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Min Capacity</label>
+                        <input type="number" [(ngModel)]="filters().minCapacity" (change)="onFilterChange()" min="0">
+                    </div>
+                </div>
+
+                <div class="session-context-pill">
+                    <div class="context-item">
+                        <i class="fas fa-calendar-day"></i>
+                        <span>{{ sessionDate() | date:'mediumDate' }}</span>
+                    </div>
+                    <div class="context-item">
+                        <i class="fas fa-clock"></i>
+                        <span>{{ sessionStartTime() }} - {{ sessionEndTime() }}</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Results Area -->
+            <main class="fd-results-main">
+                @if (isLoading()) {
+                    <div class="fd-loading-state">
+                        <div class="fd-spinner"></div>
+                        <p>Scanning nearby infrastructure...</p>
+                    </div>
+                } @else if (locations().length === 0) {
+                    <div class="fd-empty-state">
+                        <i class="fas fa-search-location"></i>
+                        <h3>No matches nearby</h3>
+                        <p>Try expanding your radius or changing the facility type.</p>
+                    </div>
+                } @else {
+                    <div class="location-accordion">
+                        @for (loc of locations(); track loc.partnerId) {
+                            <div class="loc-card" [class.is-expanded]="expandedLocationId() === loc.partnerId">
+                                <!-- Location Summary (Sticky Header-like) -->
+                                <div class="loc-summary" (click)="toggleExpand(loc.partnerId)">
+                                    <div class="loc-info">
+                                        <div class="loc-name-row">
+                                            <h3>{{ loc.partnerName }}</h3>
+                                            @if (loc.distance <= 3) {
+                                                <span class="badge-near">📍 Near You</span>
+                                            }
+                                        </div>
+                                        <div class="loc-meta">
+                                            <span><i class="fas fa-map-marker-alt"></i> {{ loc.shortAddress }}</span>
+                                            <span><i class="fas fa-route"></i> {{ loc.distance }} km away</span>
+                                            <span class="fac-count">{{ loc.availableFacilities }} facilities available</span>
+                                        </div>
+                                    </div>
+                                    <div class="loc-toggle">
+                                        <i class="fas" [class.fa-chevron-down]="expandedLocationId() !== loc.partnerId" [class.fa-chevron-up]="expandedLocationId() === loc.partnerId"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Facilities Nested List -->
+                                @if (expandedLocationId() === loc.partnerId) {
+                                    <div class="loc-details">
+                                        <div class="loc-address-bar">
+                                            <i class="fas fa-info-circle"></i> {{ loc.address }}
+                                        </div>
+
+                                        <div class="facilities-list">
+                                            @for (f of loc.facilities; track f.facilityId) {
+                                                <div class="fac-item" [class.is-booked]="f.status === 'Booked'" [class.is-rec]="f.isRecommended">
+                                                    <div class="fac-header">
+                                                        <div class="fac-type-status">
+                                                            <span class="type-tag">{{ f.facilityType }}</span>
+                                                            @if (f.isRecommended) {
+                                                                <span class="rec-badge">⭐ Best Fit</span>
+                                                            }
+                                                            <span class="status-badge" [class]="f.status === 'Available' ? 'available' : 'unavailable'">
+                                                                {{ f.status }}
+                                                            </span>
+                                                        </div>
+                                                        <h4>{{ f.facilityName }}</h4>
+                                                    </div>
+
+                                                    <div class="fac-specs">
+                                                        <div class="spec">
+                                                            <i class="fas fa-users"></i>
+                                                            <span>{{ f.capacity }} capacity</span>
+                                                        </div>
+                                                        <div class="spec">
+                                                            <i class="fas fa-tag"></i>
+                                                            <span>₹{{ f.pricing.amount }} / {{ f.pricing.unit }}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="fac-features">
+                                                        @for (feat of f.features.slice(0, 4); track feat) {
+                                                            <span class="feat-chip">{{ feat }}</span>
+                                                        }
+                                                    </div>
+
+                                                    <button class="btn-select-facility" 
+                                                            [disabled]="f.status !== 'Available'"
+                                                            (click)="selectFacility(loc, f)">
+                                                        {{ f.status === 'Available' ? 'Select & Book' : 'Unavailable' }}
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </main>
+        </div>
+    </div>
+</div>

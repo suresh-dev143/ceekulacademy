@@ -16,13 +16,13 @@ import { finalize } from 'rxjs';
   template: `
     <div class="mgmt-section">
       <div class="section-header">
-        <h3 class="section-title"><i class="fas fa-building"></i> Infrastructure & Venues</h3>
+        <div class="header-left">
+          <h3 class="section-title"><i class="fas fa-building"></i> Infrastructure & Venues</h3>
+          <p class="section-subtitle">Manage your institutional facilities and learning spaces</p>
+        </div>
         @if (!isAddingResource() && !isEditingResource()) {
             <div class="header-actions">
-                @if (infraList().length > 0) {
-                    <button class="btn-danger-sm" (click)="confirmReset()"><i class="fas fa-trash-alt"></i> Reset All</button>
-                }
-                <button class="btn-outline-sm" (click)="toggleAddResource()">Add Site</button>
+                <button class="btn-primary-sm" (click)="toggleAddResource()"><i class="fas fa-plus"></i> Add Site</button>
             </div>
         }
       </div>
@@ -31,98 +31,188 @@ import { finalize } from 'rxjs';
         <app-infrastructure-form [initialData]="editData()" (close)="onFormClose()"></app-infrastructure-form>
       } @else if (isLoading()) {
         <div class="loading-state">
-            <i class="fas fa-spinner fa-spin"></i> Loading infrastructure...
+            <div class="spinner-container">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <span>Loading infrastructure...</span>
+            </div>
         </div>
       } @else {
-        <div class="infra-list-container">
+        <div class="infra-container">
             @for (infra of infraList(); track infra._id) {
-                <div class="site-group">
-                    <div class="site-header">
-                        <div class="site-info">
-                            <h4 class="site-name">{{ infra.generalInfo.schoolName }}</h4>
-                            <p class="site-address">{{ infra.generalInfo.address }}</p>
+                <div class="infra-card" [class.expanded]="expandedInfraId() === infra._id">
+                    <div class="card-header" (click)="toggleExpand(infra._id)">
+                        <div class="header-main">
+                            <div class="school-brand">
+                              <div class="brand-icon"><i class="fas fa-university"></i></div>
+                              <div class="school-details">
+                                  <h4 class="school-name">{{ infra.generalInfo.schoolName }}</h4>
+                                  <p class="school-address"><i class="fas fa-map-marker-alt"></i> {{ formatAddress(infra.generalInfo.address) }}</p>
+                              </div>
+                            </div>
+                            
+                            <div class="quick-stats">
+                                <div class="stat-pill">
+                                    <i class="fas fa-user-tie"></i>
+                                    <span>{{ infra.generalInfo.contactName }}</span>
+                                </div>
+                                <div class="stat-group">
+                                    <div class="stat" title="Classrooms">
+                                        <span class="count">{{ infra.classrooms.length }}</span>
+                                        <span class="label">Classrooms</span>
+                                    </div>
+                                    <div class="stat" title="Computer Labs">
+                                        <span class="count">{{ infra.computerLabs.length }}</span>
+                                        <span class="label">Labs</span>
+                                    </div>
+                                    <div class="stat" title="Other Facilities">
+                                        <span class="count">{{ infra.otherFacilities.length }}</span>
+                                        <span class="label">Facilities</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="site-actions">
-                            <button class="btn-outline-sm" (click)="toggleAddClassroom(infra._id)"><i class="fas fa-plus"></i> Add Classroom</button>
-                            <button class="btn-outline-sm" (click)="toggleAddComputerLab(infra._id)"><i class="fas fa-plus"></i> Add Lab</button>
-                            <button class="btn-outline-sm" (click)="toggleAddFacility(infra._id)"><i class="fas fa-plus"></i> Add Facility</button>
-                            <button class="btn-outline-sm" (click)="editResource(infra)"><i class="fas fa-edit"></i> Edit Site</button>
+                        <div class="header-indicator">
+                            <i class="fas" [class.fa-chevron-down]="expandedInfraId() !== infra._id" [class.fa-chevron-up]="expandedInfraId() === infra._id"></i>
                         </div>
                     </div>
 
-                    <div class="infra-list">
-                        <!-- Classrooms -->
-                        @for (item of infra.classrooms; track item.name) {
-                            <div class="infra-item">
-                                <div class="infra-main">
-                                    <div class="infra-type-icon">🏫</div>
-                                    <div class="infra-info">
-                                        <h4 class="infra-name">{{ item.name }} - {{ item.type }}</h4>
-                                        <div class="infra-tags">
-                                            <span class="tag">Capacity: {{ item.capacity }}</span>
-                                            <span class="tag">{{ item.primaryUsage }}</span>
-                                        </div>
-                                    </div>
+                    <div class="card-content" [class.show]="expandedInfraId() === infra._id">
+                        <div class="content-inner">
+                            <div class="site-actions-bar">
+                                <div class="action-group">
+                                    <button class="btn-action" (click)="toggleAddClassroom(infra._id); $event.stopPropagation()">
+                                        <i class="fas fa-chalkboard-teacher"></i> Add Classroom
+                                    </button>
+                                    <button class="btn-action" (click)="toggleAddComputerLab(infra._id); $event.stopPropagation()">
+                                        <i class="fas fa-desktop"></i> Add Lab
+                                    </button>
+                                    <button class="btn-action" (click)="toggleAddFacility(infra._id); $event.stopPropagation()">
+                                        <i class="fas fa-building"></i> Add Facility
+                                    </button>
                                 </div>
-                                <div class="infra-actions">
-                                    <button class="icon-btn" (click)="editClassroom(item, infra._id)"><i class="fas fa-edit"></i></button>
-                                    <button class="icon-btn danger" (click)="confirmDelete('classrooms', item.name, infra)"><i class="fas fa-trash"></i></button>
+                                <div class="site-danger-zone">
+                                    <button class="btn-edit-site" (click)="editResource(infra); $event.stopPropagation()">
+                                        <i class="fas fa-cog"></i> Edit Site Details
+                                    </button>
+                                    <button class="btn-delete-site" (click)="confirmDeleteSite(infra._id); $event.stopPropagation()">
+                                        <i class="fas fa-trash-alt"></i> Delete Site
+                                    </button>
                                 </div>
                             </div>
-                        }
 
-                        <!-- Labs -->
-                        @for (item of infra.computerLabs; track item.name) {
-                            <div class="infra-item">
-                                <div class="infra-main">
-                                    <div class="infra-type-icon">🧪</div>
-                                    <div class="infra-info">
-                                        <h4 class="infra-name">{{ item.name }}</h4>
-                                        <div class="infra-tags">
-                                            <span class="tag">Workstations: {{ item.workstations }}</span>
-                                            <span class="tag">{{ item.internetSpeed }}</span>
-                                        </div>
+                            <div class="resource-grid">
+                                <!-- Classrooms Section -->
+                                <div class="resource-section">
+                                    <div class="res-header">
+                                        <h5><i class="fas fa-school"></i> Classrooms</h5>
+                                        <span class="res-count">{{ infra.classrooms.length }}</span>
+                                    </div>
+                                    <div class="res-list">
+                                        @for (item of infra.classrooms; track item.name) {
+                                            <div class="res-item">
+                                                <div class="res-info">
+                                                    <span class="res-name">{{ item.name }}</span>
+                                                    <div class="res-meta">
+                                                      <span class="res-tag">{{ item.type }}</span>
+                                                      <span class="res-tag"><i class="fas fa-users"></i> {{ item.capacity }}</span>
+                                                      <span class="res-tag pricing-tag" [class.free]="isFree(item.availabilitySchedule)">
+                                                        <i class="fas fa-tag"></i> {{ formatPricing(item.availabilitySchedule) }}
+                                                      </span>
+                                                  </div>
+                                                </div>
+                                                <div class="res-actions">
+                                                    <button class="mini-btn" (click)="editClassroom(item, infra._id); $event.stopPropagation()"><i class="fas fa-pen"></i></button>
+                                                    <button class="mini-btn danger" (click)="confirmDelete('classrooms', item.name, infra); $event.stopPropagation()"><i class="fas fa-trash"></i></button>
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (infra.classrooms.length === 0) {
+                                            <div class="res-empty">No classrooms added</div>
+                                        }
                                     </div>
                                 </div>
-                                <div class="infra-actions">
-                                    <button class="icon-btn" (click)="editLab(item, infra._id)"><i class="fas fa-edit"></i></button>
-                                    <button class="icon-btn danger" (click)="confirmDelete('computerLabs', item.name, infra)"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </div>
-                        }
 
-                        <!-- Other Facilities -->
-                        @for (item of infra.otherFacilities; track item.name) {
-                            <div class="infra-item">
-                                <div class="infra-main">
-                                    <div class="infra-type-icon">🏗️</div>
-                                    <div class="infra-info">
-                                        <h4 class="infra-name">{{ item.name }} - {{ item.type }}</h4>
-                                        <div class="infra-tags">
-                                            <span class="tag">Capacity: {{ item.capacity }}</span>
-                                            <span class="tag">{{ item.type }}</span>
-                                        </div>
+                                <!-- Labs Section -->
+                                <div class="resource-section">
+                                    <div class="res-header">
+                                        <h5><i class="fas fa-desktop"></i> Computer Labs</h5>
+                                        <span class="res-count">{{ infra.computerLabs.length }}</span>
+                                    </div>
+                                    <div class="res-list">
+                                        @for (item of infra.computerLabs; track item.name) {
+                                            <div class="res-item">
+                                                <div class="res-info">
+                                                    <span class="res-name">{{ item.name }}</span>
+                                                    <div class="res-meta">
+                                                      <span class="res-tag"><i class="fas fa-desktop"></i> {{ item.workstations }} Units</span>
+                                                      <span class="res-tag"><i class="fas fa-wifi"></i> {{ item.internetSpeed }}</span>
+                                                      <span class="res-tag pricing-tag" [class.free]="isFree(item.availabilitySchedule)">
+                                                        <i class="fas fa-tag"></i> {{ formatPricing(item.availabilitySchedule) }}
+                                                      </span>
+                                                  </div>
+                                                </div>
+                                                <div class="res-actions">
+                                                    <button class="mini-btn" (click)="editLab(item, infra._id); $event.stopPropagation()"><i class="fas fa-pen"></i></button>
+                                                    <button class="mini-btn danger" (click)="confirmDelete('computerLabs', item.name, infra); $event.stopPropagation()"><i class="fas fa-trash"></i></button>
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (infra.computerLabs.length === 0) {
+                                            <div class="res-empty">No labs added</div>
+                                        }
                                     </div>
                                 </div>
-                                <div class="infra-actions">
-                                    <button class="icon-btn" (click)="editFacility(item, infra._id)"><i class="fas fa-edit"></i></button>
-                                    <button class="icon-btn danger" (click)="confirmDelete('otherFacilities', item.name, infra)"><i class="fas fa-trash"></i></button>
+
+                                <!-- Facilities Section -->
+                                <div class="resource-section">
+                                    <div class="res-header">
+                                        <h5><i class="fas fa-building"></i> Other Facilities</h5>
+                                        <span class="res-count">{{ infra.otherFacilities.length }}</span>
+                                    </div>
+                                    <div class="res-list">
+                                        @for (item of infra.otherFacilities; track item.name) {
+                                            <div class="res-item">
+                                                <div class="res-info">
+                                                    <span class="res-name">{{ item.name }}</span>
+                                                    <div class="res-meta">
+                                                      <span class="res-tag">{{ item.type }}</span>
+                                                      @if (item.capacity) { <span class="res-tag"><i class="fas fa-users"></i> {{ item.capacity }}</span> }
+                                                      <span class="res-tag pricing-tag" [class.free]="isFree(item.availabilitySchedule)">
+                                                        <i class="fas fa-tag"></i> {{ formatPricing(item.availabilitySchedule) }}
+                                                      </span>
+                                                  </div>
+                                                </div>
+                                                <div class="res-actions">
+                                                    <button class="mini-btn" (click)="editFacility(item, infra._id); $event.stopPropagation()"><i class="fas fa-pen"></i></button>
+                                                    <button class="mini-btn danger" (click)="confirmDelete('otherFacilities', item.name, infra); $event.stopPropagation()"><i class="fas fa-trash"></i></button>
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (infra.otherFacilities.length === 0) {
+                                            <div class="res-empty">No facilities added</div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
-                        }
+                        </div>
                     </div>
                 </div>
             }
 
             @if (infraList().length === 0) {
-                <div class="empty-state">No infrastructure found. Click "Add Site" to create one.</div>
+                <div class="empty-placeholder">
+                    <i class="fas fa-city"></i>
+                    <h4>No Infrastructure Found</h4>
+                    <p>Get started by adding your first school or venue site.</p>
+                    <button class="btn-primary" (click)="toggleAddResource()">Add Your First Site</button>
+                </div>
             }
         </div>
       }
 
       @if (isAddingClassroom() && selectedInfraId()) {
-        <div class="modal-backdrop">
-          <div class="modal-content">
+        <div class="modal-layer">
+          <div class="modal-window">
             <app-classroom-form 
               [infraId]="selectedInfraId()!" 
               [editData]="editClassroomData() || undefined"
@@ -134,8 +224,8 @@ import { finalize } from 'rxjs';
       }
       
       @if (isAddingComputerLab() && selectedInfraId()) {
-        <div class="modal-backdrop">
-          <div class="modal-content">
+        <div class="modal-layer">
+          <div class="modal-window">
             <app-computer-lab-form 
               [infraId]="selectedInfraId()!" 
               [editData]="editLabData() || undefined"
@@ -147,8 +237,8 @@ import { finalize } from 'rxjs';
       }
 
       @if (isAddingFacility() && selectedInfraId()) {
-        <div class="modal-backdrop">
-          <div class="modal-content">
+        <div class="modal-layer">
+          <div class="modal-window">
             <app-facility-form 
               [infraId]="selectedInfraId()!" 
               [editData]="editFacilityData() || undefined"
@@ -161,65 +251,108 @@ import { finalize } from 'rxjs';
     </div>
   `,
   styles: [`
-    .mgmt-section { padding: 2.5rem; background: #010101;  border-radius: 0; margin-bottom: 0.5rem; }
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-    .section-title { font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; i { color: var(--accent-primary); } }
+    :host { --accent: #ffd700; --bg-card: #0a0a0a; --bg-header: #111111; --border-color: #222; --text-muted: #888; }
     
-    .infra-list-container { display: flex; flex-direction: column; gap: 2.5rem; }
-    .site-group { border-top: 1px solid #333; padding-top: 1.5rem; }
-    .site-group:first-child { border-top: none; padding-top: 0; }
-    .site-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
-    .site-name { font-size: 1.1rem; font-weight: 800; color: var(--accent-primary); margin: 0 0 0.25rem; text-transform: uppercase; }
-    .site-address { font-size: 0.8rem; color: #888; margin: 0; }
+    .mgmt-section { padding: 2rem; background: #000; min-height: 100%; color: #fff; }
     
-    .infra-list { display: flex; flex-direction: column; gap: 0.75rem; }
-    .infra-item {
-      background: #050505; border: 1px solid var(--row-border); border-radius: 0;
-      padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; transition: 0.2s;
-      &:hover { border-color: var(--accent-primary); background: #0a0a0a; }
+    .section-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; }
+    .section-title { font-size: 1.5rem; font-weight: 900; margin: 0; color: #fff; display: flex; align-items: center; gap: 1rem; text-transform: uppercase; letter-spacing: 1px; i { color: var(--accent); } }
+    .section-subtitle { font-size: 0.85rem; color: var(--text-muted); margin: 0.3rem 0 0; }
+    
+    .header-actions { display: flex; gap: 1rem; }
+    .btn-primary-sm { background: var(--accent); color: #000; border: none; padding: 0.7rem 1.2rem; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: 0.2s; &:hover { transform: translateY(-2px); filter: brightness(1.1); } }
+    .btn-danger-sm { background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 0.7rem 1.2rem; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; cursor: pointer; transition: 0.2s; &:hover { background: #ff4444; color: #fff; } }
+
+    .infra-container { display: flex; flex-direction: column; gap: 1.2rem; }
+    
+    .infra-card { background: var(--bg-card); border: 1px solid var(--border-color); position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        &:hover { border-color: #444; }
+        &.expanded { border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     }
 
-    .infra-main { display: flex; align-items: center; gap: 1.2rem; flex: 2; }
-    .infra-type-icon { width: 44px; height: 44px; background: #000000; border: 1px solid var(--row-border); border-radius: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; filter: grayscale(1); }
-    .infra-name { font-weight: 800; color: #fff; margin: 0 0 0.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .infra-tags { display: flex; gap: 0.5rem; }
-    .tag { font-size: 0.65rem; font-weight: 900; color: #000000; background: var(--accent-primary); border: 1px solid var(--accent-primary); padding: 0.2rem 0.6rem; border-radius: 0; text-transform: uppercase; letter-spacing: 0.5px; }
-
-    .infra-capacity { text-align: center; flex: 1; }
-    .cap-val { display: block; font-size: 1.5rem; font-weight: 900; color: #fff; }
-    .cap-label { font-size: 0.7rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-
-    .infra-actions { display: flex; gap: 0.8rem; }
-    .icon-btn { background: none; border: 1px solid var(--row-border); color: var(--text-secondary); width: 34px; height: 34px; border-radius: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem; transition: 0.2s; 
-        &:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
-        &.danger:hover { color: #ff4d4d; border-color: #ff4d4d; }
-    }
-    .btn-outline-sm { background: #000000; border: 1px solid var(--accent-primary); color: var(--text-primary); padding: 0.6rem 1.25rem; border-radius: 0; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; &:hover { background: var(--accent-primary); color: #000000; } }
-    .btn-danger-sm { background: transparent; border: 1px solid #ff4d4d; color: #ff4d4d; padding: 0.6rem 1.25rem; border-radius: 0; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; &:hover { background: #ff4d4d; color: #fff; } }
-    .header-actions { display: flex; gap: 1rem; align-items: center; }
+    .card-header { padding: 1.2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+    .header-main { display: flex; align-items: center; gap: 2rem; flex: 1; }
     
-    .loading-state, .empty-state { padding: 2rem; text-align: center; color: #888; font-size: 0.9rem; border: 1px dashed #333; }
+    .school-brand { display: flex; align-items: center; gap: 1.2rem; min-width: 250px; }
+    .brand-icon { width: 48px; height: 48px; background: #000; border: 1px solid #333; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--accent); }
+    .school-name { font-size: 1.1rem; font-weight: 800; margin: 0; color: #fff; text-transform: uppercase; }
+    .school-address { font-size: 0.75rem; color: var(--text-muted); margin: 0.2rem 0 0; display: flex; align-items: center; gap: 0.4rem; i { font-size: 0.7rem; } }
+
+    .quick-stats { display: flex; align-items: center; gap: 2rem; }
+    .stat-pill { background: #1a1a1a; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; color: #ccc; display: flex; align-items: center; gap: 0.6rem; border: 1px solid #333; }
+    .stat-group { display: flex; gap: 1.5rem; padding-left: 1.5rem; border-left: 1px solid #333; }
+    .stat { display: flex; flex-direction: column; align-items: center;
+        .count { font-size: 1rem; font-weight: 900; color: #fff; line-height: 1; }
+        .label { font-size: 0.6rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 0.2rem; }
+    }
+
+    .header-indicator { color: var(--text-muted); font-size: 0.9rem; transition: 0.3s; }
+    .infra-card.expanded .header-indicator { color: var(--accent); }
+
+    .card-content { max-height: 0; overflow: hidden; visibility: hidden; transition: all 0.3s ease-in-out; background: #050505;
+        &.show { max-height: 2000px; visibility: visible; }
+    }
+    .content-inner { padding: 1.5rem; border-top: 1px solid #222; }
+
+    .site-actions-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.2rem; border-bottom: 1px dashed #333; }
+    .action-group { display: flex; gap: 0.8rem; }
+    .site-danger-zone { display: flex; gap: 0.8rem; align-items: center; }
+    .btn-action { background: #111; border: 1px solid #333; color: #fff; padding: 0.6rem 1rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.6rem; transition: 0.2s; &:hover { border-color: var(--accent); color: var(--accent); } }
+    .btn-edit-site { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 0.6rem 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; gap: 0.6rem; &:hover { background: var(--accent); color: #000; } }
+    .btn-delete-site { background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 0.6rem 1rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; gap: 0.6rem; &:hover { background: #ff4444; color: #fff; } }
+
+    .resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .resource-section { background: #000; border: 1px solid #222; padding: 1.2rem; }
+    .res-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; 
+        h5 { margin: 0; font-size: 0.85rem; font-weight: 900; text-transform: uppercase; color: #eee; display: flex; align-items: center; gap: 0.6rem; i { color: var(--accent); font-size: 0.8rem; } }
+        .res-count { background: #222; color: #fff; font-size: 0.7rem; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    }
+
+    .res-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .res-item { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; &:hover { border-color: #333; } }
+    .res-name { display: block; font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 0.2rem; }
+    .res-meta { display: flex; gap: 0.6rem; }
+    .res-tag { font-size: 0.6rem; color: var(--text-muted); background: #111; padding: 0.15rem 0.5rem; border: 1px solid #222; display: flex; align-items: center; gap: 0.3rem; }
+    .pricing-tag { color: var(--accent); border-color: rgba(255, 215, 0, 0.3); font-weight: 700;
+        &.free { color: #2ecc71; border-color: rgba(46, 204, 113, 0.3); }
+    }
+
+    .res-actions { display: flex; gap: 0.4rem; }
+    .mini-btn { background: none; border: 1px solid #333; color: #666; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; transition: 0.2s; &:hover { color: var(--accent); border-color: var(--accent); } &.danger:hover { color: #ff4444; border-color: #ff4444; } }
+    .res-empty { padding: 1.5rem; text-align: center; color: #444; font-size: 0.75rem; border: 1px dashed #222; }
+
+    .empty-placeholder { padding: 5rem 2rem; text-align: center; border: 1px dashed #333; color: #555;
+        i { font-size: 3rem; margin-bottom: 1.5rem; color: #222; }
+        h4 { color: #fff; margin: 0 0 0.5rem; font-weight: 800; text-transform: uppercase; }
+        p { margin-bottom: 2rem; font-size: 0.9rem; }
+        .btn-primary { background: var(--accent); color: #000; border: none; padding: 1rem 2rem; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+    }
+
+    .loading-state { padding: 5rem; display: flex; justify-content: center;
+        .spinner-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; color: var(--accent); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+            i { font-size: 2rem; }
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .header-main { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .quick-stats { width: 100%; border-top: 1px solid #222; padding-top: 1rem; justify-content: space-between; }
+        .stat-group { border: none; padding: 0; }
+    }
 
     @media (max-width: 768px) {
-      .mgmt-section { padding: 1.5rem; }
-      .section-header { flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
-      .infra-item { flex-direction: column; align-items: flex-start; gap: 1rem; }
-      .infra-main { flex: unset; width: 100%; }
-      .infra-capacity { display: flex; align-items: center; gap: 0.75rem; text-align: left;
-        .cap-val { font-size: 1.2rem; }
-        .cap-label { margin: 0; }
-      }
-      .infra-actions { align-self: flex-end; }
+        .mgmt-section { padding: 1rem; }
+        .section-header { flex-direction: column; gap: 1.5rem; }
+        .header-actions { width: 100%; justify-content: space-between; }
+        .quick-stats { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .stat-group { width: 100%; justify-content: space-between; }
+        .site-actions-bar { flex-direction: column; gap: 1.2rem; align-items: stretch; }
+        .action-group { flex-direction: column; }
+        .btn-edit-site { justify-content: center; }
     }
 
-    .modal-backdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-    .modal-content { width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; background: #000; border: 1px solid var(--accent-primary); }
-
-    @media (max-width: 480px) {
-      .mgmt-section { padding: 1rem; }
-      .section-title { font-size: 1rem; letter-spacing: 1px; }
-      .modal-content { max-width: 95%; max-height: 95vh; }
-    }
+    .modal-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .modal-window { width: 95%; max-width: 1000px; max-height: 90vh; overflow-y: auto; background: #000; border: 1px solid var(--accent); position: relative; }
   `]
 })
 export class InfrastructureManagerComponent implements OnInit {
@@ -233,6 +366,11 @@ export class InfrastructureManagerComponent implements OnInit {
   isAddingResource = signal(false);
   isEditingResource = signal(false);
   editData = signal<InfrastructureData | null>(null);
+  expandedInfraId = signal<string | null>(null);
+
+  toggleExpand(id: string) {
+    this.expandedInfraId.update(current => current === id ? null : id);
+  }
 
   isAddingClassroom = signal(false);
   isAddingComputerLab = signal(false);
@@ -241,6 +379,38 @@ export class InfrastructureManagerComponent implements OnInit {
   editClassroomData = signal<Classroom | null>(null);
   editLabData = signal<ComputerLab | null>(null);
   editFacilityData = signal<OtherFacility | null>(null);
+
+  formatAddress(address: any): string {
+    if (typeof address === 'string') return address;
+    if (!address) return '';
+    return [address.addressLine1, address.city, address.state].filter(x => x).join(', ');
+  }
+
+  isFree(schedule: Classroom['availabilitySchedule'] | ComputerLab['availabilitySchedule'] | OtherFacility['availabilitySchedule']): boolean {
+    if (!schedule || schedule.length === 0) return true;
+    return schedule.every(s => !s.pricing || s.pricing.type === 'Free');
+  }
+
+  formatPricing(schedule: Classroom['availabilitySchedule'] | ComputerLab['availabilitySchedule'] | OtherFacility['availabilitySchedule']): string {
+    if (!schedule || schedule.length === 0) return 'Free';
+    
+    const slotsWithPricing = schedule.filter(s => s.pricing && s.pricing.type !== 'Free');
+    if (slotsWithPricing.length === 0) return 'Free';
+
+    const types = new Set(slotsWithPricing.map(s => s.pricing!.type));
+    if (types.size === 1) {
+      const type = Array.from(types)[0];
+      const amounts = new Set(slotsWithPricing.map(s => s.pricing!.amount));
+      
+      if (amounts.size === 1) {
+        const amt = Array.from(amounts)[0];
+        return type === 'Share' ? `${amt}% Share` : `₹${amt}/hr`;
+      }
+      return `Varies (${type})`;
+    }
+    
+    return 'Varies by Slot';
+  }
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -365,46 +535,26 @@ export class InfrastructureManagerComponent implements OnInit {
       }
   }
 
-  confirmReset() {
-      if (confirm('CRITICAL: This will permanently delete ALL infrastructure and venue records for your institution. This action cannot be undone. Are you sure?')) {
-          this.resetInfrastructure();
+  confirmDeleteSite(infraId: string) {
+      if (confirm('Are you sure you want to delete this entire site? This will remove all classrooms, labs, and facilities associated with it. This action cannot be undone.')) {
+          this.deleteSite(infraId);
       }
   }
 
-  resetInfrastructure() {
-      // This resets ALL infrastructures. 
-      // In a multi-infra scenario, we might want to delete just one site, 
-      // but 'Reset All' should probably delete everything of the partner.
-      // However, the current deleteInfrastructure takes an ID.
-      // We'll loop through all and delete them, or just delete the first one if that's the logic.
-      // For now, let's keep it simple and delete all sites.
-      
-      const ids = this.infraList().map(i => i._id);
-      if (ids.length === 0) return;
-
+  deleteSite(infraId: string) {
       this.isLoading.set(true);
-      // We can't easily do parallel deletes with the current service without more logic,
-      // so we'll just delete the first one for now or rethink this.
-      // Actually, let's just delete the one by one or assume a backend "Reset All" exists.
-      // Since we don't have "Reset All" in backend, we'll just delete them.
-      
-      const deleteNext = (index: number) => {
-          if (index >= ids.length) {
-              this.infraList.set([]);
-              this.isLoading.set(false);
-              this.fetchInfrastructure();
-              return;
-          }
-          this.infraService.deleteInfrastructure(ids[index]).subscribe({
-              next: () => deleteNext(index + 1),
+      this.infraService.deleteInfrastructure(infraId)
+          .pipe(finalize(() => this.isLoading.set(false)))
+          .subscribe({
+              next: () => {
+                  this.toastService.success('Infrastructure site deleted successfully!');
+                  this.fetchInfrastructure();
+              },
               error: (err) => {
-                  console.error('Reset failed at index', index, err);
-                  this.isLoading.set(false);
+                  console.error('Site delete failed:', err);
+                  this.toastService.error(err.error?.message || 'Failed to delete site.');
               }
           });
-      };
-
-      deleteNext(0);
   }
 
   onFormClose() {

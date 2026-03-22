@@ -1,13 +1,10 @@
 import { Injectable, signal, computed } from '@angular/core';
+import { Address } from '../core/models/address.model';
 
 export type VerificationStatus = 'Pending' | 'Verified' | 'Rejected';
 export type ProfileRole = 'Student' | 'Teacher' | 'Partner' | 'Researcher' | 'Entrepreneur';
 
-export interface ProfileAddress {
-    village:  string;
-    pincode:  string;
-    district: string;
-}
+export type ProfileAddress = Address;
 
 export interface PersonalInfo {
     fullName: string;
@@ -117,7 +114,14 @@ const SAMPLE: MyProfileData = {
         dob: '2003-08-14',
         placeOfBirth: 'Raebareli, Uttar Pradesh',
         gender: 'Male',
-        address: { village: 'Ward No. 7, Gandhi Nagar', pincode: '229001', district: 'Raebareli' },
+        address: { 
+            addressLine1: 'Ward No. 7, Gandhi Nagar', 
+            city: 'Raebareli',
+            district: 'Raebareli',
+            state: 'Uttar Pradesh',
+            country: 'India',
+            pincode: '229001'
+        },
         emailVerified: true,
         mobileVerified: false,
         lastUpdated: '14 Feb 2026, 10:32 AM'
@@ -209,7 +213,7 @@ export class ProfileService {
             { label: 'Mobile Number', done: !!p.personalInfo.mobile, action: 'Add mobile number', section: 'personal' },
             { label: 'Date of Birth', done: !!p.personalInfo.dob, action: 'Add date of birth', section: 'personal' },
             { label: 'Gender', done: !!p.personalInfo.gender, action: 'Select gender', section: 'personal' },
-            { label: 'Address', done: !!p.personalInfo.address?.village, action: 'Add your address', section: 'personal' },
+            { label: 'Address', done: !!p.personalInfo.address?.addressLine1, action: 'Add your address', section: 'personal' },
             { label: 'Identity Type', done: !!p.identityInfo.identityType, action: 'Set identity type', section: 'identity' },
             { label: 'Document Uploaded', done: p.documents.length > 0, action: 'Upload ID proof', section: 'identity' },
             { label: 'Email Verified', done: p.personalInfo.emailVerified, action: 'Verify your email address', section: 'personal' },

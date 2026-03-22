@@ -85,6 +85,11 @@ export class ComputerLabFormComponent implements OnInit {
           startTime: [slot.startTime, Validators.required],
           endTime: [slot.endTime, Validators.required],
           status: [slot.status, Validators.required],
+          pricing: this.fb.group({
+            type: [slot.pricing?.type || 'Free', Validators.required],
+            amount: [slot.pricing?.amount || 0, [Validators.required, Validators.min(0)]],
+            unit: [slot.pricing?.unit || 'Hourly', Validators.required]
+          }),
           notes: [slot.notes || '']
         }));
       });
@@ -103,12 +108,21 @@ export class ComputerLabFormComponent implements OnInit {
       startTime: ['', Validators.required],
       endTime: ['', Validators.required],
       status: ['Available', Validators.required],
+      pricing: this.fb.group({
+        type: ['Free', Validators.required],
+        amount: [0, [Validators.required, Validators.min(0)]],
+        unit: ['Hourly', Validators.required]
+      }),
       notes: ['']
     }));
   }
 
   removeScheduleSlot(index: number) {
     this.availabilitySchedule.removeAt(index);
+  }
+
+  getPricingType(index: number): string {
+    return this.availabilitySchedule.at(index).get('pricing.type')?.value;
   }
 
   private splitStrings(value: string | string[]): string[] {
@@ -191,7 +205,8 @@ export class ComputerLabFormComponent implements OnInit {
       // Add Mode
       const payload: ComputerLab = {
         ...formVals,
-        softwareAvailable: this.splitStrings(formVals.softwareAvailable)
+        softwareAvailable: this.splitStrings(formVals.softwareAvailable),
+        pricing: formVals.pricing
       };
 
       this.infraService.addComputerLab(this.infraId, payload)
