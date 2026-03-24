@@ -436,6 +436,14 @@
         background: rgba(160, 160, 160, 0.1);
         color: rgba(255, 255, 255, 0.35);
     }
+    &--published {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+    &--draft {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
 }
 
 .gs-rc {

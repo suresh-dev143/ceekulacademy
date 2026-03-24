@@ -50,6 +50,9 @@ export class EnrollWorkshop implements OnInit {
     // --- Fee Calculation ---
 
     get totalFees(): number {
+        const type = this.enrollWorkshopForm.get('enrollmentType')?.value;
+        if (type === 'support') return 0; // Instructors don't pay student fees
+
         let total = 0;
         const mode = this.enrollWorkshopForm.get('modeSelection')?.value;
         const attendance = this.enrollWorkshopForm.get('attendanceMode')?.value;
@@ -64,18 +67,22 @@ export class EnrollWorkshop implements OnInit {
             total += 500; // Mock venue fee
         }
 
-        // workshop base fee (for simplicity, always add the first session's fee if any)
+        // workshop base fee
         total += this.workshop().sessions[0]?.fee || 0;
 
         return total;
     }
 
     get feeBreakdown() {
+        const type = this.enrollWorkshopForm.get('enrollmentType')?.value;
+        if (type === 'support') {
+            return { workshopFee: 0, streamingFee: 0, venueFee: 0 };
+        }
+
         const tierId = this.enrollWorkshopForm.get('qualityTier')?.value;
         const tier = this.qualityTiers.find(t => t.id === tierId);
         const mode = this.enrollWorkshopForm.get('modeSelection')?.value;
         const attendance = this.enrollWorkshopForm.get('attendanceMode')?.value;
-        const type = this.enrollWorkshopForm.get('enrollmentType')?.value;
 
         return {
             workshopFee: this.workshop().sessions[0]?.fee || 0,

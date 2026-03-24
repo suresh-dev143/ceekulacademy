@@ -405,6 +405,7 @@ export class ProgramsSectionComponent implements OnInit {
                 sections: [
                     {
                         link: '/health-connect',
+                        id: 'health-camp',
                         title: 'Health Camp',
                         description: 'Provides free medical check-ups, basic treatment, and health awareness to underserved communities.'
                     },

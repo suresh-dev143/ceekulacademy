@@ -17,6 +17,7 @@ export interface ProgramNavNode {
     level: 1 | 2 | 3;
     children: ProgramNavNode[];
     data: any;
+    link?: string;
 }
 
 export interface ProgramStructure {
@@ -124,7 +125,7 @@ const PROGRAMS_RAW: any[] = [
         content: {
             description: 'Comprehensive community care programs reaching the most vulnerable.',
             sections: [
-                { id: 'health-camp', title: 'Health Camp', instructor: 'Medical Team', description: 'Free medical check-ups, basic treatment, and health awareness for underserved communities.', syllabus: [{ section: 'Core Services', items: ['General Health Screening', 'Dental & Vision Checks', 'Vaccination Drives', 'Health Education Sessions'] }] },
+                { id: 'health-camp', title: 'Health Camp', link: '/health-connect', instructor: 'Medical Team', description: 'Free medical check-ups, basic treatment, and health awareness for underserved communities.', syllabus: [{ section: 'Core Services', items: ['General Health Screening', 'Dental & Vision Checks', 'Vaccination Drives', 'Health Education Sessions'] }] },
                 { id: 'legal-aid', title: 'Legal Aid', instructor: 'Legal Team', description: 'Free or low-cost legal advice and representation for those who cannot afford legal services.', syllabus: [{ section: 'Service Areas', items: ['Civil Rights Consultation', 'Family Law Assistance', 'Labour Rights', 'Document Support'] }] },
                 { id: 'counselling', title: 'Counselling', instructor: 'Mental Health Team', description: 'Psychological support and guidance for mental health and personal challenges.', syllabus: [{ section: 'Programme Areas', items: ['Individual Counselling', 'Group Therapy', 'Crisis Intervention', 'Grief Support'] }] },
                 { id: 'livelihood-support', title: 'Livelihood Support', instructor: 'Social Work Team', description: 'Skills and support for employment and small business development.', syllabus: [{ section: 'Programme Areas', items: ['Vocational Training', 'Microfinance Guidance', 'Job Placement', 'Entrepreneurship Mentoring'] }] }
@@ -181,11 +182,13 @@ export class ProgramNavService {
                 label: section.title,
                 level: 1,
                 data: section,
+                link: section.link,
                 children: (section.syllabus ?? []).map((syl: any): ProgramNavNode => ({
                     id: slug(syl.section),
                     label: syl.section,
                     level: 2,
                     data: syl,
+                    link: syl.link,
                     children: (syl.items ?? []).map((item: string): ProgramNavNode => ({
                         id: slug(item),
                         label: item,
@@ -227,16 +230,34 @@ export class ProgramNavService {
 
     // ── Navigation ──────────────────────────────────────────────────────────
     setActive(programId: string, sectionId?: string | null, subId?: string | null, itemId?: string | null) {
-        this.activeProgramId.set(programId);
-        this.activeSectionId.set(sectionId ?? null);
-        this.activeSubId.set(subId ?? null);
-        this.activeItemId.set(itemId ?? null);
+        const pid = programId;
+        const sid = sectionId ? slug(sectionId) : null;
+        const ssid = subId ? slug(subId) : null;
+        const iid = itemId ? slug(itemId) : null;
+
+        const program = this.getProgram(pid);
+        if (program && sid) {
+            const section = program.children.find(c => c.id === sid);
+            if (section?.link) {
+                // If the section has a direct link, avoid setting child IDs to prevent partial state
+                this.activeProgramId.set(pid);
+                this.activeSectionId.set(null);
+                this.activeSubId.set(null);
+                this.activeItemId.set(null);
+                return;
+            }
+        }
+
+        this.activeProgramId.set(pid);
+        this.activeSectionId.set(sid);
+        this.activeSubId.set(ssid);
+        this.activeItemId.set(iid);
 
         // Auto-expand ancestors
         this.expandedIds.update(s => {
             const next = new Set(s);
-            if (sectionId) next.add(sectionId);
-            if (subId) next.add(subId);
+            if (sid) next.add(sid);
+            if (ssid) next.add(ssid);
             return next;
         });
     }
@@ -262,5 +283,25 @@ export class ProgramNavService {
         const sid = this.activeSectionId();
         if (sid) return nodeId === sid;
         return false; // program root active when nothing else
+    }
+ 
+    /**
+     * If the current active content has a direct link, redirect there.
+     * Returns true if redirected.
+     */
+    checkAndRedirect(router: any): boolean {
+        const c = this.activeContent();
+        if (!c) return false;
+ 
+        let targetLink: string | undefined;
+        if (c.type === 'section') targetLink = c.section.link;
+        else if (c.type === 'subsection') targetLink = c.sub.link;
+        else if (c.type === 'item') targetLink = c.item.link;
+ 
+        if (targetLink) {
+            router.navigate([targetLink]);
+            return true;
+        }
+        return false;
     }
 }

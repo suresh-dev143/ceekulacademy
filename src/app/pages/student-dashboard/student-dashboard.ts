@@ -171,7 +171,7 @@ import { StudentProfileEditComponent } from '../../components/student/student-pr
     </app-layout>
   `,
   styles: [`
-    .student-dashboard-container { padding: 2rem 0; background:#010101; max-width: 1400px; margin: 0 auto; }
+    .student-dashboard-container { padding: 2rem 1rem; background:#010101; max-width: 1400px; margin: 0 auto; }
 
     /* Navigation Tabs */
     .dashboard-tabs {

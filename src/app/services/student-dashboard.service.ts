@@ -1,4 +1,5 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { WorkshopService } from './workshop.service';
 
 export interface EnrolledCourse {
     id: number;
@@ -69,6 +70,30 @@ export interface StudentProfile {
 
 @Injectable({ providedIn: 'root' })
 export class StudentDashboardService {
+    private workshopService = inject(WorkshopService);
+
+    constructor() {
+        // Fetch public workshops and merge into catalogData
+        this.workshopService.getPublicWorkshops({ limit: 50 }).subscribe(res => {
+            if (res.status) {
+                const workshops = res.data.workshops.map(w => ({
+                    id: Math.floor(Math.random() * 1000000), // temp numeric ID for catalog compatibility
+                    title: w.workshopTitle,
+                    category: 'Workshop',
+                    teacher: w.expertDescription,
+                    pricing: 'Paid' as const,
+                    price: w.sessions[0]?.fee || 0,
+                    mode: (w.sessions[0]?.mode === 'hybrid' ? 'Hybrid' : 'Online') as any,
+                    level: 'Beginner' as const,
+                    duration: `${w.sessions.length} Sessions`,
+                    enrolledCount: 0,
+                    rating: 5.0,
+                    thumbnail: '🎓'
+                }));
+                this.catalogData.update(list => [...list, ...workshops]);
+            }
+        });
+    }
 
     // ─── Profile ────────────────────────────────────────────────────────────────
     private profileData = signal<StudentProfile>({

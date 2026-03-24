@@ -189,6 +189,18 @@
         color: #dc5050;
         border-color: rgba(220, 80, 80, 0.3);
     }
+
+    &.publish:hover {
+        background: rgba(100, 150, 220, 0.1);
+        color: #6496dc;
+        border-color: rgba(100, 150, 220, 0.3);
+    }
+
+    &.draft:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
 }
 
 .empty-state {

@@ -1,9 +1,9 @@
 import { Component, signal, computed, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Subject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../services/auth.service';
 import { LayoutComponent } from '../../components/layout/layout';
@@ -39,7 +39,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         createdBy: 'system',
         status: 'published',
         sessions: [
-            { _id: 'm1-s1', date: new Date(Date.now() + 86400000 * 2).toISOString(), startTime: '10:00', endTime: '13:00', activity: 'Quantum Circuit Basics', fee: 45, mode: 'hybrid', location: 'Space Lab A' }
+            { _id: 'm1-s1', date: new Date(Date.now() + 86400000 * 2).toISOString(), startTime: '10:00', endTime: '13:00', activity: 'Quantum Circuit Basics', fee: 45, mode: 'hybrid', location: 'Space Lab A', resources: null }
         ],
         totalRevenuePotential: 450,
         createdAt: new Date().toISOString(),
@@ -55,7 +55,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         createdBy: 'system',
         status: 'published',
         sessions: [
-            { _id: 'm2-s1', date: new Date(Date.now() + 86400000 * 5).toISOString(), startTime: '14:00', endTime: '17:00', activity: 'Autonomous Gate Correction', fee: 120, mode: 'online', location: null }
+            { _id: 'm2-s1', date: new Date(Date.now() + 86400000 * 5).toISOString(), startTime: '14:00', endTime: '17:00', activity: 'Autonomous Gate Correction', fee: 120, mode: 'online', location: null, resources: null }
         ],
         totalRevenuePotential: 1200,
         createdAt: new Date().toISOString(),
@@ -71,7 +71,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         createdBy: 'system',
         status: 'published',
         sessions: [
-            { _id: 'm3-s1', date: new Date(Date.now() + 86400000 * 1).toISOString(), startTime: '09:00', endTime: '11:00', activity: 'Prompt Engineering 101', fee: 0, mode: 'online', location: null }
+            { _id: 'm3-s1', date: new Date(Date.now() + 86400000 * 1).toISOString(), startTime: '09:00', endTime: '11:00', activity: 'Prompt Engineering 101', fee: 0, mode: 'online', location: null, resources: null }
         ],
         totalRevenuePotential: 0,
         createdAt: new Date().toISOString(),
@@ -87,7 +87,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         createdBy: 'system',
         status: 'published',
         sessions: [
-            { _id: 'm4-s1', date: new Date(Date.now() + 86400000 * 10).toISOString(), startTime: '11:00', endTime: '15:00', activity: 'Diagnostic Model Integration', fee: 85, mode: 'hybrid', location: 'Med-Tech Center' }
+            { _id: 'm4-s1', date: new Date(Date.now() + 86400000 * 10).toISOString(), startTime: '11:00', endTime: '15:00', activity: 'Diagnostic Model Integration', fee: 85, mode: 'hybrid', location: 'Med-Tech Center', resources: null }
         ],
         totalRevenuePotential: 850,
         createdAt: new Date().toISOString(),
@@ -103,7 +103,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         createdBy: 'system',
         status: 'published',
         sessions: [
-            { _id: 'm5-s1', date: new Date(Date.now() + 86400000 * 7).toISOString(), startTime: '18:00', endTime: '21:00', activity: 'Generative Storyboarding', fee: 30, mode: 'online', location: null }
+            { _id: 'm5-s1', date: new Date(Date.now() + 86400000 * 7).toISOString(), startTime: '18:00', endTime: '21:00', activity: 'Generative Storyboarding', fee: 30, mode: 'online', location: null, resources: null }
         ],
         totalRevenuePotential: 300,
         createdAt: new Date().toISOString(),
@@ -119,7 +119,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         createdBy: 'system',
         status: 'published',
         sessions: [
-            { _id: 'm6-s1', date: new Date(Date.now() + 86400000 * 14).toISOString(), startTime: '08:00', endTime: '12:00', activity: 'Collision Avoidance Algorithms', fee: 200, mode: 'hybrid', location: 'Satellite Ground Station' }
+            { _id: 'm6-s1', date: new Date(Date.now() + 86400000 * 14).toISOString(), startTime: '08:00', endTime: '12:00', activity: 'Collision Avoidance Algorithms', fee: 200, mode: 'hybrid', location: 'Satellite Ground Station', resources: null }
         ],
         totalRevenuePotential: 2000,
         createdAt: new Date().toISOString(),
@@ -174,9 +174,6 @@ export class PublicWorkshopsPageComponent {
         const scope = filters.scope;
 
         return this.workshops().filter(w => {
-            // By default (no search), show only admin/system workshops
-            if (!q && w.createdBy !== 'system' && w.createdBy !== 'admin') return false;
-
             if (scope === 'local' && q &&
                 !w.workshopTitle.toLowerCase().includes(q) &&
                 !w.workshopDescription.toLowerCase().includes(q) &&
@@ -243,16 +240,26 @@ export class PublicWorkshopsPageComponent {
             }
         });
 
-        if (this.isBrowser) {
-            this.loadWorkshops();
-        }
+        // Re-fetch from backend when search query or filters change (debounced and unified)
+        combineLatest([
+            toObservable(this.globalSearch.globalQuery),
+            toObservable(this.globalSearch.globalFilters)
+        ]).pipe(
+            debounceTime(300),
+            takeUntilDestroyed()
+        ).subscribe(() => {
+            if (this.isBrowser) {
+                this.loadWorkshops();
+            }
+        });
     }
 
     // ── Data loading ──────────────────────────────────────────────────────────
 
     loadWorkshops(): void {
+        const q = this.globalSearch.globalQuery().trim();
         this.isLoading.set(true);
-        this.ws.getPublicWorkshops({ page: 1, limit: 100, skipToast: true }).subscribe({
+        this.ws.getPublicWorkshops({ q, page: 1, limit: 100, skipToast: true }).subscribe({
             next: res => {
                 // Store all public workshops + default mocks
                 this.workshops.set([...DEFAULT_WORKSHOPS, ...res.data.workshops]);

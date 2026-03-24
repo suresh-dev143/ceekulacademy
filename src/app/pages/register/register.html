@@ -21,7 +21,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Full Name</label>
-                        <input type="text" class="form-control" formControlName="name" placeholder="John Doe">
+                        <input type="text" class="form-control" formControlName="name" placeholder="John Doe" [class.is-invalid]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
                         @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
                         <div class="error-message">Name is required</div>
                         }
@@ -29,7 +29,7 @@
 
                     <div class="form-group">
                         <label class="form-label">Email Address</label>
-                        <input type="email" class="form-control" formControlName="email" placeholder="john@example.com">
+                        <input type="email" class="form-control" formControlName="email" placeholder="john@example.com" [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
                         @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
                         <div class="error-message">Valid email is required</div>
                         }
@@ -43,7 +43,7 @@
                     <div class="form-row">
                         <div class="form-group flex-1">
                             <label class="form-label">Gender *</label>
-                            <select class="form-control" formControlName="gender">
+                            <select class="form-control" formControlName="gender" [class.is-invalid]="registerForm.get('gender')?.invalid && registerForm.get('gender')?.touched">
                                 <option value="">-- Select Gender --</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -56,7 +56,7 @@
 
                         <div class="form-group flex-1">
                             <label class="form-label">Date of Birth *</label>
-                            <input type="date" class="form-control" formControlName="dob">
+                            <input type="date" class="form-control" formControlName="dob" [class.is-invalid]="registerForm.get('dob')?.invalid && registerForm.get('dob')?.touched">
                             @if (registerForm.get('dob')?.invalid && registerForm.get('dob')?.touched) {
                             <div class="error-message">Date of birth is required</div>
                             }
@@ -66,29 +66,48 @@
                     <div class="form-group">
                         <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
                             Local Address *
-                            <button type="button" class="btn-detect" (click)="useCurrentLocation()">
-                                <i class="fas fa-location-arrow"></i> Detect Location
+                            <button type="button" class="btn-detect" (click)="useCurrentLocation()" [disabled]="isDetectingLocation()">
+                                @if (isDetectingLocation()) {
+                                    <i class="fas fa-spinner fa-spin"></i> Detecting...
+                                } @else {
+                                    <i class="fas fa-location-arrow"></i> Detect Location
+                                }
                             </button>
                         </label>
                         
                         <div formGroupName="address">
                             <div class="form-group">
                                 <input type="text" class="form-control" formControlName="addressLine1" placeholder="Address Line 1" [class.is-invalid]="registerForm.get('address.addressLine1')?.invalid && registerForm.get('address.addressLine1')?.touched">
+                                @if (registerForm.get('address.addressLine1')?.invalid && registerForm.get('address.addressLine1')?.touched) {
+                                    <div class="error-message">Address Line 1 is required</div>
+                                }
                             </div>
                             <div class="form-row">
                                 <div class="form-group flex-1">
                                     <input type="text" class="form-control" formControlName="city" placeholder="City" [class.is-invalid]="registerForm.get('address.city')?.invalid && registerForm.get('address.city')?.touched">
+                                    @if (registerForm.get('address.city')?.invalid && registerForm.get('address.city')?.touched) {
+                                        <div class="error-message">City is required</div>
+                                    }
                                 </div>
                                 <div class="form-group flex-1">
                                     <input type="text" class="form-control" formControlName="district" placeholder="District" [class.is-invalid]="registerForm.get('address.district')?.invalid && registerForm.get('address.district')?.touched">
+                                    @if (registerForm.get('address.district')?.invalid && registerForm.get('address.district')?.touched) {
+                                        <div class="error-message">District is required</div>
+                                    }
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group flex-1">
                                     <input type="text" class="form-control" formControlName="state" placeholder="State" [class.is-invalid]="registerForm.get('address.state')?.invalid && registerForm.get('address.state')?.touched">
+                                    @if (registerForm.get('address.state')?.invalid && registerForm.get('address.state')?.touched) {
+                                        <div class="error-message">State is required</div>
+                                    }
                                 </div>
                                 <div class="form-group flex-1">
                                     <input type="text" class="form-control" formControlName="pincode" placeholder="PIN Code" [class.is-invalid]="registerForm.get('address.pincode')?.invalid && registerForm.get('address.pincode')?.touched">
+                                    @if (registerForm.get('address.pincode')?.invalid && registerForm.get('address.pincode')?.touched) {
+                                        <div class="error-message">Valid 6-digit PIN code is required</div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -142,19 +161,25 @@
                     <div class="form-group">
                         <label class="form-label">Password *</label>
                         <input type="password" class="form-control" formControlName="password"
-                            placeholder="Create a strong password">
+                            placeholder="Create a strong password" [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+                        <div class="password-hint" style="font-size: 0.75rem; color: #888; margin-top: 0.4rem;">
+                            Must be at least 8 characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character.
+                        </div>
                         @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
-                        <div class="error-message">Password must be at least 6 characters</div>
+                        <div class="error-message">Password does not meet requirements</div>
                         }
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Confirm Password *</label>
                         <input type="password" class="form-control" formControlName="confirmPassword"
-                            placeholder="Re-enter your password">
+                            placeholder="Re-enter your password" [class.is-invalid]="(registerForm.hasError('passwordMismatch') || registerForm.get('confirmPassword')?.invalid) && registerForm.get('confirmPassword')?.touched">
                         @if (registerForm.hasError('passwordMismatch') &&
                         registerForm.get('confirmPassword')?.touched) {
                         <div class="error-message">Passwords do not match</div>
+                        }
+                        @if (registerForm.get('confirmPassword')?.hasError('required') && registerForm.get('confirmPassword')?.touched) {
+                        <div class="error-message">Please confirm your password</div>
                         }
                     </div>
 

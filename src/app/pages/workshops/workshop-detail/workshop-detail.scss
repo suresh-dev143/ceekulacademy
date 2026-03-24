@@ -30,7 +30,6 @@ $status-colors: (
 // ── Wrapper ───────────────────────────────────────────────────────────────────
 
 .wd-wrap {
-    max-width: 900px;
     margin: 0 auto;
     padding-bottom: 3rem;
     animation: wdFadeIn 0.25s ease-out;
@@ -1031,6 +1030,7 @@ $status-colors: (
         gap: 0.5rem;
     }
 }
+
 // ── Enrollees Section ────────────────────────────────────────────────────────
 
 .wd-enrollees-section {
@@ -1191,5 +1191,93 @@ $status-colors: (
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+    }
+}
+
+// ── Location Discovery (Dynamic) ────────────────────────
+
+.wd-location-placeholder {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-top: 0.5rem;
+
+    p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
+}
+
+.wd-btn-discovery {
+    background: #FFD700;
+    color: #000;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+
+.wd-selected-facility {
+    background: rgba(100, 150, 220, 0.05);
+    border: 1px solid rgba(100, 150, 220, 0.2);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.wd-facility-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    i {
+        font-size: 1.2rem;
+        color: #6496dc;
+    }
+
+    strong {
+        display: block;
+        font-size: 0.9rem;
+        color: #fff;
+    }
+
+    span {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+}
+
+.wd-facility-remove {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: #aaa;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    &:hover {
+        background: rgba(220, 80, 80, 0.1);
+        color: #dc5050;
     }
 }

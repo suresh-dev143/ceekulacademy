@@ -2,11 +2,12 @@ import { Injectable, inject, signal } from '@angular/core';
 import { AuthService } from './auth.service';
 import { ScheduleService } from './schedule.service';
 import { ProfileService, StudentInfo, TeacherInfo, PartnerInfo } from './profile.service';
+import { WorkshopService, WorkshopListItem } from './workshop.service';
 
 // ── Core types ─────────────────────────────────────────────────────────────────
 export type SearchCategory =
     | 'Course' | 'Schedule' | 'Person' | 'Page' | 'Facility'
-    | 'Program' | 'Session' | 'Institution' | 'Document' | 'Report';
+    | 'Program' | 'Session' | 'Institution' | 'Document' | 'Report' | 'Workshop';
 
 export type FilterCategory =
     | 'all' | 'programs' | 'courses' | 'sessions'
@@ -61,8 +62,8 @@ const PAGES: SearchResult[] = [
 const FILTER_MAP: Record<FilterCategory, SearchCategory[]> = {
     all: [],
     programs: ['Program'],
-    courses: ['Course'],
-    sessions: ['Schedule', 'Session'],
+    courses: ['Course', 'Workshop'],
+    sessions: ['Schedule', 'Session', 'Workshop'],
     users: ['Person'],
     institutions: ['Facility', 'Institution'],
     documents: ['Document'],
@@ -74,9 +75,19 @@ export class SearchService {
     private authService = inject(AuthService);
     private scheduleService = inject(ScheduleService);
     private profileService = inject(ProfileService);
+    private workshopService = inject(WorkshopService);
+
+    private _publicWorkshops = signal<WorkshopListItem[]>([]);
 
     private _recent = signal<string[]>([]);
     readonly recentSearches = this._recent.asReadonly();
+
+    constructor() {
+        // Fetch public workshops initially to have them in global search
+        this.workshopService.getPublicWorkshops({ limit: 100 }).subscribe(res => {
+            if (res.status) this._publicWorkshops.set(res.data.workshops);
+        });
+    }
 
     // ── Global Search State (for shared reactive usage) ───────────────────
     globalQuery = signal<string>('');
@@ -94,6 +105,26 @@ export class SearchService {
 
         const role = this.authService.currentUserRole();
         const all: SearchResult[] = [...PAGES];
+
+        // ── Workshops ──────────────────────────────────────────────────────────
+        // If we have no workshops yet, trigger a background refresh for next time
+        if (this._publicWorkshops().length === 0) {
+             this.workshopService.getPublicWorkshops({ limit: 100 }).subscribe(res => {
+                if (res.status) this._publicWorkshops.set(res.data.workshops);
+            });
+        }
+
+        for (const w of this._publicWorkshops()) {
+            all.push({
+                id: 'ws-' + w._id,
+                title: w.workshopTitle,
+                subtitle: `Workshop · ${w.expertDescription}`,
+                category: 'Workshop',
+                icon: 'fa-chalkboard-teacher',
+                route: `/workshops`, 
+                status: w.status as any,
+            });
+        }
 
         // ── Schedule items (today) ─────────────────────────────────────────────
         const todayStr = new Date().toISOString().split('T')[0];

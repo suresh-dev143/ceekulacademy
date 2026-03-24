@@ -226,15 +226,31 @@
                 @if (isHybridMode) {
                 <div class="wd-field">
                     <label class="wd-label">Venue / Location *</label>
-                    <select class="wd-input wd-select" formControlName="location"
-                        [class.is-error]="fieldHasError('location','required')">
-                        <option value="">— Select a venue —</option>
-                        @for (loc of registeredLocations; track loc) {
-                        <option [value]="loc">{{ loc }}</option>
-                        }
-                    </select>
-                    @if (fieldHasError('location','required')) {
-                    <div class="wd-error">Venue is required for hybrid sessions.</div>
+ 
+                    @if (!addForm.get('facilityId')?.value) {
+                    <div class="wd-location-placeholder">
+                        <p>No facility selected for this hybrid session.</p>
+                        <button type="button" class="wd-btn-discovery" (click)="openDiscovery()">
+                            <i class="fas fa-search-location"></i> Find Facility
+                        </button>
+                    </div>
+                    } @else {
+                    <div class="wd-selected-facility">
+                        <div class="wd-facility-info">
+                            <i class="fas fa-university"></i>
+                            <div>
+                                <strong>{{ addForm.get('location')?.value }}</strong>
+                                <span>{{ addForm.get('facilityType')?.value }}</span>
+                            </div>
+                        </div>
+                        <button type="button" class="wd-facility-remove" (click)="removeFacility()" title="Change Facility">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    }
+ 
+                    @if (fieldHasError('facilityId','required')) {
+                    <div class="wd-error">Please select a facility for hybrid sessions.</div>
                     }
                 </div>
                 }
@@ -341,18 +357,20 @@
                 </div>
 
                 <!-- Teacher actions (Edit/Delete) -->
-                @if (canDeleteSession(s)) {
                 <div class="wd-session-actions">
+                    @if (canEditSession(s)) {
                     <button type="button" class="wd-icon-btn wd-icon-btn--edit" title="Edit session (coming soon)"
                         disabled>
                         <i class="fas fa-pen"></i>
                     </button>
+                    }
+                    @if (canDeleteSession(s)) {
                     <button type="button" class="wd-icon-btn wd-icon-btn--delete" (click)="onDeleteSession(s)"
                         [disabled]="isSubmitting()" title="Delete session">
                         <i class="fas fa-trash-alt"></i>
                     </button>
+                    }
                 </div>
-                }
 
             </div>
             }

@@ -125,6 +125,7 @@ export class InfrastructureFormComponent implements OnInit {
     this.isLoading.set(true);
     this.locationService.getCurrentLocation().subscribe({
       next: (loc) => {
+        console.log('Location detected successfully!', loc);
         this.infraForm.get('generalInfo.location')?.patchValue(loc);
         this.toastService.success('Location detected successfully!');
         this.isLoading.set(false);
@@ -169,7 +170,7 @@ export class InfrastructureFormComponent implements OnInit {
     if (data?.availabilitySchedule) {
       data.availabilitySchedule.forEach((s: any) => this.addScheduleSlot(group.get('availabilitySchedule') as FormArray, s));
     } else {
-        this.addScheduleSlot(group.get('availabilitySchedule') as FormArray);
+      this.addScheduleSlot(group.get('availabilitySchedule') as FormArray);
     }
 
     this.classrooms.push(group);
@@ -191,7 +192,7 @@ export class InfrastructureFormComponent implements OnInit {
     if (data?.availabilitySchedule) {
       data.availabilitySchedule.forEach((s: any) => this.addScheduleSlot(group.get('availabilitySchedule') as FormArray, s));
     } else {
-        this.addScheduleSlot(group.get('availabilitySchedule') as FormArray);
+      this.addScheduleSlot(group.get('availabilitySchedule') as FormArray);
     }
 
     this.computerLabs.push(group);
@@ -213,7 +214,7 @@ export class InfrastructureFormComponent implements OnInit {
     if (data?.availabilitySchedule) {
       data.availabilitySchedule.forEach((s: any) => this.addScheduleSlot(group.get('availabilitySchedule') as FormArray, s));
     } else {
-        this.addScheduleSlot(group.get('availabilitySchedule') as FormArray);
+      this.addScheduleSlot(group.get('availabilitySchedule') as FormArray);
     }
 
     this.otherFacilities.push(group);
@@ -268,7 +269,7 @@ export class InfrastructureFormComponent implements OnInit {
       }))
     };
 
-    const action = this.isEditMode() 
+    const action = this.isEditMode()
       ? this.infraService.updateInfrastructure(this.initialData!._id, payload)
       : this.infraService.addInfrastructure(payload);
 
@@ -286,7 +287,7 @@ export class InfrastructureFormComponent implements OnInit {
           console.error('Infrastructure save error:', err);
           const message = err.error?.errors ? 'Please fix the errors highlighted below.' : (err.error?.message || 'Server error while saving infrastructure.');
           this.toastService.error(message);
-          
+
           if (err.error?.errors) {
             this.validationService.handleBackendErrors(this.infraForm, err.error.errors);
           }

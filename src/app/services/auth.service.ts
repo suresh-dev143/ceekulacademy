@@ -30,6 +30,7 @@ export interface RegisterRequest {
     password: string;
     authProvider: 'EMAIL_PASSWORD' | 'MOBILE_OTP';
     name: string;
+    selectedRole?: string;
     dateOfBirth?: string;
     gender?: string;
     partnerType?: string;
@@ -245,6 +246,38 @@ export class AuthService {
                     this._currentUser.set(merged);
                     if (this.isBrowser) {
                         localStorage.setItem('auth_user', JSON.stringify(merged));
+                    }
+                })
+            );
+    }
+
+    refreshProfile(): Observable<UserProfile> {
+        const userId = this._currentUser()?.id;
+        if (!userId) {
+            throw new Error('No user logged in');
+        }
+
+        return this.http
+            .get<any>(`${this.base}/users/profile`) // Assuming this endpoint returns current user profile
+            .pipe(
+                map(res => {
+                    const user = res.data.user;
+                    const role = user.selectedRole || (user.partnerType ? 'Partner' : (user.expertTypes && user.expertTypes.length > 0 ? user.expertTypes[0] : 'Student'));
+
+                    return {
+                        id: user._id,
+                        name: user.name,
+                        email: user.email,
+                        role: role as UserRole,
+                        partnerType: user.partnerType,
+                        expertTypes: user.expertTypes,
+                        activityType: user.activityType,
+                    } satisfies UserProfile;
+                }),
+                tap(updated => {
+                    this._currentUser.set(updated);
+                    if (this.isBrowser) {
+                        localStorage.setItem('auth_user', JSON.stringify(updated));
                     }
                 })
             );

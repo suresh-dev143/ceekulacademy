@@ -42,7 +42,7 @@ export class LocationService {
   geocodeAddress(address: string): Observable<GeoLocation> {
     // Real implementation would use Google Geocoding API:
     // return this.http.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${environment.googleMapsApiKey}`)
-    
+
     // For now, return a random-ish location near Noida if it's a mock
     console.log('Geocoding address:', address);
     return of({

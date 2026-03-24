@@ -1,12 +1,12 @@
 .enrolled-workshops-container {
-  padding: 2.5rem;
+  padding: 2rem 0;
   max-width: 1200px;
   margin: 0 auto;
   min-height: 80vh;
 
   .header-section {
     margin-bottom: 3rem;
-    
+
     h1 {
       font-size: 2.5rem;
       font-weight: 800;
@@ -23,7 +23,8 @@
   }
 
   /* States */
-  .loading-state, .empty-state {
+  .loading-state,
+  .empty-state {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -83,9 +84,20 @@
       text-transform: uppercase;
       z-index: 2;
 
-      &[data-status="active"] { background: #dcfce7; color: #166534; }
-      &[data-status="draft"] { background: #f1f5f9; color: #475569; }
-      &[data-status="cancelled"] { background: #fee2e2; color: #991b1b; }
+      &[data-status="active"] {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      &[data-status="draft"] {
+        background: #f1f5f9;
+        color: #475569;
+      }
+
+      &[data-status="cancelled"] {
+        background: #fee2e2;
+        color: #991b1b;
+      }
     }
 
     .card-content {
@@ -106,7 +118,10 @@
           background: #eff6ff;
           color: #1e40af;
 
-          &[data-role="Instructor"] { background: #fef3c7; color: #92400e; }
+          &[data-role="Instructor"] {
+            background: #fef3c7;
+            color: #92400e;
+          }
         }
 
         .enrolled-date {
@@ -148,7 +163,10 @@
           font-size: 0.85rem;
           color: #64748b;
 
-          i { color: #94a3b8; width: 14px; }
+          i {
+            color: #94a3b8;
+            width: 14px;
+          }
         }
       }
     }
@@ -162,8 +180,17 @@
       align-items: center;
 
       .revenue {
-        .label { font-size: 0.75rem; color: #94a3b8; display: block; }
-        .value { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+        .label {
+          font-size: 0.75rem;
+          color: #94a3b8;
+          display: block;
+        }
+
+        .value {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: #0f172a;
+        }
       }
     }
   }
@@ -179,7 +206,9 @@
   cursor: pointer;
   transition: background 0.2s;
 
-  &:hover { background: #1d4ed8; }
+  &:hover {
+    background: #1d4ed8;
+  }
 }
 
 .btn-outline {
@@ -200,14 +229,21 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 640px) {
   .enrolled-workshops-container {
     padding: 1.5rem;
-    
-    .header-section h1 { font-size: 2rem; }
-    .workshops-grid { grid-template-columns: 1fr; }
+
+    .header-section h1 {
+      font-size: 2rem;
+    }
+
+    .workshops-grid {
+      grid-template-columns: 1fr;
+    }
   }
 }

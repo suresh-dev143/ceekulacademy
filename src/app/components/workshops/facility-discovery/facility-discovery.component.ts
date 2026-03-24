@@ -48,9 +48,6 @@ export class FacilityDiscoveryComponent implements OnInit {
 
     fetchLocations() {
         this.isLoading.set(true);
-        // Using mock user location (Noida/Delhi region)
-        const mockLat = 28.6273;
-        const mockLng = 77.3725;
 
         const searchFilters = {
             ...this.filters(),
@@ -59,7 +56,29 @@ export class FacilityDiscoveryComponent implements OnInit {
             endTime: this.sessionEndTime()
         };
 
-        this.bookingService.getAvailableLocations(mockLat, mockLng, searchFilters).subscribe({
+        // Get user location using Browser GPS
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    this.callBookingService(lat, lng, searchFilters);
+                },
+                (error) => {
+                    console.warn('Geolocation denied or failed, using fallback coordinates.', error);
+                    // Fallback to Delhi/Noida region
+                    this.callBookingService(28.6273, 77.3725, searchFilters);
+                },
+                { timeout: 10000 }
+            );
+        } else {
+            console.warn('Geolocation not supported, using fallback coordinates.');
+            this.callBookingService(28.6273, 77.3725, searchFilters);
+        }
+    }
+
+    private callBookingService(lat: number, lng: number, searchFilters: any) {
+        this.bookingService.getAvailableLocations(lat, lng, searchFilters).subscribe({
             next: (results) => {
                 this.locations.set(results);
                 this.isLoading.set(false);

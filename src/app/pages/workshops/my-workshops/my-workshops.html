@@ -66,6 +66,17 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     @if (w.status !== 'cancelled' && w.status !== 'completed') {
+                                    @if (w.status === 'draft') {
+                                    <button class="icon-btn publish" (click)="onStatusChange(w, 'published')"
+                                        title="Publish Workshop">
+                                        <i class="fas fa-book"></i>
+                                    </button>
+                                    } @else if (w.status === 'published') {
+                                    <button class="icon-btn draft" (click)="onStatusChange(w, 'draft')"
+                                        title="Revert to Draft">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    }
                                     <button class="icon-btn" (click)="onEdit(w)" title="Edit Workshop">
                                         <i class="fas fa-edit"></i>
                                     </button>

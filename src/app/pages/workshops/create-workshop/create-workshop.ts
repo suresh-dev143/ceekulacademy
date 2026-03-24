@@ -50,10 +50,10 @@ function nowInTz(tzKey: string): TzNow {
 // ── Validators ────────────────────────────────────────────────────────────────
 
 /** Rejects any date before today in the selected timezone. */
-function pastDateValidator(getTz: () => string): ValidatorFn {
+function pastDateValidator(getTz: () => string, isEditMode: () => boolean): ValidatorFn {
     return (ctrl: AbstractControl): ValidationErrors | null => {
         const val = ctrl.value as string;
-        if (!val) return null;
+        if (!val || isEditMode()) return null;
         return val < nowInTz(getTz()).dateStr ? { pastDate: true } : null;
     };
 }
@@ -63,7 +63,7 @@ function pastDateValidator(getTz: () => string): ValidatorFn {
  *   • endBeforeStart — endTime <= startTime
  *   • pastTime       — today's date selected AND startTime <= current time in tz
  */
-function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
+function sessionConstraintsValidator(getTz: () => string, isEditMode: () => boolean): ValidatorFn {
     return (group: AbstractControl): ValidationErrors | null => {
         const errs: ValidationErrors = {};
         const date = (group.get('date')?.value as string) ?? '';
@@ -79,8 +79,7 @@ function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
             if (diff !== 60) errs['invalidDuration'] = true;
         }
 
-        if (date && start) {
-
+        if (date && start && !isEditMode()) {
             const { dateStr, hours: nh, minutes: nm } = nowInTz(getTz());
             if (date === dateStr) {
                 const [sh, sm] = start.split(':').map(Number);
@@ -187,7 +186,7 @@ export class CreateWorkshop implements OnInit {
                         partnerId: s.partnerId || '',
                         partnerName: s.partnerName || '',
                         facilityDetails: s.facilityDetails || null,
-                    }, { validators: sessionConstraintsValidator(() => this.tz) });
+                    }, { validators: sessionConstraintsValidator(() => this.tz, () => this.isEditMode()) });
 
                     this.syncLocationValidator(row, s.mode);
                     this.sessions.push(row);
@@ -244,8 +243,9 @@ export class CreateWorkshop implements OnInit {
 
     addSession() {
         const getTz = () => this.tz;
+        const isEdit = () => this.isEditMode();
         const row = this.fb.group({
-            date: ['', [Validators.required, pastDateValidator(getTz)]],
+            date: ['', [Validators.required, pastDateValidator(getTz, isEdit)]],
             startTime: ['', Validators.required],
             endTime: ['', Validators.required],
             activity: ['', [Validators.required, Validators.minLength(3)]],
@@ -259,7 +259,7 @@ export class CreateWorkshop implements OnInit {
             partnerId: [''],
             partnerName: [''],
             facilityDetails: [null],
-        }, { validators: sessionConstraintsValidator(getTz) });
+        }, { validators: sessionConstraintsValidator(getTz, isEdit) });
 
         row.get('mode')!.valueChanges.subscribe(m => this.syncLocationValidator(row, m ?? 'online'));
         this.sessions.push(row);
@@ -406,6 +406,22 @@ export class CreateWorkshop implements OnInit {
                 expertDescription: v.expertDescription.trim(),
                 timezone: v.timezone,
                 instructorType: v.instructorType,
+                sessions: v.sessions.map((s: any) => ({
+                    date: s.date,
+                    startTime: s.startTime,
+                    endTime: s.endTime,
+                    activity: s.activity.trim(),
+                    description: s.description?.trim() || '',
+                    fee: Number(s.fee),
+                    mode: s.mode,
+                    location: s.mode === 'hybrid' ? (s.location || null) : null,
+                    resources: s.resources?.trim() || null,
+                    facilityId: s.facilityId || null,
+                    facilityType: s.facilityType || null,
+                    partnerId: s.partnerId || null,
+                    partnerName: s.partnerName || null,
+                    facilityDetails: s.facilityDetails || null,
+                })),
             };
 
             this.ws.updateWorkshop(editData._id, updatePayload).subscribe({

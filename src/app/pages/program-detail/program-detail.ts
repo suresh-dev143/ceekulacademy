@@ -36,12 +36,16 @@ export class ProgramDetailComponent implements OnInit, OnDestroy {
 
             if (!pid) { this.router.navigate(['/programs']); return; }
             this.navService.setActive(pid, sid, ssid, iid);
+
+            // If this node has a direct link, go there instead
+            this.navService.checkAndRedirect(this.router);
         });
 
         // Also watch query params for item selection
         this.route.queryParamMap.subscribe(qp => {
             const iid = qp.get('item');
             this.navService.activeItemId.set(iid);
+            this.navService.checkAndRedirect(this.router);
         });
     }
 

@@ -89,7 +89,9 @@ export class EnrolledWorkshopsComponent implements OnInit {
             status: w.status as any,
             sessions: w.sessions.map(s => ({
                 ...s,
-                location: s.location || null
+                instructorId: undefined, // EnrolledWorkshopSession doesn't have it yet
+                location: s.location,
+                resources: (s as any).resources || null
             }))
         };
         this.selectedWorkshop.set(item);

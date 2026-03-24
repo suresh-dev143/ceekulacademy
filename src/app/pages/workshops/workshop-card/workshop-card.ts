@@ -36,8 +36,8 @@ export class WorkshopCardComponent {
         // 2. Admin/Director
         if (['Admin', 'Director'].includes(role)) return true;
 
-        // 3. Instructor (likely enrolled)
-        if (role === 'Instructor') return true;
+        // 3. Enrolled as Instructor for this specific workshop
+        if (this.workshop().userEnrollment?.role === 'Instructor') return true;
 
         return false;
     });

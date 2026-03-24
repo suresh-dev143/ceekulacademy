@@ -49,11 +49,12 @@ export interface CreateWorkshopRequest {
 }
 
 export interface UpdateWorkshopRequest {
-    workshopTitle: string;
-    workshopDescription: string;
-    expertDescription: string;
-    timezone: string;
-    instructorType: 'myself' | 'open';
+    workshopTitle?: string;
+    workshopDescription?: string;
+    expertDescription?: string;
+    timezone?: string;
+    instructorType?: 'myself' | 'open' | 'Individual' | 'Organization';
+    sessions?: WorkshopApiSession[];
     status?: WorkshopStatus;
 }
 
@@ -101,15 +102,16 @@ export type WorkshopStatus =
 
 export interface WorkshopApiSession {
     _id: string;
-    date: string;   // ISO datetime
-    startTime: string;   // HH:mm
-    endTime: string;   // HH:mm
+    date: string;         // ISO string (YYYY-MM-DD or full)
+    startTime: string;    // HH:mm
+    endTime: string;      // HH:mm
     activity: string;
     description?: string;
     fee: number;
     mode: 'online' | 'hybrid';
     location: string | null;
-    resources?: string | null;
+    resources: string | null;
+    instructorId?: string; // ID of the instructor (Expert or enrolled Instructor)
     facilityId?: string;
     facilityType?: 'Classroom' | 'Lab' | 'Other';
     partnerId?: string;
@@ -128,6 +130,10 @@ export interface WorkshopListItem {
     status: WorkshopStatus;
     sessions: WorkshopApiSession[];
     totalRevenuePotential: number;
+    userEnrollment?: {
+        role: string;
+        status: string;
+    };
     createdAt: string;
     updatedAt: string;
 }
@@ -149,6 +155,7 @@ export interface GetWorkshopsResponse {
 }
 
 export interface GetWorkshopsParams {
+    q?: string;
     page?: number;
     limit?: number;
     skipToast?: boolean;
@@ -351,10 +358,12 @@ export class WorkshopService {
             } else {
                 const item: WorkshopListItem = {
                     ...w,
-                    instructorType: w.instructorType as 'myself' | 'open',
+                    instructorType: w.instructorType as any,
                     status: w.status as WorkshopStatus,
                     sessions: w.sessions.map(s => ({
                         ...s,
+                        location: s.location ?? null,
+                        resources: s.resources ?? null,
                         mode: s.mode as 'online' | 'hybrid'
                     }))
                 };
@@ -461,7 +470,7 @@ export class WorkshopService {
     // ── Get my workshops ──────────────────────────────────────────────────────
 
     getMyWorkshops(params: GetWorkshopsParams = {}): Observable<GetWorkshopsResponse> {
-        const { page = 1, limit = 100, skipToast = false } = params;
+        const { q, page = 1, limit = 100, skipToast = false } = params;
 
         let headers = new HttpHeaders();
         if (skipToast) {
@@ -470,7 +479,11 @@ export class WorkshopService {
 
         return this.http
             .get<GetWorkshopsResponse>(`${this.base}/api/v1/workshops/my`, {
-                params: { page: String(page), limit: String(limit) },
+                params: { 
+                    page: String(page), 
+                    limit: String(limit),
+                    ...(q && { q })
+                },
                 headers
             })
             .pipe(
@@ -496,7 +509,7 @@ export class WorkshopService {
 
     // ── Get all public workshops ────────────────────────────────────────────────
     getPublicWorkshops(params: GetWorkshopsParams = {}): Observable<GetWorkshopsResponse> {
-        const { page = 1, limit = 100, skipToast = false } = params;
+        const { q, page = 1, limit = 100, skipToast = false } = params;
 
         let headers = new HttpHeaders();
         if (skipToast) {
@@ -505,7 +518,11 @@ export class WorkshopService {
 
         return this.http
             .get<GetWorkshopsResponse>(`${this.base}/api/v1/workshops`, {
-                params: { page: String(page), limit: String(limit) },
+                params: { 
+                    page: String(page), 
+                    limit: String(limit),
+                    ...(q && { q })
+                },
                 headers
             })
             .pipe(

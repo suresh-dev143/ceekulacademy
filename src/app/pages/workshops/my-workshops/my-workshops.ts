@@ -41,12 +41,12 @@ export class MyWorkshopsComponent implements OnInit {
             this.isLoading.set(false);
         }
     }
-
     loadMyWorkshops() {
         this.isLoading.set(true);
         this.ws.getMyWorkshops({ skipToast: true }).subscribe({
             next: (res) => {
                 this.workshops.set(res.data.workshops);
+                console.log('my workshop data', res.data.workshops);
                 this.isLoading.set(false);
             },
             error: (err) => {
@@ -89,7 +89,23 @@ export class MyWorkshopsComponent implements OnInit {
             });
         }
     }
-
+ 
+    onStatusChange(w: WorkshopListItem, newStatus: string) {
+        const msg = newStatus === 'published' ? 'publish' : 'revert to draft';
+        if (confirm(`Are you sure you want to ${msg} "${w.workshopTitle}"?`)) {
+            this.ws.updateWorkshop(w._id, { status: newStatus as any }).subscribe({
+                next: () => {
+                    this.toast.success(`Workshop ${newStatus === 'published' ? 'published' : 'reverted to draft'}`);
+                    this.loadMyWorkshops();
+                },
+                error: (err) => {
+                    console.error('Failed to update status:', err);
+                    this.toast.error('Failed to update workshop status');
+                }
+            });
+        }
+    }
+ 
     closeDetail() {
         this.showDetail.set(false);
         this.selectedWorkshop.set(null);

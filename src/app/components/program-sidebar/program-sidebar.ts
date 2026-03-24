@@ -108,6 +108,10 @@ export class ProgramSidebarComponent implements AfterViewInit {
 
     /** Navigate to section; only expands — never collapses */
     goToSection(node: ProgramNavNode) {
+        if (node.link) {
+            this.router.navigate([node.link]);
+            return;
+        }
         const pid = this.pid();
         this.navService.setActive(pid, node.id);   // setActive auto-expands
         this.router.navigate(['/programs', pid, node.id]);
@@ -115,12 +119,20 @@ export class ProgramSidebarComponent implements AfterViewInit {
 
     /** Navigate to subsection; only expands — never collapses */
     goToSub(sectionNode: ProgramNavNode, subNode: ProgramNavNode) {
+        if (subNode.link) {
+            this.router.navigate([subNode.link]);
+            return;
+        }
         const pid = this.pid();
         this.navService.setActive(pid, sectionNode.id, subNode.id);
         this.router.navigate(['/programs', pid, sectionNode.id, subNode.id]);
     }
 
     goToItem(sectionNode: ProgramNavNode, subNode: ProgramNavNode, itemNode: ProgramNavNode) {
+        if (itemNode.link) {
+            this.router.navigate([itemNode.link]);
+            return;
+        }
         const pid = this.pid();
         this.navService.setActive(pid, sectionNode.id, subNode.id, itemNode.id);
         this.router.navigate(['/programs', pid, sectionNode.id, subNode.id],

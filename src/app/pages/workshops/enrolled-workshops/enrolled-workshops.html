@@ -1,13 +1,10 @@
-<app-layout [showRightSidebar]="false">
+<app-layout [showRightSidebar]="true">
   <div class="enrolled-workshops-container animate-fade-in">
-    
+
     @if (selectedWorkshop()) {
-      <app-workshop-detail 
-        [workshop]="selectedWorkshop()!" 
-        [userRole]="currentUser()?.role ?? ''"
-        [currentUserId]="currentUser()?.id" 
-        (close)="closeWorkshopDetail()">
-      </app-workshop-detail>
+    <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="currentUser()?.role ?? ''"
+      [currentUserId]="currentUser()?.id" (close)="closeWorkshopDetail()">
+    </app-workshop-detail>
     } @else {
     <div class="header-section">
       <h1>My enrolled workshop</h1>
@@ -26,7 +23,8 @@
         <i class="fas fa-graduation-cap"></i>
       </div>
       <h2>No Workshops Found</h2>
-      <p>You haven't enrolled in any workshops as a Learner or Instructor yet. Browse our public workshops to get started!</p>
+      <p>You haven't enrolled in any workshops as a Learner or Instructor yet. Browse our public workshops to get
+        started!</p>
       <button class="btn-primary" routerLink="/workshops">Browse Workshops</button>
     </div>
 
@@ -36,7 +34,7 @@
         <div class="card-status" [attr.data-status]="enrollment.status">
           {{ enrollment.status | titlecase }}
         </div>
-        
+
         <div class="card-content">
           <div class="workshop-header">
             <span class="role-badge" [attr.data-role]="enrollment.role">

@@ -66,7 +66,7 @@
                 <div class="pd-section-grid">
                     @for (node of c.program.children; track node.id) {
                     <div class="pd-course-card"
-                        (click)="navigate({ label: node.label, commands: ['/programs', c.program.id, node.id] })">
+                        (click)="node.link ? navigate({ label: node.label, commands: [node.link] }) : navigate({ label: node.label, commands: ['/programs', c.program.id, node.id] })">
                         <div class="pcc-index">{{ $index + 1 }}</div>
                         <div class="pcc-body">
                             <div class="pcc-title">{{ node.label }}</div>
@@ -113,7 +113,7 @@
                     <div class="pd-module-list">
                         @for (sub of c.section.children; track sub.id; let i = $index) {
                         <div class="pd-module-row"
-                            (click)="navigate({ label: sub.label, commands: ['/programs', c.program.id, c.section.id, sub.id] })">
+                            (click)="sub.link ? navigate({ label: sub.label, commands: [sub.link] }) : navigate({ label: sub.label, commands: ['/programs', c.program.id, c.section.id, sub.id] })">
                             <div class="pmr-num">{{ i + 1 }}</div>
                             <div class="pmr-body">
                                 <div class="pmr-title">{{ sub.label }}</div>

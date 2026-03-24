@@ -16,7 +16,9 @@ import {
 } from '../../../services/workshop.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { RazorpayService } from '../../../services/razorpay.service';
+import { AuthService } from '../../../services/auth.service';
 import { EnrollWorkshop } from '../enroll-workshop/enroll-workshop';
+import { FacilityDiscoveryComponent } from '../../../components/workshops/facility-discovery/facility-discovery.component';
 
 // ── Timezone helpers (same as create-workshop) ────────────────────────────────
 
@@ -147,6 +149,7 @@ export class WorkshopDetailComponent {
     private ws = inject(WorkshopService);
     private toast = inject(ToastService);
     private razorpay = inject(RazorpayService);
+    private authService = inject(AuthService);
 
     // ── Inputs / Outputs ──────────────────────────────────────────────────────
 
@@ -165,7 +168,7 @@ export class WorkshopDetailComponent {
             : workshop.createdBy;
 
         const res = String(createdById) === String(userId);
-        
+
         console.log('WorkshopDetail: isOwner check (robust)', {
             currentUserId: userId,
             workshopCreatedBy: workshop.createdBy,
@@ -204,17 +207,21 @@ export class WorkshopDetailComponent {
     enrollees = signal<Enrollee[]>([]);
     isLoadingEnrollees = signal(false);
 
-    enrolledInstructorsList = computed(() => 
+    // Booking State
+    showDiscovery = signal(false);
+    activeSessionIndex = signal<number | null>(null);
+
+    enrolledInstructorsList = computed(() =>
         this.enrollees().filter(e => e.role?.toLowerCase() === 'instructor')
     );
-    enrolledStudentsList = computed(() => 
+    enrolledStudentsList = computed(() =>
         this.enrollees().filter(e => e.role?.toLowerCase() === 'student' || e.role?.toLowerCase() === 'learner')
     );
 
     toggleOffline(): void {
         this.ws.toggleLocalCache(this.currentWorkshop());
-        const msg = this.isSavedOffline() 
-            ? 'Workshop saved for offline access' 
+        const msg = this.isSavedOffline()
+            ? 'Workshop saved for offline access'
             : 'Workshop removed from offline storage';
         this.toast.success(msg);
     }
@@ -242,12 +249,6 @@ export class WorkshopDetailComponent {
 
     showEnrollForm = signal(false);
 
-    // ── Registered locations (for hybrid sessions) ────────────────────────────
-
-    readonly registeredLocations = [
-        'Central Library', 'Innovation Hub', 'Community Center', 'Tech Park'
-    ];
-
     // ── Role helpers ──────────────────────────────────────────────────────────
 
     get isTeacher(): boolean {
@@ -258,7 +259,10 @@ export class WorkshopDetailComponent {
         return ['Director', 'Admin', 'Manager'].includes(this.userRole());
     }
     get canEnroll(): boolean {
-        return !!this.currentUserId() && !this.isOwner();
+        if (!this.currentUserId() || this.isOwner()) return false;
+        if (this.currentWorkshop().userEnrollment) return false;
+        if (this.isEnrolledAsInstructor()) return false;
+        return true;
     }
 
     /**
@@ -281,13 +285,47 @@ export class WorkshopDetailComponent {
         if (['Admin', 'Director'].includes(role)) return true;
 
         // 3. Enrolled as Instructor for this workshop
-        if (role === 'Instructor' || this.isEnrolledAsInstructor()) return true;
+        if (workshop.userEnrollment?.role === 'Instructor' || this.isEnrolledAsInstructor()) return true;
 
         return false;
     }
 
+    private normalizeId(id: any): string | null {
+        if (!id) return null;
+        if (typeof id === 'object') return id._id || id.id || null;
+        return String(id);
+    }
+
+    /**
+     * Users who can edit a specific session:
+     * 1. The original creator of the session (Expert or Instructor)
+     * 2. Admins/Directors
+     */
+    canEditSession(session: WorkshopApiSession): boolean {
+        const userId = this.normalizeId(this.currentUserId());
+        const role = this.userRole();
+        if (!userId) return false;
+
+        // 1. Admin/Director can edit anything
+        if (['Admin', 'Director'].includes(role)) return true;
+
+        const instId = this.normalizeId(session.instructorId);
+
+        // 2. If no instructorId tracked yet, fallback to workshop owner
+        // (This typically applies to legacy sessions created during workshop creation)
+        if (!instId) return this.isOwner();
+
+        // 3. Only the creator of the session can edit it
+        return userId === instId;
+    }
+
+    /**
+     * Users who can delete a specific session:
+     * 1. The original creator of the session
+     * 2. Admins/Directors
+     */
     canDeleteSession(session: WorkshopApiSession): boolean {
-        return this.canManageSessions;
+        return this.canEditSession(session);
     }
 
     // ── Workshop display helpers ──────────────────────────────────────────────
@@ -405,12 +443,18 @@ export class WorkshopDetailComponent {
             this.workshop(); // track
             this.internalWorkshop.set(null);
             this.isEnrolledAsInstructor.set(false);
-            
+
             // Auto-fetch enrollees if owner
             if (this.isOwner()) {
                 this.fetchEnrollees();
             } else {
                 this.enrollees.set([]);
+            }
+
+            // Always fetch the freshest data (which includes userEnrollment)
+            if (this.currentUserId()) {
+                // Execute in next tick to avoid untracked signal writes during effect
+                setTimeout(() => this.refreshWorkshopData(), 0);
             }
         }, { allowSignalWrites: true });
 
@@ -433,6 +477,11 @@ export class WorkshopDetailComponent {
             mode: ['online', Validators.required],
             location: [''],
             resources: [''],
+            facilityId: [''],
+            facilityType: [''],
+            partnerId: [''],
+            partnerName: [''],
+            facilityDetails: [null],
         }, {
             validators: [
                 sessionConstraintsValidator(getTz),
@@ -459,13 +508,19 @@ export class WorkshopDetailComponent {
 
     private syncLocationValidator(mode: string): void {
         const loc = this.addForm.get('location')!;
+        const facId = this.addForm.get('facilityId')!;
+
         if (mode === 'hybrid') {
             loc.setValidators(Validators.required);
+            facId.setValidators(Validators.required);
         } else {
             loc.clearValidators();
+            facId.clearValidators();
             loc.setValue('');
+            facId.setValue('');
         }
         loc.updateValueAndValidity();
+        facId.updateValueAndValidity();
     }
 
     // ── Add form control ──────────────────────────────────────────────────────
@@ -478,6 +533,40 @@ export class WorkshopDetailComponent {
     cancelAddForm(): void {
         this.showAddForm.set(false);
         this.addForm.reset({ mode: 'online', fee: 0 });
+    }
+
+    // ── Facility Booking logic ──────────────────────────────────────────────
+
+    openDiscovery() {
+        this.showDiscovery.set(true);
+    }
+
+    closeDiscovery() {
+        this.showDiscovery.set(false);
+    }
+
+    onFacilitySelected(selection: any) {
+        this.addForm.patchValue({
+            facilityId: selection.facilityId,
+            facilityType: selection.facilityType,
+            partnerId: selection.partnerId,
+            partnerName: selection.partnerName,
+            location: `${selection.facilityName}, ${selection.partnerName}`,
+            facilityDetails: selection
+        });
+
+        this.closeDiscovery();
+    }
+
+    removeFacility() {
+        this.addForm.patchValue({
+            facilityId: '',
+            facilityType: '',
+            partnerId: '',
+            partnerName: '',
+            location: '',
+            facilityDetails: null
+        });
     }
 
     // ── Edit Info control ─────────────────────────────────────────────────────
@@ -641,6 +730,11 @@ export class WorkshopDetailComponent {
             mode: v.mode,
             location: v.mode === 'hybrid' ? (v.location || null) : null,
             resources: v.resources?.trim() || null,
+            facilityId: v.facilityId || null,
+            facilityType: v.facilityType || null,
+            partnerId: v.partnerId || null,
+            partnerName: v.partnerName || null,
+            facilityDetails: v.facilityDetails || null,
         }];
 
         this.isSubmitting.set(true);
@@ -702,6 +796,7 @@ export class WorkshopDetailComponent {
                 this.toast.success(res.message);
                 if (role === 'Instructor') {
                     this.isEnrolledAsInstructor.set(true);
+                    this.authService.refreshProfile().subscribe();
                 }
                 this.showEnrollForm.set(false);
                 this.refreshWorkshopData();

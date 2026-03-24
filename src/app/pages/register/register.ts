@@ -6,6 +6,8 @@ import { LayoutComponent } from '../../components/layout/layout';
 import { AuthService, RegisterRequest, AuthResponse } from '../../services/auth.service';
 import { NavbarComponent } from '../../components/navbar/navbar';
 import { LocationService } from '../../core/services/location.service';
+import { ToastService } from '../../core/services/toast.service';
+import { ValidationService } from '../../core/services/validation.service';
 
 @Component({
     selector: 'app-register',
@@ -16,8 +18,11 @@ import { LocationService } from '../../core/services/location.service';
 export class RegisterComponent {
     private authService = inject(AuthService);
     private locationService = inject(LocationService);
+    private toast = inject(ToastService);
+    private validationService = inject(ValidationService);
     registerForm: FormGroup;
     isSubmitting = signal(false);
+    isDetectingLocation = signal(false);
     isLoggedIn = this.authService.isLoggedIn;
 
     // Available roles
@@ -87,7 +92,11 @@ export class RegisterComponent {
             partnerType: [''],
 
             // Section 3: Account Security
-            password: ['', [Validators.required, Validators.minLength(6)]],
+            password: ['', [
+                Validators.required,
+                Validators.minLength(8),
+                Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z]).{8,}$/)
+            ]],
             confirmPassword: ['', Validators.required]
         }, { validators: this.passwordMatchValidator });
     }
@@ -130,20 +139,39 @@ export class RegisterComponent {
     }
 
     useCurrentLocation() {
-        this.isSubmitting.set(true);
+        if (this.isDetectingLocation()) return;
+
+        this.isDetectingLocation.set(true);
         this.locationService.getCurrentLocation().subscribe({
             next: (loc) => {
                 this.registerForm.get('location')?.patchValue(loc);
-                this.isSubmitting.set(false);
+                this.toast.success('Location detected successfully!');
+                this.isDetectingLocation.set(false);
             },
-            error: (err) => {
+            error: (err: any) => {
+                this.isDetectingLocation.set(false);
                 console.error('Failed to get location:', err);
-                this.isSubmitting.set(false);
+
+                let message = 'Could not detect location.';
+                const code = err?.code ?? (typeof err === 'object' ? err.code : null);
+
+                if (code === 1) { // PERMISSION_DENIED
+                    message = 'Location access denied. Please enable it in your browser settings (look for the lock icon in the address bar).';
+                } else if (code === 2) { // POSITION_UNAVAILABLE
+                    message = 'Location information is unavailable on your device.';
+                } else if (code === 3) { // TIMEOUT
+                    message = 'Location request timed out. Please try again.';
+                } else if (typeof err === 'string') {
+                    message = err;
+                }
+
+                this.toast.error(message);
             }
         });
     }
 
     onSubmit() {
+        console.log('Register data ', this.registerForm.value);
         if (this.registerForm.invalid) {
             this.registerForm.markAllAsTouched();
             return;
@@ -151,18 +179,19 @@ export class RegisterComponent {
 
         const v = this.registerForm.value;
 
+        const primaryRole = v.selectedRoles[0] ?? '';
+
         const payload: RegisterRequest = {
             email: v.email,
             password: v.password,
             authProvider: 'EMAIL_PASSWORD',
             name: v.name,
+            selectedRole: primaryRole,
             dateOfBirth: v.dob,
             gender: v.gender,
             address: v.address,
             location: v.location
         };
-
-        const primaryRole = v.selectedRoles[0] ?? '';
 
         // Activity Mapping
         const activityMap: { [key: string]: string } = {
@@ -181,7 +210,7 @@ export class RegisterComponent {
 
         if (primaryRole === 'Partner') {
             payload.partnerType = v.partnerType;
-        } else if (primaryRole) {
+        } else if (primaryRole && ['Teacher', 'Researcher', 'Entrepreneur', 'Instructor', 'Expert'].includes(primaryRole)) {
             payload.expertTypes = [primaryRole];
         }
 
@@ -194,12 +223,22 @@ export class RegisterComponent {
         this.authService.register(payload).subscribe({
             next: (res: AuthResponse) => {
                 this.isSubmitting.set(false);
+                this.toast.success('Registration successful! Redirecting...');
                 const role = res.user.role?.toLowerCase() ?? '';
                 this.router.navigate([`/${role}-dashboard`]).catch(() => {
                     this.router.navigate(['/dashboard']);
                 });
             },
-            error: () => this.isSubmitting.set(false)
+            error: (err) => {
+                this.isSubmitting.set(false);
+                console.error('Registration error:', err);
+                const message = err.error?.message || 'Registration failed. Please try again.';
+                this.toast.error(message);
+
+                if (err.error?.errors) {
+                    this.validationService.handleBackendErrors(this.registerForm, err.error.errors);
+                }
+            }
         });
     }
 }
