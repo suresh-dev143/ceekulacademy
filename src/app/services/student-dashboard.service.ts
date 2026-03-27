@@ -82,10 +82,10 @@ export class StudentDashboardService {
                     category: 'Workshop',
                     teacher: w.expertDescription,
                     pricing: 'Paid' as const,
-                    price: w.sessions[0]?.fee || 0,
-                    mode: (w.sessions[0]?.mode === 'hybrid' ? 'Hybrid' : 'Online') as any,
+                    price: w.schedules[0]?.fee || 0,
+                    mode: (w.schedules[0]?.mode === 'hybrid' ? 'Hybrid' : 'Online') as any,
                     level: 'Beginner' as const,
-                    duration: `${w.sessions.length} Sessions`,
+                    duration: `${w.schedules.length} Sessions`,
                     enrolledCount: 0,
                     rating: 5.0,
                     thumbnail: '🎓'

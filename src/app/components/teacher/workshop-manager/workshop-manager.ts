@@ -53,7 +53,6 @@ export class WorkshopManagerComponent implements OnInit {
             workshopTitle: ['', Validators.required],
             workshopDescription: ['', Validators.required],
             schedule: this.fb.array([]),
-            instructorType: ['myself', Validators.required], // myself or open
         });
 
         // Initialize with one schedule row
@@ -74,7 +73,9 @@ export class WorkshopManagerComponent implements OnInit {
             description: ['', []],
             fee: [0, [Validators.required, Validators.min(0)]],
             location: ['', []],
-            mode: ['online', Validators.required]
+            mode: ['online', Validators.required],
+            allowMyself: [true],
+            allowOthers: [false]
         });
 
         // Toggle location validator on row mode change
@@ -123,7 +124,7 @@ export class WorkshopManagerComponent implements OnInit {
                 id: `ws-00${this.workshopsList().length + 1}`,
                 title: formValue.workshopTitle,
                 description: formValue.workshopDescription,
-                instructor: formValue.instructorType === 'myself' ? (this.currentUser()?.name ?? 'Unknown') : 'Open to All',
+                instructor: (formValue.schedule[0]?.allowOthers) ? 'Open to All' : (this.currentUser()?.name ?? 'Unknown'),
                 date: startDate,
                 duration: duration,
                 type: formValue.schedule.some((s: any) => s.mode === 'hybrid') ? 'Hybrid' : 'Online',
@@ -132,9 +133,7 @@ export class WorkshopManagerComponent implements OnInit {
 
             this.workshopsList.update(list => [newWorkshop, ...list]);
             this.isCreatingWorkshop.set(false);
-            this.workshopForm.reset({
-                instructorType: 'myself'
-            });
+            this.workshopForm.reset();
             this.schedule.clear();
             this.addScheduleRow();
         } else {

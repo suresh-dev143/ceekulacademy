@@ -22,15 +22,24 @@ function decodeHtml(str: string): string {
 
 // ── CREATE types ──────────────────────────────────────────────────────────────
 
-export interface WorkshopSession {
+export interface WorkshopThreeHourPlan {
+    hour1: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean };
+    hour2: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean };
+    hour3: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean };
+}
+
+export interface WorkshopSchedule {
     date: string;       // YYYY-MM-DD
     startTime: string;       // HH:mm
     endTime: string;       // HH:mm
+    timezone: string;       // IANA timezone
+    sessionOrder?: 1 | 2 | 3;
     activity: string;
     description?: string;
     fee: number;
     mode: 'online' | 'hybrid';
     location: string | null;
+    instructorType: string[];  // ['myself', 'open']
     resources?: string | null;
     facilityId?: string;
     facilityType?: 'Classroom' | 'Lab' | 'Other';
@@ -43,18 +52,16 @@ export interface CreateWorkshopRequest {
     workshopTitle: string;
     workshopDescription: string;
     expertDescription: string;
-    timezone: string;
-    instructorType: 'myself' | 'open';
-    sessions: WorkshopSession[];
+    threeHourPlan?: WorkshopThreeHourPlan;
+    schedules: WorkshopSchedule[];
 }
 
 export interface UpdateWorkshopRequest {
     workshopTitle?: string;
     workshopDescription?: string;
     expertDescription?: string;
-    timezone?: string;
-    instructorType?: 'myself' | 'open' | 'Individual' | 'Organization';
-    sessions?: WorkshopApiSession[];
+    threeHourPlan?: WorkshopThreeHourPlan;
+    schedules?: WorkshopApiSchedule[];
     status?: WorkshopStatus;
 }
 
@@ -69,11 +76,10 @@ export interface CreatedWorkshopData {
     workshopTitle: string;
     workshopDescription: string;
     expertDescription: string;
-    timezone: string;
-    instructorType: string;
     createdBy: string;
     status: string;
-    sessions: Array<WorkshopSession & { _id: string; date: string }>;
+    threeHourPlan?: WorkshopThreeHourPlan;
+    schedules: Array<WorkshopSchedule & { _id: string; date: string }>;
     totalRevenuePotential: number;
     createdAt: string;
     updatedAt: string;
@@ -100,18 +106,20 @@ export interface CancelWorkshopResponse {
 export type WorkshopStatus =
     | 'draft' | 'published' | 'active' | 'ongoing' | 'completed' | 'cancelled';
 
-export interface WorkshopApiSession {
+export interface WorkshopApiSchedule {
     _id: string;
     date: string;         // ISO string (YYYY-MM-DD or full)
     startTime: string;    // HH:mm
     endTime: string;      // HH:mm
+    timezone: string;     // IANA timezone
+    sessionOrder?: 1 | 2 | 3;
     activity: string;
     description?: string;
     fee: number;
     mode: 'online' | 'hybrid';
     location: string | null;
     resources: string | null;
-    instructorId?: string; // ID of the instructor (Expert or enrolled Instructor)
+    instructorId?: { _id: string; name: string }; // Populated by backend
     facilityId?: string;
     facilityType?: 'Classroom' | 'Lab' | 'Other';
     partnerId?: string;
@@ -124,16 +132,20 @@ export interface WorkshopListItem {
     workshopTitle: string;
     workshopDescription: string;
     expertDescription: string;
-    timezone: string;
-    instructorType: 'myself' | 'open';
     createdBy: string;
     status: WorkshopStatus;
-    sessions: WorkshopApiSession[];
+    threeHourPlan?: WorkshopThreeHourPlan;
+    schedules: WorkshopApiSchedule[];
     totalRevenuePotential: number;
     userEnrollment?: {
         role: string;
         status: string;
     };
+    userEnrollments?: Array<{
+        role: string;
+        status: string;
+        scheduleId?: string;
+    }>;
     createdAt: string;
     updatedAt: string;
 }
@@ -161,12 +173,14 @@ export interface GetWorkshopsParams {
     skipToast?: boolean;
 }
 
-// ── ADD SESSIONS types ────────────────────────────────────────────────────────
+// ── ADD SCHEDULES types ────────────────────────────────────────────────────────
 
-export interface AddSessionPayload {
+export interface AddSchedulePayload {
     date: string;        // YYYY-MM-DD
     startTime: string;        // HH:mm
     endTime: string;        // HH:mm
+    timezone: string;        // IANA timezone
+    sessionOrder?: 1 | 2 | 3;
     activity: string;
     description: string;
     fee: number;
@@ -180,22 +194,22 @@ export interface AddSessionPayload {
     facilityDetails?: any;
 }
 
-export interface AddSessionsResponse {
+export interface AddSchedulesResponse {
     status: boolean;
     message: string;
     data: {
-        addedSessions: WorkshopApiSession[];
-        totalSessions: number;
+        addedSchedules: WorkshopApiSchedule[];
+        totalSchedules: number;
         totalRevenuePotential: number;
     };
 }
 
-export interface DeleteSessionResponse {
+export interface DeleteScheduleResponse {
     status: boolean;
     message: string;
     data: {
-        removedSessionId: string;
-        totalSessions: number;
+        removedScheduleId: string;
+        totalSchedules: number;
         totalRevenuePotential: number;
     };
 }
@@ -204,7 +218,7 @@ export interface DeleteSessionResponse {
 
 export interface EnrollStudentRequest {
     workshopId: string;
-    sessionId: string;
+    scheduleId: string;
     userId: string;
     fee: number;
 }
@@ -229,7 +243,7 @@ export interface EnrolVerifyRequest {
     workshopId: string;
     userId: string;
     role: 'student' | 'instructor';
-    sessionId?: string;
+    scheduleId?: string;
 }
 
 export interface EnrollWorkshopResponse {
@@ -259,6 +273,7 @@ export interface Enrollee {
     };
     role: string;
     status: string;
+    scheduleId?: string;
     enrolledAt: string;
     createdAt: string;
     updatedAt: string;
@@ -273,10 +288,12 @@ export interface GetWorkshopEnrolleesResponse {
 
 // ── GET ENROLLED types ───────────────────────────────────────────────────────
 
-export interface EnrolledWorkshopSession {
+export interface EnrolledWorkshopSchedule {
     date: string;
     startTime: string;
     endTime: string;
+    timezone: string;
+    sessionOrder?: 1 | 2 | 3;
     activity: string;
     description?: string;
     fee: number;
@@ -295,11 +312,10 @@ export interface EnrolledWorkshop {
     workshopTitle: string;
     workshopDescription: string;
     expertDescription: string;
-    timezone: string;
     instructorType: string;
     createdBy: string;
     status: string;
-    sessions: EnrolledWorkshopSession[];
+    schedules: EnrolledWorkshopSchedule[];
     totalRevenuePotential: number;
     createdAt: string;
     updatedAt: string;
@@ -358,9 +374,8 @@ export class WorkshopService {
             } else {
                 const item: WorkshopListItem = {
                     ...w,
-                    instructorType: w.instructorType as any,
                     status: w.status as WorkshopStatus,
-                    sessions: w.sessions.map(s => ({
+                    schedules: w.schedules.map(s => ({
                         ...s,
                         location: s.location ?? null,
                         resources: s.resources ?? null,
@@ -415,7 +430,7 @@ export class WorkshopService {
                     workshopTitle: decodeHtml(res.data.workshopTitle),
                     workshopDescription: decodeHtml(res.data.workshopDescription),
                     expertDescription: decodeHtml(res.data.expertDescription),
-                    sessions: res.data.sessions.map(s => ({
+                    schedules: res.data.schedules.map(s => ({
                         ...s,
                         activity: decodeHtml(s.activity),
                         description: s.description ? decodeHtml(s.description) : s.description,
@@ -456,7 +471,7 @@ export class WorkshopService {
                     workshopTitle: decodeHtml(res.data.workshopTitle),
                     workshopDescription: decodeHtml(res.data.workshopDescription),
                     expertDescription: decodeHtml(res.data.expertDescription),
-                    sessions: res.data.sessions.map(s => ({
+                    schedules: res.data.schedules.map(s => ({
                         ...s,
                         activity: decodeHtml(s.activity),
                         description: s.description ? decodeHtml(s.description) : s.description,
@@ -496,7 +511,7 @@ export class WorkshopService {
                             workshopTitle: decodeHtml(w.workshopTitle),
                             workshopDescription: decodeHtml(w.workshopDescription),
                             expertDescription: decodeHtml(w.expertDescription),
-                            sessions: w.sessions.map(s => ({
+                            schedules: w.schedules.map(s => ({
                                 ...s,
                                 activity: decodeHtml(s.activity),
                                 resources: s.resources ? decodeHtml(s.resources) : s.resources,
@@ -535,7 +550,7 @@ export class WorkshopService {
                             workshopTitle: decodeHtml(w.workshopTitle),
                             workshopDescription: decodeHtml(w.workshopDescription),
                             expertDescription: decodeHtml(w.expertDescription),
-                            sessions: w.sessions.map(s => ({
+                            schedules: w.schedules.map(s => ({
                                 ...s,
                                 activity: decodeHtml(s.activity),
                                 resources: s.resources ? decodeHtml(s.resources) : s.resources,
@@ -546,23 +561,23 @@ export class WorkshopService {
             );
     }
 
-    // ── Add sessions to an existing workshop ──────────────────────────────────
+    // ── Add schedules to an existing workshop ──────────────────────────────────
 
-    addSessions(
+    addSchedules(
         workshopId: string,
-        sessions: AddSessionPayload[]
-    ): Observable<AddSessionsResponse> {
+        schedules: AddSchedulePayload[]
+    ): Observable<AddSchedulesResponse> {
         return this.http
-            .post<AddSessionsResponse>(
-                `${this.base}/api/v1/workshops/${workshopId}/sessions`,
-                { sessions }
+            .post<AddSchedulesResponse>(
+                `${this.base}/api/v1/workshops/${workshopId}/schedules`,
+                { schedules }
             )
             .pipe(
                 map(res => ({
                     ...res,
                     data: {
                         ...res.data,
-                        addedSessions: res.data.addedSessions.map(s => ({
+                        addedSchedules: res.data.addedSchedules.map(s => ({
                             ...s,
                             activity: decodeHtml(s.activity),
                             resources: s.resources ? decodeHtml(s.resources) : s.resources,
@@ -572,11 +587,11 @@ export class WorkshopService {
             );
     }
 
-    // ── Delete session from a workshop ───────────────────────────────────────────
+    // ── Delete schedule from a workshop ───────────────────────────────────────────
 
-    deleteSession(workshopId: string, sessionId: string): Observable<DeleteSessionResponse> {
-        return this.http.delete<DeleteSessionResponse>(
-            `${this.base}/api/v1/workshops/${workshopId}/sessions/${sessionId}`
+    deleteSchedule(workshopId: string, scheduleId: string): Observable<DeleteScheduleResponse> {
+        return this.http.delete<DeleteScheduleResponse>(
+            `${this.base}/api/v1/workshops/${workshopId}/schedules/${scheduleId}`
         );
     }
 
@@ -603,10 +618,10 @@ export class WorkshopService {
         );
     }
 
-    enrollInWorkshop(workshopId: string, role: 'Instructor' | 'Student'): Observable<EnrollWorkshopResponse> {
+    enrollInWorkshop(workshopId: string, role: 'Instructor' | 'Student', scheduleId?: string, sessionOrder?: number): Observable<EnrollWorkshopResponse> {
         return this.http.post<EnrollWorkshopResponse>(
             `${this.base}/api/v1/workshops/${workshopId}/enroll`,
-            { role }
+            { role, scheduleId, sessionOrder }
         );
     }
 
@@ -633,7 +648,7 @@ export class WorkshopService {
                         workshopTitle: decodeHtml(enrollment.workshop.workshopTitle),
                         workshopDescription: decodeHtml(enrollment.workshop.workshopDescription),
                         expertDescription: decodeHtml(enrollment.workshop.expertDescription),
-                        sessions: enrollment.workshop.sessions.map(s => ({
+                        schedules: enrollment.workshop.schedules.map(s => ({
                             ...s,
                             activity: decodeHtml(s.activity),
                             description: s.description ? decodeHtml(s.description) : s.description

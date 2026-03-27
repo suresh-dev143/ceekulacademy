@@ -194,11 +194,30 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     }
 }
 
+.cwf-input--locked {
+    background: color-mix(in srgb, #000, transparent 85%);
+    color: color-mix(in srgb, #fff, transparent 65%);
+    cursor: not-allowed;
+    border-color: color-mix(in srgb, #fff, transparent 94%);
+    opacity: 0.8;
+}
+
+.cwf-input--large {
+    font-size: 1rem;
+    padding: 0.8rem 1rem;
+}
+
 .cwf-textarea {
     resize: vertical;
     min-height: 90px;
     line-height: 1.55;
     padding-bottom: 1.6rem; // room for char counter
+
+    &--large {
+        min-height: 120px;
+        font-size: 1rem;
+        padding: 0.8rem 1rem 2rem;
+    }
 }
 
 .cwf-select {
@@ -329,6 +348,83 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     }
 }
 
+// ── Checkbox groups ──────────────────────────────────────────────────────────
+
+.cwf-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    @media (min-width: 600px) {
+        flex-direction: row;
+        gap: 1.5rem;
+    }
+}
+
+.cwf-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    user-select: none;
+    transition: color 0.2s;
+
+    // Hide native checkbox
+    input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+    }
+
+    // Custom mark
+    .cwf-checkbox-mark {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 2px solid $border-dim;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.2s;
+        background: $bg-input;
+
+        &::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 9px;
+            color: white;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    }
+
+    input[type="checkbox"]:checked ~ .cwf-checkbox-mark {
+        background: $accent;
+        border-color: $accent;
+        box-shadow: 0 0 10px color-mix(in srgb, $accent, transparent 70%);
+
+        &::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    &:hover .cwf-checkbox-mark {
+        border-color: color-mix(in srgb, $accent, transparent 50%);
+    }
+
+    &:hover {
+        color: var(--text-primary);
+    }
+}
+
 // ── Add session button ────────────────────────────────────────────────────────
 
 .cwf-add-btn {
@@ -352,6 +448,93 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     &:disabled {
         opacity: 0.45;
         cursor: not-allowed;
+    }
+}
+
+// ── Accordion (3-Hour Plan) ──────────────────────────────────────────────────
+
+.cwf-accordion {
+    background: color-mix(in srgb, #fff, transparent 96%);
+    border: 1px solid $border-dim;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &[open] {
+        border-color: color-mix(in srgb, $accent, transparent 50%);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+        .cwf-acc-arrow {
+            transform: rotate(180deg);
+            color: $accent;
+        }
+    }
+}
+
+.cwf-accordion-head {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    list-style: none; /* remove default arrow in webkit/blink */
+    
+    &::-webkit-details-marker {
+        display: none;
+    }
+
+    &:hover {
+        background: color-mix(in srgb, #fff, transparent 94%);
+    }
+}
+
+.cwf-accordion-icon {
+    font-size: 1.5rem;
+    margin-right: 1.25rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.cwf-accordion-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+
+    span {
+        font-size: 0.85rem;
+        color: $text-dim;
+        font-weight: 400;
+        margin-left: 0.5rem;
+        background: color-mix(in srgb, #fff, transparent 92%);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        vertical-align: middle;
+    }
+}
+
+.cwf-acc-arrow {
+    color: $text-mid;
+    transition: transform 0.3s, color 0.3s;
+    font-size: 0.9rem;
+}
+
+.cwf-accordion-body {
+    padding: 0 1.5rem 1.5rem;
+    border-top: 1px solid $border-dimmer;
+    margin-top: 0.25rem;
+    padding-top: 1.25rem;
+    animation: accFadeDown 0.3s ease-out;
+}
+
+@keyframes accFadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 

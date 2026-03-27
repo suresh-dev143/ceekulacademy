@@ -49,11 +49,11 @@
           <div class="workshop-meta">
             <div class="meta-item">
               <i class="fas fa-globe"></i>
-              <span>{{ enrollment.workshop.timezone }}</span>
+              <span>{{ enrollment.workshop.schedules[0]?.timezone || 'IST' }}</span>
             </div>
             <div class="meta-item">
               <i class="fas fa-calendar-check"></i>
-              <span>{{ enrollment.workshop.sessions.length }} Sessions</span>
+              <span>{{ enrollment.workshop.schedules.length }} Sessions</span>
             </div>
           </div>
         </div>

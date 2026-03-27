@@ -19,7 +19,7 @@
     <p class="wc-desc">{{ workshop().workshopDescription }}</p>
 
     <div class="wc-meta">
-        @if (firstSession) {
+        @if (firstSchedule) {
         <span class="wc-meta-item">
             <i class="fas fa-calendar-day"></i> {{ formattedDate }}
         </span>
@@ -29,10 +29,10 @@
         }
         <span class="wc-meta-item">
             <i class="fas fa-layer-group"></i>
-            {{ sessionCount }} Session{{ sessionCount !== 1 ? 's' : '' }}
+            {{ totalSchedules }} Session{{ totalSchedules !== 1 ? 's' : '' }}
         </span>
         <span class="wc-meta-item wc-meta-item--tz">
-            <i class="fas fa-globe"></i> {{ workshop().timezone }}
+            <i class="fas fa-globe"></i> {{ timezone }}
         </span>
     </div>
 
@@ -43,7 +43,7 @@
                 <i class="fas fa-layer-group"></i> Sessions
             </span>
             <span class="wc-sessions-count">
-                {{ sessionCount }}/10 &nbsp;·&nbsp;
+                {{ totalSchedules }}/10 &nbsp;·&nbsp;
                 ₹{{ workshop().totalRevenuePotential | number:'1.0-0' }} potential
             </span>
         </div>

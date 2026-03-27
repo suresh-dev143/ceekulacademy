@@ -1,7 +1,7 @@
 import { Component, input, output, computed } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { inject } from '@angular/core';
-import { WorkshopListItem, WorkshopApiSession, WorkshopService } from '../../../services/workshop.service';
+import { WorkshopListItem, WorkshopApiSchedule, WorkshopService } from '../../../services/workshop.service';
 
 @Component({
     selector: 'app-workshop-card',
@@ -53,21 +53,21 @@ export class WorkshopCardComponent {
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    get firstSession(): WorkshopApiSession | null {
-        return this.workshop().sessions[0] ?? null;
+    get firstSchedule(): WorkshopApiSchedule | null {
+        return this.workshop().schedules[0] ?? null;
     }
 
-    get sessionCount(): number {
-        return this.workshop().sessions.length;
+    get totalSchedules(): number {
+        return this.workshop().schedules.length;
     }
 
     /** Width % for the sessions progress bar (max 10 sessions). */
     get sessionProgressPct(): number {
-        return Math.min(100, (this.sessionCount / 10) * 100);
+        return Math.min(100, (this.totalSchedules / 10) * 100);
     }
 
     get formattedDate(): string {
-        const s = this.firstSession;
+        const s = this.firstSchedule;
         if (!s) return '—';
         try {
             return new Date(s.date).toLocaleDateString('en-IN', {
@@ -79,8 +79,12 @@ export class WorkshopCardComponent {
     }
 
     get timeRange(): string {
-        const s = this.firstSession;
+        const s = this.firstSchedule;
         return s ? `${s.startTime} – ${s.endTime}` : '—';
+    }
+
+    get timezone(): string {
+        return this.firstSchedule?.timezone ?? 'IST';
     }
 
     get statusLabel(): string {

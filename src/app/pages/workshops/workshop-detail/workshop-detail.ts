@@ -1,4 +1,4 @@
-import { Component, input, output, signal, computed, inject, effect } from '@angular/core';
+import { Component, input, output, signal, computed, inject, effect, untracked } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import {
     AbstractControl, FormBuilder, FormGroup,
@@ -7,8 +7,8 @@ import {
 import {
     WorkshopService,
     WorkshopListItem,
-    WorkshopApiSession,
-    AddSessionPayload,
+    WorkshopApiSchedule,
+    AddSchedulePayload,
     UpdateWorkshopRequest,
     UpdatedWorkshopResponse,
     CancelWorkshopResponse,
@@ -95,44 +95,7 @@ function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
     };
 }
 
-/**
- * Cross-checks the new session against already-scheduled sessions on the same date.
- * Reports { timeConflict: { with: 'HH:mm–HH:mm (Activity)' } } on overlap.
- */
-function sessionConflictValidator(getSessions: () => WorkshopApiSession[]): ValidatorFn {
-    return (group: AbstractControl): ValidationErrors | null => {
-        const date = (group.get('date')?.value as string) ?? '';
-        const start = (group.get('startTime')?.value as string) ?? '';
-        const end = (group.get('endTime')?.value as string) ?? '';
-
-        if (!date || !start || !end) return null;
-
-        const [sh, sm] = start.split(':').map(Number);
-        const [eh, em] = end.split(':').map(Number);
-        const newStart = sh * 60 + sm;
-        const newEnd = eh * 60 + em;
-
-        if (newEnd <= newStart) return null; // handled by sessionConstraintsValidator
-
-        for (const s of getSessions()) {
-            // Normalize ISO datetime → YYYY-MM-DD for comparison
-            const sDate = s.date.includes('T') ? s.date.split('T')[0] : s.date;
-            if (sDate !== date) continue;
-
-            const [esh, esm] = s.startTime.split(':').map(Number);
-            const [eeh, eem] = s.endTime.split(':').map(Number);
-            const existStart = esh * 60 + esm;
-            const existEnd = eeh * 60 + eem;
-
-            // Overlap: newStart < existEnd && newEnd > existStart
-            if (newStart < existEnd && newEnd > existStart) {
-                return { timeConflict: { with: `${s.startTime}–${s.endTime} (${s.activity})` } };
-            }
-        }
-
-        return null;
-    };
-}
+// Frontend overlap validation removed to allow parallel schedules. Backend handles strict instructor/location conflict detection.
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -156,6 +119,7 @@ export class WorkshopDetailComponent {
     workshop = input.required<WorkshopListItem>();
     userRole = input<string>('');
     currentUserId = input<string | undefined>();
+    autoAddSession = input<boolean>(false);
 
     isOwner = computed(() => {
         const userId = this.currentUserId();
@@ -169,13 +133,13 @@ export class WorkshopDetailComponent {
 
         const res = String(createdById) === String(userId);
 
-        console.log('WorkshopDetail: isOwner check (robust)', {
-            currentUserId: userId,
-            workshopCreatedBy: workshop.createdBy,
-            derivedCreatedById: createdById,
-            isMatch: res,
-            workshopTitle: workshop.workshopTitle
-        });
+        // console.log('WorkshopDetail: isOwner check (robust)', {
+        //     currentUserId: userId,
+        //     workshopCreatedBy: workshop.createdBy,
+        //     derivedCreatedById: createdById,
+        //     isMatch: res,
+        //     workshopTitle: workshop.workshopTitle
+        // });
         return res;
     });
 
@@ -185,7 +149,7 @@ export class WorkshopDetailComponent {
 
     // ── Local sessions (starts from workshop input, updated optimistically) ───
 
-    localSessions = signal<WorkshopApiSession[]>([]);
+    localSchedules = signal<WorkshopApiSchedule[]>([]);
 
     // ── Form state ────────────────────────────────────────────────────────────
 
@@ -200,7 +164,13 @@ export class WorkshopDetailComponent {
     isSavingInfo = signal(false);
     isCancelling = signal(false);
     isRefreshing = signal(false);
-    isEnrolledAsInstructor = signal(false);
+    isEnrolledAsInstructor = computed(() => {
+        const enrollments = this.currentWorkshop().userEnrollments || [];
+        return enrollments.some(e =>
+            e.role?.toLowerCase() === 'instructor' &&
+            e.status?.toLowerCase() === 'active'
+        );
+    });
     editInfoForm!: FormGroup;
 
     // ── Enrollees state (Experts only) ──────────────────────────────────────────
@@ -217,6 +187,11 @@ export class WorkshopDetailComponent {
     enrolledStudentsList = computed(() =>
         this.enrollees().filter(e => e.role?.toLowerCase() === 'student' || e.role?.toLowerCase() === 'learner')
     );
+
+    getScheduleForEnrollee(scheduleId?: string): WorkshopApiSchedule | null {
+        if (!scheduleId) return null;
+        return this.currentWorkshop().schedules.find(s => s._id === scheduleId) || null;
+    }
 
     toggleOffline(): void {
         this.ws.toggleLocalCache(this.currentWorkshop());
@@ -246,8 +221,43 @@ export class WorkshopDetailComponent {
     ];
 
     // ── Enroll state ──────────────────────────────────────────────────────────
-
+ 
     showEnrollForm = signal(false);
+    isInstructorEnrollment = signal(false);
+    selectedScheduleForEnrollment = signal<WorkshopApiSchedule | null>(null);
+    selectedSessionOrderForEnrollment = signal<number | null>(null);
+
+    openEnrollForm(schedule: WorkshopApiSchedule) {
+        this.selectedSessionOrderForEnrollment.set(schedule.sessionOrder ?? null);
+        this.selectedScheduleForEnrollment.set(schedule);
+        this.isInstructorEnrollment.set(false);
+        this.showEnrollForm.set(true);
+    }
+
+    openEnrollFormForSession(order: number) {
+        this.selectedSessionOrderForEnrollment.set(order);
+        this.selectedScheduleForEnrollment.set(null);
+        this.isInstructorEnrollment.set(true);
+        this.showEnrollForm.set(true);
+    }
+
+    /**
+     * Users can enroll as an instructor for a specific session if:
+     * 1. Not the owner
+     * 2. Not already enrolled as an instructor
+     * 3. The workshop plan allows guest instructors for that specific hour
+     */
+    canEnrollForSession(order: number): boolean {
+        const userId = this.currentUserId();
+        if (!userId || this.isOwner()) return false;
+        if (this.isEnrolledAsInstructor()) return false;
+
+        const plan = this.currentWorkshop().threeHourPlan;
+        if (!plan) return false;
+
+        const hour = order === 1 ? plan.hour1 : order === 2 ? plan.hour2 : plan.hour3;
+        return !!hour?.instructorAllowed;
+    }
 
     // ── Role helpers ──────────────────────────────────────────────────────────
 
@@ -260,32 +270,53 @@ export class WorkshopDetailComponent {
     }
     get canEnroll(): boolean {
         if (!this.currentUserId() || this.isOwner()) return false;
-        if (this.currentWorkshop().userEnrollment) return false;
+        // Instructor enroll once globally
         if (this.isEnrolledAsInstructor()) return false;
         return true;
     }
 
+    isEnrolledInSchedule(scheduleId: string): boolean {
+        const enrollments = this.currentWorkshop().userEnrollments || [];
+        return enrollments.some(e => e.scheduleId === scheduleId && e.role === 'Student');
+    }
+
     /**
-     * Users who can manage sessions (add/delete):
-     * 1. Workshop Owner (Expert)
-     * 2. Users enrolled as 'Instructor' (Session Manager)
-     * 3. Admins/Directors (Audit/Management)
+     * Determines if a user can create a schedule for a specific Session (Hour 1, 2, or 3)
      */
-    get canManageSessions(): boolean {
+    canCreateSchedule(sessionOrder: number): boolean {
         const userId = this.currentUserId();
         const role = this.userRole();
         const workshop = this.currentWorkshop();
 
         if (!userId) return false;
 
-        // 1. Owner
-        if (this.isOwner()) return true;
-
-        // 2. Admin/Director
+        // Admin/Director power
         if (['Admin', 'Director'].includes(role)) return true;
 
-        // 3. Enrolled as Instructor for this workshop
-        if (workshop.userEnrollment?.role === 'Instructor' || this.isEnrolledAsInstructor()) return true;
+        // Check threeHourPlan flags
+        const plan = workshop.threeHourPlan;
+        if (!plan) return false;
+
+        let expertAllowed = false;
+        let instructorAllowed = false;
+
+        if (sessionOrder === 1 && plan.hour1) {
+            expertAllowed = plan.hour1.expertAllowed ?? true;
+            instructorAllowed = plan.hour1.instructorAllowed ?? false;
+        } else if (sessionOrder === 2 && plan.hour2) {
+            expertAllowed = plan.hour2.expertAllowed ?? true;
+            instructorAllowed = plan.hour2.instructorAllowed ?? false;
+        } else if (sessionOrder === 3 && plan.hour3) {
+            expertAllowed = plan.hour3.expertAllowed ?? true;
+            instructorAllowed = plan.hour3.instructorAllowed ?? false;
+        }
+
+        if (this.isOwner() && expertAllowed) return true;
+
+        const isEnrolled = this.currentWorkshop().userEnrollment?.role?.toLowerCase() === 'instructor' ||
+            this.isEnrolledAsInstructor();
+
+        if (isEnrolled && instructorAllowed) return true;
 
         return false;
     }
@@ -301,7 +332,7 @@ export class WorkshopDetailComponent {
      * 1. The original creator of the session (Expert or Instructor)
      * 2. Admins/Directors
      */
-    canEditSession(session: WorkshopApiSession): boolean {
+    canEditSchedule(session: WorkshopApiSchedule): boolean {
         const userId = this.normalizeId(this.currentUserId());
         const role = this.userRole();
         if (!userId) return false;
@@ -324,8 +355,8 @@ export class WorkshopDetailComponent {
      * 1. The original creator of the session
      * 2. Admins/Directors
      */
-    canDeleteSession(session: WorkshopApiSession): boolean {
-        return this.canEditSession(session);
+    canDeleteSchedule(session: WorkshopApiSchedule): boolean {
+        return this.canEditSchedule(session);
     }
 
     // ── Workshop display helpers ──────────────────────────────────────────────
@@ -340,7 +371,14 @@ export class WorkshopDetailComponent {
 
 
     get instructorLabel(): string {
-        return this.currentWorkshop().instructorType === 'myself' ? 'Solo instructor' : 'Open to instructors';
+        const plan = this.currentWorkshop().threeHourPlan;
+        if (!plan) return 'Expert-led workshop';
+
+        const hasOpen = (plan.hour1?.instructorAllowed) ||
+            (plan.hour2?.instructorAllowed) ||
+            (plan.hour3?.instructorAllowed);
+
+        return hasOpen ? 'Open to guest instructors' : 'Expert-led workshop';
     }
 
     get formattedCreatedAt(): string {
@@ -352,8 +390,8 @@ export class WorkshopDetailComponent {
 
     // ── Sorted sessions ───────────────────────────────────────────────────────
 
-    sortedSessions = computed(() =>
-        [...this.localSessions()].sort((a, b) => {
+    sortedSchedules = computed(() =>
+        [...this.localSchedules()].sort((a, b) => {
             const da = a.date.split('T')[0];
             const db = b.date.split('T')[0];
             if (da !== db) return da < db ? -1 : 1;
@@ -361,10 +399,18 @@ export class WorkshopDetailComponent {
         })
     );
 
+    schedulesByOrder(order: number): WorkshopApiSchedule[] {
+        return this.sortedSchedules().filter(s => s.sessionOrder === order);
+    }
+
     // ── Timezone helpers ──────────────────────────────────────────────────────
 
     private get tz(): string {
-        return this.currentWorkshop().timezone ?? 'IST';
+        // Fallback to the first session's timezone, or IST.
+        // In a multi-timezone scenario, validations often depend on the context of the session being added/edited.
+        const sessions = this.localSchedules();
+        if (sessions.length > 0) return sessions[0].timezone;
+        return 'IST';
     }
 
     get todayStr(): string { return nowInTz(this.tz).dateStr; }
@@ -389,7 +435,7 @@ export class WorkshopDetailComponent {
         } catch { return '—'; }
     }
 
-    sessionDuration(s: WorkshopApiSession): string {
+    sessionDuration(s: WorkshopApiSchedule): string {
         const [sh, sm] = s.startTime.split(':').map(Number);
         const [eh, em] = s.endTime.split(':').map(Number);
         const diff = (eh * 60 + em) - (sh * 60 + sm);
@@ -430,33 +476,76 @@ export class WorkshopDetailComponent {
         return !!this.selectedDate && this.selectedDate === this.todayStr;
     }
 
+    // ── Session Auto-Content helpers ─────────────────────────────────────────
+
+    // Since schedules can now overlap, we no longer check if an order is "taken" globally.
+    isSessionOrderTaken(order: number): boolean {
+        return false;
+    }
+
+    get selectedSessionOrder(): number | null {
+        const val = this.addForm?.getRawValue()?.sessionOrder;
+        return val ? Number(val) : null;
+    }
+
+    get sessionContentPreview(): { title: string, description: string } | null {
+        const order = this.selectedSessionOrder;
+        if (!order) return null;
+        const plan = this.currentWorkshop()?.threeHourPlan;
+        if (!plan) return null;
+        if (order === 1) return plan.hour1;
+        if (order === 2) return plan.hour2;
+        if (order === 3) return plan.hour3;
+        return null;
+    }
+
+    get sessionConductLabel(): string {
+        const order = this.selectedSessionOrder;
+        if (!order) return '';
+        const plan = this.currentWorkshop()?.threeHourPlan;
+        if (!plan) return '';
+
+        let expert = true;
+        let instructor = false;
+
+        if (order === 1 && plan.hour1) { expert = plan.hour1.expertAllowed ?? true; instructor = plan.hour1.instructorAllowed ?? false; }
+        else if (order === 2 && plan.hour2) { expert = plan.hour2.expertAllowed ?? true; instructor = plan.hour2.instructorAllowed ?? false; }
+        else if (order === 3 && plan.hour3) { expert = plan.hour3.expertAllowed ?? true; instructor = plan.hour3.instructorAllowed ?? false; }
+
+        if (expert && instructor) return 'Expert & Guest Instructors';
+        if (expert) return 'Expert only';
+        if (instructor) return 'Guest Instructors only';
+        return 'Not configured';
+    }
+
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     constructor() {
         // Sync local sessions whenever the workshop input changes
         effect(() => {
-            this.localSessions.set([...this.currentWorkshop().sessions]);
-        }, { allowSignalWrites: true });
+            this.localSchedules.set([...this.currentWorkshop().schedules]);
+        });
 
-        // Reset internal workshop when input changes (to avoid stale data from previous workshop)
         effect(() => {
-            this.workshop(); // track
-            this.internalWorkshop.set(null);
-            this.isEnrolledAsInstructor.set(false);
+            const workshopId = this.workshop()._id;
+            const userId = this.currentUserId();
 
-            // Auto-fetch enrollees if owner
-            if (this.isOwner()) {
-                this.fetchEnrollees();
-            } else {
-                this.enrollees.set([]);
-            }
+            untracked(() => {
+                this.internalWorkshop.set(null);
 
-            // Always fetch the freshest data (which includes userEnrollment)
-            if (this.currentUserId()) {
-                // Execute in next tick to avoid untracked signal writes during effect
-                setTimeout(() => this.refreshWorkshopData(), 0);
-            }
-        }, { allowSignalWrites: true });
+                // Auto-fetch enrollees if owner
+                if (this.isOwner()) {
+                    this.fetchEnrollees();
+                } else {
+                    this.enrollees.set([]);
+                }
+
+                // Always fetch the freshest data (which includes userEnrollment)
+                if (userId) {
+                    this.refreshWorkshopData();
+                }
+            });
+        });
 
         this.buildForm();
         this.buildEditInfoForm();
@@ -465,14 +554,14 @@ export class WorkshopDetailComponent {
     // ── Form builder ──────────────────────────────────────────────────────────
 
     private buildForm(): void {
-        const getTz = () => this.tz;
+        const getFormTz = () => this.addForm?.get('timezone')?.value ?? 'IST';
 
         this.addForm = this.fb.group({
-            date: ['', [Validators.required, pastDateValidator(getTz)]],
+            date: ['', [Validators.required, pastDateValidator(getFormTz)]],
             startTime: ['', Validators.required],
             endTime: ['', Validators.required],
-            activity: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-            description: ['', [Validators.maxLength(1000)]],
+            timezone: ['IST', Validators.required],
+            sessionOrder: ['', Validators.required],
             fee: [0, [Validators.required, Validators.min(0)]],
             mode: ['online', Validators.required],
             location: [''],
@@ -484,8 +573,7 @@ export class WorkshopDetailComponent {
             facilityDetails: [null],
         }, {
             validators: [
-                sessionConstraintsValidator(getTz),
-                sessionConflictValidator(() => this.localSessions()),
+                sessionConstraintsValidator(getFormTz)
             ]
         });
 
@@ -500,8 +588,6 @@ export class WorkshopDetailComponent {
             workshopTitle: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
             workshopDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
             expertDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
-            timezone: ['IST', Validators.required],
-            instructorType: ['myself', Validators.required],
             status: ['draft', Validators.required],
         });
     }
@@ -525,14 +611,26 @@ export class WorkshopDetailComponent {
 
     // ── Add form control ──────────────────────────────────────────────────────
 
-    openAddForm(): void {
+    openAddForm(sessionOrder?: number): void {
         this.showAddForm.set(true);
-        this.addForm.reset({ mode: 'online', fee: 0 });
+        const orderControl = this.addForm.get('sessionOrder');
+
+        this.addForm.reset({
+            mode: 'online',
+            fee: 0,
+            sessionOrder: sessionOrder || ''
+        });
+
+        if (sessionOrder) {
+            orderControl?.disable();
+        } else {
+            orderControl?.enable();
+        }
     }
 
     cancelAddForm(): void {
         this.showAddForm.set(false);
-        this.addForm.reset({ mode: 'online', fee: 0 });
+        this.addForm.reset({ mode: 'online', fee: 0, sessionOrder: '' });
     }
 
     // ── Facility Booking logic ──────────────────────────────────────────────
@@ -577,8 +675,6 @@ export class WorkshopDetailComponent {
             workshopTitle: w.workshopTitle,
             workshopDescription: w.workshopDescription,
             expertDescription: w.expertDescription,
-            timezone: w.timezone,
-            instructorType: w.instructorType,
             status: w.status,
         });
         this.isEditingInfo.set(true);
@@ -597,8 +693,6 @@ export class WorkshopDetailComponent {
             workshopTitle: val.workshopTitle.trim(),
             workshopDescription: val.workshopDescription.trim(),
             expertDescription: val.expertDescription.trim(),
-            timezone: val.timezone,
-            instructorType: val.instructorType,
             status: val.status,
         };
 
@@ -670,6 +764,7 @@ export class WorkshopDetailComponent {
     }
 
     fetchEnrollees(): void {
+        console.log('Fetching enrollees...');
         const id = this.workshop()._id;
         if (!id || this.isLoadingEnrollees()) return;
 
@@ -720,12 +815,14 @@ export class WorkshopDetailComponent {
     }
 
     private proceedWithAddSession(v: any): void {
-        const payload: AddSessionPayload[] = [{
+        const payload: AddSchedulePayload[] = [{
             date: v.date,
             startTime: v.startTime,
             endTime: v.endTime,
-            activity: v.activity.trim(),
-            description: v.description?.trim() || '',
+            timezone: v.timezone,
+            sessionOrder: Number(v.sessionOrder) as (1 | 2 | 3),
+            activity: '', // Populated by backend
+            description: '', // Populated by backend
             fee: Number(v.fee),
             mode: v.mode,
             location: v.mode === 'hybrid' ? (v.location || null) : null,
@@ -738,14 +835,14 @@ export class WorkshopDetailComponent {
         }];
 
         this.isSubmitting.set(true);
-        this.ws.addSessions(this.workshop()._id, payload).subscribe({
+        this.ws.addSchedules(this.workshop()._id, payload).subscribe({
             next: res => {
                 // Optimistic: append new sessions immediately
-                this.localSessions.update(list => [...list, ...res.data.addedSessions]);
+                this.localSchedules.update(list => [...list, ...res.data.addedSchedules]);
                 this.toast.success(res.message);
                 this.isSubmitting.set(false);
                 this.showAddForm.set(false);
-                this.addForm.reset({ mode: 'online', fee: 0 });
+                this.addForm.reset({ mode: 'online', fee: 0, sessionOrder: '' });
                 this.sessionAdded.emit();  // background refresh in parent
             },
             error: () => this.isSubmitting.set(false),
@@ -754,8 +851,8 @@ export class WorkshopDetailComponent {
 
     // ── Session Deletion ─────────────────────────────────────────────────────
 
-    onDeleteSession(session: WorkshopApiSession): void {
-        if (!this.canDeleteSession(session)) {
+    onDeleteSchedule(session: WorkshopApiSchedule): void {
+        if (!this.canDeleteSchedule(session)) {
             this.toast.error('You do not have permission to delete this session.');
             return;
         }
@@ -763,10 +860,10 @@ export class WorkshopDetailComponent {
         const msg = `Are you sure you want to remove the session "${session.activity}" on ${this.formatDate(session.date)}?`;
         if (!confirm(msg)) return;
 
-        this.ws.deleteSession(this.workshop()._id, session._id).subscribe({
+        this.ws.deleteSchedule(this.workshop()._id, session._id).subscribe({
             next: res => {
                 // Optimistic UI update
-                this.localSessions.update(list => list.filter(s => s._id !== session._id));
+                this.localSchedules.update(list => list.filter(s => s._id !== session._id));
                 this.toast.success(res.message);
                 this.sessionAdded.emit(); // trigger refresh in parent
             },
@@ -790,12 +887,13 @@ export class WorkshopDetailComponent {
         const enrollmentType = formValue.enrollmentType;
         const workshopId = this.currentWorkshop()._id;
         const role = enrollmentType === 'support' ? 'Instructor' : 'Student';
+        const scheduleId = this.selectedScheduleForEnrollment()?._id;
+        const sessionOrder = this.selectedSessionOrderForEnrollment() || undefined;
 
-        this.ws.enrollInWorkshop(workshopId, role).subscribe({
+        this.ws.enrollInWorkshop(workshopId, role, scheduleId, sessionOrder).subscribe({
             next: (res) => {
                 this.toast.success(res.message);
                 if (role === 'Instructor') {
-                    this.isEnrolledAsInstructor.set(true);
                     this.authService.refreshProfile().subscribe();
                 }
                 this.showEnrollForm.set(false);

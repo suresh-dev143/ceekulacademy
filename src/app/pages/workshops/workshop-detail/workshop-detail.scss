@@ -341,7 +341,40 @@ $status-colors: (
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.wd-session-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+
+    h4 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+}
+
+.wd-session-header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.wd-btn-enroll-teach {
+    background: var(--primary-light, #E3F2FD);
+    color: var(--primary, #2196F3);
+    border: 1px solid var(--primary-border, #BBDEFB);
+
+    &:hover {
+        background: var(--primary-hover, #BBDEFB);
+        transform: translateY(-1px);
+    }
 }
 
 .wd-section-title {
@@ -814,7 +847,7 @@ $status-colors: (
 }
 
 .wd-icon-btn {
-    width: 30px;
+    width: auto;
     height: 30px;
     border-radius: 7px;
     display: inline-flex;
@@ -912,6 +945,95 @@ $status-colors: (
 
     &:hover {
         color: var(--text-primary);
+    }
+}
+
+// ── Checkbox groups ──────────────────────────────────────────────────────────
+
+.wd-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+
+    @media (min-width: 600px) {
+        flex-direction: row;
+        gap: 1.5rem;
+    }
+}
+
+.wd-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    user-select: none;
+    transition: color 0.2s;
+
+    input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .wd-checkbox-mark {
+        width: 20px;
+        height: 20px;
+        border-radius: 5px;
+        border: 2px solid color-mix(in srgb, #fff, transparent 85%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        background: rgba(255, 255, 255, 0.03);
+
+        &::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 10px;
+            color: #fff;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    }
+
+    input[type="checkbox"]:checked~.wd-checkbox-mark {
+        background: var(--accent, #FF6B00);
+        border-color: var(--accent, #FF6B00);
+        box-shadow: 0 0 12px color-mix(in srgb, var(--accent, #FF6B00), transparent 70%);
+
+        &::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    &:hover .wd-checkbox-mark {
+        border-color: color-mix(in srgb, var(--accent, #FF6B00), transparent 40%);
+    }
+
+    &:hover {
+        color: var(--text-primary);
+    }
+}
+
+.wd-session-instructor-info {
+    font-size: 0.78rem;
+    color: color-mix(in srgb, #fff, transparent 40%);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+
+    i {
+        font-size: 0.85rem;
+        color: var(--accent, #FF6B00);
     }
 }
 

@@ -141,10 +141,8 @@ import { CourseService, Course } from '../../services/course.service';
     </app-layout>
   `,
   styles: [`
-    .teacher-dashboard-container { padding: 2rem; max-width: 1400px; margin: 0 auto; }
-    
+    .teacher-dashboard-container { padding: 2rem 0; max-width: 1400px; margin: 0 auto; }
     .main-content-scroll { display: flex; flex-direction: column; gap: 2.5rem; }
-
     .teacher-insights { margin-top:2rem;padding: 1.5rem; border-radius: 24px;
       .panel-title { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.8rem; i { color: #8b5cf6; } }
       h4 { font-size: 0.75rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 70%); text-transform: uppercase; margin: 2rem 0 1rem; letter-spacing: 0.5px; }

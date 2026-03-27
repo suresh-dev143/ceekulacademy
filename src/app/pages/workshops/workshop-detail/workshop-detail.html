@@ -7,7 +7,10 @@
 
     <!-- ══ Enrollment overlay ════════════════════════════════════════════════════ -->
     @if (showEnrollForm()) {
-    <app-enroll-workshop [workshop]="currentWorkshop()" [userRole]="userRole()" (enrolled)="onEnrolled($event)"
+    <app-enroll-workshop [workshop]="currentWorkshop()" [userRole]="userRole()" 
+        [sessionOrder]="selectedSessionOrderForEnrollment()"
+        [isInstructorFlow]="isInstructorEnrollment()"
+        (enrolled)="onEnrolled($event)"
         (cancel)="showEnrollForm.set(false)">
     </app-enroll-workshop>
     } @else {
@@ -18,9 +21,12 @@
             <span class="wd-badge wd-badge--status" [class]="'wd-badge--' + currentWorkshop().status">
                 {{ statusLabel }}
             </span>
-            <span class="wd-badge wd-badge--tz">
-                <i class="fas fa-globe"></i> {{ currentWorkshop().timezone }}
+            @if (isEnrolledAsInstructor()) {
+            <span class="wd-badge"
+                style="background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border);">
+                <i class="fas fa-check-circle"></i> Enrolled as Instructor
             </span>
+            }
         </div>
 
 
@@ -50,7 +56,8 @@
             <span><i class="fas fa-user-tie"></i> {{ instructorLabel }}</span>
             <span><i class="fas fa-calendar-alt"></i> Created {{ formattedCreatedAt }}</span>
             <span><i class="fas fa-layer-group"></i>
-                {{ currentWorkshop().sessions.length }} Session{{ currentWorkshop().sessions.length !== 1 ? 's' : '' }}
+                {{ currentWorkshop().schedules.length }} Session{{ currentWorkshop().schedules.length !== 1 ? 's' : ''
+                }}
             </span>
             <span class="wd-revenue">
                 <i class="fas fa-rupee-sign"></i>
@@ -89,21 +96,16 @@
         <!-- Section header -->
         <div class="wd-section-header">
             <div class="wd-section-title">
-                <i class="fas fa-calendar-day"></i> Sessions
-                <span class="wd-session-count-badge">{{ localSessions().length }}</span>
+                <i class="fas fa-calendar-day"></i> Active Schedules
+                <span class="wd-session-count-badge">{{ localSchedules().length }}</span>
             </div>
-            @if (canManageSessions && !showAddForm()) {
-            <button type="button" class="wd-add-btn" (click)="openAddForm()">
-                <i class="fas fa-plus"></i> Add Session
-            </button>
-            }
         </div>
 
         <!-- ══ Add session form ═══════════════════════════════════════════════ -->
         @if (showAddForm()) {
         <div class="wd-add-form-card">
             <div class="wd-add-form-header">
-                <span><i class="fas fa-plus-circle"></i> New Session</span>
+                <span><i class="fas fa-plus-circle"></i> New Schedule</span>
                 <button type="button" class="wd-add-form-close" (click)="cancelAddForm()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -116,7 +118,8 @@
                 <div class="wd-today-hint">
                     <i class="fas fa-exclamation-triangle"></i>
                     You are scheduling for <strong>today</strong>.
-                    Start time must be later than the current time in <strong>{{ workshop().timezone }}</strong>.
+                    Start time must be later than the current time in <strong>{{ addForm.get('timezone')?.value
+                        }}</strong>.
                 </div>
                 }
 
@@ -131,8 +134,8 @@
                 </div>
                 }
 
-                <!-- Row 1: Date · Start Time · End Time -->
-                <div class="wd-form-grid wd-form-grid--3">
+                <!-- Row 1: Date · Timezone · Start Time · End Time -->
+                <div class="wd-form-grid wd-form-grid--2">
 
                     <div class="wd-field">
                         <label class="wd-label">Date *</label>
@@ -143,6 +146,15 @@
                         } @else if (fieldHasError('date','pastDate')) {
                         <div class="wd-error">Cannot select a past date.</div>
                         }
+                    </div>
+
+                    <div class="wd-field">
+                        <label class="wd-label">Timezone *</label>
+                        <select class="wd-input wd-select" formControlName="timezone">
+                            @for (tz of timezones; track tz.key) {
+                            <option [value]="tz.key">{{ tz.label }}</option>
+                            }
+                        </select>
                     </div>
 
                     <div class="wd-field">
@@ -172,28 +184,45 @@
 
                 </div>
 
-                <!-- Row 2: Activity · Fee · Mode -->
+                <!-- Row 2: Session Order · Preview · Fee · Mode -->
                 <div class="wd-form-grid wd-form-grid--3">
 
                     <div class="wd-field">
-                        <label class="wd-label">Activity *</label>
-                        <input type="text" class="wd-input" formControlName="activity"
-                            [class.is-error]="fieldError('activity')" placeholder="e.g., HTML/CSS Fundamentals">
-                        @if (fieldHasError('activity','required')) {
-                        <div class="wd-error">Activity description is required.</div>
-                        } @else if (fieldHasError('activity','minlength')) {
-                        <div class="wd-error">Minimum 3 characters.</div>
+                        <label class="wd-label">Session Order *</label>
+                        <select class="wd-input wd-select" formControlName="sessionOrder"
+                            [class.is-error]="fieldHasError('sessionOrder','required')">
+                            <option value="" disabled selected>Select Session Mapping</option>
+                            <option [value]="1" [disabled]="isSessionOrderTaken(1)">🧠 Hour 1: Learning</option>
+                            <option [value]="2" [disabled]="isSessionOrderTaken(2)">⚙️ Hour 2: Hands On</option>
+                            <option [value]="3" [disabled]="isSessionOrderTaken(3)">🚀 Hour 3: Project Discussion
+                            </option>
+                        </select>
+                        @if (fieldHasError('sessionOrder','required')) {
+                        <div class="wd-error">Please select a session mapping.</div>
                         }
                     </div>
 
-                    <div class="wd-field">
-                        <label class="wd-label">Description (Optional)</label>
-                        <textarea class="wd-input wd-textarea" formControlName="description"
-                            placeholder="Provide more details for this session..." rows="2" maxlength="1000"></textarea>
-                        <span class="wd-char">
-                            {{ addForm.get('description')?.value?.length ?? 0 }}/1000
-                        </span>
+                    @if (sessionContentPreview) {
+                    <div class="wd-field wd-content-preview">
+                        <label class="wd-label"><i class="fas fa-lock"></i> Auto-Generated Content</label>
+                        <div class="wd-preview-card"
+                            style="font-size: 0.85rem; padding: 0.6rem; background: var(--surface-hover); border-radius: var(--radius-sm); border: 1px solid var(--border-color); color: var(--text-color);">
+                            <strong style="display: block; margin-bottom: 0.25rem;">{{ sessionContentPreview.title
+                                }}</strong>
+                            <p
+                                style="margin: 0; color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                                {{ sessionContentPreview.description }}</p>
+                        </div>
                     </div>
+                    } @else {
+                    <div class="wd-field wd-content-preview">
+                        <label class="wd-label"><i class="fas fa-lock"></i> Content Preview</label>
+                        <div class="wd-preview-card"
+                            style="font-size: 0.85rem; padding: 0.6rem; background: var(--surface-base); border-radius: var(--radius-sm); border: 1px dashed var(--border-color); color: var(--text-muted); display: flex; align-items: center; justify-content: center; height: 100%;">
+                            <span>Select a mapping to preview...</span>
+                        </div>
+                    </div>
+                    }
 
                     <div class="wd-field">
                         <label class="wd-label">Fee (₹) *</label>
@@ -222,11 +251,20 @@
 
                 </div>
 
+                <div class="wd-field" style="margin-top: 1rem;">
+                    <label class="wd-label"><i class="fas fa-lock"></i> Conduct Policy (Fixed per Session)</label>
+                    <div class="wd-preview-card"
+                        style="font-size: 0.85rem; padding: 0.6rem; background: var(--surface-hover); border-radius: var(--radius-sm); border: 1px solid var(--border-color); color: var(--text-color); display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-user-shield" style="color: var(--primary);"></i>
+                        <span>{{ sessionConductLabel }}</span>
+                    </div>
+                </div>
+
                 <!-- Conditional: Venue (hybrid) -->
                 @if (isHybridMode) {
                 <div class="wd-field">
                     <label class="wd-label">Venue / Location *</label>
- 
+
                     @if (!addForm.get('facilityId')?.value) {
                     <div class="wd-location-placeholder">
                         <p>No facility selected for this hybrid session.</p>
@@ -243,12 +281,13 @@
                                 <span>{{ addForm.get('facilityType')?.value }}</span>
                             </div>
                         </div>
-                        <button type="button" class="wd-facility-remove" (click)="removeFacility()" title="Change Facility">
+                        <button type="button" class="wd-facility-remove" (click)="removeFacility()"
+                            title="Change Facility">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                     }
- 
+
                     @if (fieldHasError('facilityId','required')) {
                     <div class="wd-error">Please select a facility for hybrid sessions.</div>
                     }
@@ -275,7 +314,7 @@
                         @if (isSubmitting()) {
                         <i class="fas fa-spinner fa-spin"></i> Adding…
                         } @else {
-                        <i class="fas fa-plus-circle"></i> Add Session
+                        <i class="fas fa-plus-circle"></i> Add Schedule
                         }
                     </button>
                 </div>
@@ -284,22 +323,103 @@
         </div>
         }<!-- end showAddForm -->
 
-        <!-- ══ Sessions list ════════════════════════════════════════════════ -->
-        @if (sortedSessions().length === 0 && !showAddForm()) {
+        <!-- ══ Scheduled Sessions Blocks ════════════════════════════════════════════════ -->
+        @if (localSchedules().length === 0 && !showAddForm()) {
         <div class="wd-empty-sessions">
             <i class="fas fa-calendar-times"></i>
-            <p>No sessions have been scheduled yet.</p>
-            @if (isOwner()) {
-            <button type="button" class="wd-add-btn" (click)="openAddForm()">
-                <i class="fas fa-plus"></i> Schedule the First Session
-            </button>
-            }
+            <p>No schedules have been added yet.</p>
         </div>
-        } @else if (sortedSessions().length > 0) {
-        <div class="wd-sessions-list">
-            @for (s of sortedSessions(); track s._id; let idx = $index) {
-            <div class="wd-session-item">
+        }
 
+        <div class="wd-session-blocks">
+            <!-- Hour 1 Block -->
+            <div class="wd-session-block">
+                <div class="wd-session-block-header">
+                    <h4>🧠 Session 1: Learn & Innovate</h4>
+                    <div class="wd-session-header-actions">
+                        @if (canCreateSchedule(1) && !showAddForm()) {
+                        <button type="button" class="wd-btn-small" (click)="openAddForm(1)">
+                            <i class="fas fa-plus"></i> Add Schedule
+                        </button>
+                        }
+                        @if (canEnrollForSession(1)) {
+                        <button type="button" class="wd-btn-small wd-btn-enroll-teach" (click)="openEnrollFormForSession(1)">
+                            Enroll to Teach
+                        </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="wd-sessions-list">
+                    @for (s of schedulesByOrder(1); track s._id; let idx = $index) {
+                    <ng-container *ngTemplateOutlet="scheduleCard; context: { $implicit: s, idx: idx }"></ng-container>
+                    }
+                    @if (schedulesByOrder(1).length === 0) {
+                    <div class="wd-empty-schedule">No schedules available for this session.</div>
+                    }
+                </div>
+            </div>
+
+            <!-- Hour 2 Block -->
+            <div class="wd-session-block" style="margin-top: 2rem;">
+                <div class="wd-session-block-header">
+                    <h4>⚙️ Session 2: Hands-On</h4>
+                    <div class="wd-session-header-actions">
+                        @if (canCreateSchedule(2) && !showAddForm()) {
+                        <button type="button" class="wd-btn-small" (click)="openAddForm(2)">
+                            <i class="fas fa-plus"></i> Add Schedule
+                        </button>
+                        }
+                        @if (canEnrollForSession(2)) {
+                        <button type="button" class="wd-btn-small wd-btn-enroll-teach" (click)="openEnrollFormForSession(2)">
+                            Enroll to Teach
+                        </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="wd-sessions-list">
+                    @for (s of schedulesByOrder(2); track s._id; let idx = $index) {
+                    <ng-container *ngTemplateOutlet="scheduleCard; context: { $implicit: s, idx: idx }"></ng-container>
+                    }
+                    @if (schedulesByOrder(2).length === 0) {
+                    <div class="wd-empty-schedule">No schedules available for this session.</div>
+                    }
+                </div>
+            </div>
+
+            <!-- Hour 3 Block -->
+            <div class="wd-session-block" style="margin-top: 2rem;">
+                <div class="wd-session-block-header">
+                    <h4>🚀 Session 3: Project Discussion</h4>
+                    <div class="wd-session-header-actions">
+                        @if (canCreateSchedule(3) && !showAddForm()) {
+                        <button type="button" class="wd-btn-small" (click)="openAddForm(3)">
+                            <i class="fas fa-plus"></i> Add Schedule
+                        </button>
+                        }
+                        @if (canEnrollForSession(3)) {
+                        <button type="button" class="wd-btn-small wd-btn-enroll-teach" (click)="openEnrollFormForSession(3)">
+                            Enroll to Teach
+                        </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="wd-sessions-list">
+                    @for (s of schedulesByOrder(3); track s._id; let idx = $index) {
+                    <ng-container *ngTemplateOutlet="scheduleCard; context: { $implicit: s, idx: idx }"></ng-container>
+                    }
+                    @if (schedulesByOrder(3).length === 0) {
+                    <div class="wd-empty-schedule">No schedules available for this session.</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Reusable Schedule Card Template -->
+        <ng-template #scheduleCard let-s let-idx="idx">
+            <div class="wd-session-item">
                 <!-- Index bubble -->
                 <div class="wd-session-index">{{ idx + 1 }}</div>
 
@@ -310,7 +430,7 @@
                         <div class="wd-session-title-wrap">
                             <span class="wd-session-activity">{{ s.activity }}</span>
                             @if (s.description) {
-                                <p class="wd-session-desc">{{ s.description }}</p>
+                            <p class="wd-session-desc">{{ s.description }}</p>
                             }
                         </div>
                         <div class="wd-session-tags">
@@ -352,40 +472,54 @@
                             {{ s.location }}
                         </span>
                         }
+                        <span class="wd-session-instructor-info" style="color: var(--primary); font-weight: 500;">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            {{ s.instructorId?.name || 'Expert' }}
+                        </span>
                     </div>
-
                 </div>
 
-                <!-- Teacher actions (Edit/Delete) -->
+                <!-- Teacher / User actions -->
                 <div class="wd-session-actions">
-                    @if (canEditSession(s)) {
+                    @if (canEnroll) {
+                    @if (isEnrolledInSchedule(s._id)) {
+                    <span class="wd-enrolled-pill">
+                        <i class="fas fa-check-circle"></i> Enrolled
+                    </span>
+                    } @else {
+                    <button type="button" class="wd-icon-btn wd-icon-btn--enroll" style="color: var(--primary);"
+                        (click)="openEnrollForm(s)" title="Enroll in schedule">
+                        Enroll
+                    </button>
+                    }
+                    }
+
+                    @if (canEditSchedule(s)) {
                     <button type="button" class="wd-icon-btn wd-icon-btn--edit" title="Edit session (coming soon)"
                         disabled>
                         <i class="fas fa-pen"></i>
                     </button>
                     }
-                    @if (canDeleteSession(s)) {
-                    <button type="button" class="wd-icon-btn wd-icon-btn--delete" (click)="onDeleteSession(s)"
-                        [disabled]="isSubmitting()" title="Delete session">
+                    @if (canDeleteSchedule(s)) {
+                    <button type="button" class="wd-icon-btn wd-icon-btn--delete" (click)="onDeleteSchedule(s)"
+                        [disabled]="isSubmitting()" title="Delete schedule">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                     }
                 </div>
-
             </div>
-            }
-        </div>
-        }
+        </ng-template>
 
     </section>
-    
+
     <!-- ══ Enrollees section (Experts only) ══════════════════════════════════ -->
     @if (isOwner()) {
     <section class="wd-enrollees-section animate-fade-in">
         <div class="wd-section-header">
             <div class="wd-section-title">
                 <i class="fas fa-users"></i> Enrolled Participants
-                <button type="button" class="wd-refresh-mini" (click)="fetchEnrollees()" [disabled]="isLoadingEnrollees()" title="Refresh Enrollees">
+                <button type="button" class="wd-refresh-mini" (click)="fetchEnrollees()"
+                    [disabled]="isLoadingEnrollees()" title="Refresh Enrollees">
                     <i class="fas fa-sync-alt" [class.fa-spin]="isLoadingEnrollees()"></i>
                 </button>
             </div>
@@ -395,24 +529,25 @@
             <!-- Instructors -->
             <div class="wd-enrollee-column">
                 <h4 class="wd-column-title">
-                    <i class="fas fa-chalkboard-teacher"></i> Instructors 
+                    <i class="fas fa-chalkboard-teacher"></i> Instructors
                     <span class="wd-count-pill">{{ enrolledInstructorsList().length }}</span>
                 </h4>
                 @if (enrolledInstructorsList().length === 0) {
-                    <div class="wd-column-empty">No instructors enrolled yet.</div>
+                <div class="wd-column-empty">No instructors enrolled yet.</div>
                 } @else {
-                    <div class="wd-enrollee-list">
-                        @for (e of enrolledInstructorsList(); track e._id) {
-                        <div class="wd-enrollee-card">
-                            <img [src]="e.userId.profileImage || 'assets/default-avatar.png'" alt="avatar" class="wd-enrollee-avatar">
-                            <div class="wd-enrollee-info">
-                                <span class="wd-enrollee-name">{{ e.userId.name }}</span>
-                                <span class="wd-enrollee-email">{{ e.userId.email }}</span>
-                            </div>
-                            <span class="wd-enrollee-status" [attr.data-status]="e.status">{{ e.status }}</span>
+                <div class="wd-enrollee-list">
+                    @for (e of enrolledInstructorsList(); track e._id) {
+                    <div class="wd-enrollee-card">
+                        <img [src]="e.userId.profileImage || 'assets/default-avatar.png'" alt="avatar"
+                            class="wd-enrollee-avatar">
+                        <div class="wd-enrollee-info">
+                            <span class="wd-enrollee-name">{{ e.userId.name }}</span>
+                            <span class="wd-enrollee-email">{{ e.userId.email }}</span>
                         </div>
-                        }
+                        <span class="wd-enrollee-status" [attr.data-status]="e.status">{{ e.status }}</span>
                     </div>
+                    }
+                </div>
                 }
             </div>
 
@@ -423,41 +558,37 @@
                     <span class="wd-count-pill">{{ enrolledStudentsList().length }}</span>
                 </h4>
                 @if (enrolledStudentsList().length === 0) {
-                    <div class="wd-column-empty">No learners enrolled yet.</div>
+                <div class="wd-column-empty">No learners enrolled yet.</div>
                 } @else {
-                    <div class="wd-enrollee-list">
-                        @for (e of enrolledStudentsList(); track e._id) {
-                        <div class="wd-enrollee-card">
-                            <img [src]="e.userId.profileImage || 'assets/default-avatar.png'" alt="avatar" class="wd-enrollee-avatar">
-                            <div class="wd-enrollee-info">
-                                <span class="wd-enrollee-name">{{ e.userId.name }}</span>
-                                <span class="wd-enrollee-email">{{ e.userId.email }}</span>
+                <div class="wd-enrollee-list">
+                    @for (e of enrolledStudentsList(); track e._id) {
+                    <div class="wd-enrollee-card">
+                        <img [src]="e.userId.profileImage || 'assets/default-avatar.png'" alt="avatar"
+                            class="wd-enrollee-avatar">
+                        <div class="wd-enrollee-info">
+                            <span class="wd-enrollee-name">{{ e.userId.name }}</span>
+                            <span class="wd-enrollee-email">{{ e.userId.email }}</span>
+
+                            @if (getScheduleForEnrollee(e.scheduleId)) {
+                            <div class="wd-enrollee-schedule"
+                                style="font-size: 0.8rem; color: var(--text-dim); margin-top: 4px;">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ getScheduleForEnrollee(e.scheduleId)?.startTime }}
+                                ({{ getScheduleForEnrollee(e.scheduleId)?.date | date:'shortDate' }})
                             </div>
-                            <span class="wd-enrollee-status" [attr.data-status]="e.status">{{ e.status }}</span>
+                            }
                         </div>
-                        }
+                        <span class="wd-enrollee-status" [attr.data-status]="e.status">{{ e.status }}</span>
                     </div>
+                    }
+                </div>
                 }
             </div>
         </div>
     </section>
     }
 
-    <!-- ══ Student action bar ════════════════════════════════════════════════ -->
-    @if (canEnroll && localSessions().length > 0) {
-    <div class="wd-student-bar">
-        <div class="wd-student-bar-text">
-            <i class="fas fa-info-circle"></i>
-            Ready to join? Enroll to participate in all {{ localSessions().length }} session{{ localSessions().length
-            !== 1 ? 's' : '' }}.
-        </div>
-        <button type="button" class="wd-enroll-btn" (click)="showEnrollForm.set(true)">
-            <i class="fas fa-bookmark"></i> Enroll in Workshop
-        </button>
-    </div>
-    }
-
-    }<!-- end enrollment overlay check -->
+    <!-- Student action bar removed to force schedule-specific enrollment clicks -->
 
     <!-- ══ Edit Info Modal ═══════════════════════════════════════════════════ -->
     @if (isEditingInfo()) {
@@ -504,35 +635,17 @@
                     </div> }
                 </div>
 
-                <div class="wd-form-grid wd-form-grid--2">
-                    <div class="wd-field">
-                        <label class="wd-label">Timezone *</label>
-                        <select class="wd-input wd-select" formControlName="timezone">
-                            @for (tz of timezones; track tz.key) {
-                            <option [value]="tz.key">{{ tz.label }}</option>
-                            }
-                        </select>
-                    </div>
-                </div>
 
-                <div class="wd-form-grid wd-form-grid--2">
-                    <div class="wd-field">
-                        <label class="wd-label">Instructor Type *</label>
-                        <select class="wd-input wd-select" formControlName="instructorType">
-                            <option value="myself">Myself (Solo)</option>
-                            <option value="open">Open to Instructors</option>
-                        </select>
-                    </div>
-                    <div class="wd-field">
-                        <label class="wd-label">Status *</label>
-                        <select class="wd-input wd-select" formControlName="status">
-                            <option value="draft">Draft</option>
-                            <option value="published">Published</option>
-                            <option value="active">Active</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                    </div>
+
+                <div class="wd-field">
+                    <label class="wd-label">Status *</label>
+                    <select class="wd-input wd-select" formControlName="status">
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
                 </div>
 
                 <div class="wd-modal-footer">
@@ -550,5 +663,5 @@
         </div>
     </div>
     }
-
+    }
 </div>

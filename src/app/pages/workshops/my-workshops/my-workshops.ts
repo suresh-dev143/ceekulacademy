@@ -30,6 +30,8 @@ export class MyWorkshopsComponent implements OnInit {
     workshopToEdit = signal<WorkshopListItem | null>(null);
     showDetail = signal<boolean>(false);
     showEdit = signal<boolean>(false);
+    isCreating = signal<boolean>(false);
+    isAddingSession = signal<boolean>(false);
 
     ngOnInit() {
         if (!this.isBrowser) return;
@@ -70,6 +72,13 @@ export class MyWorkshopsComponent implements OnInit {
 
     onView(w: WorkshopListItem) {
         this.selectedWorkshop.set(w);
+        this.isAddingSession.set(false);
+        this.showDetail.set(true);
+    }
+
+    onAddSession(w: WorkshopListItem) {
+        this.selectedWorkshop.set(w);
+        this.isAddingSession.set(true);
         this.showDetail.set(true);
     }
 
@@ -109,6 +118,7 @@ export class MyWorkshopsComponent implements OnInit {
     closeDetail() {
         this.showDetail.set(false);
         this.selectedWorkshop.set(null);
+        this.isAddingSession.set(false);
     }
 
     closeEdit() {
@@ -118,6 +128,20 @@ export class MyWorkshopsComponent implements OnInit {
 
     onWorkshopUpdated() {
         this.closeEdit();
+        this.loadMyWorkshops();
+    }
+
+    openCreate() {
+        this.isCreating.set(true);
+    }
+
+    closeCreate() {
+        this.isCreating.set(false);
+    }
+
+    onWorkshopCreated(_data: CreatedWorkshopData) {
+        this.closeCreate();
+        this.toast.success('Workshop created successfully!');
         this.loadMyWorkshops();
     }
 }

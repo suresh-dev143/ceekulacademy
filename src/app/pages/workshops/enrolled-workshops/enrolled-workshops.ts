@@ -85,11 +85,11 @@ export class EnrolledWorkshopsComponent implements OnInit {
         const w = enrollment.workshop;
         const item: WorkshopListItem = {
             ...w,
-            instructorType: w.instructorType as 'myself' | 'open',
             status: w.status as any,
-            sessions: w.sessions.map(s => ({
+            schedules: w.schedules.map(s => ({
                 ...s,
-                instructorId: undefined, // EnrolledWorkshopSession doesn't have it yet
+                instructorId: undefined, // EnrolledWorkshopSchedule doesn't have it yet
+                instructorType: (s as any).instructorType || ['myself'],
                 location: s.location,
                 resources: (s as any).resources || null
             }))

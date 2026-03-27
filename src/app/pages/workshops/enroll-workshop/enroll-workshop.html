@@ -4,6 +4,13 @@
     </button>
 
     <div class="workshop-preview-card">
+        @if (sessionOrder) {
+        <div class="session-notice"
+            style="margin-bottom: 1rem; padding: 0.75rem; border-radius: 8px; border-left: 4px solid var(--primary, #2196F3); color: var(--text-color);">
+            <i class="fas fa-chalkboard-teacher" style="margin-right: 0.5rem; color: var(--primary);"></i>
+            Enrolling for <strong>{{ sessionTitle }}</strong> (Hour {{ sessionOrder }})
+        </div>
+        }
         <div class="workshop-meta">
             <span>{{ workshop().instructor }}</span>
             <span>{{ workshop().date }}</span>
@@ -21,18 +28,20 @@
             </div>
         </div>
 
+        @if (isInstructorFlow) {
         <div class="form-section">
             <h3>Enrollment Type</h3>
             <div class="radio-group">
-                @if (userRole() && workshop().instructorType !== 'myself') {
+                @if (userRole() && isOpenToOthers) {
                 <label class="radio-option">
                     <input type="radio" formControlName="enrollmentType" value="support">
-                    <span>Practical Hands-on Support (Instructor)</span>
+                    <span>{{ sessionOrder ? 'Enroll to Teach this Session' : 'Practical Hands-on Support (Instructor)'
+                        }}</span>
                 </label>
                 }
                 <label class="radio-option">
                     <input type="radio" formControlName="enrollmentType" value="learning">
-                    <span>Learn (Student)</span>
+                    <span>{{ sessionOrder ? 'Enroll as Learner' : 'Learn (Student)' }}</span>
                 </label>
             </div>
         </div>
@@ -73,7 +82,8 @@
                 <label class="form-label">Streaming Quality/Platform *</label>
                 <div class="quality-grid">
                     @for (tier of qualityTiers; track tier.id) {
-                    <label class="quality-option" [class.selected]="enrollWorkshopForm.get('qualityTier')?.value === tier.id">
+                    <label class="quality-option"
+                        [class.selected]="enrollWorkshopForm.get('qualityTier')?.value === tier.id">
                         <input type="radio" formControlName="qualityTier" [value]="tier.id">
                         <div class="quality-info">
                             <span class="quality-label">{{ tier.label }}</span>
@@ -86,9 +96,19 @@
 
             <div class="form-group">
                 <label class="form-label">Mobilizer ID (Optional)</label>
-                <input type="text" class="form-control" formControlName="mobilizerId" placeholder="Enter ID if you were referred">
+                <input type="text" class="form-control" formControlName="mobilizerId"
+                    placeholder="Enter ID if you were referred">
             </div>
         </div>
+        } @else {
+        <div class="form-section">
+            <div class="form-group">
+                <label class="form-label">Mobilizer ID (Optional)</label>
+                <input type="text" class="form-control" formControlName="mobilizerId"
+                    placeholder="Enter ID if you were referred">
+            </div>
+        </div>
+        }
 
         <div class="form-section payment-summary">
             <h3>Payment Breakdown</h3>

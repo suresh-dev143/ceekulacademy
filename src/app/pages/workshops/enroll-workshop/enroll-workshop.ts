@@ -1,4 +1,4 @@
-import { Component, inject, input, output, OnInit, signal } from '@angular/core';
+import { Component, inject, input, output, OnInit, signal, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RazorpayService } from '../../../services/razorpay.service';
@@ -18,6 +18,8 @@ export class EnrollWorkshop implements OnInit {
 
     workshop = input.required<any>();
     userRole = input<string>('');
+    @Input() isInstructorFlow: boolean = false;
+    @Input() sessionOrder: number | null = null;
 
     enrolled = output<any>();
     cancel = output<void>();
@@ -37,14 +39,39 @@ export class EnrollWorkshop implements OnInit {
     ngOnInit() {
         this.enrollWorkshopForm = this.fb.group({
             organization: [''],
-            enrollmentType: ['learning', Validators.required],
+            enrollmentType: [this.isInstructorFlow ? 'support' : 'learning', Validators.required],
             modeSelection: ['online', Validators.required], // online or hybrid
             attendanceMode: ['online'], // online or physical (for hybrid)
             qualityTier: ['free', Validators.required],
             mobilizerId: [''],
             acceptTerms: [false, Validators.requiredTrue]
         });
+    }
 
+    get isOpenToOthers(): boolean {
+        const plan = this.workshop()?.threeHourPlan;
+        if (!plan) return false;
+        
+        const order = this.sessionOrder;
+        if (order) {
+            const hour = order === 1 ? plan.hour1 : order === 2 ? plan.hour2 : plan.hour3;
+            return !!hour?.instructorAllowed;
+        }
+
+        return !!(plan.hour1?.instructorAllowed || plan.hour2?.instructorAllowed || plan.hour3?.instructorAllowed);
+    }
+
+    get sessionTitle(): string {
+        const order = this.sessionOrder;
+        if (!order) return '';
+        const plan = this.workshop()?.threeHourPlan;
+        if (!plan) return `Session ${order}`;
+        const hour = order === 1 ? plan.hour1 : order === 2 ? plan.hour2 : plan.hour3;
+        return hour?.title || `Session ${order}`;
+    }
+
+    get totalWorkshopFee(): number {
+        return this.workshop().totalRevenuePotential || 0;
     }
 
     // --- Fee Calculation ---
@@ -68,7 +95,7 @@ export class EnrollWorkshop implements OnInit {
         }
 
         // workshop base fee
-        total += this.workshop().sessions[0]?.fee || 0;
+        total += this.totalWorkshopFee;
 
         return total;
     }
@@ -85,7 +112,7 @@ export class EnrollWorkshop implements OnInit {
         const attendance = this.enrollWorkshopForm.get('attendanceMode')?.value;
 
         return {
-            workshopFee: this.workshop().sessions[0]?.fee || 0,
+            workshopFee: this.totalWorkshopFee,
             streamingFee: tier?.fee || 0,
             venueFee: (mode === 'hybrid' && attendance === 'physical') ? 500 : 0
         };

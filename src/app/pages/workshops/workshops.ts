@@ -7,7 +7,6 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../services/auth.service';
 import { LayoutComponent } from '../../components/layout/layout';
-import { CreateWorkshop } from './create-workshop/create-workshop';
 import { WorkshopCardComponent } from './workshop-card/workshop-card';
 import { WorkshopDetailComponent } from './workshop-detail/workshop-detail';
 import {
@@ -34,12 +33,10 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'Quantum Machine Learning',
         workshopDescription: 'Explore the intersection of quantum computing and machine learning. Learn how quantum bits (qubits) can revolutionize pattern recognition and optimization algorithms.',
         expertDescription: 'Lead by Dr. Julian Voss, Senior Researcher in Quantum AI.',
-        timezone: 'GMT+5:30',
-        instructorType: 'myself',
         createdBy: 'system',
         status: 'published',
-        sessions: [
-            { _id: 'm1-s1', date: new Date(Date.now() + 86400000 * 2).toISOString(), startTime: '10:00', endTime: '13:00', activity: 'Quantum Circuit Basics', fee: 45, mode: 'hybrid', location: 'Space Lab A', resources: null }
+        schedules: [
+            { _id: 'm1-s1', date: new Date(Date.now() + 86400000 * 2).toISOString(), startTime: '10:00', endTime: '13:00', timezone: 'IST', activity: 'Quantum Circuit Basics', fee: 45, mode: 'hybrid', location: 'Space Lab A', resources: null }
         ],
         totalRevenuePotential: 450,
         createdAt: new Date().toISOString(),
@@ -50,12 +47,10 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'Agentic Quantum Engineering',
         workshopDescription: 'Building autonomous quantum agents that can self-correct and optimize quantum gates in real-time. A deep dive into agentic workflows for quantum hardware.',
         expertDescription: 'Advanced workshop for Quantum Engineers.',
-        timezone: 'UTC',
-        instructorType: 'myself',
         createdBy: 'system',
         status: 'published',
-        sessions: [
-            { _id: 'm2-s1', date: new Date(Date.now() + 86400000 * 5).toISOString(), startTime: '14:00', endTime: '17:00', activity: 'Autonomous Gate Correction', fee: 120, mode: 'online', location: null, resources: null }
+        schedules: [
+            { _id: 'm2-s1', date: new Date(Date.now() + 86400000 * 5).toISOString(), startTime: '14:00', endTime: '17:00', timezone: 'UTC', activity: 'Autonomous Gate Correction', fee: 120, mode: 'online', location: null, resources: null }
         ],
         totalRevenuePotential: 1200,
         createdAt: new Date().toISOString(),
@@ -66,12 +61,10 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'AI for Everyone',
         workshopDescription: 'A comprehensive introduction to Artificial Intelligence for non-technical professionals. Understand LLMs, diffusion models, and how to leverage AI in your daily workflow.',
         expertDescription: 'Suitable for all backgrounds. No coding required.',
-        timezone: 'UTC',
-        instructorType: 'open',
         createdBy: 'system',
         status: 'published',
-        sessions: [
-            { _id: 'm3-s1', date: new Date(Date.now() + 86400000 * 1).toISOString(), startTime: '09:00', endTime: '11:00', activity: 'Prompt Engineering 101', fee: 0, mode: 'online', location: null, resources: null }
+        schedules: [
+            { _id: 'm3-s1', date: new Date(Date.now() + 86400000 * 1).toISOString(), startTime: '09:00', endTime: '11:00', timezone: 'UTC', activity: 'Prompt Engineering 101', fee: 0, mode: 'online', location: null, resources: null }
         ],
         totalRevenuePotential: 0,
         createdAt: new Date().toISOString(),
@@ -82,12 +75,10 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'AI for Healthcare',
         workshopDescription: 'Implementing AI solutions in clinical environments. Focus on diagnostic imaging, predictive patient analytics, and ethical AI in medicine.',
         expertDescription: 'Jointly certified by HealthTech Institute.',
-        timezone: 'GMT+5:30',
-        instructorType: 'myself',
         createdBy: 'system',
         status: 'published',
-        sessions: [
-            { _id: 'm4-s1', date: new Date(Date.now() + 86400000 * 10).toISOString(), startTime: '11:00', endTime: '15:00', activity: 'Diagnostic Model Integration', fee: 85, mode: 'hybrid', location: 'Med-Tech Center', resources: null }
+        schedules: [
+            { _id: 'm4-s1', date: new Date(Date.now() + 86400000 * 10).toISOString(), startTime: '11:00', endTime: '15:00', timezone: 'IST', activity: 'Diagnostic Model Integration', fee: 85, mode: 'hybrid', location: 'Med-Tech Center', resources: null }
         ],
         totalRevenuePotential: 850,
         createdAt: new Date().toISOString(),
@@ -98,12 +89,10 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'AI for Film Education',
         workshopDescription: 'Revolutionizing cinema through AI-driven scriptwriting, storyboarding, and virtual production. Learn how to use Generative Video for independent filmmaking.',
         expertDescription: 'Explore the future of storytelling.',
-        timezone: 'PST',
-        instructorType: 'myself',
         createdBy: 'system',
         status: 'published',
-        sessions: [
-            { _id: 'm5-s1', date: new Date(Date.now() + 86400000 * 7).toISOString(), startTime: '18:00', endTime: '21:00', activity: 'Generative Storyboarding', fee: 30, mode: 'online', location: null, resources: null }
+        schedules: [
+            { _id: 'm5-s1', date: new Date(Date.now() + 86400000 * 7).toISOString(), startTime: '18:00', endTime: '21:00', timezone: 'PST', activity: 'Generative Storyboarding', fee: 30, mode: 'online', location: null, resources: null }
         ],
         totalRevenuePotential: 300,
         createdAt: new Date().toISOString(),
@@ -114,12 +103,10 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         workshopTitle: 'AI for Space Automation',
         workshopDescription: 'Autonomous navigation and resource management for deep-space missions. Focus on edge-AI deployment on satellite constellations.',
         expertDescription: 'Advanced research session.',
-        timezone: 'Greenwich',
-        instructorType: 'myself',
         createdBy: 'system',
         status: 'published',
-        sessions: [
-            { _id: 'm6-s1', date: new Date(Date.now() + 86400000 * 14).toISOString(), startTime: '08:00', endTime: '12:00', activity: 'Collision Avoidance Algorithms', fee: 200, mode: 'hybrid', location: 'Satellite Ground Station', resources: null }
+        schedules: [
+            { _id: 'm6-s1', date: new Date(Date.now() + 86400000 * 14).toISOString(), startTime: '08:00', endTime: '12:00', timezone: 'UTC', activity: 'Collision Avoidance Algorithms', fee: 200, mode: 'hybrid', location: 'Satellite Ground Station', resources: null }
         ],
         totalRevenuePotential: 2000,
         createdAt: new Date().toISOString(),
@@ -132,7 +119,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
     standalone: true,
     imports: [
         CommonModule, FormsModule,
-        LayoutComponent, CreateWorkshop, WorkshopCardComponent, WorkshopDetailComponent,
+        LayoutComponent, WorkshopCardComponent, WorkshopDetailComponent,
     ],
     templateUrl: './workshops.html',
     styleUrl: './workshops.scss',
@@ -159,7 +146,6 @@ export class PublicWorkshopsPageComponent {
 
     // ── UI state ──────────────────────────────────────────────────────────────
 
-    isCreatingWorkshop = signal<boolean>(false);
     selectedWorkshop = signal<WorkshopListItem | null>(null);
     showWorkshopDetail = signal<boolean>(false);
 
@@ -284,15 +270,7 @@ export class PublicWorkshopsPageComponent {
 
     // ── Workshop actions ──────────────────────────────────────────────────────
 
-    onWorkshopCreated(_data: CreatedWorkshopData): void {
-        this.isCreatingWorkshop.set(false);
-        this.toast.success('Workshop created successfully!');
-        this.ws.triggerRefresh();
-    }
 
-    cancelCreateWorkshop(): void {
-        this.isCreatingWorkshop.set(false);
-    }
 
     onViewWorkshop(w: WorkshopListItem): void {
         this.selectedWorkshop.set(w);

@@ -35,6 +35,13 @@
                 }
             </div>
 
+
+
+
+        </section>
+
+        <!-- ══ 2. WORKSHOP STRUCTURE (3-HOUR PLAN) ═══════════════════════════════════════════════ -->
+        <section class="cwf-section">
             <!-- Workshop Description -->
             <div class="cwf-field">
                 <label class="cwf-label">Workshop Description *</label>
@@ -54,9 +61,141 @@
                 }
             </div>
 
+            <div class="cwf-section-label"><span class="cwf-dot"></span> WORKSHOP STRUCTURE (3-HOUR PLAN)</div>
+            <div class="cwf-hint" style="margin-bottom: 1.25rem;">
+                <i class="fas fa-lightbulb"></i>
+                Design your workshop in a structured 3-hour format for better learning outcomes.
+            </div>
+
+            <div formGroupName="threeHourPlan">
+
+            <!-- Hour 1 -->
+            <details class="cwf-accordion" open>
+                <summary class="cwf-accordion-head">
+                    <span class="cwf-accordion-icon">🧠</span>
+                    <span class="cwf-accordion-title">Hour 1 <span>(Learn & Innovate)</span></span>
+                    <i class="fas fa-chevron-down cwf-acc-arrow"></i>
+                </summary>
+                <div class="cwf-accordion-body" formGroupName="hour1">
+                    <div class="cwf-field">
+                        <label class="cwf-label">Title *</label>
+                        <div class="cwf-input-wrap">
+                            <input type="text" class="cwf-input cwf-input--large" formControlName="title"
+                                placeholder="e.g., Introduction to AI Systems"
+                                [class.is-error]="workshopForm.get('threeHourPlan.hour1.title')?.invalid && workshopForm.get('threeHourPlan.hour1.title')?.touched">
+                        </div>
+                        @if (workshopForm.get('threeHourPlan.hour1.title')?.hasError('required') &&
+                        workshopForm.get('threeHourPlan.hour1.title')?.touched) {
+                        <div class="cwf-error">Please enter title for Hour 1</div>
+                        }
+                    </div>
+                    <div class="cwf-field" style="margin-top: 1rem;">
+                        <label class="cwf-label">Description *</label>
+                        <textarea class="cwf-input cwf-textarea cwf-textarea--large" formControlName="description"
+                            placeholder="What will be covered in Hour 1..." rows="4"
+                            [class.is-error]="workshopForm.get('threeHourPlan.hour1.description')?.invalid && workshopForm.get('threeHourPlan.hour1.description')?.touched"></textarea>
+                        @if (workshopForm.get('threeHourPlan.hour1.description')?.hasError('required') &&
+                        workshopForm.get('threeHourPlan.hour1.description')?.touched) {
+                        <div class="cwf-error">Description is required for Hour 1</div>
+                        }
+                    </div>
+                </div>
+            </details>
+
+            <!-- Hour 2 -->
+            <details class="cwf-accordion">
+                <summary class="cwf-accordion-head">
+                    <span class="cwf-accordion-icon">⚙️</span>
+                    <span class="cwf-accordion-title">Hour 2 <span>(Hands-On)</span></span>
+                    <i class="fas fa-chevron-down cwf-acc-arrow"></i>
+                </summary>
+                <div class="cwf-accordion-body" formGroupName="hour2">
+                    <div class="cwf-field">
+                        <label class="cwf-label">Title</label>
+                        <div class="cwf-input-wrap">
+                            <input type="text" class="cwf-input cwf-input--locked cwf-input--large"
+                                formControlName="title">
+                        </div>
+                    </div>
+                    <div class="cwf-field" style="margin-top: 1rem;">
+                        <label class="cwf-label">Description *</label>
+                        <textarea class="cwf-input cwf-textarea cwf-textarea--large" formControlName="description"
+                            placeholder="Describe the hands-on activity..." rows="4"
+                            [class.is-error]="workshopForm.get('threeHourPlan.hour2.description')?.invalid && workshopForm.get('threeHourPlan.hour2.description')?.touched"></textarea>
+                        @if (workshopForm.get('threeHourPlan.hour2.description')?.hasError('required') &&
+                        workshopForm.get('threeHourPlan.hour2.description')?.touched) {
+                        <div class="cwf-error">Hands-On session description is required</div>
+                        }
+                    </div>
+                    <div class="cwf-field" style="margin-top: 1rem;">
+                        <label class="cwf-label">Who can conduct this session? *</label>
+                        <div class="cwf-checkbox-group">
+                            <label class="cwf-checkbox">
+                                <input type="checkbox" formControlName="expertAllowed">
+                                <span class="cwf-checkbox-mark"></span>
+                                <span>Myself (Expert)</span>
+                            </label>
+                            <label class="cwf-checkbox">
+                                <input type="checkbox" formControlName="instructorAllowed">
+                                <span class="cwf-checkbox-mark"></span>
+                                <span>Open to others (Instructors)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Hour 3 -->
+            <details class="cwf-accordion">
+                <summary class="cwf-accordion-head">
+                    <span class="cwf-accordion-icon">🚀</span>
+                    <span class="cwf-accordion-title">Hour 3 <span>(Project)</span></span>
+                    <i class="fas fa-chevron-down cwf-acc-arrow"></i>
+                </summary>
+                <div class="cwf-accordion-body" formGroupName="hour3">
+                    <div class="cwf-field">
+                        <label class="cwf-label">Title *</label>
+                        <div class="cwf-input-wrap">
+                            <input type="text" class="cwf-input cwf-input--large" formControlName="title"
+                                placeholder="Project details or discussion topics..."
+                                [class.is-error]="workshopForm.get('threeHourPlan.hour3.title')?.invalid && workshopForm.get('threeHourPlan.hour3.title')?.touched">
+                        </div>
+                        @if (workshopForm.get('threeHourPlan.hour3.title')?.hasError('required') &&
+                        workshopForm.get('threeHourPlan.hour3.title')?.touched) {
+                        <div class="cwf-error">Please enter title for Hour 3</div>
+                        }
+                    </div>
+                    <div class="cwf-field" style="margin-top: 1rem;">
+                        <label class="cwf-label">Description *</label>
+                        <textarea class="cwf-input cwf-textarea cwf-textarea--large" formControlName="description"
+                            placeholder="Project details or discussion topics..." rows="4"
+                            [class.is-error]="workshopForm.get('threeHourPlan.hour3.description')?.invalid && workshopForm.get('threeHourPlan.hour3.description')?.touched"></textarea>
+                        @if (workshopForm.get('threeHourPlan.hour3.description')?.hasError('required') &&
+                        workshopForm.get('threeHourPlan.hour3.description')?.touched) {
+                        <div class="cwf-error">Please provide details for Hour 3</div>
+                        }
+                    </div>
+                    <div class="cwf-field" style="margin-top: 1rem;">
+                        <label class="cwf-label">Who can conduct this session? *</label>
+                        <div class="cwf-checkbox-group">
+                            <label class="cwf-checkbox">
+                                <input type="checkbox" formControlName="expertAllowed">
+                                <span class="cwf-checkbox-mark"></span>
+                                <span>Myself (Expert)</span>
+                            </label>
+                            <label class="cwf-checkbox">
+                                <input type="checkbox" formControlName="instructorAllowed">
+                                <span class="cwf-checkbox-mark"></span>
+                                <span>Open to others (Instructors)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </details>
+            </div>
             <!-- Expert Description -->
             <div class="cwf-field">
-                <label class="cwf-label">Your Expert Description *</label>
+                <label class="cwf-label">Expert Details</label>
                 <div class="cwf-input-wrap">
                     <textarea class="cwf-input cwf-textarea" formControlName="expertDescription"
                         [class.is-error]="fieldError('expertDescription')"
@@ -74,222 +213,11 @@
             </div>
         </section>
 
-        <!-- ══ 2. CONFIGURATION ═══════════════════════════════════════════════ -->
-        <section class="cwf-section">
-            <div class="cwf-section-label"><span class="cwf-dot"></span> CONFIGURATION</div>
 
-            <div class="cwf-config-grid">
-
-
-                <!-- Timezone -->
-                <div class="cwf-field">
-                    <label class="cwf-label">Timezone *</label>
-                    <select class="cwf-input cwf-select" formControlName="timezone">
-                        @for (tz of timezones; track tz.key) {
-                        <option [value]="tz.key">{{ tz.label }}</option>
-                        }
-                    </select>
-                    <div class="cwf-hint">
-                        <i class="fas fa-info-circle"></i>
-                        All session date/time validation uses this timezone.
-                    </div>
-                </div>
-
-                <!-- Instructor Type -->
-                <div class="cwf-field">
-                    <label class="cwf-label">Instructor *</label>
-                    <div class="cwf-radio-group">
-                        <label class="cwf-radio">
-                            <input type="radio" formControlName="instructorType" value="myself">
-                            <span class="cwf-radio-mark"></span>
-                            <span>Myself</span>
-                        </label>
-                        <label class="cwf-radio">
-                            <input type="radio" formControlName="instructorType" value="open">
-                            <span class="cwf-radio-mark"></span>
-                            <span>Open to Other Instructors</span>
-                        </label>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ══ 3. SESSIONS ════════════════════════════════════════════════════ -->
-        <section class="cwf-section">
-            <div class="cwf-section-header">
-                <div class="cwf-section-label"><span class="cwf-dot"></span> SESSIONS</div>
-                <button type="button" class="cwf-add-btn" (click)="addSession()" [disabled]="sessions.length >= 10">
-                    <i class="fas fa-plus"></i> Add Session
-                </button>
-            </div>
-
-            @for (session of sessions.controls; track $index) {
-            <div class="cwf-session-card" [class.is-invalid]="session.invalid && session.touched">
-
-                <!-- Session card header -->
-                <div class="cwf-session-head">
-                    <div class="cwf-session-num">
-                        <i class="fas fa-calendar-day"></i> Session {{ $index + 1 }}
-                    </div>
-                    @if (sessionDuration($index)) {
-                    <div class="cwf-duration-badge">
-                        <i class="fas fa-clock"></i> {{ sessionDuration($index) }}
-                    </div>
-                    }
-                    <div class="cwf-charge-badge">
-                        <i class="fas fa-info-circle"></i> Platform Charges: ₹25
-                    </div>
-                    <button type="button" class="cwf-remove-btn" (click)="removeSession($index)"
-                        [disabled]="sessions.length === 1" title="Remove session">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-
-                <!-- Today scheduling hint -->
-                @if (isTodaySession($index)) {
-                <div class="cwf-today-hint">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    You are scheduling for <strong>today</strong>.
-                    Start time must be later than the current time in the selected timezone.
-                </div>
-                }
-
-                <!-- Row 1: Date / Start Time / End Time -->
-                <div class="cwf-session-grid">
-
-                    <div class="cwf-field">
-                        <label class="cwf-label">Date *</label>
-                        <input type="date" class="cwf-input" [formControl]="$any(session.get('date'))" [min]="todayStr"
-                            [class.is-error]="sessionFieldError($index, 'date', 'required') ||
-                                              sessionFieldError($index, 'date', 'pastDate')">
-                        @if (sessionFieldError($index, 'date', 'required')) {
-                        <div class="cwf-error">Date is required.</div>
-                        } @else if (sessionFieldError($index, 'date', 'pastDate')) {
-                        <div class="cwf-error">Cannot select a past date.</div>
-                        }
-                    </div>
-
-                    <div class="cwf-field">
-                        <label class="cwf-label">Start Time *</label>
-                        <input type="time" class="cwf-input" [formControl]="$any(session.get('startTime'))"
-                            [min]="minStartTime($index)" [class.is-error]="sessionFieldError($index, 'startTime', 'required') ||
-                                              sessionError($index, 'pastTime')">
-                        @if (sessionFieldError($index, 'startTime', 'required')) {
-                        <div class="cwf-error">Start time is required.</div>
-                        } @else if (sessionError($index, 'pastTime')) {
-                        <div class="cwf-error">
-                            Start time is already past for today in the selected timezone.
-                        </div>
-                        }
-                    </div>
-
-                    <div class="cwf-field">
-                        <label class="cwf-label">End Time *</label>
-                        <input type="time" class="cwf-input" [formControl]="$any(session.get('endTime'))"
-                            [class.is-error]="sessionFieldError($index, 'endTime', 'required') ||
-                                              sessionError($index, 'endBeforeStart')">
-                        @if (sessionFieldError($index, 'endTime', 'required')) {
-                        <div class="cwf-error">End time is required.</div>
-                        } @else if (sessionError($index, 'endBeforeStart')) {
-                        <div class="cwf-error">End time must be after start time.</div>
-                        } @else if (sessionError($index, 'invalidDuration')) {
-                        <div class="cwf-error">Session duration must be exactly 1 hour.</div>
-                        }
-                    </div>
-
-                </div>
-
-                <!-- Row 2: Activity / Fee / Session Mode -->
-                <div class="cwf-session-grid cwf-session-grid--lower">
-
-                    <div class="cwf-field">
-                        <label class="cwf-label">Activity *</label>
-                        <input type="text" class="cwf-input" [formControl]="$any(session.get('activity'))"
-                            [class.is-error]="sessionFieldError($index, 'activity', 'required')"
-                            placeholder="e.g., HTML/CSS Fundamentals">
-                        @if (sessionFieldError($index, 'activity', 'required')) {
-                        <div class="cwf-error">Activity description is required.</div>
-                        }
-                    </div>
-
-                    <div class="cwf-field">
-                        <label class="cwf-label">Description (Optional)</label>
-                        <textarea class="cwf-input cwf-textarea" [formControl]="$any(session.get('description'))"
-                            placeholder="Provide more details for this session..." rows="2" maxlength="1000"></textarea>
-                        <span class="cwf-char">
-                            {{ session.get('description')?.value?.length ?? 0 }}/1000
-                        </span>
-                    </div>
-
-                    <div class="cwf-field">
-                        <label class="cwf-label">Fee (₹) *</label>
-                        <input type="number" class="cwf-input" [formControl]="$any(session.get('fee'))"
-                            [class.is-error]="sessionFieldError($index, 'fee', 'min')" min="0" step="50"
-                            placeholder="0 for free">
-                        @if (sessionFieldError($index, 'fee', 'min')) {
-                        <div class="cwf-error">Fee cannot be negative.</div>
-                        }
-                    </div>
-
-                    <div class="cwf-field">
-                        <label class="cwf-label">Session Mode *</label>
-                        <div class="cwf-radio-group cwf-radio-group--inline">
-                            <label class="cwf-radio">
-                                <input type="radio" [formControl]="$any(session.get('mode'))" value="online">
-                                <span class="cwf-radio-mark"></span>
-                                <span>Online</span>
-                            </label>
-                            <label class="cwf-radio">
-                                <input type="radio" [formControl]="$any(session.get('mode'))" value="hybrid">
-                                <span class="cwf-radio-mark"></span>
-                                <span>Hybrid</span>
-                            </label>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Facility Booking Summary (hybrid only) -->
-                @if (session.get('mode')?.value === 'hybrid') {
-                    <div class="cwf-facility-booking">
-                        @if (session.get('facilityId')?.value) {
-                            <div class="booked-facility-card">
-                                <div class="facility-main">
-                                    <div class="facility-icon"><i class="fas fa-building"></i></div>
-                                    <div class="facility-meta">
-                                        <div class="facility-name">{{ session.get('partnerName')?.value }} - {{ session.get('location')?.value.split(',')[0] }}</div>
-                                        <div class="facility-type">{{ session.get('facilityType')?.value }}</div>
-                                    </div>
-                                    <button type="button" class="btn-remove-facility" (click)="removeFacility($index)" title="Remove booking">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        } @else {
-                            <div class="empty-facility-box">
-                                <p>No facility booked yet.</p>
-                                <button type="button" class="btn-search-nearby" (click)="openDiscovery($index)">
-                                    <i class="fas fa-search-location"></i> Search Nearby Facilities
-                                </button>
-                            </div>
-                        }
-                    </div>
-                }
-
-                <div class="cwf-field" style="margin-top: 1rem;">
-                    <label class="cwf-label">Resources (Links/Materials)</label>
-                    <input type="text" class="cwf-input" [formControl]="$any(session.get('resources'))"
-                        placeholder="Optional: Google Drive links, reading materials, etc.">
-                </div>
-
-            </div>
-            }
-        </section>
 
         <!-- ══ Submit row ══════════════════════════════════════════════════════ -->
         <div class="cwf-submit-row">
-            @if (!isEditMode()) {
+            @if (!isEditMode() && totalCommission > 0) {
             <div class="cwf-charge-notice">
                 <span>Total Portal Charges (₹25 × Number of Sessions):</span>
                 <span class="cwf-charge-amount">₹{{ totalCommission }}</span>
@@ -300,7 +228,8 @@
             </button>
             <button type="submit" class="cwf-btn-primary" [disabled]="workshopForm.invalid || isSubmitting()">
                 @if (isSubmitting()) {
-                <i class="fas fa-spinner fa-spin"></i> {{ isEditMode() ? 'Updating Workshop...' : 'Creating Workshop...' }}
+                <i class="fas fa-spinner fa-spin"></i> {{ isEditMode() ? 'Updating Workshop...' : 'Creating Workshop...'
+                }}
                 } @else {
                 <i class="fas fa-check-circle"></i> {{ isEditMode() ? 'Update Workshop' : 'Create Workshop' }}
                 }
@@ -309,15 +238,3 @@
 
     </form>
 </div>
-
-<!-- Facility Discovery Modal -->
-@if (showDiscovery()) {
-    <app-facility-discovery
-        [sessionDate]="sessions.at(activeSessionIndex()!).get('date')?.value"
-        [sessionStartTime]="sessions.at(activeSessionIndex()!).get('startTime')?.value"
-        [sessionEndTime]="sessions.at(activeSessionIndex()!).get('endTime')?.value"
-        [requiredCapacity]="30" 
-        (facilitySelected)="onFacilitySelected($event)"
-        (close)="closeDiscovery()">
-    </app-facility-discovery>
-}

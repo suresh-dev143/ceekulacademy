@@ -4,29 +4,16 @@
         <!-- ══ Page header ══════════════════════════════════════════════════════ -->
         <div class="view-header">
             <h1 class="page-title">Workshops</h1>
-            <p class="section-subtitle">Explore, enroll, create, and manage practical learning sessions.</p>
+            <p class="section-subtitle">Explore and enroll in practical learning sessions hosted by experts.</p>
         </div>
 
-        <!-- ══ Create Workshop (teacher / instructor / admin) ═══════════════════ -->
-        @if (canCreateWorkshop) {
-        <div class="create-workshop-section">
-            @if (!isCreatingWorkshop()) {
-            <button class="btn-create-workshop" (click)="isCreatingWorkshop.set(true)">
-                Create New Workshop
-            </button>
-            }
-        </div>
-        }
-
-        @if (isCreatingWorkshop()) {
-        <app-create-workshop (workshopCreated)="onWorkshopCreated($event)" (cancel)="cancelCreateWorkshop()">
-        </app-create-workshop>
-        }
 
 
 
-        <!-- ══ Workshop detail / session management view ═══════════════════════ -->
-        @if (!isCreatingWorkshop()) {
+
+
+
+
 
         @if (showWorkshopDetail() && selectedWorkshop()) {
         <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="currentUser()?.role ?? ''"
@@ -116,16 +103,13 @@
             } @else {
             <p><strong>No workshops found.</strong></p>
             @if (canCreateWorkshop) {
-            <p>Create your first workshop using the button above.</p>
-            } @else {
             <p>Check back soon — workshops will appear here once available.</p>
             }
             }
         </div>
         }
 
-        }<!-- end detail/list check -->
-        }<!-- end create-workshop check -->
+        }
 
     </div>
 </app-layout>
