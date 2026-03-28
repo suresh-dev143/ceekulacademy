@@ -253,7 +253,7 @@ import { finalize } from 'rxjs';
   styles: [`
     :host { --accent: #ffd700; --bg-card: #0a0a0a; --bg-header: #111111; --border-color: #222; --text-muted: #888; }
     
-    .mgmt-section { padding: 2rem; background: #000; min-height: 100%; color: #fff; }
+    .mgmt-section { padding: 1rem; background: #010101; min-height: 100%; color: #fff; }
     
     .section-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem; }
     .section-title { font-size: 1.5rem; font-weight: 900; margin: 0; color: #fff; display: flex; align-items: center; gap: 1rem; text-transform: uppercase; letter-spacing: 1px; i { color: var(--accent); } }
@@ -360,7 +360,7 @@ export class InfrastructureManagerComponent implements OnInit {
   private infraService = inject(InfrastructureService);
   private toastService = inject(ToastService);
   private platformId = inject(PLATFORM_ID);
-  
+
   infraList = signal<InfrastructureData[]>([]);
   isLoading = signal(false);
   isAddingResource = signal(false);
@@ -393,7 +393,7 @@ export class InfrastructureManagerComponent implements OnInit {
 
   formatPricing(schedule: Classroom['availabilitySchedule'] | ComputerLab['availabilitySchedule'] | OtherFacility['availabilitySchedule']): string {
     if (!schedule || schedule.length === 0) return 'Free';
-    
+
     const slotsWithPricing = schedule.filter(s => s.pricing && s.pricing.type !== 'Free');
     if (slotsWithPricing.length === 0) return 'Free';
 
@@ -401,14 +401,14 @@ export class InfrastructureManagerComponent implements OnInit {
     if (types.size === 1) {
       const type = Array.from(types)[0];
       const amounts = new Set(slotsWithPricing.map(s => s.pricing!.amount));
-      
+
       if (amounts.size === 1) {
         const amt = Array.from(amounts)[0];
         return type === 'Share' ? `${amt}% Share` : `₹${amt}/hr`;
       }
       return `Varies (${type})`;
     }
-    
+
     return 'Varies by Slot';
   }
 
@@ -420,7 +420,7 @@ export class InfrastructureManagerComponent implements OnInit {
 
   fetchInfrastructure() {
     if (!isPlatformBrowser(this.platformId)) return;
-    
+
     this.isLoading.set(true);
     this.infraService.getInfrastructure()
       .pipe(finalize(() => this.isLoading.set(false)))
@@ -444,117 +444,117 @@ export class InfrastructureManagerComponent implements OnInit {
   }
 
   editResource(infra: InfrastructureData) {
-      this.editData.set(infra);
-      this.isAddingResource.set(false);
-      this.isEditingResource.set(true);
+    this.editData.set(infra);
+    this.isAddingResource.set(false);
+    this.isEditingResource.set(true);
   }
 
   confirmDelete(type: string, id: string, infra: InfrastructureData) {
-      if (confirm(`Are you sure you want to delete this ${type} item?`)) {
-          this.deleteResource(type, id, infra);
-      }
+    if (confirm(`Are you sure you want to delete this ${type} item?`)) {
+      this.deleteResource(type, id, infra);
+    }
   }
 
   deleteResource(type: string, name: string, infra: InfrastructureData) {
-      this.isLoading.set(true);
+    this.isLoading.set(true);
 
-      if (type === 'classrooms') {
-          // Find the classroom object to get its internal ID
-          const classroom = (infra.classrooms as Classroom[]).find(c => c.name === name);
-          const classroomId = classroom?._id || classroom?.id;
+    if (type === 'classrooms') {
+      // Find the classroom object to get its internal ID
+      const classroom = (infra.classrooms as Classroom[]).find(c => c.name === name);
+      const classroomId = classroom?._id || classroom?.id;
 
-          if (!classroomId) {
-              this.toastService.error('Could not identify classroom for deletion.');
-              this.isLoading.set(false);
-              return;
-          }
-
-          this.infraService.deleteClassroom(infra._id, classroomId)
-              .pipe(finalize(() => this.isLoading.set(false)))
-              .subscribe({
-                  next: () => {
-                      this.toastService.success('Classroom deleted successfully!');
-                      this.fetchInfrastructure();
-                  },
-                  error: (err) => {
-                      console.error('Classroom delete failed:', err);
-                      this.toastService.error(err.error?.message || 'Failed to delete classroom.');
-                  }
-              });
-          return;
+      if (!classroomId) {
+        this.toastService.error('Could not identify classroom for deletion.');
+        this.isLoading.set(false);
+        return;
       }
 
-      if (type === 'computerLabs') {
-          const lab = (infra.computerLabs as ComputerLab[]).find(l => l.name === name);
-          const labId = lab?._id || lab?.id;
-
-          if (!labId) {
-              this.toastService.error('Could not identify computer lab for deletion.');
-              this.isLoading.set(false);
-              return;
+      this.infraService.deleteClassroom(infra._id, classroomId)
+        .pipe(finalize(() => this.isLoading.set(false)))
+        .subscribe({
+          next: () => {
+            this.toastService.success('Classroom deleted successfully!');
+            this.fetchInfrastructure();
+          },
+          error: (err) => {
+            console.error('Classroom delete failed:', err);
+            this.toastService.error(err.error?.message || 'Failed to delete classroom.');
           }
+        });
+      return;
+    }
 
-          this.infraService.deleteComputerLab(infra._id, labId)
-              .pipe(finalize(() => this.isLoading.set(false)))
-              .subscribe({
-                  next: () => {
-                      this.toastService.success('Computer lab deleted successfully!');
-                      this.fetchInfrastructure();
-                  },
-                  error: (err) => {
-                      console.error('Computer lab delete failed:', err);
-                      this.toastService.error(err.error?.message || 'Failed to delete computer lab.');
-                  }
-              });
-          return;
+    if (type === 'computerLabs') {
+      const lab = (infra.computerLabs as ComputerLab[]).find(l => l.name === name);
+      const labId = lab?._id || lab?.id;
+
+      if (!labId) {
+        this.toastService.error('Could not identify computer lab for deletion.');
+        this.isLoading.set(false);
+        return;
       }
 
-      if (type === 'otherFacilities') {
-          const facility = (infra.otherFacilities as OtherFacility[]).find(f => f.name === name);
-          const facilityId = facility?._id || facility?.id;
-
-          if (!facilityId) {
-              this.toastService.error('Could not identify facility for deletion.');
-              this.isLoading.set(false);
-              return;
+      this.infraService.deleteComputerLab(infra._id, labId)
+        .pipe(finalize(() => this.isLoading.set(false)))
+        .subscribe({
+          next: () => {
+            this.toastService.success('Computer lab deleted successfully!');
+            this.fetchInfrastructure();
+          },
+          error: (err) => {
+            console.error('Computer lab delete failed:', err);
+            this.toastService.error(err.error?.message || 'Failed to delete computer lab.');
           }
+        });
+      return;
+    }
 
-          this.infraService.deleteFacility(infra._id, facilityId)
-              .pipe(finalize(() => this.isLoading.set(false)))
-              .subscribe({
-                  next: () => {
-                      this.toastService.success('Facility deleted successfully!');
-                      this.fetchInfrastructure();
-                  },
-                  error: (err) => {
-                      console.error('Facility delete failed:', err);
-                      this.toastService.error(err.error?.message || 'Failed to delete facility.');
-                  }
-              });
-          return;
+    if (type === 'otherFacilities') {
+      const facility = (infra.otherFacilities as OtherFacility[]).find(f => f.name === name);
+      const facilityId = facility?._id || facility?.id;
+
+      if (!facilityId) {
+        this.toastService.error('Could not identify facility for deletion.');
+        this.isLoading.set(false);
+        return;
       }
+
+      this.infraService.deleteFacility(infra._id, facilityId)
+        .pipe(finalize(() => this.isLoading.set(false)))
+        .subscribe({
+          next: () => {
+            this.toastService.success('Facility deleted successfully!');
+            this.fetchInfrastructure();
+          },
+          error: (err) => {
+            console.error('Facility delete failed:', err);
+            this.toastService.error(err.error?.message || 'Failed to delete facility.');
+          }
+        });
+      return;
+    }
   }
 
   confirmDeleteSite(infraId: string) {
-      if (confirm('Are you sure you want to delete this entire site? This will remove all classrooms, labs, and facilities associated with it. This action cannot be undone.')) {
-          this.deleteSite(infraId);
-      }
+    if (confirm('Are you sure you want to delete this entire site? This will remove all classrooms, labs, and facilities associated with it. This action cannot be undone.')) {
+      this.deleteSite(infraId);
+    }
   }
 
   deleteSite(infraId: string) {
-      this.isLoading.set(true);
-      this.infraService.deleteInfrastructure(infraId)
-          .pipe(finalize(() => this.isLoading.set(false)))
-          .subscribe({
-              next: () => {
-                  this.toastService.success('Infrastructure site deleted successfully!');
-                  this.fetchInfrastructure();
-              },
-              error: (err) => {
-                  console.error('Site delete failed:', err);
-                  this.toastService.error(err.error?.message || 'Failed to delete site.');
-              }
-          });
+    this.isLoading.set(true);
+    this.infraService.deleteInfrastructure(infraId)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: () => {
+          this.toastService.success('Infrastructure site deleted successfully!');
+          this.fetchInfrastructure();
+        },
+        error: (err) => {
+          console.error('Site delete failed:', err);
+          this.toastService.error(err.error?.message || 'Failed to delete site.');
+        }
+      });
   }
 
   onFormClose() {

@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject, PLATFORM_ID, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { InfrastructureService } from '../core/services/infrastructure.service';
+import { LocationService } from '../core/services/location.service';
 import { InfrastructureResponse } from '../core/models/infrastructure.model';
 import { AuthService } from './auth.service';
 import { Address } from '../core/models/address.model';
@@ -15,6 +16,7 @@ export interface NearbyUser {
     mode: 'Online' | 'Offline' | 'Hybrid';
     availability: string;
     activityType?: 'Learning' | 'Research';
+    coordinates?: { lat: number; lng: number };
 }
 
 export interface Infrastructure {
@@ -60,6 +62,7 @@ export interface ResourceStats {
 export class PartnerService {
     private infraService = inject(InfrastructureService);
     private authService = inject(AuthService);
+    private locationService = inject(LocationService);
     private platformId = inject(PLATFORM_ID);
 
     private partnerProfile = signal<{
@@ -82,6 +85,9 @@ export class PartnerService {
     });
 
     private infra = signal<Infrastructure[]>([]);
+
+    profile = this.partnerProfile.asReadonly();
+    infraList = this.infra.asReadonly();
 
     constructor() {
         // Reactively fetch when logged in
@@ -126,14 +132,18 @@ export class PartnerService {
                             tags: []
                         }));
 
-                        if (data.generalInfo && !this.partnerProfile().name.includes(data.generalInfo.schoolName)) {
-                            // Optionally handle multiple profile names if needed, 
-                            // but for now, we just update with the first one or keep it as is.
+                        if (data.generalInfo) {
+                            // Extract real coordinates from GeoJSON location data [lng, lat]
+                            const coords = data.generalInfo.location?.coordinates;
+                            const partnerLocation = coords && coords.length === 2 
+                                ? { lat: coords[1], lng: coords[0] } 
+                                : { lat: 28.6273, lng: 77.3725 };
+
                             this.partnerProfile.set({
                                 name: data.generalInfo.schoolName,
                                 type: 'Infrastructure Provider',
                                 address: data.generalInfo.address,
-                                coordinates: { lat: 28.6273, lng: 77.3725 }
+                                coordinates: partnerLocation
                             });
                         }
                     });
@@ -148,12 +158,12 @@ export class PartnerService {
     private radius = signal<number>(10);
 
     private allNearbyUsers = signal<NearbyUser[]>([
-        { id: 1,  name: 'Dr. Sameer Khan',  role: 'Teacher', specialization: 'Machine Learning', distance: 2.5,  mode: 'Hybrid',   availability: 'Mon-Fri, 9-11 AM',   activityType: 'Research' },
-        { id: 2,  name: 'Priya Sharma',     role: 'Teacher', specialization: 'UI/UX Design',     distance: 8.2,  mode: 'Offline',  availability: 'Weekdays',            activityType: 'Learning' },
-        { id: 3,  name: 'Rahul Verma',      role: 'Student', learningInterest: 'Generative AI',  distance: 1.2,  mode: 'Online',   availability: 'Evenings',            activityType: 'Learning' },
-        { id: 4,  name: 'Ananya Das',       role: 'Student', learningInterest: 'Data Science',   distance: 12.5, mode: 'Offline',  availability: 'Full-time',           activityType: 'Learning' },
-        { id: 5,  name: 'Prof. Aryan',      role: 'Teacher', specialization: 'Blockchain',       distance: 17.8, mode: 'Hybrid',   availability: 'Tue, Thu',            activityType: 'Research' },
-        { id: 6,  name: 'Ishita Kapoor',    role: 'Student', learningInterest: 'Cybersecurity',  distance: 14.2, mode: 'Hybrid',   availability: 'Flexible',            activityType: 'Learning' }
+        { id: 1,  name: 'Dr. Sameer Khan',  role: 'Teacher', specialization: 'Machine Learning', distance: 0,  mode: 'Hybrid',   availability: 'Mon-Fri, 9-11 AM',   activityType: 'Research', coordinates: { lat: 28.5355, lng: 77.3910 } },
+        { id: 2,  name: 'Priya Sharma',     role: 'Teacher', specialization: 'UI/UX Design',     distance: 0,  mode: 'Offline',  availability: 'Weekdays',            activityType: 'Learning', coordinates: { lat: 28.5455, lng: 77.4010 } },
+        { id: 3,  name: 'Rahul Verma',      role: 'Student', learningInterest: 'Generative AI',  distance: 0,  mode: 'Online',   availability: 'Evenings',            activityType: 'Learning', coordinates: { lat: 28.5255, lng: 77.3810 } },
+        { id: 4,  name: 'Ananya Das',       role: 'Student', learningInterest: 'Data Science',   distance: 0,  mode: 'Offline',  availability: 'Full-time',           activityType: 'Learning', coordinates: { lat: 28.5555, lng: 77.4110 } },
+        { id: 5,  name: 'Prof. Aryan',      role: 'Teacher', specialization: 'Blockchain',       distance: 0,  mode: 'Hybrid',   availability: 'Tue, Thu',            activityType: 'Research', coordinates: { lat: 28.5655, lng: 77.4210 } },
+        { id: 6,  name: 'Ishita Kapoor',    role: 'Student', learningInterest: 'Cybersecurity',  distance: 0,  mode: 'Hybrid',   availability: 'Flexible',            activityType: 'Learning', coordinates: { lat: 28.5155, lng: 77.3710 } }
     ]);
 
     // ── Activity mock data (dates computed dynamically) ──────────────────────
@@ -274,12 +284,26 @@ export class PartnerService {
     activities          = this.activitiesData.asReadonly();
 
     // ── Computed: discovery ──────────────────────────────────────────────────
+    private usersWithDistances = computed(() => {
+        const partner = this.partnerProfile();
+        if (!partner.coordinates) return this.allNearbyUsers();
+
+        return this.allNearbyUsers().map(u => {
+            if (!u.coordinates) return u;
+            const distance = this.locationService.calculateDistance(
+                partner.coordinates!.lat, partner.coordinates!.lng,
+                u.coordinates.lat, u.coordinates.lng
+            );
+            return { ...u, distance };
+        });
+    });
+
     nearbyTeachers = computed(() =>
-        this.allNearbyUsers().filter(u => u.role === 'Teacher' && u.distance <= this.radius())
+        this.usersWithDistances().filter(u => u.role === 'Teacher' && u.distance <= this.radius())
     );
 
     nearbyStudents = computed(() =>
-        this.allNearbyUsers().filter(u => u.role === 'Student' && u.distance <= this.radius())
+        this.usersWithDistances().filter(u => u.role === 'Student' && u.distance <= this.radius())
     );
 
     stats = computed(() => ({

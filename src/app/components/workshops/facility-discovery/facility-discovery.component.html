@@ -18,6 +18,29 @@
             <!-- Sidebar / Filters -->
             <aside class="fd-sidebar">
                 <div class="sidebar-section">
+                    <div class="origin-header">
+                        <h3>Searching Near</h3>
+                        <button class="btn-recenter" (click)="resetToMyLocation()" title="Recenter to my location">
+                            <i class="fas fa-location-arrow"></i>
+                        </button>
+                    </div>
+                    <div class="current-origin">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span class="origin-label">{{ searchLocationLabel() }}</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Location Search</h3>
+                    <div class="search-box">
+                        <input type="text" [(ngModel)]="searchAddress" placeholder="Enter city or address..." (keyup.enter)="searchByAddress()">
+                        <button class="btn-search-icon" (click)="searchByAddress()" title="Search location">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
                     <h3>Quick Filters</h3>
                     
                     <div class="filter-group">

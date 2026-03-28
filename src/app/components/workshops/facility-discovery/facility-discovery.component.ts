@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FacilityBookingService, PartnerLocationSearchResult, FacilityDetail } from '../../../services/facility-booking.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { LocationService } from '../../../core/services/location.service';
+import { PartnerService } from '../../../services/partner.service';
+import { TeacherDashboardService } from '../../../services/teacher-dashboard.service';
+import { GeoLocation } from '../../../core/models/address.model';
 
 @Component({
     selector: 'app-facility-discovery',
@@ -13,6 +17,9 @@ import { ToastService } from '../../../core/services/toast.service';
 })
 export class FacilityDiscoveryComponent implements OnInit {
     private bookingService = inject(FacilityBookingService);
+    private locationService = inject(LocationService);
+    private partnerService = inject(PartnerService);
+    private teacherService = inject(TeacherDashboardService);
     private toast = inject(ToastService);
 
     // Inputs for session context
@@ -20,6 +27,7 @@ export class FacilityDiscoveryComponent implements OnInit {
     sessionStartTime = input<string>('');
     sessionEndTime = input<string>('');
     requiredCapacity = input<number>(0);
+    isOffline = input<boolean>(false);
 
     // Outputs
     facilitySelected = output<any>(); // { partnerId, partnerName, facilityId, facilityName, facilityType, address, pricing }
@@ -30,11 +38,13 @@ export class FacilityDiscoveryComponent implements OnInit {
     isLoading = signal(false);
     expandedLocationId = signal<string | null>(null);
     selectedFacilityId = signal<string | null>(null);
+    searchAddress = signal<string>('');
+    searchLocationLabel = signal<string>('Detecting location...');
 
     filters = signal({
         type: 'All',
         minCapacity: 0,
-        maxDistance: 20
+        maxDistance: 10
     });
 
     ngOnInit() {
@@ -46,8 +56,9 @@ export class FacilityDiscoveryComponent implements OnInit {
         this.fetchLocations();
     }
 
-    fetchLocations() {
+    fetchLocations(isReset = false) {
         this.isLoading.set(true);
+        if (isReset) this.searchLocationLabel.set('Detecting location...');
 
         const searchFilters = {
             ...this.filters(),
@@ -56,25 +67,58 @@ export class FacilityDiscoveryComponent implements OnInit {
             endTime: this.sessionEndTime()
         };
 
+        if (this.isOffline()) {
+            this.loadOfflineLocations();
+            return;
+        }
+
         // Get user location using Browser GPS
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
+                    this.searchLocationLabel.set('Current GPS Location');
                     this.callBookingService(lat, lng, searchFilters);
                 },
                 (error) => {
-                    console.warn('Geolocation denied or failed, using fallback coordinates.', error);
-                    // Fallback to Delhi/Noida region
-                    this.callBookingService(28.6273, 77.3725, searchFilters);
+                    console.warn('Geolocation denied or failed, using profile fallback.', error);
+                    this.useFallbackCoordinates(searchFilters);
                 },
                 { timeout: 10000 }
             );
         } else {
-            console.warn('Geolocation not supported, using fallback coordinates.');
-            this.callBookingService(28.6273, 77.3725, searchFilters);
+            console.warn('Geolocation not supported, using profile fallback.');
+            this.useFallbackCoordinates(searchFilters);
         }
+    }
+
+    private useFallbackCoordinates(searchFilters: any) {
+        // 1. Try Partner Profile
+        const partner = this.partnerService.profile();
+        if (partner.coordinates && partner.address.city) {
+            this.searchLocationLabel.set(`${partner.address.city}, ${partner.address.state}`);
+            this.callBookingService(partner.coordinates.lat, partner.coordinates.lng, searchFilters);
+            return;
+        }
+
+        // 2. Try Teacher Profile
+        const teacherCoords = this.teacherService.currentCoordinates();
+        const teacherAddr = this.teacherService.currentLocation();
+        if (teacherCoords) {
+            this.searchLocationLabel.set(teacherAddr || 'Profile Address');
+            this.callBookingService(teacherCoords.lat, teacherCoords.lng, searchFilters);
+            return;
+        }
+
+        // 3. Last Resort: Hardcoded Fallback
+        this.searchLocationLabel.set('Noida (Default)');
+        this.callBookingService(28.6273, 77.3725, searchFilters);
+    }
+
+    resetToMyLocation() {
+        this.searchAddress.set('');
+        this.fetchLocations(true);
     }
 
     private callBookingService(lat: number, lng: number, searchFilters: any) {
@@ -88,8 +132,27 @@ export class FacilityDiscoveryComponent implements OnInit {
                 }
             },
             error: () => {
+                console.warn('API fetch failed, trying offline fallback...');
+                this.loadOfflineLocations();
+            }
+        });
+    }
+
+    private loadOfflineLocations() {
+        this.bookingService.getOfflineLocations().subscribe({
+            next: (results) => {
+                this.locations.set(results);
                 this.isLoading.set(false);
-                this.toast.error('Failed to load nearby locations.');
+                if (results.length > 0 && !this.expandedLocationId()) {
+                    this.expandedLocationId.set(results[0].partnerId);
+                }
+                if (this.isOffline() && results.length === 0) {
+                    this.toast.info('No locally saved locations found.');
+                }
+            },
+            error: () => {
+                this.isLoading.set(false);
+                this.toast.error('Failed to load locations.');
             }
         });
     }
@@ -118,6 +181,31 @@ export class FacilityDiscoveryComponent implements OnInit {
 
     onFilterChange() {
         this.fetchLocations();
+    }
+
+    searchByAddress() {
+        const addr = this.searchAddress().trim();
+        if (!addr) {
+            this.fetchLocations();
+            return;
+        }
+
+        this.isLoading.set(true);
+        this.locationService.geocodeAddress(addr).subscribe({
+            next: (loc: GeoLocation) => {
+                this.searchLocationLabel.set(addr);
+                this.callBookingService(loc.coordinates[1], loc.coordinates[0], {
+                    ...this.filters(),
+                    date: this.sessionDate(),
+                    startTime: this.sessionStartTime(),
+                    endTime: this.sessionEndTime()
+                });
+            },
+            error: () => {
+                this.isLoading.set(false);
+                this.toast.error('Could not find that location.');
+            }
+        });
     }
 
     onClose() {

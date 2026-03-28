@@ -663,5 +663,16 @@
         </div>
     </div>
     }
+
+    <!-- ══ Facility Discovery Overlay ══════════════════════════════════════════ -->
+    @if (showDiscovery()) {
+    <app-facility-discovery [sessionDate]="addForm.get('date')?.value || ''"
+        [sessionStartTime]="addForm.get('startTime')?.value || ''" 
+        [sessionEndTime]="addForm.get('endTime')?.value || ''"
+        [isOffline]="isSavedOffline()"
+        [requiredCapacity]="0" (facilitySelected)="onFacilitySelected($event)" (close)="closeDiscovery()">
+    </app-facility-discovery>
+    }
+
     }
 </div>

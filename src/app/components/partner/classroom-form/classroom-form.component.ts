@@ -19,7 +19,7 @@ import { ValidationService } from '../../../core/services/validation.service';
     .section-title { font-size: 1.2rem; font-weight: 700; color: #ef9d57; margin-bottom: 1rem; text-transform: uppercase; }
     .form-group { margin-bottom: 1rem; }
     .form-label { display: block; margin-bottom: 0.5rem; color: #aaa; font-size: 0.9rem; }
-    .form-control { width: 100%; padding: 0.8rem; background: #111; border: 1px solid #333; color: #fff; border-radius: 4px; }
+    .form-control { width: 100%; background: #111; border: 1px solid #333; color: #fff; border-radius: 4px; }
     .form-control:focus { border-color: #ef9d57; outline: none; }
     .btn-primary { background: #ef9d57; color: #000; padding: 0.8rem 1.5rem; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
     .btn-outline { background: transparent; border: 1px solid #ef9d57; color: #ef9d57; padding: 0.5rem 1rem; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; }
@@ -74,7 +74,7 @@ export class ClassroomFormComponent implements OnInit {
     } else {
       this.addScheduleSlot();
     }
-    
+
     // Auto-calculate area logic
     this.classroomForm.get('length')?.valueChanges.subscribe(() => this.calculateArea());
     this.classroomForm.get('width')?.valueChanges.subscribe(() => this.calculateArea());
@@ -107,23 +107,23 @@ export class ClassroomFormComponent implements OnInit {
     });
 
     if (data.availabilitySchedule && data.availabilitySchedule.length > 0) {
-        this.availabilitySchedule.clear();
-        data.availabilitySchedule.forEach(slot => {
-            this.availabilitySchedule.push(this.fb.group({
-                day: [slot.day, Validators.required],
-                startTime: [slot.startTime, Validators.required],
-                endTime: [slot.endTime, Validators.required],
-                status: [slot.status, Validators.required],
-                pricing: this.fb.group({
-                    type: [slot.pricing?.type || 'Free', Validators.required],
-                    amount: [slot.pricing?.amount || 0, [Validators.required, Validators.min(0)]],
-                    unit: [slot.pricing?.unit || 'Hourly', Validators.required]
-                }),
-                notes: [slot.notes || '']
-            }));
-        });
+      this.availabilitySchedule.clear();
+      data.availabilitySchedule.forEach(slot => {
+        this.availabilitySchedule.push(this.fb.group({
+          day: [slot.day, Validators.required],
+          startTime: [slot.startTime, Validators.required],
+          endTime: [slot.endTime, Validators.required],
+          status: [slot.status, Validators.required],
+          pricing: this.fb.group({
+            type: [slot.pricing?.type || 'Free', Validators.required],
+            amount: [slot.pricing?.amount || 0, [Validators.required, Validators.min(0)]],
+            unit: [slot.pricing?.unit || 'Hourly', Validators.required]
+          }),
+          notes: [slot.notes || '']
+        }));
+      });
     } else {
-        this.addScheduleSlot();
+      this.addScheduleSlot();
     }
   }
 

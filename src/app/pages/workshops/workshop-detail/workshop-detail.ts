@@ -102,7 +102,7 @@ function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
 @Component({
     selector: 'app-workshop-detail',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, DecimalPipe, EnrollWorkshop],
+    imports: [CommonModule, ReactiveFormsModule, DecimalPipe, EnrollWorkshop, FacilityDiscoveryComponent],
     templateUrl: './workshop-detail.html',
     styleUrl: './workshop-detail.scss',
 })
@@ -521,7 +521,18 @@ export class WorkshopDetailComponent {
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     constructor() {
-        // Sync local sessions whenever the workshop input changes
+
+        effect(() => {
+            const autoAdd = this.autoAddSession();
+            if (autoAdd) {
+                untracked(() => {
+                    if (!this.showAddForm()) {
+                        this.openAddForm();
+                    }
+                });
+            }
+        });
+
         effect(() => {
             this.localSchedules.set([...this.currentWorkshop().schedules]);
         });

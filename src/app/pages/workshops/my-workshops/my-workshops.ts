@@ -32,10 +32,8 @@ export class MyWorkshopsComponent implements OnInit {
     showEdit = signal<boolean>(false);
     isCreating = signal<boolean>(false);
     isAddingSession = signal<boolean>(false);
-
     ngOnInit() {
         if (!this.isBrowser) return;
-
         // Only load in the browser to ensure localStorage (token) is accessible
         if (this.auth.isLoggedIn()) {
             this.loadMyWorkshops();
@@ -69,7 +67,6 @@ export class MyWorkshopsComponent implements OnInit {
             }
         });
     }
-
     onView(w: WorkshopListItem) {
         this.selectedWorkshop.set(w);
         this.isAddingSession.set(false);
@@ -98,7 +95,7 @@ export class MyWorkshopsComponent implements OnInit {
             });
         }
     }
- 
+
     onStatusChange(w: WorkshopListItem, newStatus: string) {
         const msg = newStatus === 'published' ? 'publish' : 'revert to draft';
         if (confirm(`Are you sure you want to ${msg} "${w.workshopTitle}"?`)) {
@@ -114,7 +111,7 @@ export class MyWorkshopsComponent implements OnInit {
             });
         }
     }
- 
+
     closeDetail() {
         this.showDetail.set(false);
         this.selectedWorkshop.set(null);

@@ -98,8 +98,30 @@ export class InfrastructureFormComponent implements OnInit {
       this.isEditMode.set(true);
       this.patchForm(this.initialData);
     } else {
-      // Start with one empty slot for each if new? 
-      // Actually, the HTML has "Add" buttons, so maybe start empty is better.
+      // Auto-detect location for new entries
+      this.useCurrentLocation();
+    }
+    this.setupAddressListeners();
+  }
+
+  private setupAddressListeners() {
+    const addressGroup = this.infraForm.get('generalInfo.address');
+    if (addressGroup) {
+      addressGroup.valueChanges.subscribe(() => {
+        this.onAddressChange();
+      });
+    }
+  }
+
+  private onAddressChange() {
+    const vals = this.infraForm.get('generalInfo.address')?.value;
+    if (vals && vals.city && vals.state) {
+      const fullAddress = `${vals.addressLine1 || ''} ${vals.city}, ${vals.district || ''}, ${vals.state}, ${vals.country || 'India'}`.trim();
+      this.locationService.geocodeAddress(fullAddress).subscribe({
+        next: (loc) => {
+          this.infraForm.get('generalInfo.location')?.patchValue(loc, { emitEvent: false });
+        }
+      });
     }
   }
 
@@ -248,7 +270,7 @@ export class InfrastructureFormComponent implements OnInit {
       this.toastService.error('Please fix the validation errors before saving.');
       return;
     }
-
+    console.log('infraForm', this.infraForm.value);
     this.isLoading.set(true);
     const formVals = this.infraForm.value;
 
