@@ -39,6 +39,9 @@ export class FacilityDiscoveryComponent implements OnInit {
     expandedLocationId = signal<string | null>(null);
     selectedFacilityId = signal<string | null>(null);
     searchAddress = signal<string>('');
+    searchCity = signal<string>('');
+    searchDistrict = signal<string>('');
+    searchPincode = signal<string>('');
     searchLocationLabel = signal<string>('Detecting location...');
 
     filters = signal({
@@ -118,6 +121,9 @@ export class FacilityDiscoveryComponent implements OnInit {
 
     resetToMyLocation() {
         this.searchAddress.set('');
+        this.searchCity.set('');
+        this.searchDistrict.set('');
+        this.searchPincode.set('');
         this.fetchLocations(true);
     }
 
@@ -185,15 +191,25 @@ export class FacilityDiscoveryComponent implements OnInit {
 
     searchByAddress() {
         const addr = this.searchAddress().trim();
-        if (!addr) {
+        const city = this.searchCity().trim();
+        const district = this.searchDistrict().trim();
+        const pincode = this.searchPincode().trim();
+
+        // 1. Build a combination if specific fields are provided
+        let combinedAddr = addr;
+        if (city || district || pincode) {
+            combinedAddr = [addr, city, district, pincode].filter(x => x).join(', ');
+        }
+
+        if (!combinedAddr) {
             this.fetchLocations();
             return;
         }
 
         this.isLoading.set(true);
-        this.locationService.geocodeAddress(addr).subscribe({
+        this.locationService.geocodeAddress(combinedAddr).subscribe({
             next: (loc: GeoLocation) => {
-                this.searchLocationLabel.set(addr);
+                this.searchLocationLabel.set(combinedAddr);
                 this.callBookingService(loc.coordinates[1], loc.coordinates[0], {
                     ...this.filters(),
                     date: this.sessionDate(),
@@ -206,6 +222,13 @@ export class FacilityDiscoveryComponent implements OnInit {
                 this.toast.error('Could not find that location.');
             }
         });
+    }
+
+    clearLocationFilters() {
+        this.searchAddress.set('');
+        this.searchCity.set('');
+        this.searchDistrict.set('');
+        this.searchPincode.set('');
     }
 
     onClose() {

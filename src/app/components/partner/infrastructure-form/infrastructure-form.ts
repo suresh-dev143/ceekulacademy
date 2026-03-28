@@ -20,7 +20,7 @@ import { LocationService } from '../../../core/services/location.service';
     .section-title { font-size: 1.1rem; font-weight: 800; color: #ef9d57; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px; }
     .form-group { margin-bottom: 1.5rem; }
     .form-label { display: block; margin-bottom: 0.6rem; color: #aaa; font-size: 0.85rem; font-weight: 600; }
-    .form-control { width: 100%; padding: 0.8rem; background: #111; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.9rem; }
+    .form-control { width: 100%;background: #111; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 0.9rem; }
     .form-control:focus { border-color: #ef9d57; outline: none; background: #161616; }
     .form-control.is-invalid { border-color: #ff4d4d; }
     

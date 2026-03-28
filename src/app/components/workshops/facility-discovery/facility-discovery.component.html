@@ -31,13 +31,35 @@
                 </div>
 
                 <div class="sidebar-section">
-                    <h3>Location Search</h3>
-                    <div class="search-box">
-                        <input type="text" [(ngModel)]="searchAddress" placeholder="Enter city or address..." (keyup.enter)="searchByAddress()">
+                    <div class="section-title-row">
+                        <h3>Location Search</h3>
+                        <button class="btn-clear-filters" (click)="clearLocationFilters()" *ngIf="searchAddress() || searchCity() || searchDistrict() || searchPincode()">
+                            Clear
+                        </button>
+                    </div>
+                    
+                    <div class="search-box main-search">
+                        <input type="text" [(ngModel)]="searchAddress" placeholder="Street or Area..." (keyup.enter)="searchByAddress()">
                         <button class="btn-search-icon" (click)="searchByAddress()" title="Search location">
                             <i class="fas fa-search"></i>
                         </button>
                     </div>
+
+                    <div class="location-filters-grid">
+                        <div class="input-field">
+                            <input type="text" [(ngModel)]="searchCity" placeholder="City" (keyup.enter)="searchByAddress()">
+                        </div>
+                        <div class="input-field">
+                            <input type="text" [(ngModel)]="searchDistrict" placeholder="District" (keyup.enter)="searchByAddress()">
+                        </div>
+                        <div class="input-field pincode-field">
+                            <input type="text" [(ngModel)]="searchPincode" placeholder="Pincode" (keyup.enter)="searchByAddress()" maxlength="6">
+                        </div>
+                    </div>
+                    
+                    <button class="btn-apply-location" (click)="searchByAddress()">
+                        Update Search
+                    </button>
                 </div>
 
                 <div class="sidebar-section">

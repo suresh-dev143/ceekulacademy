@@ -49,6 +49,7 @@ export interface FacilityFilters {
 export class FacilityBookingService {
     private http = inject(HttpClient);
     private readonly base = environment.apiUrl;
+    private workshopService = inject(WorkshopService);
 
     /**
      * Searches for nearby institutions with available infrastructure from real backend.
@@ -105,8 +106,7 @@ export class FacilityBookingService {
      * Aggregates unique locations from locally saved workshops for offline discovery.
      */
     getOfflineLocations(): Observable<PartnerLocationSearchResult[]> {
-        const ws = inject(WorkshopService);
-        const workshops: WorkshopListItem[] = ws.localWorkshops();
+        const workshops: WorkshopListItem[] = this.workshopService.localWorkshops();
 
         const locationMap = new Map<string, PartnerLocationSearchResult>();
 
