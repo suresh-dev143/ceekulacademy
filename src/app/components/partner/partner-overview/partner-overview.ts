@@ -56,7 +56,14 @@ import { Address } from '../../../core/models/address.model';
   `,
   styles: [`
     .partner-header-card {
-      padding: 3.5rem; background: #010102; border-radius: 0; margin-bottom: 2rem;
+      padding: 3rem; 
+      background: rgba(25, 25, 35, 0.4); 
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08); 
+      border-radius: 24px; 
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     }
 
     .header-main {
@@ -65,38 +72,87 @@ import { Address } from '../../../core/models/address.model';
 
     .org-brand {
       display: flex; align-items: center; gap: 1.5rem;
-      .org-logo { width: 64px; height: 64px; background: #000000; border: 2px solid var(--accent-primary); border-radius: 0; display: flex; align-items: center; justify-content: center; font-size: 2rem; filter: grayscale(1); }
-      .org-name { font-size: 2rem; font-weight: 950; color: #fff; margin: 0; display: flex; align-items: center; gap: 1rem; text-transform: uppercase; letter-spacing: 2px; }
-      .type-badge { font-size: 0.7rem; font-weight: 900; padding: 0.3rem 0.8rem; background: #050505; color: var(--text-secondary); border: 1px solid var(--row-border); border-radius: 0; text-transform: uppercase; letter-spacing: 1px; }
-      .org-address { font-size: 0.9rem; color: var(--text-secondary); margin: 0.5rem 0 0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; i { color: var(--accent-primary); } }
+      .org-logo { 
+        width: 72px; height: 72px; 
+        background: linear-gradient(135deg, #8b5cf6, #3b82f6); 
+        border-radius: 20px; 
+        display: flex; align-items: center; justify-content: center; 
+        font-size: 2.2rem; 
+        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+      }
+      .org-name { 
+        font-size: 2.2rem; font-weight: 800; color: #fff; margin: 0; 
+        display: flex; align-items: center; gap: 1rem; 
+        letter-spacing: -0.5px; 
+      }
+      .type-badge { 
+        font-size: 0.75rem; font-weight: 700; padding: 0.4rem 1rem; 
+        background: rgba(139, 92, 246, 0.15); 
+        color: #c4b5fd; 
+        border: 1px solid rgba(139, 92, 246, 0.3); 
+        border-radius: 30px; 
+        text-transform: uppercase; letter-spacing: 1px; 
+      }
+      .org-address { 
+        font-size: 0.95rem; color: #9ca3af; margin: 0.6rem 0 0; 
+        font-weight: 500; letter-spacing: 0.2px; 
+        i { color: #8b5cf6; margin-right: 0.4rem; } 
+      }
     }
 
     .radius-control {
-      background: #050505; padding: 1.25rem; border-radius: 0; border: 1px solid var(--row-border);
-      label { display: block; font-size: 0.7rem; font-weight: 900; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 0.8rem; letter-spacing: 1px; }
-      .radio-group { display: flex; gap: 0.5rem; }
+      background: rgba(0, 0, 0, 0.2); 
+      padding: 1.25rem; 
+      border-radius: 20px; 
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      label { display: block; font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; margin-bottom: 0.8rem; letter-spacing: 1px; }
+      .radio-group { display: flex; gap: 0.5rem; background: rgba(255, 255, 255, 0.03); padding: 0.4rem; border-radius: 12px; }
       .radio-label {
-        font-size: 0.8rem; font-weight: 800; color: var(--text-secondary); padding: 0.6rem 1.25rem; border-radius: 0; border: 1px solid var(--row-border); cursor: pointer; transition: 0.2s; background: #000000; text-transform: uppercase; letter-spacing: 0.5px;
-        &:hover { border-color: var(--accent-primary); color: #fff; }
-        &.active { background: var(--accent-primary); border-color: var(--accent-primary); color: #000000; }
+        font-size: 0.85rem; font-weight: 600; color: #cbd5e1; 
+        padding: 0.6rem 1.25rem; border-radius: 8px; 
+        cursor: pointer; transition: all 0.3s ease; 
+        background: transparent;
+        &:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+        &.active { 
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6); 
+            color: #ffffff; 
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
         input { display: none; }
       }
     }
 
     .mini-stats {
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;
-      .stat-item { padding: 1.75rem; background: #050505; border: 1px solid var(--row-border); border-radius: 0; text-align: center; &:hover { border-color: var(--accent-primary); } }
-      .stat-val { font-size: 2.25rem; font-weight: 950; display: block; margin-bottom: 0.3rem; line-height: 1; color: #fff;
-        &.teachers { color: var(--accent-primary); }
-        &.students { color: #10b981; }
-        &.activities { color: #f59e0b; }
-        &.capacity { color: #ef4444; }
+      .stat-item { 
+        padding: 1.75rem; 
+        background: rgba(255, 255, 255, 0.02); 
+        border: 1px solid rgba(255, 255, 255, 0.06); 
+        border-radius: 20px; 
+        text-align: center; 
+        transition: transform 0.3s ease, border-color 0.3s ease;
+        &:hover { 
+            transform: translateY(-5px); 
+            border-color: rgba(139, 92, 246, 0.4); 
+            background: rgba(255, 255, 255, 0.04);
+        } 
       }
-      .stat-label { font-size: 0.7rem; font-weight: 900; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+      .stat-val { 
+        font-size: 2.5rem; font-weight: 800; display: block; margin-bottom: 0.5rem; line-height: 1; 
+        background: linear-gradient(135deg, #fff, #9ca3af);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        
+        &.teachers { background: linear-gradient(135deg, #a78bfa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        &.students { background: linear-gradient(135deg, #34d399, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        &.activities { background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        &.capacity { background: linear-gradient(135deg, #f87171, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      }
+      .stat-label { font-size: 0.75rem; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; }
     }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 
     @media (max-width: 992px) {
       .partner-header-card { padding: 2rem; }
@@ -105,24 +161,24 @@ import { Address } from '../../../core/models/address.model';
     }
 
     @media (max-width: 640px) {
-      .partner-header-card { padding: 1.25rem; }
+      .partner-header-card { padding: 1.5rem; border-radius: 16px; }
       .org-brand { flex-direction: column; align-items: flex-start; gap: 1rem;
-        .org-logo { width: 48px; height: 48px; font-size: 1.4rem; }
-        .org-name { font-size: 1.25rem; letter-spacing: 1px; flex-wrap: wrap; gap: 0.5rem; }
+        .org-logo { width: 56px; height: 56px; font-size: 1.6rem; border-radius: 16px; }
+        .org-name { font-size: 1.5rem; flex-wrap: wrap; gap: 0.5rem; }
       }
       .radius-control { width: 100%;
-        .radio-group { flex-wrap: wrap; gap: 0.4rem; }
+        .radio-group { flex-wrap: wrap; gap: 0.4rem; padding: 0.4rem; }
         .radio-label { padding: 0.5rem 0.9rem; font-size: 0.75rem; }
       }
-      .mini-stats { grid-template-columns: repeat(2, 1fr); gap: 0.75rem;
-        .stat-item { padding: 1rem; }
-        .stat-val { font-size: 1.75rem; }
+      .mini-stats { grid-template-columns: repeat(2, 1fr); gap: 1rem;
+        .stat-item { padding: 1.25rem; border-radius: 16px; }
+        .stat-val { font-size: 2rem; }
       }
     }
 
     @media (max-width: 380px) {
-      .mini-stats { grid-template-columns: 1fr 1fr; }
-      .org-brand .org-name { font-size: 1rem; }
+      .mini-stats { grid-template-columns: 1fr; }
+      .org-brand .org-name { font-size: 1.25rem; }
     }
   `]
 })

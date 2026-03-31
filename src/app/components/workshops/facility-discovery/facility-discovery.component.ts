@@ -7,6 +7,8 @@ import { LocationService } from '../../../core/services/location.service';
 import { PartnerService } from '../../../services/partner.service';
 import { TeacherDashboardService } from '../../../services/teacher-dashboard.service';
 import { GeoLocation } from '../../../core/models/address.model';
+import { SlotOrchestrator } from '../../../core/utils/slot-orchestrator.util';
+import { HourlySlot } from '../../../core/models/infrastructure.model';
 
 @Component({
     selector: 'app-facility-discovery',
@@ -28,6 +30,7 @@ export class FacilityDiscoveryComponent implements OnInit {
     sessionEndTime = input<string>('');
     requiredCapacity = input<number>(0);
     isOffline = input<boolean>(false);
+    requiredSlots = input<number>(1); // New: defaults to 1 hour
 
     // Outputs
     facilitySelected = output<any>(); // { partnerId, partnerName, facilityId, facilityName, facilityType, address, pricing }
@@ -43,6 +46,7 @@ export class FacilityDiscoveryComponent implements OnInit {
     searchDistrict = signal<string>('');
     searchPincode = signal<string>('');
     searchLocationLabel = signal<string>('Detecting location...');
+    selectedFacilitySlots = signal<Map<string, string[]>>(new Map()); // Map<facilityId, slotTime[]>
 
     filters = signal({
         type: 'All',
@@ -67,7 +71,8 @@ export class FacilityDiscoveryComponent implements OnInit {
             ...this.filters(),
             date: this.sessionDate(),
             startTime: this.sessionStartTime(),
-            endTime: this.sessionEndTime()
+            endTime: this.sessionEndTime(),
+            requiredSlots: this.requiredSlots()
         };
 
         if (this.isOffline()) {
@@ -167,13 +172,54 @@ export class FacilityDiscoveryComponent implements OnInit {
         this.expandedLocationId.update(current => current === partnerId ? null : partnerId);
     }
 
+    toggleSlot(facilityId: string, slotTime: string) {
+        this.selectedFacilitySlots.update(map => {
+            const newMap = new Map(map);
+            const currentSlots = newMap.get(facilityId) || [];
+            if (currentSlots.includes(slotTime)) {
+                newMap.set(facilityId, currentSlots.filter(s => s !== slotTime));
+            } else {
+                newMap.set(facilityId, [...currentSlots, slotTime]);
+            }
+            return newMap;
+        });
+    }
+
+    isSlotSelected(facilityId: string, slotTime: string): boolean {
+        return this.selectedFacilitySlots().get(facilityId)?.includes(slotTime) ?? false;
+    }
+
+    getFacilityHourlySlots(facility: FacilityDetail): HourlySlot[] {
+        if (facility.slots && facility.slots.length > 0) return facility.slots;
+        
+        // Fallback: Generate standard slots and mark the requested session time as 'Available'
+        const standard = SlotOrchestrator.generateStandardSlots();
+        const startIdx = SlotOrchestrator.getTimeIndex(this.sessionStartTime());
+        const endIdx = SlotOrchestrator.getTimeIndex(this.sessionEndTime());
+
+        return standard.map((slot, idx) => {
+            const isWithinSession = idx >= startIdx && idx < endIdx;
+            return {
+                ...slot,
+                status: isWithinSession ? 'Available' : 'Closed',
+                pricing: facility.pricing as any
+            };
+        });
+    }
+
     selectFacility(partner: PartnerLocationSearchResult, facility: FacilityDetail) {
-        if (facility.status !== 'Available') {
-            this.toast.warning('This facility is currently unavailable.');
+        if (facility.status !== 'Available' && facility.status !== 'Closed') {
+             // In slot mode, 'Closed' facilities might have available slots if generated dynamically
+             // But we check top-level status first if provided
+        }
+
+        const chosenSlots = this.selectedFacilitySlots().get(facility.facilityId) || [];
+        
+        if (chosenSlots.length === 0) {
+            this.toast.warning('Please select at least one hourly slot.');
             return;
         }
 
-        // Emit complete selection data
         this.facilitySelected.emit({
             partnerId: partner.partnerId,
             partnerName: partner.partnerName,
@@ -181,8 +227,13 @@ export class FacilityDiscoveryComponent implements OnInit {
             facilityName: facility.facilityName,
             facilityType: facility.facilityType,
             address: partner.address,
-            pricing: facility.pricing
+            pricing: facility.pricing,
+            selectedSlots: chosenSlots
         });
+    }
+
+    getBestSlotSequence(facility: any): string[] {
+        return [this.sessionStartTime()]; 
     }
 
     onFilterChange() {

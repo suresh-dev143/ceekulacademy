@@ -118,6 +118,30 @@ export class TeacherDashboardService {
         this.providersWithDistances().filter(p => p.distance <= this.radius())
     );
 
+    private venueBookingsData = signal<any[]>([
+        {
+            id: 'v1',
+            workshopTitle: 'Robotics 101: Hardware Lab',
+            date: new Date(),
+            startTime: '10:00 AM',
+            endTime: '11:00 AM',
+            venueName: 'Innovation Hub Noida',
+            facilityType: 'Robotics Lab',
+            status: 'Confirmed'
+        },
+        {
+            id: 'v2',
+            workshopTitle: 'AI Masterclass',
+            date: new Date(Date.now() + 86400000), // tomorrow
+            startTime: '02:00 PM',
+            endTime: '03:00 PM',
+            venueName: 'SkillSet Training Academy',
+            facilityType: 'Computer Lab',
+            status: 'Confirmed'
+        }
+    ]);
+
+    venueBookings = this.venueBookingsData.asReadonly();
     mySchedule = this.scheduleData.asReadonly();
 
     stats = computed(() => ({

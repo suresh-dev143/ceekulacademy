@@ -7,69 +7,315 @@ import { NearbyProvider } from '../../../services/teacher-dashboard.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="discovery-section">
+    <div class="discovery-section animate-fade-in">
       <div class="section-header">
-        <h3 class="section-title"><i class="fas fa-building"></i> Nearby Infrastructure</h3>
+        <div class="title-group">
+          <h3 class="section-title"><i class="fas fa-satellite-dish"></i> Neural Infrastructure Discovery</h3>
+          <p class="section-subtitle">High-performance facilities detected within your operational radius.</p>
+        </div>
       </div>
 
       <div class="infra-list">
-        <div class="infra-item" *ngFor="let infra of infrastructure">
+        <div class="infra-item glass-card" *ngFor="let infra of infrastructure">
           <div class="infra-main">
-            <div class="icon-box">{{ getIcon(infra.type) }}</div>
+            <div class="brand-box">
+              <span class="brand-icon">{{ getIcon(infra.type) }}</span>
+              <div class="pulse-ring"></div>
+            </div>
+            
             <div class="info">
-              <h4 class="name">{{ infra.name }}</h4>
+              <div class="name-row">
+                <h4 class="name">{{ infra.name }}</h4>
+                <span class="type-pill">{{ infra.type }}</span>
+              </div>
               <div class="tags">
-                <span class="tag" *ngFor="let tag of infra.facilities">{{ tag }}</span>
+                <span class="tag" *ngFor="let tag of infra.facilities">
+                   <i class="fas fa-check-circle"></i> {{ tag }}
+                </span>
               </div>
             </div>
-            <div class="meta">
-              <span class="dist">{{ infra.distance }} km</span>
-              <span class="type">{{ infra.type }}</span>
+
+            <div class="metrics">
+              <div class="metric-item">
+                <span class="metric-value">{{ infra.distance }}</span>
+                <span class="metric-label">KM AWAY</span>
+              </div>
+              <div class="metric-divider"></div>
+              <div class="metric-item">
+                <span class="metric-value status-available">ACTIVE</span>
+                <span class="metric-label">STATUS</span>
+              </div>
             </div>
           </div>
+
           <div class="actions">
-            <button class="btn-outline-sm" (click)="collaborate.emit(infra.id)">Propose Collaboration</button>
-            <button class="icon-btn"><i class="fas fa-external-link-alt"></i></button>
+            <button class="btn-collaborate" (click)="collaborate.emit(infra.id)">
+              <i class="fas fa-handshake"></i> Propose Collaboration
+            </button>
+            <button class="btn-icon-secondary" title="View Full Profile">
+              <i class="fas fa-external-link-alt"></i>
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="empty-state" *ngIf="infrastructure.length === 0">
-        <p>No suitable infrastructure found in this radius.</p>
+      <div class="empty-state glass-card" *ngIf="infrastructure.length === 0">
+        <i class="fas fa-map-marked-alt"></i>
+        <p>No infrastructure assets detected in current range.</p>
+        <span class="hint">Try expanding your search radius to discover more facilities.</span>
       </div>
     </div>
   `,
   styles: [`
-    .discovery-section { padding: 2.5rem; background: #010102;  border-radius: 0; }
-    .section-header { margin-bottom: 2.5rem; }
-    .section-title { font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; i { color: var(--accent-primary); } }
+    :host {
+      --accent: #8b5cf6;
+      --accent-secondary: #3b82f6;
+      --success: #10b981;
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text-muted: #94a3b8;
+    }
 
-    .infra-list { display: flex; flex-direction: column; gap: 1rem; }
+    .discovery-section {
+      padding: 0;
+      background: transparent;
+    }
+
+    .section-header {
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #fff;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      i { color: var(--accent); }
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0.5rem 0 0;
+      font-weight: 500;
+    }
+
+    .infra-list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+    }
+
     .infra-item {
-      background: #050505; border: 1px solid var(--row-border); border-radius: 0; padding: 1.5rem;
-      display: flex; align-items: center; justify-content: space-between; transition: 0.2s;
-      &:hover { border-color: var(--accent-primary); background: #0a0a0a; }
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        transform: translateY(-4px);
+        border-color: rgba(139, 92, 246, 0.4);
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        
+        .pulse-ring { animation: pulse 2s infinite; opacity: 1; }
+        .brand-icon { transform: scale(1.1); filter: grayscale(0); }
+      }
     }
 
-    .infra-main { display: flex; align-items: center; gap: 1.5rem; flex: 1; }
-    .icon-box { width: 44px; height: 44px; background: #000000; border: 1px solid var(--row-border); border-radius: 0; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; filter: grayscale(1); }
-    .name { font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    
-    .tags { display: flex; gap: 0.5rem; }
-    .tag { font-size: 0.65rem; font-weight: 900; color: #000000; background: var(--accent-primary); padding: 0.2rem 0.6rem; border-radius: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .infra-main { display: flex; align-items: center; gap: 2rem; flex: 1; }
 
-    .meta { text-align: right; margin: 0 2rem; display: flex; flex-direction: column; 
-      .dist { font-size: 0.85rem; font-weight: 900; color: #10b981; text-transform: uppercase; }
-      .type { font-size: 0.7rem; color: var(--text-secondary); font-weight: 800; text-transform: uppercase; margin-top: 0.2rem; letter-spacing: 0.5px; }
+    .brand-box {
+      width: 64px;
+      height: 64px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
     }
 
-    .actions { display: flex; gap: 1rem; }
-    .btn-outline-sm { background: #000000; border: 1px solid var(--accent-primary); color: var(--text-primary); padding: 0.6rem 1.25rem; border-radius: 0; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; &:hover { background: var(--accent-primary); color: #000000; } }
-    .icon-btn { background: none; border: 1px solid var(--row-border); color: var(--text-secondary); width: 34px; height: 34px; border-radius: 0; cursor: pointer; transition: 0.2s; &:hover { color: var(--accent-primary); border-color: var(--accent-primary); } }
+    .brand-icon {
+      font-size: 1.8rem;
+      transition: all 0.3s ease;
+      filter: grayscale(0.5);
+    }
 
-    .empty-state { text-align: center; padding: 2rem; color: color-mix(in srgb, #fff, transparent 70%); font-weight: 600; }
+    .pulse-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      border: 2px solid var(--accent);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .info { flex: 1; }
+
+    .name-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .name {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .type-pill {
+      font-size: 0.6rem;
+      font-weight: 900;
+      color: var(--accent);
+      background: rgba(139, 92, 246, 0.1);
+      padding: 0.2rem 0.6rem;
+      border-radius: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .tags { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      i { color: var(--success); font-size: 0.6rem; }
+    }
+
+    .metrics {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin: 0 2.5rem;
+      padding-left: 2rem;
+      border-left: 1px solid var(--glass-border);
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .metric-value {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+      
+      &.status-available {
+        color: var(--success);
+        text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+      }
+    }
+
+    .metric-label {
+      font-size: 0.6rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      letter-spacing: 1px;
+    }
+
+    .metric-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--glass-border);
+    }
+
+    .actions { display: flex; gap: 1rem; align-items: center; }
+
+    .btn-collaborate {
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
+      }
+
+      i { font-size: 0.9rem; }
+    }
+
+    .btn-icon-secondary {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      i { font-size: 3rem; color: var(--accent); opacity: 0.4; margin-bottom: 1rem; }
+      p { font-size: 1.1rem; font-weight: 700; color: #fff; margin: 0; }
+      .hint { font-size: 0.85rem; color: var(--text-muted); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
   `]
 })
+
 export class TeacherNearbyInfrastructureComponent {
   @Input() infrastructure: NearbyProvider[] = [];
   @Output() collaborate = new EventEmitter<number>();

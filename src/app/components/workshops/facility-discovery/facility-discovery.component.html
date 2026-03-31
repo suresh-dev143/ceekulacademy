@@ -3,10 +3,10 @@
         <!-- Header -->
         <header class="fd-header">
             <div class="header-main">
-                <i class="fas fa-map-marked-alt"></i>
+                <i class="fas fa-microchip"></i>
                 <div class="header-text">
-                    <h2>Discover Nearby Facilities</h2>
-                    <p>Select a partner location and facility for your session</p>
+                    <h2>Infrastructure Marketplace</h2>
+                    <p>Verified venues for premium workshop delivery</p>
                 </div>
             </div>
             <button class="btn-close" (click)="onClose()" aria-label="Close">
@@ -19,20 +19,20 @@
             <aside class="fd-sidebar">
                 <div class="sidebar-section">
                     <div class="origin-header">
-                        <h3>Searching Near</h3>
+                        <h3>Detection Origin</h3>
                         <button class="btn-recenter" (click)="resetToMyLocation()" title="Recenter to my location">
-                            <i class="fas fa-location-arrow"></i>
+                            <i class="fas fa-crosshairs"></i>
                         </button>
                     </div>
                     <div class="current-origin">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="fas fa-radar"></i>
                         <span class="origin-label">{{ searchLocationLabel() }}</span>
                     </div>
                 </div>
 
                 <div class="sidebar-section">
                     <div class="section-title-row">
-                        <h3>Location Search</h3>
+                        <h3>Geographic Search</h3>
                         <button class="btn-clear-filters" (click)="clearLocationFilters()" *ngIf="searchAddress() || searchCity() || searchDistrict() || searchPincode()">
                             Clear
                         </button>
@@ -49,28 +49,25 @@
                         <div class="input-field">
                             <input type="text" [(ngModel)]="searchCity" placeholder="City" (keyup.enter)="searchByAddress()">
                         </div>
-                        <div class="input-field">
-                            <input type="text" [(ngModel)]="searchDistrict" placeholder="District" (keyup.enter)="searchByAddress()">
-                        </div>
                         <div class="input-field pincode-field">
                             <input type="text" [(ngModel)]="searchPincode" placeholder="Pincode" (keyup.enter)="searchByAddress()" maxlength="6">
                         </div>
                     </div>
                     
                     <button class="btn-apply-location" (click)="searchByAddress()">
-                        Update Search
+                        Update Scan
                     </button>
                 </div>
 
                 <div class="sidebar-section">
-                    <h3>Quick Filters</h3>
+                    <h3>Optimization Filters</h3>
                     
                     <div class="filter-group">
-                        <label>Facility Type</label>
+                        <label>Venue Category</label>
                         <select [(ngModel)]="filters().type" (change)="onFilterChange()">
-                            <option value="All">All Types</option>
+                            <option value="All">All Categories</option>
                             <option value="Classroom">Classroom</option>
-                            <option value="Lab">Computer Lab</option>
+                            <option value="Lab">Technology Lab</option>
                         </select>
                     </div>
 
@@ -80,18 +77,18 @@
                     </div>
 
                     <div class="filter-group">
-                        <label>Min Capacity</label>
+                        <label>Minimum Capacity</label>
                         <input type="number" [(ngModel)]="filters().minCapacity" (change)="onFilterChange()" min="0">
                     </div>
                 </div>
 
                 <div class="session-context-pill">
                     <div class="context-item">
-                        <i class="fas fa-calendar-day"></i>
+                        <i class="far fa-calendar-alt"></i>
                         <span>{{ sessionDate() | date:'mediumDate' }}</span>
                     </div>
                     <div class="context-item">
-                        <i class="fas fa-clock"></i>
+                        <i class="far fa-clock"></i>
                         <span>{{ sessionStartTime() }} - {{ sessionEndTime() }}</span>
                     </div>
                 </div>
@@ -102,35 +99,36 @@
                 @if (isLoading()) {
                     <div class="fd-loading-state">
                         <div class="fd-spinner"></div>
-                        <p>Scanning nearby infrastructure...</p>
+                        <h3>Calibrating Discovery...</h3>
+                        <p>Scanning local nodes for available infrastructure.</p>
                     </div>
                 } @else if (locations().length === 0) {
                     <div class="fd-empty-state">
-                        <i class="fas fa-search-location"></i>
-                        <h3>No matches nearby</h3>
-                        <p>Try expanding your radius or changing the facility type.</p>
+                        <i class="fas fa-satellite-dish"></i>
+                        <h3>Zero Nodes Found</h3>
+                        <p>No facilities match your current synchronization parameters.</p>
                     </div>
                 } @else {
                     <div class="location-accordion">
                         @for (loc of locations(); track loc.partnerId) {
                             <div class="loc-card" [class.is-expanded]="expandedLocationId() === loc.partnerId">
-                                <!-- Location Summary (Sticky Header-like) -->
+                                <!-- Location Summary -->
                                 <div class="loc-summary" (click)="toggleExpand(loc.partnerId)">
                                     <div class="loc-info">
                                         <div class="loc-name-row">
                                             <h3>{{ loc.partnerName }}</h3>
                                             @if (loc.distance <= 3) {
-                                                <span class="badge-near">📍 Near You</span>
+                                                <span class="badge-near">Proximal</span>
                                             }
                                         </div>
                                         <div class="loc-meta">
-                                            <span><i class="fas fa-map-marker-alt"></i> {{ loc.shortAddress }}</span>
-                                            <span><i class="fas fa-route"></i> {{ loc.distance }} km away</span>
-                                            <span class="fac-count">{{ loc.availableFacilities }} facilities available</span>
+                                            <span><i class="fas fa-location-dot"></i> {{ loc.shortAddress }}</span>
+                                            <span><i class="fas fa-arrows-left-right"></i> {{ loc.distance }} KM</span>
+                                            <span class="fac-count">{{ loc.availableFacilities }} UNITS ACTIVE</span>
                                         </div>
                                     </div>
                                     <div class="loc-toggle">
-                                        <i class="fas" [class.fa-chevron-down]="expandedLocationId() !== loc.partnerId" [class.fa-chevron-up]="expandedLocationId() === loc.partnerId"></i>
+                                        <i class="fas" [class.fa-plus]="expandedLocationId() !== loc.partnerId" [class.fa-minus]="expandedLocationId() === loc.partnerId"></i>
                                     </div>
                                 </div>
 
@@ -138,7 +136,7 @@
                                 @if (expandedLocationId() === loc.partnerId) {
                                     <div class="loc-details">
                                         <div class="loc-address-bar">
-                                            <i class="fas fa-info-circle"></i> {{ loc.address }}
+                                            <i class="fas fa-info-circle"></i> VERIFIED: {{ loc.address }}
                                         </div>
 
                                         <div class="facilities-list">
@@ -148,7 +146,7 @@
                                                         <div class="fac-type-status">
                                                             <span class="type-tag">{{ f.facilityType }}</span>
                                                             @if (f.isRecommended) {
-                                                                <span class="rec-badge">⭐ Best Fit</span>
+                                                                <span class="rec-badge">Optimal Match</span>
                                                             }
                                                             <span class="status-badge" [class]="f.status === 'Available' ? 'available' : 'unavailable'">
                                                                 {{ f.status }}
@@ -159,12 +157,12 @@
 
                                                     <div class="fac-specs">
                                                         <div class="spec">
-                                                            <i class="fas fa-users"></i>
-                                                            <span>{{ f.capacity }} capacity</span>
+                                                            <i class="fas fa-users-viewfinder"></i>
+                                                            <span>{{ f.capacity }} PAX</span>
                                                         </div>
                                                         <div class="spec">
-                                                            <i class="fas fa-tag"></i>
-                                                            <span>₹{{ f.pricing.amount }} / {{ f.pricing.unit }}</span>
+                                                            <i class="fas fa-indian-rupee-sign"></i>
+                                                            <span>{{ f.pricing.amount }} / {{ f.pricing.unit }}</span>
                                                         </div>
                                                     </div>
 
@@ -174,11 +172,39 @@
                                                         }
                                                     </div>
 
-                                                    <button class="btn-select-facility" 
-                                                            [disabled]="f.status !== 'Available'"
-                                                            (click)="selectFacility(loc, f)">
-                                                        {{ f.status === 'Available' ? 'Select & Book' : 'Unavailable' }}
-                                                    </button>
+                                                        <!-- Slot-Level Availability Grid (Granular Selection) -->
+                                                        <div class="fac-slot-timeline">
+                                                            <div class="timeline-header">
+                                                                <label class="timeline-label"><i class="fas fa-clock"></i> Select Hourly Slots</label>
+                                                                <span class="selection-count">{{ selectedFacilitySlots().get(f.facilityId)?.length || 0 }} Selected</span>
+                                                            </div>
+                                                            <div class="slot-grid-granular">
+                                                                @for (slot of getFacilityHourlySlots(f); track slot.time) {
+                                                                    <button type="button" class="slot-chip" 
+                                                                            [class.selected]="isSlotSelected(f.facilityId, slot.time)"
+                                                                            [class.available]="slot.status === 'Available'"
+                                                                            [class.booked]="slot.status === 'Booked'"
+                                                                            [class.closed]="slot.status === 'Closed'"
+                                                                            [disabled]="slot.status === 'Booked' || slot.status === 'Closed'"
+                                                                            (click)="toggleSlot(f.facilityId, slot.time)"
+                                                                            [title]="slot.time + ' - ' + slot.status">
+                                                                        {{ slot.time.split(':')[0] }}
+                                                                    </button>
+                                                                }
+                                                            </div>
+                                                            <div class="timeline-legend">
+                                                                <span class="legend-item"><span class="dot available"></span> Available</span>
+                                                                <span class="legend-item"><span class="dot selected"></span> Selected</span>
+                                                                <span class="legend-item"><span class="dot booked"></span> Booked</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <button class="btn-select-facility" 
+                                                                [disabled]="(selectedFacilitySlots().get(f.facilityId)?.length || 0) === 0"
+                                                                (click)="selectFacility(loc, f)">
+                                                            <i class="fas fa-check-circle"></i>
+                                                            Confirm {{ selectedFacilitySlots().get(f.facilityId)?.length || 0 }} Slots
+                                                        </button>
                                                 </div>
                                             }
                                         </div>

@@ -5,7 +5,6 @@ import { PartnerOverviewComponent } from '../../components/partner/partner-overv
 import { NearbyTeachersComponent } from '../../components/partner/nearby-teachers/nearby-teachers';
 import { NearbyStudentsComponent } from '../../components/partner/nearby-students/nearby-students';
 import { InfrastructureManagerComponent } from '../../components/partner/infrastructure-manager/infrastructure-manager';
-import { PartnerActivityComponent } from '../../components/partner/partner-activity/partner-activity';
 import { PartnerService } from '../../services/partner.service';
 
 @Component({
@@ -17,8 +16,7 @@ import { PartnerService } from '../../services/partner.service';
     PartnerOverviewComponent,
     NearbyTeachersComponent,
     NearbyStudentsComponent,
-    InfrastructureManagerComponent,
-    PartnerActivityComponent
+    InfrastructureManagerComponent
   ],
   template: `
     <app-layout>
@@ -33,15 +31,13 @@ import { PartnerService } from '../../services/partner.service';
           (radiusChange)="handleRadiusChange($event)">
         </app-partner-overview>
 
-        <!-- Activity Command Center -->
-        <app-partner-activity></app-partner-activity>
-
         <div class="dashboard-grid">
           <div class="main-content">
-            <!-- Discovery Tabs/Toggle could go here, currently vertical sections -->
-              <app-infrastructure-manager>
-            </app-infrastructure-manager>
+            <!-- Unified Control Center (Integrated Assets, Booking, Availability, Monitoring) -->
+            <app-infrastructure-manager></app-infrastructure-manager>
           </div>
+          
+          <div class="side-content">
             <app-nearby-teachers 
               [teachers]="teachers()" 
               (invite)="handleInvite($event)">
@@ -51,65 +47,31 @@ import { PartnerService } from '../../services/partner.service';
               [students]="students()" 
               (invite)="handleInvite($event)">
             </app-nearby-students>
-        </div>
-
-        <!-- Right Side Panel Content (Projected via app-dashboard-layout or similar mechanism) -->
-        <!-- In this generic app-layout, we can use named slots if supported, otherwise standard positioning -->
-        <div slot="right-panel">
-          <div class="partner-insights glass-card animated-fade-in">
-            <h3 class="panel-title"><i class="fas fa-magic"></i> Match Insights</h3>
-            
-            <div class="insight-card">
-              <p class="insight-text">High demand for <strong>STEM Workshops</strong> within 5km of your AI Lab.</p>
-              <button class="insight-action">Plan Activity</button>
-            </div>
-
-            <div class="match-suggestions">
-              <h4>Top Collaboration Fits</h4>
-              <div class="suggestion-item">
-                <div class="sugg-avatar">S</div>
-                <div class="sugg-info">
-                  <span class="sugg-name">Sameer Khan</span>
-                  <span class="sugg-match">98% Match for AI Lab</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="partner-alerts">
-              <h4>Ecosystem Alerts</h4>
-              <div class="alert-item info">
-                <i class="fas fa-info-circle"></i>
-                <span>2 new students joined in Sector 62.</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </app-layout>
   `,
   styles: [`
-    .partner-dashboard-container { padding: 1rem 0; margin: 0 auto; }
-    @media (max-width: 768px) { .partner-dashboard-container { padding: 1rem; } }
-    @media (max-width: 480px) { .partner-dashboard-container { padding: 0.75rem; } }
+    .partner-dashboard-container { 
+      padding: 1rem 0; margin: 0 auto; 
+      min-height: 100vh;
+    }
+    @media (max-width: 768px) { .partner-dashboard-container { padding: 1.5rem; } }
+    @media (max-width: 480px) { .partner-dashboard-container { padding: 1rem; } }
     
-    .dashboard-grid { display: flex; flex-direction: column; gap: 2rem; }
-
-    .partner-insights {
-      padding: 1.5rem; border-radius: 20px;
-      .panel-title { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; i { color: #8b5cf6; } }
-      h4 { font-size: 0.8rem; font-weight: 800; color: color-mix(in srgb, #fff, transparent 70%); text-transform: uppercase; margin: 1.5rem 0 1rem; }
+    .dashboard-grid { 
+      grid-template-columns: 1fr 320px; 
+      gap: 2.5rem; 
+      align-items: flex-start;
     }
+    
+    .main-content { min-width: 0; }
+    .side-content { display: flex; flex-direction: column; gap: 2rem; position: sticky; top: 100px; }
 
-    .insight-card {
-      background: color-mix(in srgb, #8b5cf6, transparent 90%); border: 1px solid color-mix(in srgb, #8b5cf6, transparent 80%); border-radius: 12px; padding: 1rem;
-      .insight-text { font-size: 0.85rem; color: #fff; margin-bottom: 0.8rem; strong { color: #8b5cf6; } }
-      .insight-action { width: 100%; background: #8b5cf6; color: #fff; border: none; padding: 0.4rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
-    }
-
-    .suggestion-item {
-      display: flex; align-items: center; gap: 0.8rem; background: color-mix(in srgb, #fff, transparent 97%); padding: 0.8rem; border-radius: 12px; margin-bottom: 0.5rem;
-      .sugg-avatar { width: 32px; height: 32px; background: color-mix(in srgb, #8b5cf6, transparent 80%); color: #8b5cf6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; }
-      .sugg-info { display: flex; flex-direction: column; .sugg-name { font-size: 0.8rem; font-weight: 700; color: #fff; } .sugg-match { font-size: 0.65rem; color: #10b981; font-weight: 600; } }
+    @media (max-width: 1200px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .side-content { position: static; }
     }
 
     .alert-item {

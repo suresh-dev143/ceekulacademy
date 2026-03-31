@@ -273,17 +273,21 @@
                         </button>
                     </div>
                     } @else {
-                    <div class="wd-selected-facility">
+                    <div class="wd-selected-facility glass-card">
                         <div class="wd-facility-info">
-                            <i class="fas fa-university"></i>
-                            <div>
-                                <strong>{{ addForm.get('location')?.value }}</strong>
-                                <span>{{ addForm.get('facilityType')?.value }}</span>
+                            <div class="wd-facility-icon">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="wd-facility-text">
+                                <span class="wd-facility-name">{{ addForm.get('location')?.value }}</span>
+                                <span class="wd-facility-type">
+                                    <i class="fas fa-microchip"></i> Verified Partner Facility ({{ addForm.get('facilityType')?.value }})
+                                </span>
                             </div>
                         </div>
                         <button type="button" class="wd-facility-remove" (click)="removeFacility()"
                             title="Change Facility">
-                            <i class="fas fa-times"></i>
+                            <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
                     }
@@ -448,6 +452,11 @@
                             @if (s.fee === 0) {
                             <span class="wd-tag wd-tag--free">Free</span>
                             }
+                            @if (s.partnerId) {
+                            <span class="wd-tag wd-tag--partner">
+                                <i class="fas fa-shield-alt"></i> Partner Hosted
+                            </span>
+                            }
                         </div>
                     </div>
 
@@ -476,6 +485,12 @@
                             <i class="fas fa-chalkboard-teacher"></i>
                             {{ s.instructorId?.name || 'Expert' }}
                         </span>
+
+                        @if (s.partnerId) {
+                        <span class="wd-booking-status-badge">
+                            <i class="fas fa-check-double"></i> Confirmed Delivery
+                        </span>
+                        }
                     </div>
                 </div>
 
@@ -666,11 +681,15 @@
 
     <!-- ══ Facility Discovery Overlay ══════════════════════════════════════════ -->
     @if (showDiscovery()) {
-    <app-facility-discovery [sessionDate]="addForm.get('date')?.value || ''"
+    <app-facility-discovery 
+        [sessionDate]="addForm.get('date')?.value || ''"
         [sessionStartTime]="addForm.get('startTime')?.value || ''" 
         [sessionEndTime]="addForm.get('endTime')?.value || ''"
         [isOffline]="isSavedOffline()"
-        [requiredCapacity]="0" (facilitySelected)="onFacilitySelected($event)" (close)="closeDiscovery()">
+        [requiredSlots]="1"
+        [requiredCapacity]="0" 
+        (facilitySelected)="onFacilitySelected($event)" 
+        (close)="closeDiscovery()">
     </app-facility-discovery>
     }
 

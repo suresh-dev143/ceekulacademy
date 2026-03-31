@@ -8,6 +8,8 @@ import { finalize } from 'rxjs';
 import { AppValidationErrorComponent } from '../../shared/validation-error/validation-error.component';
 import { ValidationService } from '../../../core/services/validation.service';
 import { LocationService } from '../../../core/services/location.service';
+import { SlotOrchestrator } from '../../../core/utils/slot-orchestrator.util';
+import { HourlySlot } from '../../../core/models/infrastructure.model';
 
 @Component({
   selector: 'app-infrastructure-form',
@@ -50,6 +52,53 @@ import { LocationService } from '../../../core/services/location.service';
       .form-container { padding: 1.5rem; }
       .schedule-grid { grid-template-columns: 1fr 1fr; }
     }
+
+    .slot-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 0.4rem;
+      margin-top: 0.8rem;
+      padding: 0.8rem;
+      background: #050505;
+      border: 1px solid #1a1a1a;
+      border-radius: 6px;
+    }
+
+    .slot-item {
+      padding: 0.4rem;
+      font-size: 0.65rem;
+      text-align: center;
+      background: #111;
+      border: 1px solid #222;
+      color: #666;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+      
+      &.available {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: #10b981;
+        color: #10b981;
+        font-weight: 700;
+      }
+
+      &.booked {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
+        color: #ef4444;
+      }
+
+      &.closed {
+        opacity: 0.5;
+      }
+
+      &.active {
+        border-color: #ef9d57;
+        box-shadow: 0 0 8px rgba(239, 157, 87, 0.3);
+        transform: scale(1.05);
+        color: #ef9d57;
+      }
+    }
   `]
 })
 export class InfrastructureFormComponent implements OnInit {
@@ -64,6 +113,12 @@ export class InfrastructureFormComponent implements OnInit {
 
   isLoading = signal(false);
   isEditMode = signal(false);
+  activeSlot = signal<{ 
+    type: 'classrooms' | 'computerLabs' | 'otherFacilities'; 
+    facIndex: number; 
+    dayIndex: number; 
+    slotIndex: number 
+  } | null>(null);
 
   infraForm: FormGroup = this.fb.group({
     title: ['', Validators.required],
@@ -169,6 +224,10 @@ export class InfrastructureFormComponent implements OnInit {
     return control.get('availabilitySchedule') as FormArray;
   }
 
+  getPricingType(array: FormArray, index: number): string {
+    return array.at(index).get('pricing.type')?.value;
+  }
+
   // --- ARRAY ACTIONS ---
   addClassroom(data?: any) {
     const group = this.fb.group({
@@ -245,13 +304,64 @@ export class InfrastructureFormComponent implements OnInit {
   removeFacility(index: number) { this.otherFacilities.removeAt(index); }
 
   addScheduleSlot(array: FormArray, data?: any) {
+    // Extract pricing from the first slot if available (for patching)
+    const firstSlotPricing = data?.slots?.[0]?.pricing || { type: 'Free', amount: 0, unit: 'Hourly' };
+
     array.push(this.fb.group({
       day: [data?.day || 'Monday', Validators.required],
-      startTime: [data?.startTime || '', Validators.required],
-      endTime: [data?.endTime || '', Validators.required],
+      date: [data?.date || null],
       status: [data?.status || 'Available', Validators.required],
+      slots: this.fb.array(
+        (data?.slots || SlotOrchestrator.generateStandardSlots()).map((s: any) => this.fb.group({
+          time: [s.time],
+          status: [s.status],
+          pricing: this.fb.group({
+            type: [s.pricing?.type || 'Free'],
+            amount: [s.pricing?.amount || 0],
+            unit: [s.pricing?.unit || 'Hourly']
+          })
+        }))
+      ),
+      pricing: this.fb.group({
+        type: [firstSlotPricing.type || 'Free', Validators.required],
+        amount: [firstSlotPricing.amount || 0, [Validators.required, Validators.min(0)]],
+        unit: [firstSlotPricing.unit || 'Hourly', Validators.required]
+      }),
       notes: [data?.notes || '']
     }));
+  }
+
+  getSlots(array: FormArray, dayIndex: number): FormArray {
+    return array.at(dayIndex).get('slots') as FormArray;
+  }
+
+  selectSlot(type: any, facIndex: number, dayIndex: number, slotIndex: number) {
+    this.activeSlot.set({ type, facIndex, dayIndex, slotIndex });
+  }
+
+  applyPriceToAllSlots(array: FormArray, dayIndex: number) {
+    const dayGroup = array.at(dayIndex);
+    const dayPricing = dayGroup.get('pricing')?.value;
+    const slotsArray = dayGroup.get('slots') as FormArray;
+
+    slotsArray.controls.forEach(control => {
+      control.get('pricing')?.patchValue(dayPricing);
+    });
+
+    this.toastService.success('Daily pricing applied to all slots for this day.');
+  }
+
+  toggleSlot(array: FormArray, scheduleIndex: number, slotIndex: number, type: any, facIndex: number) {
+    const slotsArray = this.getSlots(array, scheduleIndex);
+    const slotGroup = slotsArray.at(slotIndex);
+    const currentStatus = slotGroup.get('status')?.value;
+
+    slotGroup.patchValue({
+      status: currentStatus === 'Available' ? 'Closed' : 'Available'
+    });
+
+    this.selectSlot(type, facIndex, scheduleIndex, slotIndex);
+    this.infraForm.markAsDirty();
   }
 
   removeScheduleSlot(array: FormArray, index: number) {
@@ -274,6 +384,37 @@ export class InfrastructureFormComponent implements OnInit {
     this.isLoading.set(true);
     const formVals = this.infraForm.value;
 
+    // Helper to extract time range from slots and inject pricing
+    const processSchedule = (schedule: any[]) => {
+      return schedule.map(s => {
+        const slots = s.slots as HourlySlot[];
+        const availableSlots = slots.filter(slot => slot.status === 'Available');
+        let startTime = '09:00'; // Defaults
+        let endTime = '10:00';
+
+        if (availableSlots.length > 0) {
+          // Sort slots by the time range string
+          availableSlots.sort((a, b) => a.time.localeCompare(b.time));
+          
+          // Extract "09:00" from "09:00-10:00"
+          startTime = availableSlots[0].time.split('-')[0];
+          
+          // Extract "10:00" from "09:00-10:00"
+          endTime = availableSlots[availableSlots.length - 1].time.split('-')[1];
+        }
+
+        // We remove the day-level pricing from the final payload sent to backend
+        // since individual slots already carry their own pricing.
+        const { pricing, ...rest } = s;
+        
+        return {
+          ...rest,
+          startTime,
+          endTime
+        };
+      });
+    };
+
     // Process array fields (strings to arrays)
     const payload: any = {
       ...formVals,
@@ -283,11 +424,17 @@ export class InfrastructureFormComponent implements OnInit {
         furniture: this.splitStrings(c.furniture),
         lighting: this.splitStrings(c.lighting),
         ventilation: this.splitStrings(c.ventilation),
-        accessibility: this.splitStrings(c.accessibility)
+        accessibility: this.splitStrings(c.accessibility),
+        availabilitySchedule: processSchedule(c.availabilitySchedule)
       })),
       computerLabs: formVals.computerLabs.map((lab: any) => ({
         ...lab,
-        softwareAvailable: this.splitStrings(lab.softwareAvailable)
+        softwareAvailable: this.splitStrings(lab.softwareAvailable),
+        availabilitySchedule: processSchedule(lab.availabilitySchedule)
+      })),
+      otherFacilities: formVals.otherFacilities.map((f: any) => ({
+        ...f,
+        availabilitySchedule: processSchedule(f.availabilitySchedule)
       }))
     };
 

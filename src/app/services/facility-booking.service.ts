@@ -6,6 +6,8 @@ import { environment } from '../../environments/environment';
 import { InfrastructureService } from '../core/services/infrastructure.service';
 import { InfrastructureData, Classroom, ComputerLab, OtherFacility } from '../core/models/infrastructure.model';
 import { WorkshopService, WorkshopListItem, WorkshopApiSchedule } from './workshop.service';
+import { SlotOrchestrator } from '../core/utils/slot-orchestrator.util';
+import { HourlySlot } from '../core/models/infrastructure.model';
 
 export interface FacilityDetail {
     facilityId: string;
@@ -19,6 +21,7 @@ export interface FacilityDetail {
         unit: 'Hourly' | 'Session';
     };
     isRecommended?: boolean;
+    slots?: HourlySlot[]; // New granular slot-based model
 }
 
 export interface PartnerLocationSearchResult {
@@ -41,6 +44,7 @@ export interface FacilityFilters {
     date?: string;
     startTime?: string;
     endTime?: string;
+    requiredSlots?: number; // New: number of 1-hour slots needed
 }
 
 @Injectable({
@@ -83,23 +87,31 @@ export class FacilityBookingService {
     }
 
     /**
-     * Checks if a facility is available for a specific time slot (Refined).
+     * Checks if a facility is available for a specific time slot (Refined for Hourly Slots).
      */
-    checkAvailability(facilityId: string, date: string, startTime: string, endTime: string): Observable<{ available: boolean; conflict?: any }> {
-        // Mock conflict: Computer Lab 2 (f103) is always booked
-        const isConflict = facilityId === 'f103';
+    checkAvailability(facilityId: string, date: string, slots: string[]): Observable<{ available: boolean; conflict?: any }> {
+        // Mock checking against a list of slots
+        const isConflict = facilityId === 'f103' && slots.includes('09:00-10:00');
         
         return of({
             available: !isConflict,
-            conflict: isConflict ? { message: 'Conflict: This facility is reserved by another session.' } : undefined
+            conflict: isConflict ? { message: 'Conflict: One of the selected slots is already reserved.' } : undefined
         }).pipe(delay(300));
     }
 
     /**
-     * Books a facility for a session.
+     * Books a facility for one or more sessions.
      */
-    bookFacility(payload: { sessionId: string; facilityId: string; date: string; startTime: string; endTime: string }): Observable<{ status: boolean; message: string }> {
-        return of({ status: true, message: 'Facility booked successfully!' }).pipe(delay(500));
+    bookFacility(payload: { sessionId: string; facilityId: string; date: string; slots: string[] }): Observable<{ status: boolean; message: string }> {
+        return this.checkAvailability(payload.facilityId, payload.date, payload.slots).pipe(
+            map(res => {
+                if (res.available) {
+                    return { status: true, message: 'Facility booked successfully for your session(s)!' };
+                }
+                return { status: false, message: res.conflict?.message || 'Booking failed.' };
+            }),
+            delay(200)
+        );
     }
 
     /**

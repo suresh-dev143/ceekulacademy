@@ -7,6 +7,8 @@ import { OtherFacilityResponse, OtherFacility, UpdateFacilityPayload } from '../
 import { finalize } from 'rxjs';
 import { AppValidationErrorComponent } from '../../shared/validation-error/validation-error.component';
 import { ValidationService } from '../../../core/services/validation.service';
+import { SlotOrchestrator } from '../../../core/utils/slot-orchestrator.util';
+import { HourlySlot } from '../../../core/models/infrastructure.model';
 
 @Component({
   selector: 'app-facility-form',
@@ -19,7 +21,7 @@ import { ValidationService } from '../../../core/services/validation.service';
     .section-title { font-size: 1.2rem; font-weight: 700; color: #ef9d57; margin-bottom: 1rem; text-transform: uppercase; }
     .form-group { margin-bottom: 1rem; }
     .form-label { display: block; margin-bottom: 0.5rem; color: #aaa; font-size: 0.9rem; }
-    .form-control { width: 100%; padding: 0.8rem; background: #111; border: 1px solid #333; color: #fff; border-radius: 4px; }
+    .form-control { width: 100%; background: #111; border: 1px solid #333; color: #fff; border-radius: 4px; }
     .form-control:focus { border-color: #ef9d57; outline: none; }
     .form-control.is-invalid { border-color: #ff4d4d; }
     .btn-primary { background: #ef9d57; color: #000; padding: 0.8rem 1.5rem; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
@@ -39,6 +41,54 @@ import { ValidationService } from '../../../core/services/validation.service';
         .grid-header:nth-child(n+3) { display: none; }
       }
       .toggle-group { flex-direction: column; gap: 1rem; }
+    }
+
+    .slot-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #050505;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+    }
+
+    .slot-item {
+      padding: 0.5rem;
+      font-size: 0.7rem;
+      text-align: center;
+      background: #111;
+      border: 1px solid #222;
+      color: #666;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+      user-select: none;
+
+      &.available {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: #10b981;
+        color: #10b981;
+        font-weight: 700;
+      }
+
+      &.booked {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
+        color: #ef4444;
+      }
+
+      &.closed {
+        opacity: 0.5;
+      }
+
+      &.active {
+        border-color: #ef9d57;
+        box-shadow: 0 0 8px rgba(239, 157, 87, 0.3);
+        transform: scale(1.05);
+        color: #ef9d57;
+      }
     }
   `]
 })
@@ -67,6 +117,8 @@ export class FacilityFormComponent implements OnInit {
     availabilitySchedule: this.fb.array([])
   });
 
+  activeSlot = signal<{ dayIndex: number; slotIndex: number } | null>(null);
+
   ngOnInit() {
     if (this.editData) {
       this.patchForm(this.editData);
@@ -88,16 +140,27 @@ export class FacilityFormComponent implements OnInit {
     });
 
     if (data.availabilitySchedule && data.availabilitySchedule.length > 0) {
+      this.availabilitySchedule.clear();
       data.availabilitySchedule.forEach(slot => {
         this.availabilitySchedule.push(this.fb.group({
           day: [slot.day, Validators.required],
-          startTime: [slot.startTime, Validators.required],
-          endTime: [slot.endTime, Validators.required],
-          status: [slot.status, Validators.required],
+          date: [slot.date || null],
+          status: [slot.status || 'Available', Validators.required],
+          slots: this.fb.array(
+            (slot.slots || SlotOrchestrator.generateStandardSlots()).map(s => this.fb.group({
+              time: [s.time],
+              status: [s.status],
+              pricing: this.fb.group({
+                type: [s.pricing?.type || 'Free'],
+                amount: [s.pricing?.amount || 0],
+                unit: [s.pricing?.unit || 'Hourly']
+              })
+            }))
+          ),
           pricing: this.fb.group({
-            type: [slot.pricing?.type || 'Free', Validators.required],
-            amount: [slot.pricing?.amount || 0, [Validators.required, Validators.min(0)]],
-            unit: [slot.pricing?.unit || 'Hourly', Validators.required]
+            type: [slot.slots?.[0]?.pricing?.type || 'Free', Validators.required],
+            amount: [slot.slots?.[0]?.pricing?.amount || 0, [Validators.required, Validators.min(0)]],
+            unit: [slot.slots?.[0]?.pricing?.unit || 'Hourly', Validators.required]
           }),
           notes: [slot.notes || '']
         }));
@@ -114,9 +177,19 @@ export class FacilityFormComponent implements OnInit {
   addScheduleSlot() {
     this.availabilitySchedule.push(this.fb.group({
       day: ['Monday', Validators.required],
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required],
+      date: [null],
       status: ['Available', Validators.required],
+      slots: this.fb.array(
+        SlotOrchestrator.generateStandardSlots().map(s => this.fb.group({
+          time: [s.time],
+          status: [s.status],
+          pricing: this.fb.group({
+            type: ['Free'],
+            amount: [0],
+            unit: ['Hourly']
+          })
+        }))
+      ),
       pricing: this.fb.group({
         type: ['Free', Validators.required],
         amount: [0, [Validators.required, Validators.min(0)]],
@@ -124,6 +197,78 @@ export class FacilityFormComponent implements OnInit {
       }),
       notes: ['']
     }));
+  }
+
+  getSlots(dayIndex: number): FormArray {
+    return this.availabilitySchedule.at(dayIndex).get('slots') as FormArray;
+  }
+
+  selectSlot(dayIndex: number, slotIndex: number) {
+    this.activeSlot.set({ dayIndex, slotIndex });
+  }
+
+  applyPriceToAllSlots(dayIndex: number) {
+    const dayGroup = this.availabilitySchedule.at(dayIndex);
+    const dayPricing = dayGroup.get('pricing')?.value;
+    const slotsArray = dayGroup.get('slots') as FormArray;
+
+    slotsArray.controls.forEach(control => {
+      control.get('pricing')?.patchValue(dayPricing);
+    });
+
+    this.toastService.success('Daily pricing applied to all slots for this day.');
+  }
+
+  applyToWeek(index: number) {
+    const sourceGroup = this.availabilitySchedule.at(index);
+    const sourceData = sourceGroup.getRawValue(); // Use RawValue to get all nested FormArray values
+    
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    
+    // Clear and refill with the source data for each day of the week
+    while (this.availabilitySchedule.length > 0) {
+      this.availabilitySchedule.removeAt(0);
+    }
+    
+    days.forEach(dayName => {
+      this.availabilitySchedule.push(this.fb.group({
+        day: [dayName, Validators.required],
+        date: [null],
+        status: [sourceData.status || 'Available', Validators.required],
+        slots: this.fb.array(
+          sourceData.slots.map((s: any) => this.fb.group({
+            time: [s.time],
+            status: [s.status],
+            pricing: this.fb.group({
+              type: [s.pricing.type],
+              amount: [s.pricing.amount],
+              unit: [s.pricing.unit]
+            })
+          }))
+        ),
+        pricing: this.fb.group({
+          type: [sourceData.pricing.type, Validators.required],
+          amount: [sourceData.pricing.amount, [Validators.required, Validators.min(0)]],
+          unit: [sourceData.pricing.unit, Validators.required]
+        }),
+        notes: [sourceData.notes || '']
+      }));
+    });
+    
+    this.toastService.success('Schedule applied to the entire week!');
+  }
+
+  toggleSlot(scheduleIndex: number, slotIndex: number) {
+    const slotsArray = this.getSlots(scheduleIndex);
+    const slotGroup = slotsArray.at(slotIndex);
+    const currentStatus = slotGroup.get('status')?.value;
+
+    slotGroup.patchValue({
+      status: currentStatus === 'Available' ? 'Closed' : 'Available'
+    });
+
+    this.selectSlot(scheduleIndex, slotIndex);
+    this.availabilitySchedule.markAsDirty();
   }
 
   removeScheduleSlot(index: number) {
@@ -166,18 +311,31 @@ export class FacilityFormComponent implements OnInit {
     this.isLoading.set(true);
     const formVals = this.facilityForm.value;
 
+    if (formVals.availabilitySchedule) {
+      formVals.availabilitySchedule = formVals.availabilitySchedule.map((day: any) => {
+        const slots = day.slots as HourlySlot[];
+        const availableSlots = slots.filter(slot => slot.status === 'Available');
+        let startTime = '09:00';
+        let endTime = '10:00';
+
+        if (availableSlots.length > 0) {
+          availableSlots.sort((a, b) => a.time.localeCompare(b.time));
+          startTime = availableSlots[0].time.split('-')[0];
+          endTime = availableSlots[availableSlots.length - 1].time.split('-')[1];
+        }
+
+        const { pricing, ...rest } = day;
+        return {
+          ...rest,
+          startTime,
+          endTime
+        };
+      });
+    }
+
     if (this.editData) {
       // Edit Mode
-      let dirtyPayload: UpdateFacilityPayload = this.getDirtyValues(this.facilityForm);
-
-      if (!dirtyPayload) {
-        this.isLoading.set(false);
-        this.toastService.success('No changes to save.');
-        this.close.emit();
-        return;
-      }
-
-      this.infraService.updateFacility(this.infraId, this.editData._id || this.editData.id, dirtyPayload)
+      this.infraService.updateFacility(this.infraId, this.editData._id || this.editData.id, formVals)
         .pipe(finalize(() => this.isLoading.set(false)))
         .subscribe({
           next: (res: OtherFacilityResponse) => {
@@ -201,12 +359,7 @@ export class FacilityFormComponent implements OnInit {
 
     } else {
       // Add Mode
-      const payload: OtherFacility = {
-        ...formVals,
-        pricing: formVals.pricing
-      };
-
-      this.infraService.addFacility(this.infraId, payload)
+      this.infraService.addFacility(this.infraId, formVals)
         .pipe(finalize(() => this.isLoading.set(false)))
         .subscribe({
           next: (res: OtherFacilityResponse) => {

@@ -101,7 +101,7 @@
         </div>
 
         <div formArrayName="classrooms">
-            @for (classroom of classrooms.controls; track $index) {
+            @for (classroom of classrooms.controls; track $index; let facIndex = $index) {
             <div [formGroupName]="$index" class="nested-section animate-fade-in">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
                     <h5 style="margin: 0; color: #ef9d57;">Classroom #{{ $index + 1 }}</h5>
@@ -192,39 +192,101 @@
                     <textarea class="form-control" formControlName="specializedEquipment" rows="1" placeholder="e.g. Microscopes"></textarea>
                 </div>
 
-                <!-- Availability Schedule Block -->
-                <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
-                    <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
-                    <div formArrayName="availabilitySchedule">
-                        @for (slot of getSchedule(classroom).controls; track $index) {
-                        <div [formGroupName]="$index" class="schedule-grid">
-                            <select class="form-control" formControlName="day" style="padding: 0.4rem;">
-                                <option>Monday</option>
-                                <option>Tuesday</option>
-                                <option>Wednesday</option>
-                                <option>Thursday</option>
-                                <option>Friday</option>
-                                <option>Saturday</option>
-                                <option>Sunday</option>
-                            </select>
-                            <input type="time" class="form-control" formControlName="startTime" style="padding: 0.4rem;">
-                            <input type="time" class="form-control" formControlName="endTime" style="padding: 0.4rem;">
-                            <select class="form-control" formControlName="status" style="padding: 0.4rem;">
-                                <option>Available</option>
-                                <option>Booked</option>
-                                <option>Maintenance</option>
-                            </select>
-                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..." style="padding: 0.4rem;">
-                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;" (click)="removeScheduleSlot(getSchedule(classroom), $index)">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                    <!-- Availability Schedule Block -->
+                    <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
+                        <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
+                        <div formArrayName="availabilitySchedule">
+                            @for (slot of getSchedule(classroom).controls; track $index; let dayIndex = $index) {
+                            <div [formGroupName]="dayIndex" style="margin-bottom: 1rem; border: 1px solid #333; padding: 1rem; border-radius: 4px;">
+                                <div class="schedule-grid" style="grid-template-columns: 1fr 1fr 1.5fr auto;">
+                                    <select class="form-control" formControlName="day" style="padding: 0.4rem;">
+                                        <option>Monday</option>
+                                        <option>Tuesday</option>
+                                        <option>Wednesday</option>
+                                        <option>Thursday</option>
+                                        <option>Friday</option>
+                                        <option>Saturday</option>
+                                        <option>Sunday</option>
+                                    </select>
+                                    <input type="date" class="form-control" formControlName="date" style="padding: 0.4rem;" placeholder="Specific Date">
+                                    <select class="form-control" formControlName="status" style="padding: 0.4rem;">
+                                        <option>Available</option>
+                                        <option>Maintenance</option>
+                                        <option>Closed</option>
+                                    </select>
+                                    <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;" (click)="removeScheduleSlot(getSchedule(classroom), dayIndex)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Slot Grid -->
+                                <div class="slot-grid-section">
+                                    <label class="form-label" style="font-size: 0.7rem; color: #888; margin-top: 0.5rem;">Hourly Slots (Click to toggle status, then select to edit pricing)</label>
+                                    <div class="slot-grid-container" formArrayName="slots">
+                                        <div *ngFor="let s of getSlots(getSchedule(classroom), dayIndex).controls; let sid = index" [formGroupName]="sid" class="slot-item" 
+                                            [class.available]="s.get('status')?.value === 'Available'"
+                                            [class.booked]="s.get('status')?.value === 'Booked'"
+                                            [class.closed]="s.get('status')?.value === 'Closed'"
+                                            [class.active]="activeSlot()?.type === 'classrooms' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex && activeSlot()?.slotIndex === sid"
+                                            (click)="toggleSlot(getSchedule(classroom), dayIndex, sid, 'classrooms', facIndex)">
+                                            {{ s.get('time')?.value.split('-')[0] }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Active Slot Editor -->
+                                <div *ngIf="activeSlot()?.type === 'classrooms' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex" class="nested-section animate-fade-in" style="margin-top: 1rem; padding: 0.8rem; background: rgba(239, 157, 87, 0.05); border-style: dashed;">
+                                    <div [formGroup]="$any(getSlots(getSchedule(classroom), dayIndex).at(activeSlot()!.slotIndex))">
+                                        <h6 style="font-size: 0.7rem; color: #ef9d57; margin-bottom: 0.5rem; text-transform: uppercase;">Pricing for {{ getSlots(getSchedule(classroom), dayIndex).at(activeSlot()!.slotIndex).get('time')?.value }}</h6>
+                                        <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.8rem;">
+                                            <div>
+                                                <select class="form-control" formControlName="type" style="padding: 0.3rem; font-size: 0.75rem;">
+                                                    <option value="Free">Free</option>
+                                                    <option value="Fixed">Fixed Rate</option>
+                                                    <option value="Share">Revenue Share %</option>
+                                                </select>
+                                            </div>
+                                            <div *ngIf="getSlots(getSchedule(classroom), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value !== 'Free'">
+                                                <input type="number" class="form-control" formControlName="amount" style="padding: 0.3rem; font-size: 0.75rem;" [placeholder]="getSlots(getSchedule(classroom), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value === 'Share' ? '%' : '₹'">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Day-level Bulk Pricing -->
+                                <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 0.8rem; margin-top: 1rem; border-top: 1px solid #333; padding-top: 0.8rem;">
+                                    <div>
+                                        <label class="form-label" style="font-size: 0.65rem; color: #ef9d57;">Day Default Pricing</label>
+                                        <select class="form-control" formControlName="type" style="padding: 0.4rem; font-size: 0.8rem;">
+                                            <option value="Free">Free</option>
+                                            <option value="Fixed">Fixed Rate</option>
+                                            <option value="Share">Revenue Share %</option>
+                                        </select>
+                                    </div>
+                                    @if(getPricingType(getSchedule(classroom), dayIndex) !== 'Free') {
+                                        <div class="animate-fade-in">
+                                            <label class="form-label" style="font-size: 0.65rem; color: #888;">Default {{ getPricingType(getSchedule(classroom), dayIndex) === 'Share' ? 'Share %' : 'Rate' }}</label>
+                                            <input type="number" class="form-control" formControlName="amount" style="padding: 0.4rem; font-size: 0.8rem;">
+                                        </div>
+                                        <div class="animate-fade-in">
+                                            <label class="form-label" style="font-size: 0.65rem; color: #888;">Unit</label>
+                                            <select class="form-control" formControlName="unit" style="padding: 0.4rem; font-size: 0.8rem;">
+                                                <option value="Hourly">Hourly</option>
+                                                <option value="Session">Per Session</option>
+                                            </select>
+                                        </div>
+                                    }
+                                    <div style="display: flex; align-items: flex-end;">
+                                        <button type="button" class="btn-outline" style="font-size: 0.6rem; padding: 0.4rem;" (click)="applyPriceToAllSlots(getSchedule(classroom), dayIndex)">Apply to All</button>
+                                    </div>
+                                </div>
+                            </div>
+                            }
                         </div>
-                        }
+                        <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;" (click)="addScheduleSlot(getSchedule(classroom))">
+                            + Add Schedule Day
+                        </button>
                     </div>
-                    <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;" (click)="addScheduleSlot(getSchedule(classroom))">
-                        + Add Time Slot
-                    </button>
-                </div>
 
             </div>
             }
@@ -239,7 +301,7 @@
         </div>
 
         <div formArrayName="computerLabs">
-            @for (lab of computerLabs.controls; track $index) {
+            @for (lab of computerLabs.controls; track $index; let facIndex = $index) {
             <div [formGroupName]="$index" class="nested-section animate-fade-in">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
                     <h5 style="margin: 0; color: #ef9d57;">Lab #{{ $index + 1 }}</h5>
@@ -286,33 +348,95 @@
                 <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
                     <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
                     <div formArrayName="availabilitySchedule">
-                        @for (slot of getSchedule(lab).controls; track $index) {
-                        <div [formGroupName]="$index" class="schedule-grid">
-                            <select class="form-control" formControlName="day" style="padding: 0.4rem;">
-                                <option>Monday</option>
-                                <option>Tuesday</option>
-                                <option>Wednesday</option>
-                                <option>Thursday</option>
-                                <option>Friday</option>
-                                <option>Saturday</option>
-                                <option>Sunday</option>
-                            </select>
-                            <input type="time" class="form-control" formControlName="startTime" style="padding: 0.4rem;">
-                            <input type="time" class="form-control" formControlName="endTime" style="padding: 0.4rem;">
-                            <select class="form-control" formControlName="status" style="padding: 0.4rem;">
-                                <option>Available</option>
-                                <option>Booked</option>
-                                <option>Maintenance</option>
-                            </select>
-                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..." style="padding: 0.4rem;">
-                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;" (click)="removeScheduleSlot(getSchedule(lab), $index)">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        @for (slot of getSchedule(lab).controls; track $index; let dayIndex = $index) {
+                        <div [formGroupName]="dayIndex" style="margin-bottom: 1rem; border: 1px solid #333; padding: 1rem; border-radius: 4px;">
+                            <div class="schedule-grid" style="grid-template-columns: 1fr 1fr 1.5fr auto;">
+                                <select class="form-control" formControlName="day" style="padding: 0.4rem;">
+                                    <option>Monday</option>
+                                    <option>Tuesday</option>
+                                    <option>Wednesday</option>
+                                    <option>Thursday</option>
+                                    <option>Friday</option>
+                                    <option>Saturday</option>
+                                    <option>Sunday</option>
+                                </select>
+                                <input type="date" class="form-control" formControlName="date" style="padding: 0.4rem;">
+                                <select class="form-control" formControlName="status" style="padding: 0.4rem;">
+                                    <option>Available</option>
+                                    <option>Maintenance</option>
+                                    <option>Closed</option>
+                                </select>
+                                <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;" (click)="removeScheduleSlot(getSchedule(lab), dayIndex)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <!-- Slot Grid -->
+                            <div class="slot-grid-section">
+                                <label class="form-label" style="font-size: 0.7rem; color: #888; margin-top: 0.5rem;">Hourly Slots (Click to toggle status, then select to edit pricing)</label>
+                                <div class="slot-grid-container" formArrayName="slots">
+                                    <div *ngFor="let s of getSlots(getSchedule(lab), dayIndex).controls; let sid = index" [formGroupName]="sid" class="slot-item" 
+                                        [class.available]="s.get('status')?.value === 'Available'"
+                                        [class.booked]="s.get('status')?.value === 'Booked'"
+                                        [class.closed]="s.get('status')?.value === 'Closed'"
+                                        [class.active]="activeSlot()?.type === 'computerLabs' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex && activeSlot()?.slotIndex === sid"
+                                        (click)="toggleSlot(getSchedule(lab), dayIndex, sid, 'computerLabs', facIndex)">
+                                        {{ s.get('time')?.value.split('-')[0] }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Active Slot Editor -->
+                            <div *ngIf="activeSlot()?.type === 'computerLabs' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex" class="nested-section animate-fade-in" style="margin-top: 1rem; padding: 0.8rem; background: rgba(239, 157, 87, 0.05); border-style: dashed;">
+                                <div [formGroup]="$any(getSlots(getSchedule(lab), dayIndex).at(activeSlot()!.slotIndex))">
+                                    <h6 style="font-size: 0.7rem; color: #ef9d57; margin-bottom: 0.5rem; text-transform: uppercase;">Pricing for {{ getSlots(getSchedule(lab), dayIndex).at(activeSlot()!.slotIndex).get('time')?.value }}</h6>
+                                    <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.8rem;">
+                                        <div>
+                                            <select class="form-control" formControlName="type" style="padding: 0.3rem; font-size: 0.75rem;">
+                                                <option value="Free">Free</option>
+                                                <option value="Fixed">Fixed Rate</option>
+                                                <option value="Share">Revenue Share %</option>
+                                            </select>
+                                        </div>
+                                        <div *ngIf="getSlots(getSchedule(lab), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value !== 'Free'">
+                                            <input type="number" class="form-control" formControlName="amount" style="padding: 0.3rem; font-size: 0.75rem;" [placeholder]="getSlots(getSchedule(lab), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value === 'Share' ? '%' : '₹'">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Day-level Bulk Pricing -->
+                            <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 0.8rem; margin-top: 1rem; border-top: 1px solid #333; padding-top: 0.8rem;">
+                                <div>
+                                    <label class="form-label" style="font-size: 0.65rem; color: #ef9d57;">Day Default Pricing</label>
+                                    <select class="form-control" formControlName="type" style="padding: 0.4rem; font-size: 0.8rem;">
+                                        <option value="Free">Free</option>
+                                        <option value="Fixed">Fixed Rate</option>
+                                        <option value="Share">Revenue Share %</option>
+                                    </select>
+                                </div>
+                                @if(getPricingType(getSchedule(lab), dayIndex) !== 'Free') {
+                                    <div class="animate-fade-in">
+                                        <label class="form-label" style="font-size: 0.65rem; color: #888;">Default {{ getPricingType(getSchedule(lab), dayIndex) === 'Share' ? 'Share %' : 'Rate' }}</label>
+                                        <input type="number" class="form-control" formControlName="amount" style="padding: 0.4rem; font-size: 0.8rem;">
+                                    </div>
+                                    <div class="animate-fade-in">
+                                        <label class="form-label" style="font-size: 0.65rem; color: #888;">Unit</label>
+                                        <select class="form-control" formControlName="unit" style="padding: 0.4rem; font-size: 0.8rem;">
+                                            <option value="Hourly">Hourly</option>
+                                            <option value="Session">Per Session</option>
+                                        </select>
+                                    </div>
+                                }
+                                <div style="display: flex; align-items: flex-end;">
+                                    <button type="button" class="btn-outline" style="font-size: 0.6rem; padding: 0.4rem;" (click)="applyPriceToAllSlots(getSchedule(lab), dayIndex)">Apply to All</button>
+                                </div>
+                            </div>
                         </div>
                         }
                     </div>
                     <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;" (click)="addScheduleSlot(getSchedule(lab))">
-                        + Add Time Slot
+                        + Add Schedule Day
                     </button>
                 </div>
             </div>
@@ -328,7 +452,7 @@
         </div>
 
         <div formArrayName="otherFacilities">
-            @for (fac of otherFacilities.controls; track $index) {
+            @for (fac of otherFacilities.controls; track $index; let facIndex = $index) {
             <div [formGroupName]="$index" class="nested-section animate-fade-in">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
                     <h5 style="margin: 0; color: #ef9d57;">Facility #{{ $index + 1 }}</h5>
@@ -377,33 +501,95 @@
                 <div style="margin-top: 1.5rem; background: #1a1a1a; padding: 1rem; border-radius: 4px;">
                     <label class="form-label" style="color: #ddd; margin-bottom: 0.5rem;">Availability Schedule</label>
                     <div formArrayName="availabilitySchedule">
-                        @for (slot of getSchedule(fac).controls; track $index) {
-                        <div [formGroupName]="$index" class="schedule-grid">
-                            <select class="form-control" formControlName="day" style="padding: 0.4rem;">
-                                <option>Monday</option>
-                                <option>Tuesday</option>
-                                <option>Wednesday</option>
-                                <option>Thursday</option>
-                                <option>Friday</option>
-                                <option>Saturday</option>
-                                <option>Sunday</option>
-                            </select>
-                            <input type="time" class="form-control" formControlName="startTime" style="padding: 0.4rem;">
-                            <input type="time" class="form-control" formControlName="endTime" style="padding: 0.4rem;">
-                            <select class="form-control" formControlName="status" style="padding: 0.4rem;">
-                                <option>Available</option>
-                                <option>Booked</option>
-                                <option>Maintenance</option>
-                            </select>
-                            <input type="text" class="form-control" formControlName="notes" placeholder="Notes..." style="padding: 0.4rem;">
-                            <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;" (click)="removeScheduleSlot(getSchedule(fac), $index)">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        @for (slot of getSchedule(fac).controls; track $index; let dayIndex = $index) {
+                        <div [formGroupName]="dayIndex" style="margin-bottom: 1rem; border: 1px solid #333; padding: 1rem; border-radius: 4px;">
+                            <div class="schedule-grid" style="grid-template-columns: 1fr 1fr 1.5fr auto;">
+                                <select class="form-control" formControlName="day" style="padding: 0.4rem;">
+                                    <option>Monday</option>
+                                    <option>Tuesday</option>
+                                    <option>Wednesday</option>
+                                    <option>Thursday</option>
+                                    <option>Friday</option>
+                                    <option>Saturday</option>
+                                    <option>Sunday</option>
+                                </select>
+                                <input type="date" class="form-control" formControlName="date" style="padding: 0.4rem;">
+                                <select class="form-control" formControlName="status" style="padding: 0.4rem;">
+                                    <option>Available</option>
+                                    <option>Maintenance</option>
+                                    <option>Closed</option>
+                                </select>
+                                <button type="button" class="btn-danger" style="margin:0; padding: 0.2rem 0.5rem;" (click)="removeScheduleSlot(getSchedule(fac), dayIndex)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <!-- Slot Grid -->
+                            <div class="slot-grid-section">
+                                <label class="form-label" style="font-size: 0.7rem; color: #888; margin-top: 0.5rem;">Hourly Slots (Click to toggle status, then select to edit pricing)</label>
+                                <div class="slot-grid-container" formArrayName="slots">
+                                    <div *ngFor="let s of getSlots(getSchedule(fac), dayIndex).controls; let sid = index" [formGroupName]="sid" class="slot-item" 
+                                        [class.available]="s.get('status')?.value === 'Available'"
+                                        [class.booked]="s.get('status')?.value === 'Booked'"
+                                        [class.closed]="s.get('status')?.value === 'Closed'"
+                                        [class.active]="activeSlot()?.type === 'otherFacilities' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex && activeSlot()?.slotIndex === sid"
+                                        (click)="toggleSlot(getSchedule(fac), dayIndex, sid, 'otherFacilities', facIndex)">
+                                        {{ s.get('time')?.value.split('-')[0] }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Active Slot Editor -->
+                            <div *ngIf="activeSlot()?.type === 'otherFacilities' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex" class="nested-section animate-fade-in" style="margin-top: 1rem; padding: 0.8rem; background: rgba(239, 157, 87, 0.05); border-style: dashed;">
+                                <div [formGroup]="$any(getSlots(getSchedule(fac), dayIndex).at(activeSlot()!.slotIndex))">
+                                    <h6 style="font-size: 0.7rem; color: #ef9d57; margin-bottom: 0.5rem; text-transform: uppercase;">Pricing for {{ getSlots(getSchedule(fac), dayIndex).at(activeSlot()!.slotIndex).get('time')?.value }}</h6>
+                                    <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.8rem;">
+                                        <div>
+                                            <select class="form-control" formControlName="type" style="padding: 0.3rem; font-size: 0.75rem;">
+                                                <option value="Free">Free</option>
+                                                <option value="Fixed">Fixed Rate</option>
+                                                <option value="Share">Revenue Share %</option>
+                                            </select>
+                                        </div>
+                                        <div *ngIf="getSlots(getSchedule(fac), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value !== 'Free'">
+                                            <input type="number" class="form-control" formControlName="amount" style="padding: 0.3rem; font-size: 0.75rem;" [placeholder]="getSlots(getSchedule(fac), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value === 'Share' ? '%' : '₹'">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Day-level Bulk Pricing -->
+                            <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 0.8rem; margin-top: 1rem; border-top: 1px solid #333; padding-top: 0.8rem;">
+                                <div>
+                                    <label class="form-label" style="font-size: 0.65rem; color: #ef9d57;">Day Default Pricing</label>
+                                    <select class="form-control" formControlName="type" style="padding: 0.4rem; font-size: 0.8rem;">
+                                        <option value="Free">Free</option>
+                                        <option value="Fixed">Fixed Rate</option>
+                                        <option value="Share">Revenue Share %</option>
+                                    </select>
+                                </div>
+                                @if(getPricingType(getSchedule(fac), dayIndex) !== 'Free') {
+                                    <div class="animate-fade-in">
+                                        <label class="form-label" style="font-size: 0.65rem; color: #888;">Default {{ getPricingType(getSchedule(fac), dayIndex) === 'Share' ? 'Share %' : 'Rate' }}</label>
+                                        <input type="number" class="form-control" formControlName="amount" style="padding: 0.4rem; font-size: 0.8rem;">
+                                    </div>
+                                    <div class="animate-fade-in">
+                                        <label class="form-label" style="font-size: 0.65rem; color: #888;">Unit</label>
+                                        <select class="form-control" formControlName="unit" style="padding: 0.4rem; font-size: 0.8rem;">
+                                            <option value="Hourly">Hourly</option>
+                                            <option value="Session">Per Session</option>
+                                        </select>
+                                    </div>
+                                }
+                                <div style="display: flex; align-items: flex-end;">
+                                    <button type="button" class="btn-outline" style="font-size: 0.6rem; padding: 0.4rem;" (click)="applyPriceToAllSlots(getSchedule(fac), dayIndex)">Apply to All</button>
+                                </div>
+                            </div>
                         </div>
                         }
                     </div>
                     <button type="button" class="btn-outline" style="margin-top: 0.5rem; font-size: 0.7rem;" (click)="addScheduleSlot(getSchedule(fac))">
-                        + Add Time Slot
+                        + Add Schedule Day
                     </button>
                 </div>
             </div>

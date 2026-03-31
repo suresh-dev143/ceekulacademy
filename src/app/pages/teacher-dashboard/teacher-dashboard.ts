@@ -97,30 +97,39 @@ import { CourseService, Course } from '../../services/course.service';
             </div>
           } @else if (activeTab() === 'workshops') {
             <div class="teacher-insights glass-card">
-              <h3 class="panel-title"><i class="fas fa-tools"></i> Workshop Tips</h3>
+              <h3 class="panel-title"><i class="fas fa-microchip"></i> Venue Monitor</h3>
               
-              <div class="insight-alert">
-                <p>Workshops with <strong>Live Demos</strong> get 3x more students.</p>
+              <div class="venue-list">
+                @for (booking of venueBookings(); track booking.id) {
+                  <div class="venue-card-mini animate-fade-in">
+                    <div class="vcard-header">
+                      <span class="vcard-title">{{ booking.workshopTitle }}</span>
+                      <span class="vcard-status"><i class="fas fa-check-double"></i> Confirmed</span>
+                    </div>
+                    <div class="vcard-details">
+                      <div class="v-detail">
+                        <i class="fas fa-university"></i>
+                        <span>{{ booking.venueName }} ({{ booking.facilityType }})</span>
+                      </div>
+                      <div class="v-detail">
+                        <i class="far fa-clock"></i>
+                        <span>{{ booking.startTime }} – {{ booking.endTime }}</span>
+                      </div>
+                    </div>
+                  </div>
+                } @empty {
+                  <div class="empty-state-mini">
+                    <p>No upcoming venue bookings.</p>
+                  </div>
+                }
               </div>
 
-              <div class="collaboration-match">
-                <h4>Trending Topic</h4>
+              <div class="collaboration-match" style="margin-top: 2.5rem;">
+                <h4>Infrastructure Discovery</h4>
                 <div class="match-card">
-                  <span class="match-score">Highly Requested</span>
-                  <p>Students in your area are looking for <strong>Agentic AI</strong> masterclasses.</p>
-                  <button class="btn-ghost-xs">Schedule Workshop</button>
-                </div>
-              </div>
-
-              <div class="notifications">
-                <h4>Guidelines</h4>
-                <div class="notif-item">
-                  <div class="notif-dot"></div>
-                  <span>Keep sessions under 4 hours for max focus.</span>
-                </div>
-                <div class="notif-item">
-                  <div class="notif-dot"></div>
-                  <span>Ensure all materials are published.</span>
+                  <span class="match-score">Premium Lab Detected</span>
+                  <p><strong>Innovation Hub Noida</strong> has a vacant Robotics Lab this Saturday.</p>
+                  <button class="btn-ghost-xs" (click)="activeTab.set('overview')">Browse Facilities</button>
                 </div>
               </div>
             </div>
@@ -165,6 +174,20 @@ import { CourseService, Course } from '../../services/course.service';
       .notif-dot { width: 6px; height: 6px; background: #8b5cf6; border-radius: 50%; }
     }
 
+    /* Venue Monitor Styles */
+    .venue-list { display: flex; flex-direction: column; gap: 1rem; }
+    .venue-card-mini {
+      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 1.25rem;
+      transition: all 0.3s ease;
+      &:hover { border-color: rgba(139, 92, 246, 0.3); background: rgba(255, 255, 255, 0.05); }
+    }
+    .vcard-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; gap: 1rem; }
+    .vcard-title { font-size: 0.85rem; font-weight: 800; color: #fff; line-height: 1.4; }
+    .vcard-status { font-size: 0.6rem; font-weight: 900; color: #10b981; text-transform: uppercase; background: rgba(16, 185, 129, 0.1); padding: 0.2rem 0.5rem; border-radius: 8px; white-space: nowrap; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .vcard-details { display: grid; gap: 0.4rem; }
+    .v-detail { display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; color: #94a3b8; i { font-size: 0.7rem; color: #8b5cf6; width: 14px; } }
+    .empty-state-mini { text-align: center; padding: 2rem; color: #64748b; font-size: 0.8rem; font-style: italic; }
+
     /* Modal Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: color-mix(in srgb, #000, transparent 20%); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 2rem; }
     .modal-content { background: #111; border: 1px solid color-mix(in srgb, #fff, transparent 90%); border-radius: 28px; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px color-mix(in srgb, #000, transparent 50%); }
@@ -182,6 +205,7 @@ export class TeacherDashboardComponent {
   myCourses = this.dashboardService.myCourses;
   nearbyStudents = this.dashboardService.nearbyStudents;
   nearbyInfrastructure = this.dashboardService.nearbyInfrastructure;
+  venueBookings = this.dashboardService.venueBookings;
   stats = this.dashboardService.stats;
   activeTab = signal<string>('overview');
 

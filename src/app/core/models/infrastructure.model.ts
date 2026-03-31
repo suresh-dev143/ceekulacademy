@@ -6,12 +6,19 @@ export interface InfrastructurePricing {
   unit: 'Hourly' | 'Session';
 }
 
-export interface AvailabilitySchedule {
-    day: string;
-    startTime: string;
-    endTime: string;
+export interface HourlySlot {
+    time: string; // e.g., "09:00-10:00"
     status: 'Available' | 'Booked' | 'Maintenance' | 'Closed';
     pricing: InfrastructurePricing;
+}
+
+export interface AvailabilitySchedule {
+    day: string;
+    date?: string; // Optional specific date override
+    startTime?: string;
+    endTime?: string;
+    status: 'Available' | 'Booked' | 'Maintenance' | 'Closed';
+    slots?: HourlySlot[]; // New slot-based model
     notes?: string;
     _id?: string;
 }
