@@ -69,7 +69,7 @@ export interface InfrastructureProfile {
     labs: number;
     aiComputeLevel: 'High' | 'Medium' | 'Basic';
     cloudInfra: boolean;
-    hybridClassrooms: number;
+    offlineClassrooms: number;
     accessibilityScore: number;   // 0–100
     sustainabilityScore: number;   // 0–100
     equipmentUtilization: number;   // %
@@ -214,7 +214,7 @@ export class CentersComponent {
                 conflictResolutionPrograms: 1, harmonySentimentScore: 78, communityMultiplier: 1.8
             },
             infra: {
-                ici: 68, labs: 2, aiComputeLevel: 'Basic', cloudInfra: false, hybridClassrooms: 2,
+                ici: 68, labs: 2, aiComputeLevel: 'Basic', cloudInfra: false, offlineClassrooms: 2,
                 accessibilityScore: 82, sustainabilityScore: 70, equipmentUtilization: 76, serverBandwidth: '100 Mbps'
             }
         },
@@ -246,7 +246,7 @@ export class CentersComponent {
                 conflictResolutionPrograms: 2, harmonySentimentScore: 82, communityMultiplier: 2.4
             },
             infra: {
-                ici: 92, labs: 6, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 8,
+                ici: 92, labs: 6, aiComputeLevel: 'High', cloudInfra: true, offlineClassrooms: 8,
                 accessibilityScore: 88, sustainabilityScore: 85, equipmentUtilization: 88, serverBandwidth: '10 Gbps'
             }
         },
@@ -278,7 +278,7 @@ export class CentersComponent {
                 conflictResolutionPrograms: 5, harmonySentimentScore: 88, communityMultiplier: 2.8
             },
             infra: {
-                ici: 90, labs: 5, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 10,
+                ici: 90, labs: 5, aiComputeLevel: 'High', cloudInfra: true, offlineClassrooms: 10,
                 accessibilityScore: 85, sustainabilityScore: 88, equipmentUtilization: 82, serverBandwidth: '5 Gbps'
             }
         },
@@ -310,7 +310,7 @@ export class CentersComponent {
                 conflictResolutionPrograms: 3, harmonySentimentScore: 80, communityMultiplier: 2.2
             },
             infra: {
-                ici: 72, labs: 3, aiComputeLevel: 'Medium', cloudInfra: true, hybridClassrooms: 4,
+                ici: 72, labs: 3, aiComputeLevel: 'Medium', cloudInfra: true, offlineClassrooms: 4,
                 accessibilityScore: 88, sustainabilityScore: 72, equipmentUtilization: 79, serverBandwidth: '500 Mbps'
             }
         },
@@ -342,7 +342,7 @@ export class CentersComponent {
                 conflictResolutionPrograms: 2, harmonySentimentScore: 82, communityMultiplier: 2.0
             },
             infra: {
-                ici: 88, labs: 5, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 7,
+                ici: 88, labs: 5, aiComputeLevel: 'High', cloudInfra: true, offlineClassrooms: 7,
                 accessibilityScore: 82, sustainabilityScore: 90, equipmentUtilization: 84, serverBandwidth: '5 Gbps'
             }
         },
@@ -374,7 +374,7 @@ export class CentersComponent {
                 conflictResolutionPrograms: 2, harmonySentimentScore: 72, communityMultiplier: 1.9
             },
             infra: {
-                ici: 70, labs: 3, aiComputeLevel: 'Medium', cloudInfra: true, hybridClassrooms: 3,
+                ici: 70, labs: 3, aiComputeLevel: 'Medium', cloudInfra: true, offlineClassrooms: 3,
                 accessibilityScore: 80, sustainabilityScore: 68, equipmentUtilization: 75, serverBandwidth: '1 Gbps'
             }
         },
@@ -406,7 +406,7 @@ export class CentersComponent {
                 conflictResolutionPrograms: 3, harmonySentimentScore: 86, communityMultiplier: 2.5
             },
             infra: {
-                ici: 94, labs: 7, aiComputeLevel: 'High', cloudInfra: true, hybridClassrooms: 9,
+                ici: 94, labs: 7, aiComputeLevel: 'High', cloudInfra: true, offlineClassrooms: 9,
                 accessibilityScore: 80, sustainabilityScore: 88, equipmentUtilization: 90, serverBandwidth: '10 Gbps'
             }
         },
@@ -438,7 +438,7 @@ export class CentersComponent {
                 conflictResolutionPrograms: 1, harmonySentimentScore: 65, communityMultiplier: 1.5
             },
             infra: {
-                ici: 60, labs: 1, aiComputeLevel: 'Basic', cloudInfra: false, hybridClassrooms: 2,
+                ici: 60, labs: 1, aiComputeLevel: 'Basic', cloudInfra: false, offlineClassrooms: 2,
                 accessibilityScore: 85, sustainabilityScore: 65, equipmentUtilization: 70, serverBandwidth: '100 Mbps'
             }
         }

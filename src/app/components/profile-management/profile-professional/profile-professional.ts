@@ -26,9 +26,9 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
           <div class="form-group">
             <label>Mode Preference</label>
             <select formControlName="modePreference" [disabled]="!isEditing">
-              <option value="Online (Remote)">Online (Remote)</option>
-              <option value="Offline (On-site)">Offline (On-site)</option>
-              <option value="Hybrid">Hybrid</option>
+              <option value="Online (Remote)">Remote</option>
+              <option value="Offline (On-site)">On-site</option>
+              <option value="Offline">Offline</option>
               <option value="Home Tuition">Home Tuition</option>
             </select>
           </div>

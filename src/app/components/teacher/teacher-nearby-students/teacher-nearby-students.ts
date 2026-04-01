@@ -70,8 +70,7 @@ import { NearbyStudent } from '../../../services/teacher-dashboard.service';
     .detail-item { display: flex; align-items: center; gap: 0.8rem; font-size: 0.8rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; i { color: var(--accent-primary); width: 14px; text-align: center; } }
     
     .mode-badge { font-size: 0.65rem; font-weight: 900; padding: 0.2rem 0.65rem; border-radius: 0; border: 1px solid var(--row-border); text-transform: uppercase; letter-spacing: 0.5px;
-      &[data-mode="Offline"] { border-color: #ef4444; color: #ef4444; }
-      &[data-mode="Hybrid"] { border-color: #10b981; color: #10b981; }
+      &[data-mode="Offline"] { border-color: #10b981; color: #10b981; }
       &[data-mode="Online"] { border-color: var(--accent-primary); color: var(--accent-primary); }
     }
 

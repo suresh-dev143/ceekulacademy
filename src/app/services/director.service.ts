@@ -42,7 +42,7 @@ export interface DistrictActivity {
     district: string;
     date: string;
     time: string;
-    mode: 'Online' | 'Offline' | 'Hybrid';
+    mode: 'Online' | 'Offline';
     location: string;
     status: 'Planned' | 'Ongoing' | 'Completed';
     participants: { managers: number, volunteers: number, partners: number };
@@ -118,7 +118,7 @@ export class DirectorService {
             district: 'Bulandshahr',
             date: '2026-03-15',
             time: '2:00 PM',
-            mode: 'Hybrid',
+            mode: 'Offline',
             location: 'Green Earth NGO',
             status: 'Ongoing',
             participants: { managers: 2, volunteers: 8, partners: 1 }

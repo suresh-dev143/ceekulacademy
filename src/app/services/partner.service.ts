@@ -14,7 +14,7 @@ export interface NearbyUser {
     specialization?: string;
     learningInterest?: string;
     distance: number;
-    mode: 'Online' | 'Offline' | 'Hybrid';
+    mode: 'Online' | 'Offline';
     availability: string;
     activityType?: 'Learning' | 'Research';
     coordinates?: { lat: number; lng: number };
@@ -161,12 +161,12 @@ export class PartnerService {
     private radius = signal<number>(10);
 
     private allNearbyUsers = signal<NearbyUser[]>([
-        { id: 1,  name: 'Dr. Sameer Khan',  role: 'Teacher', specialization: 'Machine Learning', distance: 0,  mode: 'Hybrid',   availability: 'Mon-Fri, 9-11 AM',   activityType: 'Research', coordinates: { lat: 28.5355, lng: 77.3910 } },
+        { id: 1,  name: 'Dr. Sameer Khan',  role: 'Teacher', specialization: 'Machine Learning', distance: 0,  mode: 'Offline',   availability: 'Mon-Fri, 9-11 AM',   activityType: 'Research', coordinates: { lat: 28.5355, lng: 77.3910 } },
         { id: 2,  name: 'Priya Sharma',     role: 'Teacher', specialization: 'UI/UX Design',     distance: 0,  mode: 'Offline',  availability: 'Weekdays',            activityType: 'Learning', coordinates: { lat: 28.5455, lng: 77.4010 } },
         { id: 3,  name: 'Rahul Verma',      role: 'Student', learningInterest: 'Generative AI',  distance: 0,  mode: 'Online',   availability: 'Evenings',            activityType: 'Learning', coordinates: { lat: 28.5255, lng: 77.3810 } },
         { id: 4,  name: 'Ananya Das',       role: 'Student', learningInterest: 'Data Science',   distance: 0,  mode: 'Offline',  availability: 'Full-time',           activityType: 'Learning', coordinates: { lat: 28.5555, lng: 77.4110 } },
-        { id: 5,  name: 'Prof. Aryan',      role: 'Teacher', specialization: 'Blockchain',       distance: 0,  mode: 'Hybrid',   availability: 'Tue, Thu',            activityType: 'Research', coordinates: { lat: 28.5655, lng: 77.4210 } },
-        { id: 6,  name: 'Ishita Kapoor',    role: 'Student', learningInterest: 'Cybersecurity',  distance: 0,  mode: 'Hybrid',   availability: 'Flexible',            activityType: 'Learning', coordinates: { lat: 28.5155, lng: 77.3710 } }
+        { id: 5,  name: 'Prof. Aryan',      role: 'Teacher', specialization: 'Blockchain',       distance: 0,  mode: 'Offline',   availability: 'Tue, Thu',            activityType: 'Research', coordinates: { lat: 28.5655, lng: 77.4210 } },
+        { id: 6,  name: 'Ishita Kapoor',    role: 'Student', learningInterest: 'Cybersecurity',  distance: 0,  mode: 'Offline',   availability: 'Flexible',            activityType: 'Learning', coordinates: { lat: 28.5155, lng: 77.3710 } }
     ]);
 
     // ── Activity mock data (dates computed dynamically) ──────────────────────

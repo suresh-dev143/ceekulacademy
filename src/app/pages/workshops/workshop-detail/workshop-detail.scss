@@ -118,7 +118,7 @@ $status-colors: (
         background: color-mix(in srgb, $green, transparent 90%);
         border: 1px solid color-mix(in srgb, $green, transparent 75%);
 
-        &.wd-badge--hybrid {
+        &.wd-badge--offline {
             color: $accent;
             background: color-mix(in srgb, $accent, transparent 90%);
             border-color: color-mix(in srgb, $accent, transparent 70%);
@@ -802,7 +802,7 @@ $status-colors: (
         color: #4ade80;
     }
 
-    &--hybrid {
+    &--offline {
         background: color-mix(in srgb, $accent, transparent 92%);
         border: 1px solid color-mix(in srgb, $accent, transparent 80%);
         color: $accent;
@@ -911,6 +911,10 @@ $status-colors: (
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 20px 50px color-mix(in srgb, #000, transparent 50%);
+
+    &--enroll {
+        max-width: 800px;
+    }
 }
 
 .wd-modal-header {

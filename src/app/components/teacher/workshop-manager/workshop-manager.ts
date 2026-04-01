@@ -18,7 +18,7 @@ export class WorkshopManagerComponent implements OnInit {
     workshopForm!: FormGroup;
     isCreatingWorkshop = signal<boolean>(false);
 
-    // Mock locations for hybrid mode
+    // Mock locations for offline mode
     registeredLocations = signal<string[]>(['Central Library', 'Innovation Hub', 'Community Center', 'Tech Park']);
 
     workshopsList = signal<any[]>([
@@ -81,7 +81,7 @@ export class WorkshopManagerComponent implements OnInit {
         // Toggle location validator on row mode change
         row.get('mode')?.valueChanges.subscribe(mode => {
             const locControl = row.get('location');
-            if (mode === 'hybrid') {
+            if (mode === 'offline') {
                 locControl?.setValidators(Validators.required);
             } else {
                 locControl?.clearValidators();
@@ -127,7 +127,7 @@ export class WorkshopManagerComponent implements OnInit {
                 instructor: (formValue.schedule[0]?.allowOthers) ? 'Open to All' : (this.currentUser()?.name ?? 'Unknown'),
                 date: startDate,
                 duration: duration,
-                type: formValue.schedule.some((s: any) => s.mode === 'hybrid') ? 'Hybrid' : 'Online',
+                type: formValue.schedule.some((s: any) => s.mode === 'offline') ? 'Offline' : 'Online',
                 fee: totalFee
             };
 

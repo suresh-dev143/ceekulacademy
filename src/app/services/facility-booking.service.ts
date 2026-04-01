@@ -124,7 +124,7 @@ export class FacilityBookingService {
 
         workshops.forEach((w: WorkshopListItem) => {
             w.schedules.forEach((s: WorkshopApiSchedule) => {
-                if (s.mode === 'hybrid' && s.partnerId && s.facilityDetails) {
+                if (s.mode === 'offline' && s.partnerId && s.facilityDetails) {
                     const partnerId = s.partnerId;
                     if (!locationMap.has(partnerId)) {
                         locationMap.set(partnerId, {

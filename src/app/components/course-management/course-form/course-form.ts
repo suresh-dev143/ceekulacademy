@@ -19,7 +19,7 @@ export class CourseFormComponent implements OnInit {
 
     categories = ['Innovative Courses', 'Futuristic Research', 'Project Development', 'Online Services', 'Socio-Economic Transformation'];
     levels = ['Beginner', 'Intermediate', 'Advanced'];
-    modes = ['Online', 'Offline', 'Hybrid'];
+    modes = ['Online', 'On-site', 'Offline'];
     pricingOptions = ['Free', 'Paid'];
 
     constructor(private fb: FormBuilder) { }

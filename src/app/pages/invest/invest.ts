@@ -67,7 +67,7 @@ export class InvestPageComponent {
 
     currencies = ['INR', 'USD', 'EUR', 'GBP'];
     paymentModes = ['UPI', 'Bank Transfer', 'Card', 'International'];
-    serviceModes = ['On-site', 'Remote', 'Hybrid'];
+    serviceModes = ['On-site', 'Remote', 'Offline'];
 
 
 

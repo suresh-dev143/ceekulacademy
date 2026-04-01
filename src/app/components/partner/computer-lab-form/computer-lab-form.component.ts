@@ -322,9 +322,8 @@ export class ComputerLabFormComponent implements OnInit {
           endTime = availableSlots[availableSlots.length - 1].time.split('-')[1];
         }
 
-        const { pricing, ...rest } = day;
         return {
-          ...rest,
+          ...day,
           startTime,
           endTime
         };

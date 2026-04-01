@@ -79,7 +79,8 @@ function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
             const [sh, sm] = start.split(':').map(Number);
             const [eh, em] = end.split(':').map(Number);
             const diff = (eh * 60 + em) - (sh * 60 + sm);
-            if (diff !== 60) errs['invalidDuration'] = true;
+            // Relaxing the 1-hour strict rule to allow booking multiple dynamic slots (e.g. 2+ hours)
+            if (diff <= 0) errs['invalidDuration'] = true; 
         }
 
         if (date && start) {
@@ -464,8 +465,8 @@ export class WorkshopDetailComponent {
                 this.addForm.get('endTime')?.touched));
     }
 
-    get isHybridMode(): boolean {
-        return this.addForm?.get('mode')?.value === 'hybrid';
+    get isOfflineMode(): boolean {
+        return this.addForm?.get('mode')?.value === 'offline';
     }
 
     get selectedDate(): string {
@@ -607,7 +608,7 @@ export class WorkshopDetailComponent {
         const loc = this.addForm.get('location')!;
         const facId = this.addForm.get('facilityId')!;
 
-        if (mode === 'hybrid') {
+        if (mode === 'offline') {
             loc.setValidators(Validators.required);
             facId.setValidators(Validators.required);
         } else {
@@ -655,14 +656,31 @@ export class WorkshopDetailComponent {
     }
 
     onFacilitySelected(selection: any) {
+        let newStartTime = this.addForm.get('startTime')?.value;
+        let newEndTime = this.addForm.get('endTime')?.value;
+
+        // Dynamically update form time boundaries if slots were selected
+        if (selection.selectedSlots && selection.selectedSlots.length > 0) {
+            const sortedSlots = [...selection.selectedSlots].sort();
+            newStartTime = sortedSlots[0].split('-')[0];
+            let rawEndTime = sortedSlots[sortedSlots.length - 1].split('-')[1];
+            newEndTime = (rawEndTime === '24:00' || rawEndTime === '00:00') ? '23:59' : rawEndTime;
+        }
+
         this.addForm.patchValue({
             facilityId: selection.facilityId,
             facilityType: selection.facilityType,
             partnerId: selection.partnerId,
             partnerName: selection.partnerName,
             location: `${selection.facilityName}, ${selection.partnerName}`,
-            facilityDetails: selection
+            facilityDetails: selection,
+            startTime: newStartTime,
+            endTime: newEndTime
         });
+
+        // Lock time fields to prevent "inventing" slots
+        this.addForm.get('startTime')?.disable();
+        this.addForm.get('endTime')?.disable();
 
         this.closeDiscovery();
     }
@@ -676,6 +694,10 @@ export class WorkshopDetailComponent {
             location: '',
             facilityDetails: null
         });
+
+        // Re-enable time fields
+        this.addForm.get('startTime')?.enable();
+        this.addForm.get('endTime')?.enable();
     }
 
     // ── Edit Info control ─────────────────────────────────────────────────────
@@ -836,7 +858,7 @@ export class WorkshopDetailComponent {
             description: '', // Populated by backend
             fee: Number(v.fee),
             mode: v.mode,
-            location: v.mode === 'hybrid' ? (v.location || null) : null,
+            location: v.mode === 'offline' ? (v.location || null) : null,
             resources: v.resources?.trim() || null,
             facilityId: v.facilityId || null,
             facilityType: v.facilityType || null,

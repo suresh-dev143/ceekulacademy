@@ -7,7 +7,7 @@ export interface NearbyStudent {
     name: string;
     interest: string;
     availability: string;
-    modePreference: 'Online' | 'Offline' | 'Hybrid';
+    modePreference: 'Online' | 'Offline';
     distance: number;
     verified: boolean;
     coordinates: { lat: number; lng: number };
@@ -46,10 +46,10 @@ export class TeacherDashboardService {
 
     private studentsData = signal<NearbyStudent[]>([
         { id: 1, name: 'Aryan Sharma', interest: 'Robotics & AI', availability: 'Weekends', modePreference: 'Offline', distance: 0, verified: true, coordinates: { lat: 28.6373, lng: 77.3825 } },
-        { id: 2, name: 'Ishita Gupta', interest: 'Full Stack Development', availability: 'Evenings', modePreference: 'Hybrid', distance: 0, verified: true, coordinates: { lat: 28.6173, lng: 77.3625 } },
+        { id: 2, name: 'Ishita Gupta', interest: 'Full Stack Development', availability: 'Evenings', modePreference: 'Offline', distance: 0, verified: true, coordinates: { lat: 28.6173, lng: 77.3625 } },
         { id: 3, name: 'Rohan Mehra', interest: 'Cybersecurity', availability: 'Mornings', modePreference: 'Online', distance: 0, verified: false, coordinates: { lat: 28.6573, lng: 77.4025 } },
         { id: 4, name: 'Sneha Reddy', interest: 'Data Science', availability: 'Flexible', modePreference: 'Offline', distance: 0, verified: true, coordinates: { lat: 28.5973, lng: 77.3425 } },
-        { id: 5, name: 'Vikram Singh', interest: 'Mobile App Dev', availability: 'Weekdays', modePreference: 'Hybrid', distance: 0, verified: true, coordinates: { lat: 28.7073, lng: 77.4525 } }
+        { id: 5, name: 'Vikram Singh', interest: 'Mobile App Dev', availability: 'Weekdays', modePreference: 'Offline', distance: 0, verified: true, coordinates: { lat: 28.7073, lng: 77.4525 } }
     ]);
 
     private providersData = signal<NearbyProvider[]>([

@@ -65,7 +65,7 @@ export interface AssetInvestment {
             endDate?: string;
             hoursPerWeek?: number;
         };
-        mode?: 'On-site' | 'Remote' | 'Hybrid';
+        mode?: 'On-site' | 'Remote' | 'Offline';
 
         // Equipment
         description?: string;

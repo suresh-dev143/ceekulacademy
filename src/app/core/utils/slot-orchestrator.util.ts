@@ -57,8 +57,35 @@ export class SlotOrchestrator {
      * Helper to map a time string (e.g., "14:00") to the slot index.
      */
     static getTimeIndex(time: string): number {
+        if (!time || !time.includes(':')) return -1;
         const hour = parseInt(time.split(':')[0], 10);
         return isNaN(hour) ? -1 : hour;
+    }
+
+    /**
+     * Checks if a specific slot range overlaps with a requested session range.
+     * @param slotTime Slot in "HH:MM-HH:MM" format
+     * @param startTime Requested start time in "HH:MM" format
+     * @param endTime Requested end time in "HH:MM" format
+     * @returns Boolean indicating overlap
+     */
+    static isOverlapping(slotTime: string, startTime: string, endTime: string): boolean {
+        if (!startTime || !endTime) return true; // Permissive if times not yet defined
+        
+        const [slotStartS, slotEndS] = slotTime.split('-');
+        
+        const toMin = (t: string) => {
+            if (!t) return 0;
+            const [h, m] = t.split(':').map(Number);
+            return (h || 0) * 60 + (m || 0);
+        };
+        
+        const sStart = toMin(slotStartS);
+        const sEnd = toMin(slotEndS === '00:00' ? '24:00' : slotEndS);
+        const rStart = toMin(startTime);
+        const rEnd = toMin(endTime);
+        
+        return Math.max(sStart, rStart) < Math.min(sEnd, rEnd);
     }
 
     /**

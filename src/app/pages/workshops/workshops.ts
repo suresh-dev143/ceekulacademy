@@ -36,7 +36,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         createdBy: 'system',
         status: 'published',
         schedules: [
-            { _id: 'm1-s1', date: new Date(Date.now() + 86400000 * 2).toISOString(), startTime: '10:00', endTime: '13:00', timezone: 'IST', activity: 'Quantum Circuit Basics', fee: 45, mode: 'hybrid', location: 'Space Lab A', resources: null }
+            { _id: 'm1-s1', date: new Date(Date.now() + 86400000 * 2).toISOString(), startTime: '10:00', endTime: '13:00', timezone: 'IST', activity: 'Quantum Circuit Basics', fee: 45, mode: 'offline', location: 'Space Lab A', resources: null }
         ],
         totalRevenuePotential: 450,
         createdAt: new Date().toISOString(),
@@ -78,7 +78,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         createdBy: 'system',
         status: 'published',
         schedules: [
-            { _id: 'm4-s1', date: new Date(Date.now() + 86400000 * 10).toISOString(), startTime: '11:00', endTime: '15:00', timezone: 'IST', activity: 'Diagnostic Model Integration', fee: 85, mode: 'hybrid', location: 'Med-Tech Center', resources: null }
+            { _id: 'm4-s1', date: new Date(Date.now() + 86400000 * 10).toISOString(), startTime: '11:00', endTime: '15:00', timezone: 'IST', activity: 'Diagnostic Model Integration', fee: 85, mode: 'offline', location: 'Med-Tech Center', resources: null }
         ],
         totalRevenuePotential: 850,
         createdAt: new Date().toISOString(),
@@ -106,7 +106,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
         createdBy: 'system',
         status: 'published',
         schedules: [
-            { _id: 'm6-s1', date: new Date(Date.now() + 86400000 * 14).toISOString(), startTime: '08:00', endTime: '12:00', timezone: 'UTC', activity: 'Collision Avoidance Algorithms', fee: 200, mode: 'hybrid', location: 'Satellite Ground Station', resources: null }
+            { _id: 'm6-s1', date: new Date(Date.now() + 86400000 * 14).toISOString(), startTime: '08:00', endTime: '12:00', timezone: 'UTC', activity: 'Collision Avoidance Algorithms', fee: 200, mode: 'offline', location: 'Satellite Ground Station', resources: null }
         ],
         totalRevenuePotential: 2000,
         createdAt: new Date().toISOString(),

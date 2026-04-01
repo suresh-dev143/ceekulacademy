@@ -6,7 +6,7 @@ export interface Course {
     category: string;
     description: string;
     level: 'Beginner' | 'Intermediate' | 'Advanced';
-    mode: 'Online' | 'Offline' | 'Hybrid';
+    mode: 'Online' | 'Offline';
     duration: string;
     pricing: 'Free' | 'Paid';
     status: 'Draft' | 'Published' | 'Archived';
@@ -38,7 +38,7 @@ export class CourseService {
             category: 'Innovative Courses',
             description: 'Deeper dive into Angular.',
             level: 'Advanced',
-            mode: 'Hybrid',
+            mode: 'Offline',
             duration: '6 Weeks',
             pricing: 'Paid',
             status: 'Draft',

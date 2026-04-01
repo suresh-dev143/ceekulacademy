@@ -47,7 +47,7 @@ app.post('/api/v1/payments/verify', (req, res) => {
     } else {
       console.log('Split: 99% Creator, 1% Ceekul');
     }
-  } else if (mode === 'hybrid') {
+  } else if (mode === 'offline') {
     if (mobilizerId) {
       console.log('Split: 50% Creator, 40% Infrastructure, 10% Mobilizer');
     } else {

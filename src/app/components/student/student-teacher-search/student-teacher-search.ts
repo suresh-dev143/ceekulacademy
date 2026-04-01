@@ -43,7 +43,6 @@ import { SearchableTeacher } from '../../../services/student-dashboard.service';
               <button class="toggle-btn" [class.active]="modeFilter === 'All'" (click)="modeFilterChange.emit('All')">All</button>
               <button class="toggle-btn" [class.active]="modeFilter === 'Online'" (click)="modeFilterChange.emit('Online')">Online</button>
               <button class="toggle-btn" [class.active]="modeFilter === 'Offline'" (click)="modeFilterChange.emit('Offline')">Offline</button>
-              <button class="toggle-btn" [class.active]="modeFilter === 'Hybrid'" (click)="modeFilterChange.emit('Hybrid')">Hybrid</button>
             </div>
           </div>
           <div class="filter-group verified-toggle">
@@ -168,8 +167,7 @@ import { SearchableTeacher } from '../../../services/student-dashboard.service';
     .mode-tag {
       font-size: 0.7rem; font-weight: 900; padding: 0.2rem 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid;
       &[data-mode="Online"]  { color: var(--accent-primary); border-color: var(--accent-primary); }
-      &[data-mode="Offline"] { color: #ef4444; border-color: #ef4444; }
-      &[data-mode="Hybrid"]  { color: #10b981; border-color: #10b981; }
+      &[data-mode="Offline"] { color: #10b981; border-color: #10b981; }
     }
 
     .card-footer { display: flex; gap: 0.8rem; margin-top: auto; }

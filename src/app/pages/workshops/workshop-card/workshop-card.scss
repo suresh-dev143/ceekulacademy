@@ -90,7 +90,7 @@ $status: (
     align-items: center;
     gap: 0.3rem;
 
-    &--hybrid {
+    &--offline {
         color: $accent;
         background: color-mix(in srgb, $accent, transparent 90%);
         border-color: color-mix(in srgb, $accent, transparent 70%);

@@ -5,15 +5,9 @@
         <i class="fas fa-arrow-left"></i> Back to Workshops
     </button>
 
-    <!-- ══ Enrollment overlay ════════════════════════════════════════════════════ -->
-    @if (showEnrollForm()) {
-    <app-enroll-workshop [workshop]="currentWorkshop()" [userRole]="userRole()" 
-        [sessionOrder]="selectedSessionOrderForEnrollment()"
-        [isInstructorFlow]="isInstructorEnrollment()"
-        (enrolled)="onEnrolled($event)"
-        (cancel)="showEnrollForm.set(false)">
-    </app-enroll-workshop>
-    } @else {
+    <!-- No longer hiding details during enrollment -->
+    <!-- Content starts here -->
+
 
     <!-- ══ Workshop header ═══════════════════════════════════════════════════ -->
     <div class="wd-header">
@@ -158,10 +152,11 @@
                     </div>
 
                     <div class="wd-field">
-                        <label class="wd-label">Start Time *</label>
+                        <label class="wd-label">Start Time * @if (addForm.get('facilityId')?.value) { <i class="fas fa-lock" title="Controlled by Facility Selection" style="color: var(--primary); margin-left: 5px;"></i> }</label>
                         <input type="time" class="wd-input" formControlName="startTime"
                             [min]="isAddingForToday ? minStartTime() : ''"
-                            [class.is-error]="fieldHasError('startTime','required') || formError('pastTime')">
+                            [class.is-error]="fieldHasError('startTime','required') || formError('pastTime')"
+                            [attr.disabled]="addForm.get('facilityId')?.value ? true : null">
                         @if (fieldHasError('startTime','required')) {
                         <div class="wd-error">Start time is required.</div>
                         } @else if (formError('pastTime')) {
@@ -170,15 +165,16 @@
                     </div>
 
                     <div class="wd-field">
-                        <label class="wd-label">End Time *</label>
+                        <label class="wd-label">End Time * @if (addForm.get('facilityId')?.value) { <i class="fas fa-lock" title="Controlled by Facility Selection" style="color: var(--primary); margin-left: 5px;"></i> }</label>
                         <input type="time" class="wd-input" formControlName="endTime"
-                            [class.is-error]="fieldHasError('endTime','required') || formError('endBeforeStart')">
+                            [class.is-error]="fieldHasError('endTime','required') || formError('endBeforeStart')"
+                            [attr.disabled]="addForm.get('facilityId')?.value ? true : null">
                         @if (fieldHasError('endTime','required')) {
                         <div class="wd-error">End time is required.</div>
                         } @else if (formError('endBeforeStart')) {
                         <div class="wd-error">End time must be after start time.</div>
                         } @else if (formError('invalidDuration')) {
-                        <div class="wd-error">Session duration must be exactly 1 hour.</div>
+                        <div class="wd-error">Session duration must be greater than 0.</div>
                         }
                     </div>
 
@@ -242,9 +238,9 @@
                                 <span>Online</span>
                             </label>
                             <label class="wd-radio">
-                                <input type="radio" formControlName="mode" value="hybrid">
+                                <input type="radio" formControlName="mode" value="offline">
                                 <span class="wd-radio-mark"></span>
-                                <span>Hybrid</span>
+                                <span>Offline</span>
                             </label>
                         </div>
                     </div>
@@ -260,14 +256,14 @@
                     </div>
                 </div>
 
-                <!-- Conditional: Venue (hybrid) -->
-                @if (isHybridMode) {
+                <!-- Conditional: Venue (offline) -->
+                @if (isOfflineMode) {
                 <div class="wd-field">
                     <label class="wd-label">Venue / Location *</label>
 
                     @if (!addForm.get('facilityId')?.value) {
                     <div class="wd-location-placeholder">
-                        <p>No facility selected for this hybrid session.</p>
+                        <p>No facility selected for this offline session.</p>
                         <button type="button" class="wd-btn-discovery" (click)="openDiscovery()">
                             <i class="fas fa-search-location"></i> Find Facility
                         </button>
@@ -293,7 +289,7 @@
                     }
 
                     @if (fieldHasError('facilityId','required')) {
-                    <div class="wd-error">Please select a facility for hybrid sessions.</div>
+                    <div class="wd-error">Please select a facility for offline sessions.</div>
                     }
                 </div>
                 }
@@ -443,11 +439,11 @@
                                 <i class="fas fa-clock"></i> {{ sessionDuration(s) }}
                             </span>
                             }
-                            <span class="wd-tag" [class.wd-tag--hybrid]="s.mode === 'hybrid'"
+                            <span class="wd-tag" [class.wd-tag--offline]="s.mode === 'offline'"
                                 [class.wd-tag--online]="s.mode === 'online'">
                                 <i class="fas" [class.fa-wifi]="s.mode === 'online'"
-                                    [class.fa-map-marker-alt]="s.mode === 'hybrid'"></i>
-                                {{ s.mode === 'hybrid' ? 'Hybrid' : 'Online' }}
+                                    [class.fa-map-marker-alt]="s.mode === 'offline'"></i>
+                                {{ s.mode === 'offline' ? 'Offline' : 'Online' }}
                             </span>
                             @if (s.fee === 0) {
                             <span class="wd-tag wd-tag--free">Free</span>
@@ -679,6 +675,28 @@
     </div>
     }
 
+    <!-- ══ Enrollment Modal ════════════════════════════════════════════════════ -->
+    @if (showEnrollForm()) {
+    <div class="wd-modal-overlay">
+        <div class="wd-modal-card wd-modal-card--enroll">
+            <div class="wd-modal-header">
+                <h2><i class="fas fa-user-plus"></i> Workshop Enrollment</h2>
+                <button type="button" class="wd-modal-close" (click)="showEnrollForm.set(false)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="wd-modal-body" style="max-height: 80vh; overflow-y: auto; padding: 1.5rem;">
+                <app-enroll-workshop [workshop]="currentWorkshop()" [userRole]="userRole()" 
+                    [sessionOrder]="selectedSessionOrderForEnrollment()"
+                    [isInstructorFlow]="isInstructorEnrollment()"
+                    (enrolled)="onEnrolled($event)"
+                    (cancel)="showEnrollForm.set(false)">
+                </app-enroll-workshop>
+            </div>
+        </div>
+    </div>
+    }
+
     <!-- ══ Facility Discovery Overlay ══════════════════════════════════════════ -->
     @if (showDiscovery()) {
     <app-facility-discovery 
@@ -693,5 +711,4 @@
     </app-facility-discovery>
     }
 
-    }
 </div>

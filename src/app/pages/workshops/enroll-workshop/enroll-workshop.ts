@@ -40,8 +40,8 @@ export class EnrollWorkshop implements OnInit {
         this.enrollWorkshopForm = this.fb.group({
             organization: [''],
             enrollmentType: [this.isInstructorFlow ? 'support' : 'learning', Validators.required],
-            modeSelection: ['online', Validators.required], // online or hybrid
-            attendanceMode: ['online'], // online or physical (for hybrid)
+            modeSelection: ['online', Validators.required], // online or offline
+            attendanceMode: ['online'], // online or physical (for offline)
             qualityTier: ['free', Validators.required],
             mobilizerId: [''],
             acceptTerms: [false, Validators.requiredTrue]
@@ -89,8 +89,8 @@ export class EnrollWorkshop implements OnInit {
         const tier = this.qualityTiers.find(t => t.id === tierId);
         if (tier) total += tier.fee;
 
-        // venue fee (hybrid + physical)
-        if (mode === 'hybrid' && attendance === 'physical') {
+        // venue fee (offline + physical)
+        if (mode === 'offline' && attendance === 'physical') {
             total += 500; // Mock venue fee
         }
 
@@ -114,7 +114,7 @@ export class EnrollWorkshop implements OnInit {
         return {
             workshopFee: this.totalWorkshopFee,
             streamingFee: tier?.fee || 0,
-            venueFee: (mode === 'hybrid' && attendance === 'physical') ? 500 : 0
+            venueFee: (mode === 'offline' && attendance === 'physical') ? 500 : 0
         };
     }
 

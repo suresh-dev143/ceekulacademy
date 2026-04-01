@@ -9,7 +9,7 @@ export interface EnrolledCourse {
     progress: number; // 0-100
     status: 'In Progress' | 'Completed' | 'Paused';
     pricing: 'Free' | 'Paid';
-    mode: 'Online' | 'Offline' | 'Hybrid';
+    mode: 'Online' | 'Offline';
     lastAccessed: string;
     thumbnail: string; // emoji icon
 }
@@ -21,7 +21,7 @@ export interface CatalogCourse {
     teacher: string;
     pricing: 'Free' | 'Paid';
     price?: number;
-    mode: 'Online' | 'Offline' | 'Hybrid';
+    mode: 'Online' | 'Offline';
     level: 'Beginner' | 'Intermediate' | 'Advanced';
     duration: string;
     enrolledCount: number;
@@ -34,7 +34,7 @@ export interface SearchableTeacher {
     name: string;
     subjects: string[];
     specialization: string;
-    mode: 'Online' | 'Offline' | 'Hybrid';
+    mode: 'Online' | 'Offline';
     distance: number;
     rating: number;
     verified: boolean;
@@ -83,7 +83,7 @@ export class StudentDashboardService {
                     teacher: w.expertDescription,
                     pricing: 'Paid' as const,
                     price: w.schedules[0]?.fee || 0,
-                    mode: (w.schedules[0]?.mode === 'hybrid' ? 'Hybrid' : 'Online') as any,
+                    mode: (w.schedules[0]?.mode === 'offline' ? 'Offline' : 'Online') as any,
                     level: 'Beginner' as const,
                     duration: `${w.schedules.length} Sessions`,
                     enrolledCount: 0,
@@ -117,9 +117,9 @@ export class StudentDashboardService {
     private enrolledData = signal<EnrolledCourse[]>([
         { id: 1, title: 'Introduction to AI', category: 'Innovative Courses', teacher: 'Prof. Rajesh Khanna', progress: 72, status: 'In Progress', pricing: 'Free', mode: 'Online', lastAccessed: '2026-02-18', thumbnail: '🤖' },
         { id: 2, title: 'Advanced Physics', category: 'Science', teacher: 'Dr. Kavita Rao', progress: 100, status: 'Completed', pricing: 'Paid', mode: 'Offline', lastAccessed: '2026-02-10', thumbnail: '⚛️' },
-        { id: 3, title: 'Applied Mathematics', category: 'Mathematics', teacher: 'Mr. John Miller', progress: 40, status: 'In Progress', pricing: 'Free', mode: 'Hybrid', lastAccessed: '2026-02-17', thumbnail: '📐' },
+        { id: 3, title: 'Applied Mathematics', category: 'Mathematics', teacher: 'Mr. John Miller', progress: 40, status: 'In Progress', pricing: 'Free', mode: 'Offline', lastAccessed: '2026-02-17', thumbnail: '📐' },
         { id: 4, title: 'Environmental Science', category: 'Science', teacher: 'Anjali Deshmukh', progress: 0, status: 'Paused', pricing: 'Free', mode: 'Offline', lastAccessed: '2026-01-20', thumbnail: '🌿' },
-        { id: 5, title: 'Robotics Fundamentals', category: 'Technology', teacher: 'Dr. Sarah Chen', progress: 55, status: 'In Progress', pricing: 'Paid', mode: 'Hybrid', lastAccessed: '2026-02-15', thumbnail: '🦾' }
+        { id: 5, title: 'Robotics Fundamentals', category: 'Technology', teacher: 'Dr. Sarah Chen', progress: 55, status: 'In Progress', pricing: 'Paid', mode: 'Offline', lastAccessed: '2026-02-15', thumbnail: '🦾' }
     ]);
 
     // ─── Search state for enrolled courses ──────────────────────────────────────
@@ -146,12 +146,12 @@ export class StudentDashboardService {
         { id: 10, title: 'Introduction to AI', category: 'Technology', teacher: 'Prof. Rajesh Khanna', pricing: 'Free', mode: 'Online', level: 'Beginner', duration: '4 Weeks', enrolledCount: 320, rating: 4.8, thumbnail: '🤖' },
         { id: 11, title: 'Advanced Physics', category: 'Science', teacher: 'Dr. Kavita Rao', pricing: 'Paid', price: 499, mode: 'Offline', level: 'Advanced', duration: '8 Weeks', enrolledCount: 85, rating: 4.9, thumbnail: '⚛️' },
         { id: 12, title: 'Python for Beginners', category: 'Technology', teacher: 'Mr. John Miller', pricing: 'Free', mode: 'Online', level: 'Beginner', duration: '3 Weeks', enrolledCount: 510, rating: 4.7, thumbnail: '🐍' },
-        { id: 13, title: 'Organic Chemistry', category: 'Science', teacher: 'Dr. Sarah Chen', pricing: 'Paid', price: 299, mode: 'Hybrid', level: 'Intermediate', duration: '6 Weeks', enrolledCount: 140, rating: 4.5, thumbnail: '🧪' },
+        { id: 13, title: 'Organic Chemistry', category: 'Science', teacher: 'Dr. Sarah Chen', pricing: 'Paid', price: 299, mode: 'Offline', level: 'Intermediate', duration: '6 Weeks', enrolledCount: 140, rating: 4.5, thumbnail: '🧪' },
         { id: 14, title: 'Calculus & Linear Algebra', category: 'Mathematics', teacher: 'Mr. John Miller', pricing: 'Free', mode: 'Online', level: 'Intermediate', duration: '5 Weeks', enrolledCount: 260, rating: 4.6, thumbnail: '📐' },
         { id: 15, title: 'Robotics & Automation', category: 'Technology', teacher: 'Dr. Sarah Chen', pricing: 'Paid', price: 799, mode: 'Offline', level: 'Advanced', duration: '10 Weeks', enrolledCount: 60, rating: 4.9, thumbnail: '🦾' },
         { id: 16, title: 'Environmental Science', category: 'Science', teacher: 'Anjali Deshmukh', pricing: 'Free', mode: 'Online', level: 'Beginner', duration: '4 Weeks', enrolledCount: 195, rating: 4.4, thumbnail: '🌿' },
         { id: 17, title: 'Data Structures & Algorithms', category: 'Technology', teacher: 'Prof. Rajesh Khanna', pricing: 'Paid', price: 599, mode: 'Online', level: 'Advanced', duration: '8 Weeks', enrolledCount: 210, rating: 4.8, thumbnail: '🗃️' },
-        { id: 18, title: 'Statistics & Probability', category: 'Mathematics', teacher: 'Mr. John Miller', pricing: 'Free', mode: 'Hybrid', level: 'Intermediate', duration: '4 Weeks', enrolledCount: 155, rating: 4.5, thumbnail: '📊' }
+        { id: 18, title: 'Statistics & Probability', category: 'Mathematics', teacher: 'Mr. John Miller', pricing: 'Free', mode: 'Offline', level: 'Intermediate', duration: '4 Weeks', enrolledCount: 155, rating: 4.5, thumbnail: '📊' }
     ]);
 
     catalogSearchQuery = signal('');
@@ -178,12 +178,12 @@ export class StudentDashboardService {
     // ─── Teachers ────────────────────────────────────────────────────────────────
     private teachersData = signal<SearchableTeacher[]>([
         { id: 1, name: 'Dr. Kavita Rao', subjects: ['Physics', 'Quantum Mechanics'], specialization: 'Advanced Physics', mode: 'Offline', distance: 2.1, rating: 4.9, verified: true, experience: '12 Years', studentsCount: 340, availability: 'Mon, Wed, Fri (5–7 PM)' },
-        { id: 2, name: 'Mr. John Miller', subjects: ['Mathematics', 'Statistics', 'Calculus'], specialization: 'Applied Mathematics', mode: 'Hybrid', distance: 8.5, rating: 4.7, verified: true, experience: '8 Years', studentsCount: 210, availability: 'Weekends (10 AM–1 PM)' },
+        { id: 2, name: 'Mr. John Miller', subjects: ['Mathematics', 'Statistics', 'Calculus'], specialization: 'Applied Mathematics', mode: 'Offline', distance: 8.5, rating: 4.7, verified: true, experience: '8 Years', studentsCount: 210, availability: 'Weekends (10 AM–1 PM)' },
         { id: 3, name: 'Dr. Sarah Chen', subjects: ['Biotechnology', 'Chemistry'], specialization: 'Biotechnology Research', mode: 'Offline', distance: 12.4, rating: 4.6, verified: false, experience: '15 Years', studentsCount: 120, availability: 'Tue, Thu (4–6 PM)' },
         { id: 4, name: 'Prof. Rajesh Khanna', subjects: ['Computer Science', 'AI', 'Python'], specialization: 'Computer Science & Robotics', mode: 'Online', distance: 5.2, rating: 4.8, verified: true, experience: '10 Years', studentsCount: 580, availability: 'Daily (7–9 PM)' },
         { id: 5, name: 'Anjali Deshmukh', subjects: ['Environmental Science', 'Ecology'], specialization: 'Environmental Science', mode: 'Offline', distance: 18.2, rating: 4.5, verified: true, experience: '6 Years', studentsCount: 95, availability: 'Saturdays' },
         { id: 6, name: 'Dr. Arjun Mehta', subjects: ['History', 'Social Studies'], specialization: 'Social Sciences', mode: 'Online', distance: 3.8, rating: 4.4, verified: true, experience: '9 Years', studentsCount: 175, availability: 'Mon–Fri (6–8 PM)' },
-        { id: 7, name: 'Ms. Neha Gupta', subjects: ['English', 'Creative Writing'], specialization: 'Language & Literature', mode: 'Hybrid', distance: 6.7, rating: 4.6, verified: false, experience: '5 Years', studentsCount: 140, availability: 'Weekends' }
+        { id: 7, name: 'Ms. Neha Gupta', subjects: ['English', 'Creative Writing'], specialization: 'Language & Literature', mode: 'Offline', distance: 6.7, rating: 4.6, verified: false, experience: '5 Years', studentsCount: 140, availability: 'Weekends' }
     ]);
 
     teacherSearchQuery = signal('');

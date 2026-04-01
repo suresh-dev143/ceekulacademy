@@ -99,9 +99,8 @@ import { NearbyTeacher } from '../../../services/student-discovery.service';
     }
     .mode-tag {
       padding: 0.2rem 0.6rem; border-radius: 0; font-size: 0.75rem; font-weight: 800; border: 1px solid var(--row-border); text-transform: uppercase; letter-spacing: 0.5px;
-      &[data-mode="Offline"] { border-color: #ef4444; color: #ef4444; }
+      &[data-mode="Offline"] { border-color: #10b981; color: #10b981; }
       &[data-mode="Online"] { border-color: var(--accent-primary); color: var(--accent-primary); }
-      &[data-mode="Hybrid"] { border-color: #10b981; color: #10b981; }
     }
     .availability { color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; gap: 0.6rem; margin-top: 0.4rem; justify-content: flex-start; }
 

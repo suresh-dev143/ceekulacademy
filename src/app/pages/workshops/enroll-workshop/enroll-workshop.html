@@ -1,7 +1,4 @@
 <div class="research-form-container animate-fade-in">
-    <button class="btn-back" (click)="onCancel()" style="margin-bottom: 1.5rem;">
-        Back to Workshops
-    </button>
 
     <div class="workshop-preview-card">
         @if (sessionOrder) {
@@ -56,13 +53,13 @@
                         <span>Online Only</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" formControlName="modeSelection" value="hybrid">
-                        <span>Hybrid (Online + Physical)</span>
+                        <input type="radio" formControlName="modeSelection" value="offline">
+                        <span>Offline (Online + Physical)</span>
                     </label>
                 </div>
             </div>
 
-            @if (enrollWorkshopForm.get('modeSelection')?.value === 'hybrid') {
+            @if (enrollWorkshopForm.get('modeSelection')?.value === 'offline') {
             <div class="form-group animate-fade-in">
                 <label class="form-label">How will you attend? *</label>
                 <div class="radio-group">

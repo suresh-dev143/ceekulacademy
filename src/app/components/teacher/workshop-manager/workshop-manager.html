@@ -87,12 +87,12 @@
                                 <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.3rem;">Mode</label>
                                 <select class="form-control" formControlName="mode">
                                     <option value="online">Online</option>
-                                    <option value="hybrid">Hybrid</option>
+                                    <option value="offline">Offline</option>
                                 </select>
                             </div>
 
-                            <!-- Location (Only if Hybrid) -->
-                            @if (item.get('mode')?.value === 'hybrid') {
+                            <!-- Location (Only if Offline) -->
+                            @if (item.get('mode')?.value === 'offline') {
                             <div>
                                 <label class="form-label"
                                     style="font-size: 0.8rem; margin-bottom: 0.3rem;">Location</label>

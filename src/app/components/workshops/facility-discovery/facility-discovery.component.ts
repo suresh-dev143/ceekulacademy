@@ -135,11 +135,37 @@ export class FacilityDiscoveryComponent implements OnInit {
     private callBookingService(lat: number, lng: number, searchFilters: any) {
         this.bookingService.getAvailableLocations(lat, lng, searchFilters).subscribe({
             next: (results) => {
-                this.locations.set(results);
+                const resultsWithSlots = results.map(loc => ({
+                    ...loc,
+                    facilities: loc.facilities.map(f => {
+                        let extractedSlots = f.slots || [];
+                        const schedules = (f as any).availabilitySchedule as any[];
+                        
+                        if (extractedSlots.length === 0 && schedules && schedules.length > 0) {
+                            // Find schedule for requested date or day
+                            let targetSchedule = null;
+                            if (searchFilters.date) {
+                                const searchDate = new Date(searchFilters.date);
+                                const dayName = searchDate.toLocaleDateString('en-US', { weekday: 'long' });
+                                targetSchedule = schedules.find(s => s.date === searchFilters.date || s.day === dayName);
+                            }
+                            
+                            // If no specific match, just take the first schedule's slots as a preview
+                            if (!targetSchedule) targetSchedule = schedules[0];
+                            if (targetSchedule && targetSchedule.slots) extractedSlots = targetSchedule.slots;
+                        }
+
+                        return {
+                            ...f,
+                            slots: extractedSlots.length > 0 ? extractedSlots : this.generateFallbackSlots(f)
+                        };
+                    })
+                }));
+                this.locations.set(resultsWithSlots);
                 this.isLoading.set(false);
                 // Auto-expand first result if available and none expanded
-                if (results.length > 0 && !this.expandedLocationId()) {
-                    this.expandedLocationId.set(results[0].partnerId);
+                if (resultsWithSlots.length > 0 && !this.expandedLocationId()) {
+                    this.expandedLocationId.set(resultsWithSlots[0].partnerId);
                 }
             },
             error: () => {
@@ -152,12 +178,38 @@ export class FacilityDiscoveryComponent implements OnInit {
     private loadOfflineLocations() {
         this.bookingService.getOfflineLocations().subscribe({
             next: (results) => {
-                this.locations.set(results);
+                const resultsWithSlots = results.map(loc => ({
+                    ...loc,
+                    facilities: loc.facilities.map(f => {
+                        let extractedSlots = f.slots || [];
+                        const schedules = (f as any).availabilitySchedule as any[];
+                        
+                        if (extractedSlots.length === 0 && schedules && schedules.length > 0) {
+                            // Find schedule for requested date or day
+                            let targetSchedule = null;
+                            const sessionDateStr = this.sessionDate();
+                            if (sessionDateStr) {
+                                const searchDate = new Date(sessionDateStr);
+                                const dayName = searchDate.toLocaleDateString('en-US', { weekday: 'long' });
+                                targetSchedule = schedules.find(s => s.date === sessionDateStr || s.day === dayName);
+                            }
+                            
+                            if (!targetSchedule) targetSchedule = schedules[0];
+                            if (targetSchedule && targetSchedule.slots) extractedSlots = targetSchedule.slots;
+                        }
+
+                        return {
+                            ...f,
+                            slots: extractedSlots.length > 0 ? extractedSlots : this.generateFallbackSlots(f)
+                        };
+                    })
+                }));
+                this.locations.set(resultsWithSlots);
                 this.isLoading.set(false);
-                if (results.length > 0 && !this.expandedLocationId()) {
-                    this.expandedLocationId.set(results[0].partnerId);
+                if (resultsWithSlots.length > 0 && !this.expandedLocationId()) {
+                    this.expandedLocationId.set(resultsWithSlots[0].partnerId);
                 }
-                if (this.isOffline() && results.length === 0) {
+                if (this.isOffline() && resultsWithSlots.length === 0) {
                     this.toast.info('No locally saved locations found.');
                 }
             },
@@ -189,22 +241,32 @@ export class FacilityDiscoveryComponent implements OnInit {
         return this.selectedFacilitySlots().get(facilityId)?.includes(slotTime) ?? false;
     }
 
-    getFacilityHourlySlots(facility: FacilityDetail): HourlySlot[] {
-        if (facility.slots && facility.slots.length > 0) return facility.slots;
-        
-        // Fallback: Generate standard slots and mark the requested session time as 'Available'
-        const standard = SlotOrchestrator.generateStandardSlots();
-        const startIdx = SlotOrchestrator.getTimeIndex(this.sessionStartTime());
-        const endIdx = SlotOrchestrator.getTimeIndex(this.sessionEndTime());
+    isSlotAvailable(slot: HourlySlot): boolean {
+        return slot.status === 'Available';
+    }
 
-        return standard.map((slot, idx) => {
-            const isWithinSession = idx >= startIdx && idx < endIdx;
+    hasAnyAvailable(slots: HourlySlot[] | undefined): boolean {
+        return slots?.some(s => s.status === 'Available') ?? false;
+    }
+
+    private generateFallbackSlots(facility: FacilityDetail): HourlySlot[] {
+        // Fallback: Generate standard slots but mark all as "Closed" by default
+        // to prevent booking of non-declared infrastructure capacity.
+        const standard = SlotOrchestrator.generateStandardSlots();
+        return standard.map((slot) => {
             return {
                 ...slot,
-                status: isWithinSession ? 'Available' : 'Closed',
+                status: 'Closed',
                 pricing: facility.pricing as any
             };
         });
+    }
+
+    /**
+     * @deprecated Use f.slots directly in the template. This method is kept for backward compatibility if needed.
+     */
+    getFacilityHourlySlots(facility: FacilityDetail): HourlySlot[] {
+        return facility.slots || this.generateFallbackSlots(facility);
     }
 
     selectFacility(partner: PartnerLocationSearchResult, facility: FacilityDetail) {

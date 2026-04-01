@@ -8,7 +8,7 @@ export interface NearbyTeacher {
     name: string;
     specialization: string;
     activityType: 'Learning' | 'Research';
-    mode: 'Online' | 'Offline' | 'Hybrid';
+    mode: 'Online' | 'Offline';
     distance: number; // km
     availability: string;
     verified: boolean;
@@ -55,7 +55,7 @@ export class StudentDiscoveryService {
     // Mock data for teachers
     private teachersData = signal<NearbyTeacher[]>([
         { id: 1, name: 'Dr. Kavita Rao', specialization: 'Advanced Physics', activityType: 'Learning', mode: 'Offline', distance: 2.1, availability: 'Mon, Wed, Fri (5-7 PM)', verified: true },
-        { id: 2, name: 'Mr. John Miller', specialization: 'Applied Mathematics', activityType: 'Learning', mode: 'Hybrid', distance: 8.5, availability: 'Weekends (10 AM - 1 PM)', verified: true },
+        { id: 2, name: 'Mr. John Miller', specialization: 'Applied Mathematics', activityType: 'Learning', mode: 'Offline', distance: 8.5, availability: 'Weekends (10 AM - 1 PM)', verified: true },
         { id: 3, name: 'Dr. Sarah Chen', specialization: 'Biotechnology Research', activityType: 'Research', mode: 'Offline', distance: 12.4, availability: 'Tue, Thu (4-6 PM)', verified: false },
         { id: 4, name: 'Prof. Rajesh Khanna', specialization: 'Computer Science', activityType: 'Learning', mode: 'Online', distance: 5.2, availability: 'Daily (7-9 PM)', verified: true },
         { id: 5, name: 'Anjali Deshmukh', specialization: 'Environmental Science', activityType: 'Research', mode: 'Offline', distance: 18.2, availability: 'Saturdays', verified: true }
@@ -129,7 +129,7 @@ export class StudentDiscoveryService {
                         name: item.name,
                         specialization: item.teacherProfile?.specializations?.[0] || 'Expert',
                         activityType: 'Learning' as 'Learning' | 'Research',
-                        mode: 'Offline' as 'Online' | 'Offline' | 'Hybrid',
+                        mode: 'Offline' as 'Online' | 'Offline',
                         distance: 0.8, // Mock distance since it's hard to derive from User model directly without $near
                         availability: 'Flexible',
                         verified: item.status === 'Active'

@@ -178,25 +178,33 @@
                                                                 <label class="timeline-label"><i class="fas fa-clock"></i> Select Hourly Slots</label>
                                                                 <span class="selection-count">{{ selectedFacilitySlots().get(f.facilityId)?.length || 0 }} Selected</span>
                                                             </div>
-                                                            <div class="slot-grid-granular">
-                                                                @for (slot of getFacilityHourlySlots(f); track slot.time) {
-                                                                    <button type="button" class="slot-chip" 
-                                                                            [class.selected]="isSlotSelected(f.facilityId, slot.time)"
-                                                                            [class.available]="slot.status === 'Available'"
-                                                                            [class.booked]="slot.status === 'Booked'"
-                                                                            [class.closed]="slot.status === 'Closed'"
-                                                                            [disabled]="slot.status === 'Booked' || slot.status === 'Closed'"
-                                                                            (click)="toggleSlot(f.facilityId, slot.time)"
-                                                                            [title]="slot.time + ' - ' + slot.status">
-                                                                        {{ slot.time.split(':')[0] }}
-                                                                    </button>
-                                                                }
-                                                            </div>
-                                                            <div class="timeline-legend">
-                                                                <span class="legend-item"><span class="dot available"></span> Available</span>
-                                                                <span class="legend-item"><span class="dot selected"></span> Selected</span>
-                                                                <span class="legend-item"><span class="dot booked"></span> Booked</span>
-                                                            </div>
+
+                                                            @if (hasAnyAvailable(f.slots)) {
+                                                                <div class="slot-grid-granular">
+                                                                    @for (slot of f.slots ?? []; track slot.time) {
+                                                                        <button type="button" class="slot-chip" 
+                                                                                [class.selected]="isSlotSelected(f.facilityId, slot.time)"
+                                                                                [class.available]="slot.status === 'Available'"
+                                                                                [class.booked]="slot.status === 'Booked'"
+                                                                                [class.closed]="slot.status === 'Closed'"
+                                                                                [disabled]="slot.status === 'Booked' || slot.status === 'Closed'"
+                                                                                (click)="toggleSlot(f.facilityId, slot.time)"
+                                                                                [title]="slot.time + ' - ' + slot.status">
+                                                                            {{ slot.time.split(':')[0] }}
+                                                                        </button>
+                                                                    }
+                                                                </div>
+                                                                <div class="timeline-legend">
+                                                                    <span class="legend-item"><span class="dot available"></span> Available</span>
+                                                                    <span class="legend-item"><span class="dot selected"></span> Selected</span>
+                                                                    <span class="legend-item"><span class="dot booked"></span> Booked</span>
+                                                                </div>
+                                                            } @else {
+                                                                <div class="no-availability-notice">
+                                                                    <i class="fas fa-calendar-times"></i>
+                                                                    <p>No available slots declared for this date.</p>
+                                                                </div>
+                                                            }
                                                         </div>
 
                                                         <button class="btn-select-facility" 

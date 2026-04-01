@@ -18,7 +18,7 @@ interface HealthCamp {
   id: number;
   name: string;
   specialty: string;
-  mode: 'Online' | 'Hybrid';
+  mode: 'Online' | 'Offline';
   date: string;
   time: string;
   duration: string;
@@ -72,7 +72,7 @@ interface HealthCamp {
                 <span class="filter-lbl">Mode</span>
                 <button class="fpill" [class.on]="campModeFilter === 'All'" (click)="campModeFilter = 'All'">All</button>
                 <button class="fpill online" [class.on]="campModeFilter === 'Online'" (click)="campModeFilter = 'Online'">Online</button>
-                <button class="fpill hybrid" [class.on]="campModeFilter === 'Hybrid'" (click)="campModeFilter = 'Hybrid'">Hybrid</button>
+                <button class="fpill offline" [class.on]="campModeFilter === 'Offline'" (click)="campModeFilter = 'Offline'">Offline</button>
               </div>
               <div class="filter-pill-group">
                 <span class="filter-lbl">Specialty</span>
@@ -97,11 +97,11 @@ interface HealthCamp {
           <div class="camps-grid" *ngIf="filteredCamps().length > 0">
             <div class="camp-card" *ngFor="let camp of filteredCamps()"
               [class.online-card]="camp.mode === 'Online'"
-              [class.hybrid-card]="camp.mode === 'Hybrid'">
+              [class.offline-card]="camp.mode === 'Offline'">
 
               <!-- Card Top -->
               <div class="cc-top">
-                <div class="cc-mode-badge" [class.online]="camp.mode === 'Online'" [class.hybrid]="camp.mode === 'Hybrid'">
+                <div class="cc-mode-badge" [class.online]="camp.mode === 'Online'" [class.offline]="camp.mode === 'Offline'">
                   {{ camp.mode }}
                 </div>
                 <div class="cc-slots" [class.full]="slotsLeft(camp) === 0" [class.low]="slotsLeft(camp) > 0 && slotsLeft(camp) <= 5">
@@ -152,8 +152,8 @@ interface HealthCamp {
                 <span class="online-info-val">Shared after registration confirmation</span>
               </div>
 
-              <!-- Hybrid: Locations Accordion -->
-              <div class="hybrid-locations" *ngIf="camp.mode === 'Hybrid' && camp.locations">
+              <!-- Offline: Locations Accordion -->
+              <div class="offline-locations" *ngIf="camp.mode === 'Offline' && camp.locations">
                 <div class="loc-header" (click)="toggleLocations(camp.id)">
                   <span class="loc-header-title">{{ camp.locations.length }} Locations Available</span>
                   <span class="loc-toggle">{{ openLocationsCamp === camp.id ? '▲' : '▼' }}</span>
@@ -181,11 +181,11 @@ interface HealthCamp {
               <div class="cc-footer">
                 <ng-container *ngIf="!registeredCamps.has(camp.id)">
                   <button class="btn-register"
-                    [disabled]="slotsLeft(camp) === 0 || (camp.mode === 'Hybrid' && !getSelectedLocation(camp.id))"
+                    [disabled]="slotsLeft(camp) === 0 || (camp.mode === 'Offline' && !getSelectedLocation(camp.id))"
                     (click)="openRegistration(camp)">
                     {{ slotsLeft(camp) === 0 ? 'Camp Full' : 'Register Now' }}
                   </button>
-                  <span class="register-hint" *ngIf="camp.mode === 'Hybrid' && !getSelectedLocation(camp.id) && slotsLeft(camp) > 0">
+                  <span class="register-hint" *ngIf="camp.mode === 'Offline' && !getSelectedLocation(camp.id) && slotsLeft(camp) > 0">
                     Select a location above to register
                   </span>
                 </ng-container>
@@ -213,8 +213,8 @@ interface HealthCamp {
                 <button class="modal-close" (click)="closeModal()">✕</button>
               </div>
 
-              <!-- Hybrid: chosen location summary -->
-              <div class="modal-location-summary" *ngIf="selectedCamp?.mode === 'Hybrid' && selectedCamp?.id !== undefined">
+              <!-- Offline: chosen location summary -->
+              <div class="modal-location-summary" *ngIf="selectedCamp?.mode === 'Offline' && selectedCamp?.id !== undefined">
                 <span class="modal-loc-lbl">Selected Location</span>
                 <span class="modal-loc-val">{{ getLocationName(selectedCamp!.id) }}</span>
               </div>
@@ -583,7 +583,7 @@ interface HealthCamp {
       &:hover { color: #fff; border-color: color-mix(in srgb, #fff, transparent 70%); }
       &.on { background: color-mix(in srgb, #fff, transparent 92%); color: #fff; border-color: color-mix(in srgb, #fff, transparent 60%); }
       &.online.on { background: color-mix(in srgb, #3b82f6, transparent 85%); color: #60a5fa; border-color: #60a5fa; }
-      &.hybrid.on { background: color-mix(in srgb, #10b981, transparent 85%); color: #34d399; border-color: #34d399; }
+      &.offline.on { background: color-mix(in srgb, #10b981, transparent 85%); color: #34d399; border-color: #34d399; }
     }
 
     /* ── Results header ─────────────────────────────────────────────── */
@@ -622,7 +622,7 @@ interface HealthCamp {
       transition: 0.2s;
       &:hover { background: #080808; }
       &.online-card { border-top: 2px solid #3b82f6; }
-      &.hybrid-card { border-top: 2px solid #10b981; }
+      &.offline-card { border-top: 2px solid #10b981; }
     }
 
     .cc-top { display: flex; justify-content: space-between; align-items: center; }
@@ -630,7 +630,7 @@ interface HealthCamp {
       font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px;
       padding: 0.25rem 0.65rem; border: 1px solid;
       &.online { color: #60a5fa; border-color: #3b82f6; background: color-mix(in srgb, #3b82f6, transparent 90%); }
-      &.hybrid  { color: #34d399; border-color: #10b981; background: color-mix(in srgb, #10b981, transparent 90%); }
+      &.offline  { color: #34d399; border-color: #10b981; background: color-mix(in srgb, #10b981, transparent 90%); }
     }
     .cc-slots {
       font-size: 0.65rem; font-weight: 900; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;
@@ -669,8 +669,8 @@ interface HealthCamp {
     .online-info-lbl { display: block; font-size: 0.58rem; font-weight: 900; color: #60a5fa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.25rem; }
     .online-info-val { font-size: 0.72rem; color: color-mix(in srgb, #fff, transparent 50%); font-weight: 600; }
 
-    /* Hybrid Locations */
-    .hybrid-locations {
+    /* Offline Locations */
+    .offline-locations {
       border: 1px solid color-mix(in srgb, #10b981, transparent 75%);
       background: color-mix(in srgb, #10b981, transparent 96%);
     }
@@ -938,7 +938,7 @@ export class HealthConnectComponent {
       id: 1,
       name: 'Diabetes Awareness & Screening Camp',
       specialty: 'Endocrinology',
-      mode: 'Hybrid',
+      mode: 'Offline',
       date: '2026-03-08',
       time: '9:00 AM – 1:00 PM',
       duration: '4 Hours',
@@ -972,7 +972,7 @@ export class HealthConnectComponent {
       id: 3,
       name: 'Cardiac Health Checkup Camp',
       specialty: 'Cardiology',
-      mode: 'Hybrid',
+      mode: 'Offline',
       date: '2026-03-15',
       time: '8:00 AM – 12:00 PM',
       duration: '4 Hours',
@@ -990,7 +990,7 @@ export class HealthConnectComponent {
       id: 4,
       name: 'Women\'s Wellness & Gynecology Camp',
       specialty: 'Gynaecology',
-      mode: 'Hybrid',
+      mode: 'Offline',
       date: '2026-03-20',
       time: '10:00 AM – 2:00 PM',
       duration: '4 Hours',
@@ -1023,7 +1023,7 @@ export class HealthConnectComponent {
       id: 6,
       name: 'Paediatric Vaccination & Child Health Drive',
       specialty: 'Paediatrics',
-      mode: 'Hybrid',
+      mode: 'Offline',
       date: '2026-03-25',
       time: '9:00 AM – 4:00 PM',
       duration: 'Full Day',

@@ -18,7 +18,7 @@ export type SearchStatus =
     | 'draft' | 'published';
 
 export type DateRange = 'today' | 'this-week' | 'this-month' | '';
-export type WorkshopMode = 'online' | 'hybrid' | 'all';
+export type WorkshopMode = 'online' | 'offline' | 'all';
 export type SearchScope = 'global' | 'local';
 
 export interface SearchFilters {

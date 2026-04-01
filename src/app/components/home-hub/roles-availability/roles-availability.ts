@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 export class RolesAvailabilityComponent {
     @Input() roles: string[] = ['Student', 'Researcher'];
     @Input() availability: any = {
-        mode: 'Hybrid (Online + Classroom)',
+        mode: 'Offline (Online + Classroom)',
         location: 'Lucknow Center',
         timing: 'Mon-Fri, 10:00 AM - 04:00 PM'
     };

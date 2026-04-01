@@ -37,7 +37,7 @@ export interface WorkshopSchedule {
     activity: string;
     description?: string;
     fee: number;
-    mode: 'online' | 'hybrid';
+    mode: 'online' | 'offline';
     location: string | null;
     instructorType: string[];  // ['myself', 'open']
     resources?: string | null;
@@ -116,7 +116,7 @@ export interface WorkshopApiSchedule {
     activity: string;
     description?: string;
     fee: number;
-    mode: 'online' | 'hybrid';
+    mode: 'online' | 'offline';
     location: string | null;
     resources: string | null;
     instructorId?: { _id: string; name: string }; // Populated by backend
@@ -184,7 +184,7 @@ export interface AddSchedulePayload {
     activity: string;
     description: string;
     fee: number;
-    mode: 'online' | 'hybrid';
+    mode: 'online' | 'offline';
     location: string | null;
     resources?: string | null;
     facilityId?: string;
@@ -297,7 +297,7 @@ export interface EnrolledWorkshopSchedule {
     activity: string;
     description?: string;
     fee: number;
-    mode: 'online' | 'hybrid';
+    mode: 'online' | 'offline';
     location: string | null;
     _id: string;
     facilityId?: string;
@@ -379,7 +379,7 @@ export class WorkshopService {
                         ...s,
                         location: s.location ?? null,
                         resources: s.resources ?? null,
-                        mode: s.mode as 'online' | 'hybrid'
+                        mode: s.mode as 'online' | 'offline'
                     }))
                 };
                 newList = [item, ...list];
