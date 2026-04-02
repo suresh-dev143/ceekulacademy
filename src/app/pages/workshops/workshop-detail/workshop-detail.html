@@ -247,6 +247,34 @@
 
                 </div>
 
+                <!-- Stream Mode (online sessions only) -->
+                @if (isOnlineMode) {
+                <div class="wd-field" style="margin-top: 1rem;">
+                    <label class="wd-label">
+                        <i class="fas fa-broadcast-tower" style="color: var(--primary);"></i>
+                        Stream Mode *
+                    </label>
+                    <div class="wd-radio-group">
+                        <label class="wd-radio">
+                            <input type="radio" formControlName="streamMode" value="interactive_class">
+                            <span class="wd-radio-mark"></span>
+                            <span>
+                                <strong>Interactive Class</strong>
+                                <small style="display:block; color: var(--text-secondary);">Full-duplex · up to 30 participants with camera &amp; mic</small>
+                            </span>
+                        </label>
+                        <label class="wd-radio">
+                            <input type="radio" formControlName="streamMode" value="live_broadcast">
+                            <span class="wd-radio-mark"></span>
+                            <span>
+                                <strong>Live Broadcast</strong>
+                                <small style="display:block; color: var(--text-secondary);">One-way · 1000+ viewers, audience watches only</small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                }
+
                 <div class="wd-field" style="margin-top: 1rem;">
                     <label class="wd-label"><i class="fas fa-lock"></i> Conduct Policy (Fixed per Session)</label>
                     <div class="wd-preview-card"
@@ -445,6 +473,21 @@
                                     [class.fa-map-marker-alt]="s.mode === 'offline'"></i>
                                 {{ s.mode === 'offline' ? 'Offline' : 'Online' }}
                             </span>
+                            @if (s.streamMode === 'live_broadcast') {
+                            <span class="wd-tag wd-tag--broadcast">
+                                <i class="fas fa-broadcast-tower"></i> Broadcast
+                            </span>
+                            }
+                            @if (s.streamMode === 'interactive_class') {
+                            <span class="wd-tag wd-tag--interactive">
+                                <i class="fas fa-users"></i> Interactive
+                            </span>
+                            }
+                            @if (isLiveNow(s)) {
+                            <span class="wd-tag wd-tag--live-now">
+                                <i class="fas fa-circle"></i> LIVE NOW
+                            </span>
+                            }
                             @if (s.fee === 0) {
                             <span class="wd-tag wd-tag--free">Free</span>
                             }
@@ -503,6 +546,20 @@
                         Enroll
                     </button>
                     }
+                    }
+
+                    <!-- Go Live / Join Live -->
+                    @if (canAccessLiveRoom(s)) {
+                    <button type="button"
+                        class="wd-live-btn"
+                        [class.wd-live-btn--host]="isOwner() || isEnrolledAsInstructor()"
+                        [class.wd-live-btn--pulse]="isLiveNow(s)"
+                        (click)="goToLiveRoom(s)"
+                        [title]="liveRoomLabel(s)">
+                        <i class="fas" [class.fa-broadcast-tower]="isOwner() || isEnrolledAsInstructor()"
+                                       [class.fa-play-circle]="!(isOwner() || isEnrolledAsInstructor())"></i>
+                        {{ liveRoomLabel(s) }}
+                    </button>
                     }
 
                     @if (canEditSchedule(s)) {

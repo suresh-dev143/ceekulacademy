@@ -1,0 +1,151 @@
+<!-- Loading overlay -->
+@if (loading()) {
+  <div class="overlay">
+    <div class="spinner"></div>
+    <p>Connecting to live room…</p>
+  </div>
+}
+
+<!-- Error state -->
+@if (!loading() && errorMsg()) {
+  <div class="overlay">
+    <div class="error-card">
+      <h2>Unable to Join</h2>
+      <p>{{ errorMsg() }}</p>
+      <button (click)="goBack()">Go Back</button>
+    </div>
+  </div>
+}
+
+<!-- Room UI (rendered even while loading so DOM elements exist for video) -->
+<!-- Header -->
+<header class="live-header">
+  <button class="back-btn" (click)="goBack()">&#8592;</button>
+
+  @if (schedule()?.streamMode === 'live_broadcast') {
+    <span class="mode-badge broadcast">&#9679; LIVE</span>
+  } @else {
+    <span class="mode-badge interactive">&#128101; Interactive</span>
+  }
+
+  <span class="room-title">{{ workshopTitle() }}</span>
+  <span class="participant-count">{{ participantCount() }} participant{{ participantCount() === 1 ? '' : 's' }}</span>
+</header>
+
+<!-- Body: video grid + optional chat panel -->
+<div class="room-body">
+
+  <!-- Video grid -->
+  <div class="video-area" [class]="gridClass()">
+
+    <!-- Local video tile (hosts only) -->
+    @if (agora.isHost()) {
+      <div class="video-tile local-tile">
+        <div id="local-video" class="video-el"></div>
+        <span class="name-tag">You (Host)</span>
+        @if (!agora.isMicOn()) {
+          <span class="muted-icon">&#128263;</span>
+        }
+      </div>
+    }
+
+    <!-- Remote participant tiles -->
+    @for (p of agora.remoteParticipants(); track p.uid) {
+      <div class="video-tile">
+        @if (p.hasVideo) {
+          <div [id]="'remote-video-' + p.uid" class="video-el"></div>
+        } @else {
+          <div class="avatar-placeholder">
+            <span>&#128100;</span>
+          </div>
+        }
+        @if (!p.hasAudio) {
+          <span class="muted-icon">&#128263;</span>
+        }
+      </div>
+    }
+
+    <!-- Waiting message when no one else is in the room -->
+    @if (!agora.isHost() && agora.remoteParticipants().length === 0 && !loading()) {
+      <div class="waiting-msg">Waiting for the host to join…</div>
+    }
+    @if (agora.isHost() && agora.remoteParticipants().length === 0 && !loading()) {
+      <div class="waiting-msg">No participants yet — share your room link!</div>
+    }
+  </div>
+
+  <!-- Chat panel -->
+  <div class="chat-panel" [class.hidden]="!showChat()">
+    <div class="chat-header">Live Chat</div>
+
+    <div class="chat-messages" #chatMessages>
+      @for (msg of chat.messages(); track msg.id) {
+        <div class="chat-msg" [class.own]="msg.isOwn" [class.system]="msg.type === 'system'">
+          @if (msg.type !== 'system') {
+            <div class="chat-avatar"
+                 [style.background]="chat.avatarColor(msg.senderId)">
+              {{ chat.avatarInitial(msg.senderName) }}
+            </div>
+          }
+          <div>
+            @if (!msg.isOwn && msg.type !== 'system') {
+              <div class="chat-sender">{{ msg.senderName }}</div>
+            }
+            <div class="chat-bubble">{{ msg.text }}</div>
+          </div>
+        </div>
+      }
+
+      @if (chat.messages().length === 0) {
+        <div style="color:#475569; font-size:.78rem; text-align:center; margin-top:1rem;">
+          No messages yet. Say hello!
+        </div>
+      }
+    </div>
+
+    <div class="chat-input-row">
+      <input
+        class="chat-input"
+        type="text"
+        placeholder="Type a message…"
+        [(ngModel)]="chatInput"
+        (keydown)="onChatKeydown($event)"
+        [disabled]="!chat.isConnected()"
+      />
+      <button
+        class="chat-send-btn"
+        (click)="sendChatMessage()"
+        [disabled]="!chatInput.trim() || !chat.isConnected()"
+      >&#10148;</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Controls bar -->
+<div class="controls-bar">
+  @if (agora.isJoined()) {
+    <button class="ctrl-btn" [class.off]="!agora.isMicOn()" (click)="toggleMic()">
+      <span class="icon">{{ agora.isMicOn() ? '&#127908;' : '&#128263;' }}</span>
+      {{ agora.isMicOn() ? 'Mute' : 'Unmute' }}
+    </button>
+  }
+
+  @if (agora.isHost()) {
+    <button class="ctrl-btn" [class.off]="!agora.isCameraOn()" (click)="toggleCamera()">
+      <span class="icon">{{ agora.isCameraOn() ? '&#128249;' : '&#128247;' }}</span>
+      {{ agora.isCameraOn() ? 'Stop Video' : 'Start Video' }}
+    </button>
+  }
+
+  <!-- Chat toggle -->
+  <button class="ctrl-btn" [class.off]="showChat()" (click)="toggleChat()">
+    <span class="icon">&#128172;</span>
+    @if (!showChat() && chat.unreadCount() > 0) {
+      <span class="badge">{{ chat.unreadCount() }}</span>
+    }
+    Chat
+  </button>
+
+  <button class="leave-btn" (click)="leave()">Leave</button>
+</div>

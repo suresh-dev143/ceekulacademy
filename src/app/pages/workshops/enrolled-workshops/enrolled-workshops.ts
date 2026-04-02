@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { WorkshopService, EnrollmentRecord, WorkshopListItem } from '../../../services/workshop.service';
+import { Router, RouterModule } from '@angular/router';
+import { WorkshopService, EnrollmentRecord, WorkshopListItem, EnrolledWorkshopSchedule } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
 import { LayoutComponent } from '../../../components/layout/layout';
 import { ToastService } from '../../../core/services/toast.service';
@@ -9,7 +10,7 @@ import { WorkshopDetailComponent } from '../workshop-detail/workshop-detail';
 @Component({
     selector: 'app-enrolled-workshops',
     standalone: true,
-    imports: [CommonModule, LayoutComponent, WorkshopDetailComponent],
+    imports: [CommonModule, RouterModule, LayoutComponent, WorkshopDetailComponent],
     templateUrl: './enrolled-workshops.html',
     styleUrl: './enrolled-workshops.scss'
 })
@@ -17,6 +18,7 @@ export class EnrolledWorkshopsComponent implements OnInit {
     private ws = inject(WorkshopService);
     private auth = inject(AuthService);
     private toast = inject(ToastService);
+    private router = inject(Router);
     private platformId = inject(PLATFORM_ID);
     private isBrowser = isPlatformBrowser(this.platformId);
 
@@ -99,5 +101,26 @@ export class EnrolledWorkshopsComponent implements OnInit {
 
     closeWorkshopDetail() {
         this.selectedWorkshop.set(null);
+    }
+
+    /**
+     * Returns the first online schedule with a streamMode for this enrollment.
+     * For Students the enrolled scheduleId takes priority.
+     */
+    getLiveSchedule(enrollment: EnrollmentRecord): EnrolledWorkshopSchedule | null {
+        const schedules = enrollment.workshop.schedules;
+        // Students: find their specific enrolled schedule if it has streamMode
+        if (enrollment.scheduleId) {
+            const specific = schedules.find(s => s._id === enrollment.scheduleId && s.mode === 'online' && s.streamMode);
+            if (specific) return specific;
+        }
+        // Instructors / fallback: first online schedule with streamMode
+        return schedules.find(s => s.mode === 'online' && s.streamMode) ?? null;
+    }
+
+    goToLiveRoom(enrollment: EnrollmentRecord): void {
+        const schedule = this.getLiveSchedule(enrollment);
+        if (!schedule) return;
+        this.router.navigate(['/workshops', enrollment.workshop._id, 'live', schedule._id]);
     }
 }

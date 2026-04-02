@@ -28,6 +28,8 @@ export interface WorkshopThreeHourPlan {
     hour3: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean };
 }
 
+export type StreamMode = 'live_broadcast' | 'interactive_class';
+
 export interface WorkshopSchedule {
     date: string;       // YYYY-MM-DD
     startTime: string;       // HH:mm
@@ -38,6 +40,7 @@ export interface WorkshopSchedule {
     description?: string;
     fee: number;
     mode: 'online' | 'offline';
+    streamMode?: StreamMode;  // Only for online sessions
     location: string | null;
     instructorType: string[];  // ['myself', 'open']
     resources?: string | null;
@@ -117,6 +120,7 @@ export interface WorkshopApiSchedule {
     description?: string;
     fee: number;
     mode: 'online' | 'offline';
+    streamMode?: StreamMode;  // Only for online sessions
     location: string | null;
     resources: string | null;
     instructorId?: { _id: string; name: string }; // Populated by backend
@@ -185,6 +189,7 @@ export interface AddSchedulePayload {
     description: string;
     fee: number;
     mode: 'online' | 'offline';
+    streamMode?: StreamMode;  // Required when mode === 'online'
     location: string | null;
     resources?: string | null;
     facilityId?: string;
@@ -192,6 +197,23 @@ export interface AddSchedulePayload {
     partnerId?: string;
     partnerName?: string;
     facilityDetails?: any;
+}
+
+export interface AgoraTokenData {
+    token: string;
+    channelName: string;
+    uid: number;
+    appId: string;
+    role: 'host' | 'audience';
+    mode: StreamMode;
+    rtmToken: string;
+    rtmUid: string;
+}
+
+export interface AgoraTokenResponse {
+    status: boolean;
+    message: string;
+    data: AgoraTokenData;
 }
 
 export interface AddSchedulesResponse {
@@ -298,6 +320,7 @@ export interface EnrolledWorkshopSchedule {
     description?: string;
     fee: number;
     mode: 'online' | 'offline';
+    streamMode?: StreamMode;
     location: string | null;
     _id: string;
     facilityId?: string;
@@ -323,6 +346,7 @@ export interface EnrolledWorkshop {
 
 export interface EnrollmentRecord {
     enrollmentId: string;
+    scheduleId?: string;   // set for Student enrollments
     role: string;
     status: string;
     enrolledAt: string;
@@ -643,6 +667,7 @@ export class WorkshopService {
                 ...res,
                 data: res.data.map(enrollment => ({
                     ...enrollment,
+                    scheduleId: (enrollment as any).scheduleId ?? undefined,
                     workshop: {
                         ...enrollment.workshop,
                         workshopTitle: decodeHtml(enrollment.workshop.workshopTitle),
@@ -650,12 +675,26 @@ export class WorkshopService {
                         expertDescription: decodeHtml(enrollment.workshop.expertDescription),
                         schedules: enrollment.workshop.schedules.map(s => ({
                             ...s,
+                            streamMode: (s as any).streamMode ?? undefined,
                             activity: decodeHtml(s.activity),
                             description: s.description ? decodeHtml(s.description) : s.description
                         }))
                     }
                 }))
             }))
+        );
+    }
+
+    // ── Agora token ───────────────────────────────────────────────────────────
+
+    /**
+     * Requests a short-lived Agora RTC token from the backend.
+     * The backend determines the caller's role (host / audience) based on
+     * their enrollment and returns it alongside the token.
+     */
+    getAgoraToken(workshopId: string, scheduleId: string): Observable<AgoraTokenResponse> {
+        return this.http.get<AgoraTokenResponse>(
+            `${this.base}/api/v1/workshops/${workshopId}/schedules/${scheduleId}/agora-token`
         );
     }
 

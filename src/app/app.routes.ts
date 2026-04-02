@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home';
+import { LiveRoomComponent } from './pages/workshops/live-room/live-room';
 import { AboutComponent } from './pages/about/about';
 import { LoginComponent } from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
@@ -58,6 +59,7 @@ export const routes: Routes = [
     { path: 'programs/:programId/:sectionId', component: ProgramDetailComponent },
     { path: 'programs/:programId/:sectionId/:subSectionId', component: ProgramDetailComponent },
     { path: 'workshops', component: PublicWorkshopsPageComponent },
+    { path: 'workshops/:workshopId/live/:scheduleId', component: LiveRoomComponent },
     { path: 'transformation', component: TransformationComponent },
     { path: 'centers', component: CentersComponent },
     { path: 'health-connect', component: HealthConnectComponent },

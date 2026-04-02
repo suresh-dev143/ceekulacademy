@@ -1519,3 +1519,67 @@ $status-colors: (
         color: #dc5050;
     }
 }
+// ── Live-room tags ────────────────────────────────────────────────────────────
+
+.wd-tag--broadcast {
+    background: rgba(139, 92, 246, 0.15);
+    color: #a78bfa;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.wd-tag--interactive {
+    background: rgba(59, 130, 246, 0.12);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.wd-tag--live-now {
+    background: rgba(220, 38, 38, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(220, 38, 38, 0.35);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+
+    i { animation: live-pulse 1.2s ease-in-out infinite; }
+}
+
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+}
+
+// ── Go Live / Join Live button ────────────────────────────────────────────────
+
+.wd-live-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.9rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+
+    &:hover { background: rgba(59, 130, 246, 0.28); }
+
+    &--host {
+        background: rgba(220, 38, 38, 0.12);
+        color: #f87171;
+        border-color: rgba(220, 38, 38, 0.3);
+        &:hover { background: rgba(220, 38, 38, 0.25); }
+    }
+
+    &--pulse {
+        animation: live-btn-pulse 2s ease-in-out infinite;
+    }
+}
+
+@keyframes live-btn-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+    50%       { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+}

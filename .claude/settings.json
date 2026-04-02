@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(npx ng build:*)",
-      "Bash(ls -1 /Users/gs/Documents/GitHub/ceekulmission/src/app/services/*.ts)"
+      "Bash(ls -1 /Users/gs/Documents/GitHub/ceekulmission/src/app/services/*.ts)",
+      "Bash(grep -r \"agora\\\\|Agora\\\\|AGORA\" /Users/gs/Documents/GitHub/ceekulmission/src --include=*.ts --include=*.html)",
+      "Bash(grep -r \"agora\\\\|AgoraRTC\\\\|RTC\\\\|streaming\" /Users/gs/Documents/GitHub/ceekulmission/src/app/pages/workshops --include=*.ts)",
+      "Bash(grep -r \"agora-access-token\\\\|agora-token\" /Users/gs/Documents/GitHub/ceekulmission/src --include=*.ts --include=*.json)",
+      "Bash(find /Users/gs/Documents/GitHub/ceekulmission -name *.md -type f)",
+      "Bash(find /Users/gs/Documents/GitHub/ceekulmission/src -type f -name *stream* -o -name *agora* -o -name *video*)",
+      "Bash(grep -r \"AgoraService\\\\|agora.service\" /Users/gs/Documents/GitHub/ceekulmission/src --include=*.ts)",
+      "Read(//Users/gs/Documents/GitHub/**)"
     ]
   }
 }

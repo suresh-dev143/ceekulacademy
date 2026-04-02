@@ -4,6 +4,7 @@ import {
     AbstractControl, FormBuilder, FormGroup,
     ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import {
     WorkshopService,
     WorkshopListItem,
@@ -114,6 +115,7 @@ export class WorkshopDetailComponent {
     private toast = inject(ToastService);
     private razorpay = inject(RazorpayService);
     private authService = inject(AuthService);
+    private router = inject(Router);
 
     // ── Inputs / Outputs ──────────────────────────────────────────────────────
 
@@ -469,6 +471,43 @@ export class WorkshopDetailComponent {
         return this.addForm?.get('mode')?.value === 'offline';
     }
 
+    get isOnlineMode(): boolean {
+        return this.addForm?.get('mode')?.value === 'online';
+    }
+
+    // ── Live-room helpers ─────────────────────────────────────────────────────
+
+    /** True while the session time window is active (within the schedule's timezone). */
+    isLiveNow(s: WorkshopApiSchedule): boolean {
+        if (s.mode !== 'online' || !s.streamMode) return false;
+        const zone = TZ_IANA[s.timezone] ?? s.timezone ?? 'UTC';
+        const now = new Date();
+        const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit', hour12: false,
+        }).formatToParts(now);
+        const d = `${parts.find(p => p.type === 'year')!.value}-${parts.find(p => p.type === 'month')!.value}-${parts.find(p => p.type === 'day')!.value}`;
+        const t = `${parts.find(p => p.type === 'hour')!.value.padStart(2, '0')}:${parts.find(p => p.type === 'minute')!.value.padStart(2, '0')}`;
+        const schedDate = s.date.split('T')[0];
+        return schedDate === d && t >= s.startTime && t <= s.endTime;
+    }
+
+    /** Whether the current user can open the live room for this schedule. */
+    canAccessLiveRoom(s: WorkshopApiSchedule): boolean {
+        if (s.mode !== 'online' || !s.streamMode) return false;
+        if (this.isOwner() || this.isEnrolledAsInstructor()) return true;
+        return this.isEnrolledInSchedule(s._id);
+    }
+
+    /** Button label based on the user's role. */
+    liveRoomLabel(s: WorkshopApiSchedule): string {
+        return (this.isOwner() || this.isEnrolledAsInstructor()) ? 'Go Live' : 'Join Live';
+    }
+
+    goToLiveRoom(s: WorkshopApiSchedule): void {
+        this.router.navigate(['/workshops', this.currentWorkshop()._id, 'live', s._id]);
+    }
+
     get selectedDate(): string {
         return this.addForm?.get('date')?.value ?? '';
     }
@@ -576,6 +615,7 @@ export class WorkshopDetailComponent {
             sessionOrder: ['', Validators.required],
             fee: [0, [Validators.required, Validators.min(0)]],
             mode: ['online', Validators.required],
+            streamMode: ['interactive_class'],
             location: [''],
             resources: [''],
             facilityId: [''],
@@ -607,15 +647,18 @@ export class WorkshopDetailComponent {
     private syncLocationValidator(mode: string): void {
         const loc = this.addForm.get('location')!;
         const facId = this.addForm.get('facilityId')!;
+        const streamMode = this.addForm.get('streamMode')!;
 
         if (mode === 'offline') {
             loc.setValidators(Validators.required);
             facId.setValidators(Validators.required);
+            streamMode.setValue(null);
         } else {
             loc.clearValidators();
             facId.clearValidators();
             loc.setValue('');
             facId.setValue('');
+            if (!streamMode.value) streamMode.setValue('interactive_class');
         }
         loc.updateValueAndValidity();
         facId.updateValueAndValidity();
@@ -858,6 +901,7 @@ export class WorkshopDetailComponent {
             description: '', // Populated by backend
             fee: Number(v.fee),
             mode: v.mode,
+            streamMode: v.mode === 'online' ? (v.streamMode || 'interactive_class') : undefined,
             location: v.mode === 'offline' ? (v.location || null) : null,
             resources: v.resources?.trim() || null,
             facilityId: v.facilityId || null,

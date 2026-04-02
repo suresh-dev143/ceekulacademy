@@ -63,7 +63,15 @@
             <span class="label">Total Fee:</span>
             <span class="value">₹{{ enrollment.workshop.totalRevenuePotential }}</span>
           </div>
-          <button type="button" class="btn-outline" (click)="onViewDetails(enrollment)">View Details</button>
+          <div style="display:flex; gap:.5rem; align-items:center;">
+            @if (getLiveSchedule(enrollment)) {
+            <button type="button" class="btn-join-live" (click)="goToLiveRoom(enrollment)">
+              <i class="fas fa-broadcast-tower"></i>
+              {{ enrollment.role === 'Student' ? 'Join Live' : 'Go Live' }}
+            </button>
+            }
+            <button type="button" class="btn-outline" (click)="onViewDetails(enrollment)">View Details</button>
+          </div>
         </div>
       </div>
     </div>
