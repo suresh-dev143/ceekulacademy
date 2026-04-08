@@ -5,12 +5,14 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 @Component({
     selector: 'app-profile-professional',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [ReactiveFormsModule],
     template: `
     <div class="section-card glass-card">
       <div class="section-header">
         <h2 class="section-title"><i class="fas fa-briefcase"></i> Professional Information</h2>
-        <button *ngIf="!isEditing" class="edit-btn" (click)="toggleEdit()">Edit</button>
+        @if (!isEditing) {
+        <button class="edit-btn" (click)="toggleEdit()">Edit</button>
+        }
       </div>
 
       <form [formGroup]="professionalForm" (ngSubmit)="onSubmit()" class="modern-form">
@@ -42,10 +44,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
           </div>
         </div>
 
-        <div class="form-actions" *ngIf="isEditing">
+        @if (isEditing) {
+        <div class="form-actions">
           <button type="button" class="btn-cancel" (click)="cancel()">Cancel</button>
           <button type="submit" class="btn-save" [disabled]="professionalForm.invalid">Save Changes</button>
         </div>
+        }
       </form>
     </div>
   `,

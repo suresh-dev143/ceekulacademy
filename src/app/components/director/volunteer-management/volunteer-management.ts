@@ -14,7 +14,8 @@ import { Volunteer } from '../../../services/director.service';
       </div>
 
       <div class="volunteer-list">
-        <div class="volunteer-row" *ngFor="let volunteer of volunteers">
+        @for (volunteer of volunteers; track $index) {
+        <div class="volunteer-row">
           <div class="vol-profile">
             <div class="vol-avatar">{{ volunteer.name[0] }}</div>
             <div class="vol-info">
@@ -40,6 +41,7 @@ import { Volunteer } from '../../../services/director.service';
             <button class="btn-icon accent">Assign</button>
           </div>
         </div>
+        }
       </div>
     </div>
   `,

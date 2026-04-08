@@ -11,7 +11,6 @@ import { PartnerService } from '../../services/partner.service';
   selector: 'app-partner-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
     LayoutComponent,
     PartnerOverviewComponent,
     NearbyTeachersComponent,

@@ -14,7 +14,8 @@ import { NearbyStudent } from '../../../services/teacher-dashboard.service';
       </div>
 
       <div class="student-grid">
-        <div class="student-card" *ngFor="let student of students">
+        @for (student of students; track student.id) {
+        <div class="student-card">
           <div class="dist-tag">{{ student.distance }} km away</div>
           <div class="card-header">
             <div class="avatar">{{ student.name[0] }}</div>
@@ -40,11 +41,14 @@ import { NearbyStudent } from '../../../services/teacher-dashboard.service';
             <button class="btn-icon"><i class="far fa-bookmark"></i></button>
           </div>
         </div>
+        }
       </div>
 
-      <div class="empty-state" *ngIf="students.length === 0">
+      @if (students.length === 0) {
+      <div class="empty-state">
         <p>No students found in this radius. Try widening your search.</p>
       </div>
+      }
     </div>
   `,
   styles: [`

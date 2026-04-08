@@ -36,7 +36,8 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
 
       <div class="panel-content">
         <!-- Tab 1: Post Guidance -->
-        <div *ngIf="activeTab() === 'post'" class="tab-content animate-fade-in">
+        @if (activeTab() === 'post') {
+        <div class="tab-content animate-fade-in">
           <div class="form-grid">
             <div class="form-group">
               <label>Guidance Type</label>
@@ -75,9 +76,11 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
             </div>
           </div>
         </div>
+        }
 
         <!-- Tab 2: Schedule Session -->
-        <div *ngIf="activeTab() === 'schedule'" class="tab-content animate-fade-in">
+        @if (activeTab() === 'schedule') {
+        <div class="tab-content animate-fade-in">
           <div class="form-grid">
             <div class="form-group full-width">
               <label>Session Topic</label>
@@ -126,12 +129,15 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
             </div>
           </div>
         </div>
+        }
 
         <!-- Tab 3: Active Items -->
-        <div *ngIf="activeTab() === 'active'" class="tab-content animate-fade-in">
+        @if (activeTab() === 'active') {
+        <div class="tab-content animate-fade-in">
           <div class="items-list">
             <h4>Active Guidance Notes</h4>
-            <div class="list-item" *ngFor="let guidance of publishedGuidances()">
+            @for (guidance of publishedGuidances(); track $index) {
+            <div class="list-item">
               <div class="item-header">
                 <span class="badge" [class]="guidance.type.toLowerCase().replace(' ', '-')">{{ guidance.type }}</span>
                 <span class="date">{{ guidance.publishedAt | date:'mediumDate' }}</span>
@@ -143,9 +149,11 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
                 <span>{{ guidance.viewCount }} views</span>
               </div>
             </div>
+            }
 
             <h4 class="mt-4">Upcoming Sessions</h4>
-            <div class="list-item session" *ngFor="let session of upcomingSessions()">
+            @for (session of upcomingSessions(); track $index) {
+            <div class="list-item session">
               <div class="session-date">
                 <span class="day">{{ session.scheduledDate | date:'d' }}</span>
                 <span class="month">{{ session.scheduledDate | date:'MMM' }}</span>
@@ -155,13 +163,17 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
                 <p>{{ session.scheduledTime }} ({{ session.duration }} mins) • {{ session.mode }}</p>
                 <div class="item-meta">
                    <span>{{ session.targetAudience.join(', ') }}</span>
-                   <a *ngIf="session.meetingLink" [href]="session.meetingLink" target="_blank" class="join-link">Join Link</a>
+                   @if (session.meetingLink) {
+                   <a [href]="session.meetingLink" target="_blank" class="join-link">Join Link</a>
+                   }
                 </div>
               </div>
               <button class="btn-icon" (click)="cancelSession(session.id)">&times;</button>
             </div>
+            }
           </div>
         </div>
+        }
       </div>
     </div>
   `,

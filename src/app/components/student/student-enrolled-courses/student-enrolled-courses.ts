@@ -6,7 +6,7 @@ import { EnrolledCourse } from '../../../services/student-dashboard.service';
 @Component({
     selector: 'app-student-enrolled-courses',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     template: `
     <div class="section-wrap animate-fade-in">
       <!-- Header & Filters -->
@@ -30,7 +30,9 @@ import { EnrolledCourse } from '../../../services/student-dashboard.service';
         <div class="filter-group">
           <label class="filter-label">Category</label>
           <select class="filter-select" [ngModel]="categoryFilter" (ngModelChange)="categoryFilterChange.emit($event)">
-            <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+            @for (c of categories; track $index) {
+            <option [value]="c">{{ c }}</option>
+            }
           </select>
         </div>
         <div class="filter-toggles">
@@ -41,8 +43,10 @@ import { EnrolledCourse } from '../../../services/student-dashboard.service';
       </div>
 
       <!-- Course Cards Grid -->
-      <div class="courses-grid" *ngIf="courses.length > 0">
-        <div class="course-card" *ngFor="let c of courses">
+      @if (courses.length > 0) {
+      <div class="courses-grid">
+        @for (c of courses; track c.id) {
+        <div class="course-card">
           <div class="card-top">
             <div class="thumb">{{ c.thumbnail }}</div>
             <div class="course-meta">
@@ -69,21 +73,29 @@ import { EnrolledCourse } from '../../../services/student-dashboard.service';
           </div>
 
           <div class="card-footer">
-            <button class="btn-primary" *ngIf="c.status !== 'Completed'">
+            @if (c.status !== 'Completed') {
+            <button class="btn-primary">
               <i class="fas fa-play"></i> Continue
             </button>
-            <button class="btn-success" *ngIf="c.status === 'Completed'">
+            }
+            @if (c.status === 'Completed') {
+            <button class="btn-success">
               <i class="fas fa-certificate"></i> Certificate
             </button>
+            }
             <span class="last-accessed">Last: {{ c.lastAccessed }}</span>
           </div>
         </div>
+        }
       </div>
+      }
 
-      <div class="empty-state" *ngIf="courses.length === 0">
+      @if (courses.length === 0) {
+      <div class="empty-state">
         <i class="fas fa-search"></i>
         <p>No courses match your filters.</p>
       </div>
+      }
     </div>
   `,
     styles: [`

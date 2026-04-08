@@ -20,7 +20,7 @@ type MentorFilter   = 'All' | 'Yes' | 'No';
 @Component({
     selector: 'app-research-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, LayoutComponent, RouterLink],
+    imports: [FormsModule, LayoutComponent, RouterLink],
     templateUrl: './research.html',
     styleUrl: './research.scss',
 })

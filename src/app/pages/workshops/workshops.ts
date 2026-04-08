@@ -1,5 +1,5 @@
 import { Component, signal, computed, inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs/operators';
@@ -118,7 +118,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
     selector: 'app-public-workshops-page',
     standalone: true,
     imports: [
-        CommonModule, FormsModule,
+        FormsModule,
         LayoutComponent, WorkshopCardComponent, WorkshopDetailComponent,
     ],
     templateUrl: './workshops.html',

@@ -12,7 +12,7 @@ import { AuthService } from '../../../services/auth.service';
 @Component({
     selector: 'app-live-room',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     templateUrl: './live-room.html',
     styles: [`
         :host {

@@ -5,7 +5,8 @@
     </div>
 
     <div class="activities-list">
-        <div class="activity-item" *ngFor="let activity of activities">
+        @for (activity of activities; track $index) {
+        <div class="activity-item">
             <div class="activity-type-icon" [attr.data-type]="activity.type">
                 <i class="fas" [ngClass]="getTypeIcon(activity.type)"></i>
             </div>
@@ -24,10 +25,13 @@
                 </div>
             </div>
         </div>
+        }
 
-        <div class="empty-state" *ngIf="activities.length === 0">
+        @if (activities.length === 0) {
+        <div class="empty-state">
             <p>No active programs found. Start exploring!</p>
             <button class="cta-btn">Join a Program</button>
         </div>
+        }
     </div>
 </div>

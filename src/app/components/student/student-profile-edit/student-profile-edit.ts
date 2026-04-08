@@ -19,7 +19,8 @@ import { StudentProfile } from '../../../services/student-dashboard.service';
 
       <div class="profile-card">
         <!-- View Mode -->
-        <div class="view-mode" *ngIf="!isEditing">
+        @if (!isEditing) {
+        <div class="view-mode">
           <div class="profile-hero">
             <div class="avatar-large">{{ profile.name[0] }}</div>
             <div class="hero-info">
@@ -40,7 +41,9 @@ import { StudentProfile } from '../../../services/student-dashboard.service';
           <div class="interests-section">
             <label class="lbl">Interests & Goals</label>
             <div class="chip-cloud">
-              <span class="chip" *ngFor="let i of profile.interests">{{ i }}</span>
+              @for (i of profile.interests; track $index) {
+              <span class="chip">{{ i }}</span>
+              }
             </div>
           </div>
 
@@ -48,9 +51,11 @@ import { StudentProfile } from '../../../services/student-dashboard.service';
             <span>Joined: {{ profile.joinedDate | date:'mediumDate' }}</span>
           </div>
         </div>
+        }
 
         <!-- Edit Mode -->
-        <div class="edit-mode" *ngIf="isEditing">
+        @if (isEditing) {
+        <div class="edit-mode">
           <div class="form-grid">
             <div class="form-group">
               <label>Full Name</label>
@@ -83,6 +88,7 @@ import { StudentProfile } from '../../../services/student-dashboard.service';
             <button class="btn-save" (click)="save()">Save Changes</button>
           </div>
         </div>
+        }
       </div>
     </div>
   `,

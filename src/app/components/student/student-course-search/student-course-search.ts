@@ -6,7 +6,7 @@ import { CatalogCourse } from '../../../services/student-dashboard.service';
 @Component({
     selector: 'app-student-course-search',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     template: `
     <div class="section-wrap animate-fade-in">
       <div class="section-header">
@@ -30,7 +30,9 @@ import { CatalogCourse } from '../../../services/student-dashboard.service';
           <div class="filter-group">
             <label class="filter-label">Category</label>
             <select class="filter-select" [ngModel]="categoryFilter" (ngModelChange)="categoryFilterChange.emit($event)">
-              <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+              @for (c of categories; track $index) {
+              <option [value]="c">{{ c }}</option>
+              }
             </select>
           </div>
           <div class="filter-group">
@@ -54,8 +56,10 @@ import { CatalogCourse } from '../../../services/student-dashboard.service';
       </div>
 
       <!-- Courses Grid -->
-      <div class="courses-grid" *ngIf="courses.length > 0">
-        <div class="course-card" *ngFor="let c of courses">
+      @if (courses.length > 0) {
+      <div class="courses-grid">
+        @for (c of courses; track c.id) {
+        <div class="course-card">
           <div class="card-thumb">
             <span class="thumb-emoji">{{ c.thumbnail }}</span>
             <span class="level-tag" [attr.data-level]="c.level">{{ c.level }}</span>
@@ -81,20 +85,24 @@ import { CatalogCourse } from '../../../services/student-dashboard.service';
           </div>
           <div class="card-footer">
             <div class="price-display">
-              <span class="price-free" *ngIf="c.pricing === 'Free'">FREE</span>
-              <span class="price-paid" *ngIf="c.pricing === 'Paid'">₹{{ c.price }}</span>
+              @if (c.pricing === 'Free') { <span class="price-free">FREE</span> }
+              @if (c.pricing === 'Paid') { <span class="price-paid">₹{{ c.price }}</span> }
             </div>
             <button class="btn-enroll" (click)="enroll.emit(c.id)">
               <i class="fas fa-plus"></i> Enroll
             </button>
           </div>
         </div>
+        }
       </div>
+      }
 
-      <div class="empty-state" *ngIf="courses.length === 0">
+      @if (courses.length === 0) {
+      <div class="empty-state">
         <i class="fas fa-search"></i>
         <p>No courses match your search.</p>
       </div>
+      }
     </div>
   `,
     styles: [`

@@ -8,9 +8,11 @@ import { ValidationService } from '../../../core/services/validation.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div *ngIf="shouldShowError()" class="error-message">
+    @if (shouldShowError()) {
+    <div class="error-message">
        <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
     </div>
+    }
   `,
   styles: [`
     .error-message {

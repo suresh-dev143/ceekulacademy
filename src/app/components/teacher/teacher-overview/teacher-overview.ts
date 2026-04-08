@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-teacher-overview',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="teacher-overview-card animated-fade-in">
       <div class="header-section">
@@ -32,11 +32,12 @@ import { FormsModule } from '@angular/forms';
         <div class="radius-selector">
           <label>Discovery Radius</label>
           <div class="button-group">
-            <button *ngFor="let r of [10, 15, 20]" 
-                    [class.active]="radius === r" 
+            @for (r of [10, 15, 20]; track $index) {
+            <button [class.active]="radius === r"
                     (click)="radiusChange.emit(r)">
               {{ r }} km
             </button>
+            }
           </div>
         </div>
       </div>

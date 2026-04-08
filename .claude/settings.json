@@ -10,6 +10,10 @@
       "Bash(find /Users/gs/Documents/GitHub/ceekulmission/src -type f -name *stream* -o -name *agora* -o -name *video*)",
       "Bash(grep -r \"AgoraService\\\\|agora.service\" /Users/gs/Documents/GitHub/ceekulmission/src --include=*.ts)",
       "Read(//Users/gs/Documents/GitHub/**)"
+    ],
+    "additionalDirectories": [
+      "/Users/gs/Documents/GitHub/ceekulmissionapi/src/services",
+      "/Users/gs/Documents/GitHub/ceekulmissionapi/src/controllers"
     ]
   }
 }

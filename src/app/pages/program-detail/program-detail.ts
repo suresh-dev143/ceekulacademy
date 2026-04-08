@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, SlicePipe} from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../components/navbar/navbar';
 import { ChatPanelComponent } from '../../components/chat-panel/chat-panel';
@@ -11,7 +11,8 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-program-detail',
     standalone: true,
-    imports: [CommonModule, NavbarComponent, ChatPanelComponent, ProgramSidebarComponent, GlobalSearchComponent],
+    imports: [NavbarComponent, ChatPanelComponent, ProgramSidebarComponent, GlobalSearchComponent,
+    SlicePipe],
     templateUrl: './program-detail.html',
     styleUrl: './program-detail.scss'
 })

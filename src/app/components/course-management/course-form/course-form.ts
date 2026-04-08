@@ -6,7 +6,7 @@ import { Course } from '../../../services/course.service';
 @Component({
     selector: 'app-course-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [ReactiveFormsModule],
     templateUrl: './course-form.html',
     styleUrl: './course-form.scss'
 })

@@ -1,5 +1,5 @@
 import { Component, signal, computed, inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, TitleCasePipe} from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { WorkshopService, EnrollmentRecord, WorkshopListItem, EnrolledWorkshopSchedule } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
@@ -10,7 +10,8 @@ import { WorkshopDetailComponent } from '../workshop-detail/workshop-detail';
 @Component({
     selector: 'app-enrolled-workshops',
     standalone: true,
-    imports: [CommonModule, RouterModule, LayoutComponent, WorkshopDetailComponent],
+    imports: [RouterModule, LayoutComponent, WorkshopDetailComponent,
+    TitleCasePipe],
     templateUrl: './enrolled-workshops.html',
     styleUrl: './enrolled-workshops.scss'
 })

@@ -1,5 +1,6 @@
-import { Component, inject, Input, computed, OnInit, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, Input, computed, OnInit, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule, UpperCasePipe} from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService, UserRole } from '../../services/auth.service';
 import { WorkshopService } from '../../services/workshop.service';
@@ -26,7 +27,8 @@ export interface NavSection {
 @Component({
     selector: 'app-sidebar-left',
     standalone: true,
-    imports: [CommonModule, RouterLink, RouterLinkActive, NewsSidebarTickerComponent],
+    imports: [RouterLink, RouterLinkActive, NewsSidebarTickerComponent,
+    UpperCasePipe],
     templateUrl: './sidebar-left.html',
     styleUrl: './sidebar-left.scss'
 })
@@ -34,6 +36,7 @@ export class SidebarLeftComponent implements OnInit {
 
     private authService = inject(AuthService);
     private workshopService = inject(WorkshopService);
+    private destroyRef = inject(DestroyRef);
 
     @Input() collapsed = false;
 
@@ -51,7 +54,7 @@ export class SidebarLeftComponent implements OnInit {
         this.checkUserEngagements();
 
         // Listen for new workshop creations
-        this.workshopService.refresh$.subscribe(() => {
+        this.workshopService.refresh$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
             this.checkUserEngagements();
         });
     }
@@ -147,6 +150,12 @@ export class SidebarLeftComponent implements OnInit {
 
         return [
             ...coreSections,
+            {
+                label: 'Ad Platform',
+                items: [
+                    { label: 'Advertiser Dashboard', route: '/dashboard/advertiser' },
+                ]
+            }
         ];
     });
 

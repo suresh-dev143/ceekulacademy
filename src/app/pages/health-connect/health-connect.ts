@@ -34,7 +34,7 @@ interface HealthCamp {
 @Component({
   selector: 'app-health-connect',
   standalone: true,
-  imports: [CommonModule, FormsModule, LayoutComponent],
+  imports: [FormsModule, LayoutComponent],
   template: `
     <app-layout>
       <div class="hc-page">
@@ -60,7 +60,8 @@ interface HealthCamp {
         <!-- ══════════════════════════════════════════════════════════
              PAGE: HEALTH CAMPS
         ══════════════════════════════════════════════════════════ -->
-        <div *ngIf="activePage() === 'camps'">
+        @if (activePage() === 'camps') {
+        <div>
 
           <!-- Filters Bar -->
           <div class="camps-filters">
@@ -76,13 +77,15 @@ interface HealthCamp {
               </div>
               <div class="filter-pill-group">
                 <span class="filter-lbl">Specialty</span>
-                <button class="fpill" [class.on]="campSpecFilter === s"
-                  *ngFor="let s of campSpecialties" (click)="campSpecFilter = s">{{ s }}</button>
+                @for (s of campSpecialties; track s) {
+                <button class="fpill" [class.on]="campSpecFilter === s" (click)="campSpecFilter = s">{{ s }}</button>
+                }
               </div>
               <div class="filter-pill-group">
                 <span class="filter-lbl">City</span>
-                <button class="fpill" [class.on]="campCityFilter === c"
-                  *ngFor="let c of campCities" (click)="campCityFilter = c">{{ c }}</button>
+                @for (c of campCities; track c) {
+                <button class="fpill" [class.on]="campCityFilter === c" (click)="campCityFilter = c">{{ c }}</button>
+                }
               </div>
             </div>
           </div>
@@ -94,8 +97,10 @@ interface HealthCamp {
           </div>
 
           <!-- Camp Cards Grid -->
-          <div class="camps-grid" *ngIf="filteredCamps().length > 0">
-            <div class="camp-card" *ngFor="let camp of filteredCamps()"
+          @if (filteredCamps().length > 0) {
+          <div class="camps-grid">
+            @for (camp of filteredCamps(); track camp.id) {
+            <div class="camp-card"
               [class.online-card]="camp.mode === 'Online'"
               [class.offline-card]="camp.mode === 'Offline'">
 
@@ -136,7 +141,7 @@ interface HealthCamp {
 
               <!-- Tags -->
               <div class="cc-tags">
-                <span class="cc-tag" *ngFor="let t of camp.tags">{{ t }}</span>
+                @for (t of camp.tags; track t) { <span class="cc-tag">{{ t }}</span> }
               </div>
 
               <!-- Slots bar -->
@@ -147,19 +152,24 @@ interface HealthCamp {
               <span class="slots-text">{{ camp.bookedSlots }} / {{ camp.totalSlots }} registered</span>
 
               <!-- Online: meeting info -->
-              <div class="online-info" *ngIf="camp.mode === 'Online'">
+              @if (camp.mode === 'Online') {
+              <div class="online-info">
                 <span class="online-info-lbl">Secure Video Link</span>
                 <span class="online-info-val">Shared after registration confirmation</span>
               </div>
+              }
 
               <!-- Offline: Locations Accordion -->
-              <div class="offline-locations" *ngIf="camp.mode === 'Offline' && camp.locations">
+              @if (camp.mode === 'Offline' && camp.locations) {
+              <div class="offline-locations">
                 <div class="loc-header" (click)="toggleLocations(camp.id)">
                   <span class="loc-header-title">{{ camp.locations.length }} Locations Available</span>
                   <span class="loc-toggle">{{ openLocationsCamp === camp.id ? '▲' : '▼' }}</span>
                 </div>
-                <div class="loc-list" *ngIf="openLocationsCamp === camp.id">
-                  <div class="loc-row" *ngFor="let loc of camp.locations"
+                @if (openLocationsCamp === camp.id) {
+                <div class="loc-list">
+                  @for (loc of camp.locations; track loc.id) {
+                  <div class="loc-row"
                     [class.sel]="getSelectedLocation(camp.id) === loc.id"
                     (click)="selectLocation(camp.id, loc.id)">
                     <div class="loc-pick">
@@ -174,35 +184,47 @@ interface HealthCamp {
                       {{ loc.slotsAvailable }} slots
                     </div>
                   </div>
+                  }
                 </div>
+                }
               </div>
+              }
 
               <!-- Register / Registered state -->
               <div class="cc-footer">
-                <ng-container *ngIf="!registeredCamps.has(camp.id)">
+                @if (!registeredCamps.has(camp.id)) {
                   <button class="btn-register"
                     [disabled]="slotsLeft(camp) === 0 || (camp.mode === 'Offline' && !getSelectedLocation(camp.id))"
                     (click)="openRegistration(camp)">
                     {{ slotsLeft(camp) === 0 ? 'Camp Full' : 'Register Now' }}
                   </button>
-                  <span class="register-hint" *ngIf="camp.mode === 'Offline' && !getSelectedLocation(camp.id) && slotsLeft(camp) > 0">
+                  @if (camp.mode === 'Offline' && !getSelectedLocation(camp.id) && slotsLeft(camp) > 0) {
+                  <span class="register-hint">
                     Select a location above to register
                   </span>
-                </ng-container>
-                <div class="registered-badge" *ngIf="registeredCamps.has(camp.id)">
+                  }
+                }
+                @if (registeredCamps.has(camp.id)) {
+                <div class="registered-badge">
                   Registered — Confirmation sent to your email
                 </div>
+                }
               </div>
 
             </div>
+            }
           </div>
+          }
 
-          <div class="empty-state" *ngIf="filteredCamps().length === 0">
+          @if (filteredCamps().length === 0) {
+          <div class="empty-state">
             <p>No camps match your filters. Try adjusting mode, specialty or city.</p>
           </div>
+          }
 
           <!-- ── Registration Modal ──────────────────────────────── -->
-          <div class="modal-backdrop" *ngIf="registrationModal" (click)="closeModal()">
+          @if (registrationModal) {
+          <div class="modal-backdrop" (click)="closeModal()">
             <div class="modal-box" (click)="$event.stopPropagation()">
               <div class="modal-header">
                 <div>
@@ -214,15 +236,19 @@ interface HealthCamp {
               </div>
 
               <!-- Offline: chosen location summary -->
-              <div class="modal-location-summary" *ngIf="selectedCamp?.mode === 'Offline' && selectedCamp?.id !== undefined">
+              @if (selectedCamp?.mode === 'Offline' && selectedCamp?.id !== undefined) {
+              <div class="modal-location-summary">
                 <span class="modal-loc-lbl">Selected Location</span>
                 <span class="modal-loc-val">{{ getLocationName(selectedCamp!.id) }}</span>
               </div>
+              }
 
               <!-- Online: meeting info -->
-              <div class="modal-online-info" *ngIf="selectedCamp?.mode === 'Online'">
+              @if (selectedCamp?.mode === 'Online') {
+              <div class="modal-online-info">
                 A secure video meeting link will be sent to your registered email 30 minutes before the camp begins. Ensure your camera and microphone are working.
               </div>
+              }
 
               <div class="modal-form">
                 <div class="form-grid modal-grid">
@@ -265,14 +291,17 @@ interface HealthCamp {
               </div>
             </div>
           </div>
+          }
 
-        </div><!-- /camps page -->
+        </div>
+        }<!-- /camps page -->
 
 
         <!-- ══════════════════════════════════════════════════════════
              PAGE: CARE REGISTRATION FORM
         ══════════════════════════════════════════════════════════ -->
-        <div *ngIf="activePage() === 'care'">
+        @if (activePage() === 'care') {
+        <div>
 
           <!-- Progress track -->
           <div class="progress-track">
@@ -331,7 +360,8 @@ interface HealthCamp {
                 </div>
               </div>
 
-              <div class="sub-section" *ngIf="userType === 'individual'">
+              @if (userType === 'individual') {
+              <div class="sub-section">
                 <h3 class="sub-title">Personal Details</h3>
                 <div class="form-grid">
                   <div class="fg"><label class="fl req">Full Legal Name</label><input type="text" class="fi" [(ngModel)]="fullLegalName" name="fullLegalName" placeholder="As per official documents" required></div>
@@ -342,8 +372,10 @@ interface HealthCamp {
                   <div class="fg span-full"><label class="fl req">Current Address</label><textarea class="fta" [(ngModel)]="currentAddress" name="currentAddress" rows="3" placeholder="Full address including area, city, pin code..." required></textarea><span class="fh">Used to find nearby health centers</span></div>
                 </div>
               </div>
+              }
 
-              <div class="sub-section" *ngIf="userType === 'caregiver'">
+              @if (userType === 'caregiver') {
+              <div class="sub-section">
                 <h3 class="sub-title">Caregiver Details</h3>
                 <div class="form-grid">
                   <div class="fg"><label class="fl req">Caregiver Full Legal Name</label><input type="text" class="fi" [(ngModel)]="caregiverFullName" name="caregiverFullName" placeholder="Your full name" required></div>
@@ -363,6 +395,7 @@ interface HealthCamp {
                   </div>
                 </div>
               </div>
+              }
             </div>
 
             <!-- PART 2 -->
@@ -373,13 +406,13 @@ interface HealthCamp {
                 <p class="section-desc">Automated pre-screening — Your information helps us provide accurate, personalised care.</p>
               </div>
               <div class="form-grid">
-                <div class="fg span-full"><label class="fl">Known Allergies</label><div class="chip-group"><button type="button" class="chip" [class.on]="isIn(knownAllergies, opt)" *ngFor="let opt of allergyOpts" (click)="toggle(knownAllergies, opt)">{{ opt }}</button></div></div>
+                <div class="fg span-full"><label class="fl">Known Allergies</label><div class="chip-group">@for (opt of allergyOpts; track opt) { <button type="button" class="chip" [class.on]="isIn(knownAllergies, opt)" (click)="toggle(knownAllergies, opt)">{{ opt }}</button> }</div></div>
                 <div class="fg span-full"><label class="fl">Current Medications</label><textarea class="fta" [(ngModel)]="currentMedications" name="currentMedications" rows="3" placeholder="List all current medications, dosage, and frequency..."></textarea></div>
-                <div class="fg span-full"><label class="fl">Chronic Conditions</label><div class="chip-group"><button type="button" class="chip" [class.on]="isIn(chronicConditions, opt)" *ngFor="let opt of chronicOpts" (click)="toggle(chronicConditions, opt)">{{ opt }}</button></div></div>
+                <div class="fg span-full"><label class="fl">Chronic Conditions</label><div class="chip-group">@for (opt of chronicOpts; track opt) { <button type="button" class="chip" [class.on]="isIn(chronicConditions, opt)" (click)="toggle(chronicConditions, opt)">{{ opt }}</button> }</div></div>
                 <div class="fg span-full"><label class="fl">Past Surgeries &amp; Hospitalizations</label><textarea class="fta" [(ngModel)]="pastSurgeries" name="pastSurgeries" rows="3" placeholder="Briefly describe dates and reasons..."></textarea></div>
-                <div class="fg span-full"><label class="fl">Family Medical History</label><div class="chip-group"><button type="button" class="chip" [class.on]="isIn(familyHistory, opt)" *ngFor="let opt of familyHistoryOpts" (click)="toggle(familyHistory, opt)">{{ opt }}</button></div></div>
-                <div class="fg"><label class="fl">Smoking Status</label><div class="pill-group"><label class="pill" [class.on]="smokingStatus === v" *ngFor="let v of ['Never','Former','Current']"><input type="radio" [name]="'smokingStatus'" [value]="v" [(ngModel)]="smokingStatus"> {{ v }}</label></div></div>
-                <div class="fg"><label class="fl">Alcohol Consumption</label><div class="pill-group"><label class="pill" [class.on]="alcoholConsumption === v" *ngFor="let v of ['Never','Socially','Regularly','Heavy']"><input type="radio" [name]="'alcoholConsumption'" [value]="v" [(ngModel)]="alcoholConsumption"> {{ v }}</label></div></div>
+                <div class="fg span-full"><label class="fl">Family Medical History</label><div class="chip-group">@for (opt of familyHistoryOpts; track opt) { <button type="button" class="chip" [class.on]="isIn(familyHistory, opt)" (click)="toggle(familyHistory, opt)">{{ opt }}</button> }</div></div>
+                <div class="fg"><label class="fl">Smoking Status</label><div class="pill-group">@for (v of ['Never','Former','Current']; track v) { <label class="pill" [class.on]="smokingStatus === v"><input type="radio" [name]="'smokingStatus'" [value]="v" [(ngModel)]="smokingStatus"> {{ v }}</label> }</div></div>
+                <div class="fg"><label class="fl">Alcohol Consumption</label><div class="pill-group">@for (v of ['Never','Socially','Regularly','Heavy']; track v) { <label class="pill" [class.on]="alcoholConsumption === v"><input type="radio" [name]="'alcoholConsumption'" [value]="v" [(ngModel)]="alcoholConsumption"> {{ v }}</label> }</div></div>
                 <div class="fg"><label class="fl">Physical Activity Level</label><select class="fs" [(ngModel)]="physicalActivityLevel" name="physicalActivityLevel"><option value="">Select level</option><option>Sedentary</option><option>Lightly Active</option><option>Moderately Active</option><option>Very Active</option></select></div>
                 <div class="fg span-full"><label class="fl">Vaccination Status <span class="opt-tag">Optional</span></label><textarea class="fta" [(ngModel)]="vaccinationStatus" name="vaccinationStatus" rows="2" placeholder="e.g. Flu 2023, COVID-19 full series, Hepatitis B..."></textarea></div>
                 <div class="fg span-full"><label class="fl">Upload Existing Medical Records <span class="opt-tag">Optional</span></label><div class="file-zone"><input type="file" class="file-inp" id="medRecords" accept=".pdf,.jpg,.jpeg,.png" multiple><label for="medRecords" class="file-lbl"><span class="file-main">Upload lab reports, doctor's notes, prescriptions</span><span class="file-hint">PDF, DICOM, JPEG — Max 20 MB</span></label></div></div>
@@ -405,21 +438,25 @@ interface HealthCamp {
                     <label class="radio-card" [class.sel]="hasInsurance === 'no'"><input type="radio" name="hasInsurance" value="no" [(ngModel)]="hasInsurance"><div class="rc-body"><span class="rc-title">No, I do not have health insurance</span><span class="rc-sub">I will choose a payment method below</span></div></label>
                   </div>
                 </div>
-                <ng-container *ngIf="hasInsurance === 'yes'">
+                @if (hasInsurance === 'yes') {
                   <div class="fg"><label class="fl req">Insurance Provider</label><input type="text" class="fi" [(ngModel)]="insuranceProvider" name="insuranceProvider" placeholder="e.g. Star Health, HDFC ERGO" required></div>
                   <div class="fg"><label class="fl req">Policy Number</label><input type="text" class="fi" [(ngModel)]="policyNumber" name="policyNumber" placeholder="Your policy number" required></div>
                   <div class="fg"><label class="fl">Group Number <span class="opt-tag">Optional</span></label><input type="text" class="fi" [(ngModel)]="groupNumber" name="groupNumber" placeholder="Employer / group number"></div>
                   <div class="fg span-full"><label class="fl req">Upload Insurance Card</label><div class="file-zone"><input type="file" class="file-inp" id="insCard" accept=".jpg,.jpeg,.png,.pdf"><label for="insCard" class="file-lbl"><span class="file-main">Upload front and back of insurance card</span><span class="file-hint">JPG, PNG, PDF — Max 2 MB</span></label></div></div>
                   <div class="fg span-full"><label class="checkbox-row"><input type="checkbox" [(ngModel)]="consentToBillInsurance" name="consentToBillInsurance" required><span class="cb-label">I authorize Ceekul Health Connect to directly bill my insurance provider for eligible services on my behalf.</span></label></div>
-                </ng-container>
-                <ng-container *ngIf="hasInsurance === 'no'">
+                }
+                @if (hasInsurance === 'no') {
                   <div class="fg span-full"><label class="fl req">Preferred Payment Method</label>
                     <div class="radio-card-group four-col">
-                      <label class="radio-card sm" [class.sel]="paymentMethodPreference === v.val" *ngFor="let v of paymentMethods"><input type="radio" name="paymentMethodPreference" [value]="v.val" [(ngModel)]="paymentMethodPreference"><div class="rc-body"><span class="rc-title">{{ v.label }}</span></div></label>
+                      @for (v of paymentMethods; track v.val) {
+                      <label class="radio-card sm" [class.sel]="paymentMethodPreference === v.val"><input type="radio" name="paymentMethodPreference" [value]="v.val" [(ngModel)]="paymentMethodPreference"><div class="rc-body"><span class="rc-title">{{ v.label }}</span></div></label>
+                      }
                     </div>
                   </div>
-                  <div class="fg span-full" *ngIf="paymentMethodPreference === 'aid'"><label class="fl">Briefly explain your financial assistance need <span class="opt-tag">Optional</span></label><textarea class="fta" [(ngModel)]="financialAidRequestBrief" name="financialAidRequestBrief" rows="4" placeholder="Explain your need for financial assistance or a payment plan..."></textarea></div>
-                </ng-container>
+                  @if (paymentMethodPreference === 'aid') {
+                  <div class="fg span-full"><label class="fl">Briefly explain your financial assistance need <span class="opt-tag">Optional</span></label><textarea class="fta" [(ngModel)]="financialAidRequestBrief" name="financialAidRequestBrief" rows="4" placeholder="Explain your need for financial assistance or a payment plan..."></textarea></div>
+                  }
+                }
               </div>
             </div>
 
@@ -439,33 +476,35 @@ interface HealthCamp {
                   </div>
                 </div>
                 <div class="fg span-full"><label class="fl req">Reason for Visit</label><textarea class="fta" [(ngModel)]="reasonForVisit" name="reasonForVisit" rows="5" placeholder="Describe your symptoms, concerns, or reason for seeking care (max 500 words)..." required></textarea></div>
-                <div class="fg span-full"><label class="fl">Symptom List</label><div class="chip-group"><button type="button" class="chip" [class.on]="isIn(symptomList, opt)" *ngFor="let opt of symptomOpts" (click)="toggle(symptomList, opt)">{{ opt }}</button></div></div>
+                <div class="fg span-full"><label class="fl">Symptom List</label><div class="chip-group">@for (opt of symptomOpts; track opt) { <button type="button" class="chip" [class.on]="isIn(symptomList, opt)" (click)="toggle(symptomList, opt)">{{ opt }}</button> }</div></div>
                 <div class="fg"><label class="fl req">Symptom Start Date</label><input type="date" class="fi" [(ngModel)]="symptomStartDate" name="symptomStartDate" required></div>
                 <div class="fg"><label class="fl req">Symptom Severity</label><select class="fs" [(ngModel)]="symptomSeverity" name="symptomSeverity" required><option value="">Select severity</option><option value="mild">Mild — Not disrupting daily life</option><option value="moderate">Moderate — Affecting daily activities</option><option value="severe">Severe — Significantly limiting function</option><option value="critical">Critical — Requires urgent attention</option></select></div>
                 <div class="fg"><label class="fl">Upload Symptom Photos <span class="opt-tag">Optional</span></label><div class="file-zone compact"><input type="file" class="file-inp" id="symPhotos" accept=".jpg,.jpeg,.png" multiple><label for="symPhotos" class="file-lbl"><span class="file-main">Upload rash, injury or other photos</span><span class="file-hint">JPEG, PNG — Max 5 MB</span></label></div></div>
 
-                <ng-container *ngIf="careModePreference === 'online'">
+                @if (careModePreference === 'online') {
                   <div class="conditional-banner span-full">Online Consultation — Additional Details</div>
                   <div class="fg"><label class="fl">Preferred Consultation Time</label><input type="datetime-local" class="fi" [(ngModel)]="preferredConsultationTime" name="preferredConsultationTime"><span class="fh">Multiple dates can be selected during confirmation</span></div>
                   <div class="fg"><label class="fl">Doctor Gender Preference</label><select class="fs" [(ngModel)]="doctorGenderPreference" name="doctorGenderPreference"><option value="">No Preference</option><option>Male</option><option>Female</option></select></div>
                   <div class="fg"><label class="fl">Specialty Preference <span class="opt-tag">Optional</span></label><select class="fs" [(ngModel)]="specialtyPreference" name="specialtyPreference"><option value="">Any Specialty</option><option>General Physician</option><option>Pediatrician</option><option>Dermatologist</option><option>Psychologist</option><option>Cardiologist</option><option>Orthopedist</option><option>Other</option></select></div>
-                </ng-container>
+                }
 
-                <ng-container *ngIf="careModePreference === 'inperson'">
+                @if (careModePreference === 'inperson') {
                   <div class="conditional-banner span-full">In-Person Visit — Additional Details</div>
                   <div class="fg span-full"><label class="checkbox-row"><input type="checkbox" [(ngModel)]="locationAccess" name="locationAccess"><span class="cb-label">Allow Ceekul Health Connect to use my current location to find the nearest center.</span></label></div>
-                  <div class="fg" *ngIf="!locationAccess"><label class="fl">Preferred Center Location</label><input type="text" class="fi" [(ngModel)]="preferredCenterLocation" name="preferredCenterLocation" placeholder="Search by city or pin code"></div>
+                  @if (!locationAccess) {
+                  <div class="fg"><label class="fl">Preferred Center Location</label><input type="text" class="fi" [(ngModel)]="preferredCenterLocation" name="preferredCenterLocation" placeholder="Search by city or pin code"></div>
+                  }
                   <div class="fg"><label class="fl">Preferred In-Person Time</label><input type="datetime-local" class="fi" [(ngModel)]="preferredInPersonTime" name="preferredInPersonTime"></div>
                   <div class="fg"><label class="fl">Doctor Gender Preference</label><select class="fs" [(ngModel)]="doctorGenderPreferenceInPerson" name="doctorGenderPreferenceInPerson"><option value="">No Preference</option><option>Male</option><option>Female</option></select></div>
                   <div class="fg"><label class="fl">Specialty Preference <span class="opt-tag">Optional</span></label><select class="fs" [(ngModel)]="specialtyPreferenceInPerson" name="specialtyPreferenceInPerson"><option value="">Any Specialty</option><option>General Physician</option><option>Pediatrician</option><option>Dermatologist</option><option>Psychologist</option><option>Cardiologist</option><option>Orthopedist</option><option>Other</option></select></div>
-                </ng-container>
+                }
 
-                <ng-container *ngIf="careModePreference === 'hometest'">
+                @if (careModePreference === 'hometest') {
                   <div class="conditional-banner span-full">At-Home Testing Kit — Additional Details</div>
                   <div class="fg"><label class="fl req">Kit Type Requested</label><select class="fs" [(ngModel)]="kitTypeRequested" name="kitTypeRequested" required><option value="">Select kit type</option><option>Blood Pressure Monitor</option><option>Glucose Meter</option><option>Basic Blood Test Kit</option><option>STI Test</option><option>Pregnancy Test</option><option>Genetic Test</option><option>Other</option></select></div>
                   <div class="fg span-full"><label class="fl">Delivery Address <span class="opt-tag">If different from current address</span></label><textarea class="fta" [(ngModel)]="deliveryAddress" name="deliveryAddress" rows="3" placeholder="Enter full delivery address..."></textarea></div>
                   <div class="fg span-full"><label class="checkbox-row"><input type="checkbox" [(ngModel)]="confirmSelfTest" name="confirmSelfTest" required><span class="cb-label">I understand that I am responsible for performing the test accurately and uploading results as instructed, and that a professional review is required for interpretation.</span></label></div>
-                </ng-container>
+                }
               </div>
             </div>
 
@@ -477,7 +516,7 @@ interface HealthCamp {
                 <p class="section-desc">Automated &amp; human-assisted — Stay connected with reminders and real-time support.</p>
               </div>
               <div class="form-grid">
-                <div class="fg span-full"><label class="fl req">Notification Preferences</label><div class="chip-group"><button type="button" class="chip" [class.on]="isIn(notificationPreference, opt)" *ngFor="let opt of notificationOpts" (click)="toggle(notificationPreference, opt)">{{ opt }}</button></div></div>
+                <div class="fg span-full"><label class="fl req">Notification Preferences</label><div class="chip-group">@for (opt of notificationOpts; track opt) { <button type="button" class="chip" [class.on]="isIn(notificationPreference, opt)" (click)="toggle(notificationPreference, opt)">{{ opt }}</button> }</div></div>
                 <div class="fg span-full"><label class="checkbox-row"><input type="checkbox" [(ngModel)]="consentAutomatedReminders" name="consentAutomatedReminders" required><span class="cb-label">I consent to receive automated reminders for appointments, medication, and follow-ups. <span class="req-mark">Required</span></span></label></div>
                 <div class="fg span-full"><label class="checkbox-row"><input type="checkbox" [(ngModel)]="consentHealthTips" name="consentHealthTips"><span class="cb-label">I would like to receive general health tips and updates from Ceekul Health Connect. <span class="opt-tag">Optional</span></span></label></div>
                 <div class="fg span-full"><div class="action-btn-row"><button type="button" class="action-btn">Access 24/7 Live Chat Support</button><button type="button" class="action-btn">Browse AI-Powered FAQ Database</button></div></div>
@@ -504,7 +543,8 @@ interface HealthCamp {
             </div>
 
           </form>
-        </div><!-- /care page -->
+        </div>
+        }<!-- /care page -->
 
       </div>
     </app-layout>

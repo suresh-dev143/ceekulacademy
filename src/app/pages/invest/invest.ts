@@ -8,7 +8,7 @@ import { AssetInvestmentService, AssetInvestment, InvestmentArea, AssetType, Sco
 @Component({
     selector: 'app-invest-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, LayoutComponent],
+    imports: [FormsModule, LayoutComponent],
     templateUrl: './invest.html',
     styleUrl: './invest.scss'
 })

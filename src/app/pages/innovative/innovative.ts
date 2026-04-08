@@ -5,7 +5,7 @@ import { LayoutComponent } from '../../components/layout/layout';
 
 @Component({
   selector: 'app-innovative',
-  imports: [CommonModule, LayoutComponent],
+  imports: [LayoutComponent],
   templateUrl: './innovative.html',
   styleUrl: './innovative.scss'
 })

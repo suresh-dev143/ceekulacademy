@@ -8,6 +8,7 @@ import { TeacherNearbyStudentsComponent } from '../../components/teacher/teacher
 import { TeacherNearbyInfrastructureComponent } from '../../components/teacher/teacher-nearby-infrastructure/teacher-nearby-infrastructure';
 import { WorkshopManagerComponent } from '../../components/teacher/workshop-manager/workshop-manager';
 import { CourseFormComponent } from '../../components/course-management/course-form/course-form';
+import { NeuronWalletComponent } from '../../components/neuron-wallet/neuron-wallet';
 import { TeacherDashboardService } from '../../services/teacher-dashboard.service';
 import { CourseService, Course } from '../../services/course.service';
 
@@ -15,7 +16,6 @@ import { CourseService, Course } from '../../services/course.service';
   selector: 'app-teacher-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
     LayoutComponent,
     TeacherOverviewComponent,
     TeacherCourseManagerComponent,
@@ -138,15 +138,17 @@ import { CourseService, Course } from '../../services/course.service';
       </div>
 
       <!-- Course Form Modal -->
-      <div class="modal-overlay" *ngIf="isFormOpen" (click)="isFormOpen = false">
+      @if (isFormOpen) {
+      <div class="modal-overlay" (click)="isFormOpen = false">
         <div class="modal-content" (click)="$event.stopPropagation()">
-          <app-course-form 
-            [course]="selectedCourse" 
-            (save)="handleSave($event)" 
+          <app-course-form
+            [course]="selectedCourse"
+            (save)="handleSave($event)"
             (cancel)="isFormOpen = false">
           </app-course-form>
         </div>
       </div>
+      }
     </app-layout>
   `,
   styles: [`

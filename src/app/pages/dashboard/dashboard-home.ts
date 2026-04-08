@@ -11,7 +11,6 @@ import { NotificationsListComponent } from '../../components/home-hub/notificati
     selector: 'dashboard-app-home',
     standalone: true,
     imports: [
-        CommonModule,
         LayoutComponent,
         ProfileSummaryComponent,
         CourseCardsComponent,

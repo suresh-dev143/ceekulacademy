@@ -14,7 +14,8 @@ import { Partner } from '../../../services/director.service';
       </div>
 
       <div class="partner-grid">
-        <div class="partner-card" *ngFor="let partner of partners">
+        @for (partner of partners; track $index) {
+        <div class="partner-card">
           <div class="partner-info">
             <h4 class="partner-name">{{ partner.name }}</h4>
             <div class="partner-tags">
@@ -34,6 +35,7 @@ import { Partner } from '../../../services/director.service';
             <button class="action-btn delete">Deactivate</button>
           </div>
         </div>
+        }
       </div>
     </div>
   `,

@@ -6,7 +6,7 @@ import { AuthService } from '../../../services/auth.service';
 @Component({
     selector: 'app-workshop-manager',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [ReactiveFormsModule],
     templateUrl: './workshop-manager.html',
     styleUrl: './workshop-manager.scss'
 })

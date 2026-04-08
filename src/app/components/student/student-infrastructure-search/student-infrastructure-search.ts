@@ -6,7 +6,7 @@ import { SearchableInfrastructure } from '../../../services/student-dashboard.se
 @Component({
     selector: 'app-student-infrastructure-search',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     template: `
     <div class="section-wrap animate-fade-in">
       <div class="section-header">
@@ -58,8 +58,10 @@ import { SearchableInfrastructure } from '../../../services/student-dashboard.se
       </div>
 
       <!-- Infra Grid -->
-      <div class="infra-grid" *ngIf="infrastructure.length > 0">
-        <div class="infra-card" *ngFor="let infra of infrastructure">
+      @if (infrastructure.length > 0) {
+      <div class="infra-grid">
+        @for (infra of infrastructure; track infra.id) {
+        <div class="infra-card">
           <div class="card-header">
             <div class="infra-icon">{{ getIcon(infra.type) }}</div>
             <div class="infra-info">
@@ -74,7 +76,9 @@ import { SearchableInfrastructure } from '../../../services/student-dashboard.se
           </div>
 
           <div class="facilities-cloud">
-            <span class="facility-chip" *ngFor="let f of infra.facilities">{{ f }}</span>
+            @for (f of infra.facilities; track $index) {
+            <span class="facility-chip">{{ f }}</span>
+            }
           </div>
 
           <div class="stats-row">
@@ -86,9 +90,11 @@ import { SearchableInfrastructure } from '../../../services/student-dashboard.se
               <span class="stat-val"><i class="fas fa-star rating-star"></i> {{ infra.rating }}</span>
               <span class="stat-lbl">Rating</span>
             </div>
-            <div class="stat-item verified" *ngIf="infra.verified">
+            @if (infra.verified) {
+            <div class="stat-item verified">
               <i class="fas fa-certificate"></i> Verified
             </div>
+            }
           </div>
 
           <div class="card-footer">
@@ -100,12 +106,16 @@ import { SearchableInfrastructure } from '../../../services/student-dashboard.se
             </button>
           </div>
         </div>
+        }
       </div>
+      }
 
-      <div class="empty-state" *ngIf="infrastructure.length === 0">
+      @if (infrastructure.length === 0) {
+      <div class="empty-state">
         <i class="fas fa-building"></i>
         <p>No infrastructure found matching your criteria.</p>
       </div>
+      }
     </div>
   `,
     styles: [`

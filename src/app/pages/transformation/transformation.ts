@@ -5,7 +5,7 @@ import { LayoutComponent } from '../../components/layout/layout';
 
 @Component({
     selector: 'app-transformation',
-    imports: [CommonModule, LayoutComponent],
+    imports: [LayoutComponent],
     templateUrl: './transformation.html',
     styleUrl: './transformation.scss'
 })

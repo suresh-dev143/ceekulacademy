@@ -1,4 +1,5 @@
-<div class="news-ticker-container" *ngIf="latestNews().length > 0">
+@if (latestNews().length > 0) {
+<div class="news-ticker-container">
     <div class="ticker-header">
         <span class="pulse-dot"></span> Latest News
     </div>
@@ -6,7 +7,8 @@
     <div class="ticker-window">
         <div class="ticker-track">
             <!-- First set of items -->
-            <div class="ticker-item" *ngFor="let item of latestNews()" (click)="onNewsClick(item)">
+            @for (item of latestNews(); track item) {
+            <div class="ticker-item" (click)="onNewsClick(item)">
                 <div class="news-card glass-panel">
                     <div class="news-header">
                         <span class="badge" [ngClass]="item.type.toLowerCase()">{{ item.type }}</span>
@@ -20,9 +22,11 @@
                     </div>
                 </div>
             </div>
+            }
 
             <!-- Duplicate set for seamless loop -->
-            <div class="ticker-item" *ngFor="let item of latestNews()" (click)="onNewsClick(item)">
+            @for (item of latestNews(); track $index) {
+            <div class="ticker-item" (click)="onNewsClick(item)">
                 <div class="news-card glass-panel">
                     <div class="news-header">
                         <span class="badge" [ngClass]="item.type.toLowerCase()">{{ item.type }}</span>
@@ -36,6 +40,8 @@
                     </div>
                 </div>
             </div>
+            }
         </div>
     </div>
 </div>
+}

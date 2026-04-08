@@ -11,7 +11,6 @@ import { IssueDetailComponent } from '../../components/issues/issue-detail/issue
   selector: 'app-issues-page',
   standalone: true,
   imports: [
-    CommonModule,
     LayoutComponent,
     IssueCreateComponent,
     IssueListComponent,
@@ -20,15 +19,18 @@ import { IssueDetailComponent } from '../../components/issues/issue-detail/issue
   template: `
     <app-layout>
       <div class="issues-container">
-        <header class="issues-header animated-fade-in" *ngIf="view() !== 'detail'">
+        @if (view() !== 'detail') {
+        <header class="issues-header animated-fade-in">
           <h1 class="page-title">Community Issues</h1>
           <p class="page-subtitle">Report, track, and resolve local concerns with transparency.</p>
         </header>
+        }
 
         <div class="issues-layout-grid">
           <!-- Center Content: List, Create, or Detail -->
           <div class="center-content">
-            <div class="actions-bar" *ngIf="view() !== 'detail'">
+            @if (view() !== 'detail') {
+            <div class="actions-bar">
               <button class="btn-primary" (click)="view.set('create')" [class.active]="view() === 'create'">
                 <i class="fas fa-plus"></i> Submit New Issue
               </button>
@@ -36,23 +38,27 @@ import { IssueDetailComponent } from '../../components/issues/issue-detail/issue
                 <i class="fas fa-list"></i> Track Issues
               </button>
             </div>
+            }
 
             <div class="view-content animate-fade-up">
-              <app-issue-list 
-                *ngIf="view() === 'list'" 
+              @if (view() === 'list') {
+              <app-issue-list
                 (selectIssue)="onIssueSelected($event)">
               </app-issue-list>
+              }
 
-              <app-issue-create 
-                *ngIf="view() === 'create'" 
+              @if (view() === 'create') {
+              <app-issue-create
                 (submitted)="view.set('list')">
               </app-issue-create>
+              }
 
-              <app-issue-detail 
-                *ngIf="view() === 'detail'" 
-                [issue]="selectedIssue()" 
+              @if (view() === 'detail') {
+              <app-issue-detail
+                [issue]="selectedIssue()"
                 (close)="view.set('list')">
               </app-issue-detail>
+              }
             </div>
           </div>
         </div>

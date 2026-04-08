@@ -8,7 +8,7 @@ import { ToastComponent } from '../toast/toast';
 
 @Component({
     selector: 'app-layout',
-    imports: [CommonModule, SidebarLeftComponent, ChatPanelComponent, NavbarComponent, GlobalSearchComponent, ToastComponent],
+    imports: [SidebarLeftComponent, ChatPanelComponent, NavbarComponent, GlobalSearchComponent, ToastComponent],
     templateUrl: './layout.html',
     styleUrl: './layout.scss'
 })

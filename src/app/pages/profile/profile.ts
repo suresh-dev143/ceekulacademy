@@ -13,7 +13,6 @@ import { UserService } from '../../services/user.service';
     selector: 'app-profile',
     standalone: true,
     imports: [
-        CommonModule,
         LayoutComponent,
         ProfileHeaderComponent,
         ProfilePersonalComponent,

@@ -10,7 +10,6 @@ import { StudentDiscoveryService } from '../../services/student-discovery.servic
   selector: 'app-student-nearby',
   standalone: true,
   imports: [
-    CommonModule,
     LayoutComponent,
     StudentNearbyOverviewComponent,
     StudentTeacherDiscoveryComponent,

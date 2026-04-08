@@ -6,7 +6,7 @@ import { Course } from '../../../services/course.service';
 @Component({
   selector: 'app-teacher-course-manager',
   standalone: true,
-  imports: [CommonModule, CourseListItemComponent],
+  imports: [CourseListItemComponent],
   template: `
     <div class="course-mgmt-section">
       <div class="section-header">
@@ -20,21 +20,24 @@ import { Course } from '../../../services/course.service';
       </div>
 
       <div class="course-list">
-        <app-course-list-item 
-          *ngFor="let course of courses" 
+        @for (course of courses; track course.id) {
+        <app-course-list-item
           [course]="course"
           [canEdit]="true"
           (edit)="edit.emit($event)"
           (delete)="delete.emit($event)"
           (togglePublish)="togglePublish.emit($event)">
         </app-course-list-item>
+        }
       </div>
 
-      <div class="empty-state" *ngIf="courses.length === 0">
+      @if (courses.length === 0) {
+      <div class="empty-state">
         <div class="empty-icon">📚</div>
         <p>You haven't created any courses yet.</p>
         <button class="btn-primary-sm" (click)="create.emit()">Create Your First Course</button>
       </div>
+      }
     </div>
   `,
   styles: [`

@@ -1,5 +1,5 @@
 import { Component, inject, input, output, OnInit, signal, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, UpperCasePipe} from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RazorpayService } from '../../../services/razorpay.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -7,7 +7,8 @@ import { ToastService } from '../../../core/services/toast.service';
 @Component({
     selector: 'app-enroll-workshop',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [ReactiveFormsModule,
+    UpperCasePipe],
     templateUrl: './enroll-workshop.html',
     styleUrl: '../workshops.scss',
 })

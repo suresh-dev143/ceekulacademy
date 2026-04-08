@@ -11,7 +11,7 @@ import { ValidationService } from '../../core/services/validation.service';
 
 @Component({
     selector: 'app-register',
-    imports: [CommonModule, ReactiveFormsModule, RouterLink, NavbarComponent],
+    imports: [ReactiveFormsModule, RouterLink, NavbarComponent],
     templateUrl: './register.html',
     styleUrl: './register.scss'
 })

@@ -8,7 +8,7 @@ import { DonationService, Donation, DonationArea, PaymentMethod } from '../../se
 @Component({
     selector: 'app-donate-page',
     standalone: true,
-    imports: [CommonModule, FormsModule, LayoutComponent],
+    imports: [FormsModule, LayoutComponent],
     templateUrl: './donate.html',
     styleUrl: './donate.scss'
 })

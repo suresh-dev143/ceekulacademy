@@ -7,12 +7,16 @@
         <!-- Left Column (Sidebar) -->
         @if (showLeftSidebar) {
         <aside class="col-left" [class.active]="mobileSidebarOpen()" [class.collapsed]="leftCollapsed()">
-            <button class="toggle-sidebar-btn left" (click)="toggleLeft()" *ngIf="!leftCollapsed()">
+            @if (!leftCollapsed()) {
+            <button class="toggle-sidebar-btn left" (click)="toggleLeft()">
                 ◀
             </button>
-            <button class="expand-sidebar-btn left" (click)="expandLeft()" *ngIf="leftCollapsed()">
+            }
+            @if (leftCollapsed()) {
+            <button class="expand-sidebar-btn left" (click)="expandLeft()">
                 ▶
             </button>
+            }
 
             <div class="sidebar-content">
                 @if (customLeftSidebar) {
@@ -37,12 +41,16 @@
         <!-- Right Column (Chat/Info) -->
         @if (showRightSidebar) {
         <aside class="col-right" [class.collapsed]="rightCollapsed()" [class.active]="mobileRightSidebarOpen()">
-            <button class="toggle-sidebar-btn right" (click)="toggleRight()" *ngIf="!rightCollapsed()">
+            @if (!rightCollapsed()) {
+            <button class="toggle-sidebar-btn right" (click)="toggleRight()">
                 ▶
             </button>
-            <button class="expand-sidebar-btn right" (click)="expandRight()" *ngIf="rightCollapsed()">
+            }
+            @if (rightCollapsed()) {
+            <button class="expand-sidebar-btn right" (click)="expandRight()">
                 ◀
             </button>
+            }
 
             <div class="sidebar-content" [class.hidden]="rightCollapsed()">
                 <ng-content select="[slot=right-panel]"></ng-content>
@@ -52,8 +60,12 @@
         }
 
         <!-- Overlay for mobile sidebar -->
-        <div class="sidebar-overlay" *ngIf="mobileSidebarOpen()" (click)="toggleMobileSidebar()"></div>
-        <div class="sidebar-overlay" *ngIf="mobileRightSidebarOpen()" (click)="toggleMobileRightSidebar()"></div>
+        @if (mobileSidebarOpen()) {
+        <div class="sidebar-overlay" (click)="toggleMobileSidebar()"></div>
+        }
+        @if (mobileRightSidebarOpen()) {
+        <div class="sidebar-overlay" (click)="toggleMobileRightSidebar()"></div>
+        }
 
         <!-- Global toast notifications -->
         <app-toast></app-toast>

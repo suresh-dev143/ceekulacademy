@@ -30,7 +30,7 @@ import { finalize } from 'rxjs';
               <button class="nav-tab" [class.active]="activeTab() === 'bookings'" (click)="activeTab.set('bookings')">
                   <i class="fas fa-history"></i> 
                   Recent Bookings
-                  <span class="badge" *ngIf="partnerService.requests().length > 0">{{ partnerService.requests().length }}</span>
+                  @if (partnerService.requests().length > 0) { <span class="badge">{{ partnerService.requests().length }}</span> }
               </button>
               <button class="nav-tab" [class.active]="activeTab() === 'availability'" (click)="activeTab.set('availability')">
                   <i class="fas fa-calendar-check"></i> Availability Grid
@@ -44,7 +44,8 @@ import { finalize } from 'rxjs';
       <div class="cc-content animate-fade-in">
         
         <!-- ── TAB: INVENTORY ────────────────────────────────────────────── -->
-        <div *ngIf="activeTab() === 'inventory'">
+        @if (activeTab() === 'inventory') {
+        <div>
           <div class="section-header">
             <div class="header-left">
               <h3 class="section-title"><i class="fas fa-building"></i> Infrastructure & Venues</h3>
@@ -218,9 +219,11 @@ import { finalize } from 'rxjs';
             </div>
           }
         </div>
+        }
 
         <!-- ── TAB: BOOKINGS ─────────────────────────────────────────────── -->
-        <div *ngIf="activeTab() === 'bookings'">
+        @if (activeTab() === 'bookings') {
+        <div>
             <div class="section-header">
                 <div class="header-left">
                     <h3 class="section-title"><i class="fas fa-history"></i> Recent Booking Activity</h3>
@@ -232,7 +235,8 @@ import { finalize } from 'rxjs';
             </div>
 
             <div class="requests-grid">
-                <div *ngFor="let req of partnerService.requests()" class="request-card glass-card" style="border-left-color: #10b981;">
+                @for (req of partnerService.requests(); track req.sessionId) {
+                <div class="request-card glass-card" style="border-left-color: #10b981;">
                     <div class="request-main">
                         <div class="req-header">
                             <span class="req-type-badge">{{ req.resourceType }}</span>
@@ -247,14 +251,16 @@ import { finalize } from 'rxjs';
                         </div>
 
                         <!-- Granular Slot Synchronization -->
-                        <div *ngIf="req.selectedSlots && req.selectedSlots.length > 0" class="req-slots-sync">
+                        @if (req.selectedSlots && req.selectedSlots.length > 0) {
+                        <div class="req-slots-sync">
                             <label><i class="fas fa-layer-group"></i> Granular Slots</label>
                             <div class="sync-slot-grid">
-                                <span *ngFor="let slot of req.selectedSlots" class="sync-slot-chip">
-                                    {{ slot.split(':')[0] }}
-                                </span>
+                                @for (slot of req.selectedSlots; track slot) {
+                                <span class="sync-slot-chip">{{ slot.split(':')[0] }}</span>
+                                }
                             </div>
                         </div>
+                        }
                     </div>
                     <div class="request-actions" style="grid-template-columns: 1fr;">
                         <button class="btn-cc-outline" style="color: #10b981; border-color: rgba(16, 185, 129, 0.3); cursor: default; justify-content: center;">
@@ -262,17 +268,22 @@ import { finalize } from 'rxjs';
                         </button>
                     </div>
                 </div>
+                }
 
-                <div *ngIf="partnerService.requests().length === 0" class="empty-placeholder">
+                @if (partnerService.requests().length === 0) {
+                <div class="empty-placeholder">
                     <i class="fas fa-check-circle" style="color: #10b981; font-size: 3rem; margin-bottom: 1rem;"></i>
                     <h4>All Caught Up!</h4>
                     <p style="color: var(--text-muted); font-size: 0.85rem;">No recent booking activity found.</p>
                 </div>
+                }
             </div>
         </div>
+        }
 
         <!-- ── TAB: AVAILABILITY ─────────────────────────────────────────── -->
-        <div *ngIf="activeTab() === 'availability'">
+        @if (activeTab() === 'availability') {
+        <div>
             <div class="section-header">
                 <div class="header-left">
                     <h3 class="section-title"><i class="fas fa-calendar-check"></i> Site Availability Grid</h3>
@@ -295,7 +306,8 @@ import { finalize } from 'rxjs';
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let infra of infraList()">
+                        @for (infra of infraList(); track infra._id) {
+                        <tr>
                             <td class="primary-cell">
                                 <span class="loc-name">{{ infra.generalInfo.schoolName }}</span>
                                 <span class="loc-sub">All Rooms</span>
@@ -309,6 +321,7 @@ import { finalize } from 'rxjs';
                                 </button>
                             </td>
                         </tr>
+                        }
                     </tbody>
                 </table>
                 <div class="grid-placeholder">
@@ -316,24 +329,33 @@ import { finalize } from 'rxjs';
                 </div>
             </div>
         </div>
+        }
 
         <!-- ── TAB: MONITOR ──────────────────────────────────────────────── -->
-        <div *ngIf="activeTab() === 'monitor'">
+        @if (activeTab() === 'monitor') {
+        <div>
             <app-partner-activity></app-partner-activity>
         </div>
+        }
 
       </div>
 
       <!-- Existing Modals -->
-      <div *ngIf="isAddingClassroom() && selectedInfraId()" class="modal-layer">
+      @if (isAddingClassroom() && selectedInfraId()) {
+      <div class="modal-layer">
           <div class="modal-window"><app-classroom-form [infraId]="selectedInfraId()!" [editData]="editClassroomData() || undefined" (close)="onClassroomFormClose()"></app-classroom-form></div>
       </div>
-      <div *ngIf="isAddingComputerLab() && selectedInfraId()" class="modal-layer">
+      }
+      @if (isAddingComputerLab() && selectedInfraId()) {
+      <div class="modal-layer">
           <div class="modal-window"><app-computer-lab-form [infraId]="selectedInfraId()!" [editData]="editLabData() || undefined" (close)="onLabFormClose()"></app-computer-lab-form></div>
       </div>
-      <div *ngIf="isAddingFacility() && selectedInfraId()" class="modal-layer">
+      }
+      @if (isAddingFacility() && selectedInfraId()) {
+      <div class="modal-layer">
           <div class="modal-window"><app-facility-form [infraId]="selectedInfraId()!" [editData]="editFacilityData() || undefined" (close)="onFacilityFormClose()"></app-facility-form></div>
       </div>
+      }
     </div>
   `,
   styles: [`

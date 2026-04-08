@@ -5,7 +5,8 @@
     </div>
 
     <div class="courses-grid">
-        <div class="course-card" *ngFor="let course of courses" [class.completed]="course.status === 'Completed'">
+        @for (course of courses; track $index) {
+        <div class="course-card" [class.completed]="course.status === 'Completed'">
             <div class="course-header">
                 <div class="course-icon">{{ course.thumbnail }}</div>
                 <div class="course-status-badge" [class.in-progress]="course.status === 'In progress'"
@@ -33,17 +34,22 @@
                 <button class="footer-btn secondary" (click)="onViewDetails(course)" title="View Details">
                     <i class="fas fa-info-circle"></i>
                 </button>
-                <button class="footer-btn primary" (click)="onContinue(course)" *ngIf="course.status !== 'Completed'">
+                @if (course.status !== 'Completed') {
+                <button class="footer-btn primary" (click)="onContinue(course)">
                     Continue <i class="fas fa-play"></i>
                 </button>
-                <button class="footer-btn success" *ngIf="course.status === 'Completed'"
+                }
+                @if (course.status === 'Completed') {
+                <button class="footer-btn success"
                     (click)="onViewDetails(course)">
                     Review <i class="fas fa-check-circle"></i>
                 </button>
+                }
                 <button class="footer-btn manage" (click)="onManage(course)" title="Manage">
                     <i class="fas fa-cog"></i>
                 </button>
             </div>
         </div>
+        }
     </div>
 </div>

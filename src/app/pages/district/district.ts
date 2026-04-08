@@ -4,7 +4,7 @@ import { LayoutComponent } from '../../components/layout/layout';
 
 @Component({
   selector: 'app-district',
-  imports: [CommonModule, LayoutComponent],
+  imports: [LayoutComponent],
   templateUrl: './district.html',
   styleUrl: './district.scss'
 })

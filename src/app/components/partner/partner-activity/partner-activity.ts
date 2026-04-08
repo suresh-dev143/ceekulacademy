@@ -87,7 +87,8 @@ import { PartnerService, Activity } from '../../../services/partner.service';
       <!-- ═══════════════════════════════════════════════════════════════════ -->
       <!-- VIEW: LIVE NOW                                                      -->
       <!-- ═══════════════════════════════════════════════════════════════════ -->
-      <div class="view-panel" *ngIf="activeView === 'live'">
+      @if (activeView === 'live') {
+      <div class="view-panel">
         <div class="panel-header">
           <h3 class="panel-title">
             <span class="live-pulse"></span>
@@ -96,9 +97,10 @@ import { PartnerService, Activity } from '../../../services/partner.service';
           <span class="panel-hint">{{ liveSessions.length }} session(s) ongoing right now</span>
         </div>
 
-        <div class="live-sessions-grid" *ngIf="liveSessions.length > 0">
+        @if (liveSessions.length > 0) {
+        <div class="live-sessions-grid">
+          @for (session of liveSessions; track $index) {
           <div class="session-card"
-               *ngFor="let session of liveSessions"
                [ngStyle]="{'border-left-color': getStatusColor(session.status)}">
 
             <!-- Status badge -->
@@ -115,9 +117,11 @@ import { PartnerService, Activity } from '../../../services/partner.service';
             </div>
 
             <!-- Conflict warning -->
-            <div class="conflict-badge" *ngIf="session.hasConflict">
+            @if (session.hasConflict) {
+            <div class="conflict-badge">
               <i class="fas fa-exclamation-triangle"></i> Conflict
             </div>
+            }
 
             <!-- Course info -->
             <div class="session-course">{{ session.courseName }}</div>
@@ -142,10 +146,12 @@ import { PartnerService, Activity } from '../../../services/partner.service';
                 <i class="far fa-clock"></i>
                 <span>{{ session.startTime }} – {{ session.endTime }}</span>
               </div>
-              <div class="meta-item" *ngIf="session.resources && session.resources.length">
+              @if (session.resources && session.resources.length) {
+              <div class="meta-item">
                 <i class="fas fa-tools"></i>
                 <span>{{ session.resources.join(', ') }}</span>
               </div>
+              }
             </div>
 
             <!-- Attendance bar -->
@@ -170,23 +176,31 @@ import { PartnerService, Activity } from '../../../services/partner.service';
             <!-- Actions -->
             <div class="session-actions">
               <button class="btn-view">View Details</button>
-              <button class="btn-join" *ngIf="session.resourceType === 'Online'">
+              @if (session.resourceType === 'Online') {
+              <button class="btn-join">
                 <i class="fas fa-video"></i> Join
               </button>
+              }
             </div>
           </div>
+          }
         </div>
+        }
 
-        <div class="empty-state" *ngIf="liveSessions.length === 0">
+        @if (liveSessions.length === 0) {
+        <div class="empty-state">
           <div class="empty-icon">📡</div>
           <p>No active sessions right now.<br>Check upcoming sessions.</p>
         </div>
+        }
       </div>
+      }
 
       <!-- ═══════════════════════════════════════════════════════════════════ -->
       <!-- VIEW: UPCOMING SESSIONS                                             -->
       <!-- ═══════════════════════════════════════════════════════════════════ -->
-      <div class="view-panel" *ngIf="activeView === 'upcoming'">
+      @if (activeView === 'upcoming') {
+      <div class="view-panel">
 
         <!-- Filter bar -->
         <div class="filter-bar">
@@ -198,25 +212,32 @@ import { PartnerService, Activity } from '../../../services/partner.service';
 
           <select [(ngModel)]="filterTeacher">
             <option value="">All Teachers</option>
-            <option *ngFor="let t of uniqueTeachers()" [value]="t">{{ t }}</option>
+            @for (t of uniqueTeachers(); track $index) {
+            <option [value]="t">{{ t }}</option>
+            }
           </select>
 
           <select [(ngModel)]="filterRoom">
             <option value="">All Rooms</option>
-            <option *ngFor="let r of uniqueRooms()" [value]="r">{{ r }}</option>
+            @for (r of uniqueRooms(); track $index) {
+            <option [value]="r">{{ r }}</option>
+            }
           </select>
 
           <select [(ngModel)]="filterCourse">
             <option value="">All Courses</option>
-            <option *ngFor="let c of uniqueCourses()" [value]="c">{{ c }}</option>
+            @for (c of uniqueCourses(); track $index) {
+            <option [value]="c">{{ c }}</option>
+            }
           </select>
 
           <input type="date" [(ngModel)]="filterDate" class="date-filter">
 
-          <button class="btn-clear" (click)="clearFilters()"
-                  *ngIf="searchQuery || filterTeacher || filterRoom || filterCourse || filterDate">
+          @if (searchQuery || filterTeacher || filterRoom || filterCourse || filterDate) {
+          <button class="btn-clear" (click)="clearFilters()">
             <i class="fas fa-times"></i> Clear
           </button>
+          }
 
           <button class="btn-export" (click)="exportCSV()">
             <i class="fas fa-file-csv"></i> Export CSV
@@ -224,16 +245,19 @@ import { PartnerService, Activity } from '../../../services/partner.service';
         </div>
 
         <!-- Results count -->
-        <div class="results-meta" *ngIf="filteredUpcoming.length > 0">
+        @if (filteredUpcoming.length > 0) {
+        <div class="results-meta">
           <span class="results-count">{{ filteredUpcoming.length }} session(s) found</span>
-          <span class="results-range" *ngIf="filteredUpcoming.length > 0">
+          <span class="results-range">
             · Next: {{ filteredUpcoming[0].date | date:'EEE, MMM d' }}
             at {{ filteredUpcoming[0].startTime }}
           </span>
         </div>
+        }
 
         <!-- Sessions table -->
-        <div class="sessions-table-wrap" *ngIf="filteredUpcoming.length > 0">
+        @if (filteredUpcoming.length > 0) {
+        <div class="sessions-table-wrap">
           <table class="sessions-table">
             <thead>
               <tr>
@@ -249,8 +273,8 @@ import { PartnerService, Activity } from '../../../services/partner.service';
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let session of filteredUpcoming"
-                  [class.conflict-row]="session.hasConflict">
+              @for (session of filteredUpcoming; track $index) {
+              <tr [class.conflict-row]="session.hasConflict">
                 <td>
                   <span class="date-cell">{{ session.date | date:'MMM d' }}</span>
                   <span class="day-cell">{{ session.date | date:'EEE' }}</span>
@@ -305,21 +329,27 @@ import { PartnerService, Activity } from '../../../services/partner.service';
                   <button class="btn-view-sm" (click)="viewSession(session)">View</button>
                 </td>
               </tr>
+              }
             </tbody>
           </table>
         </div>
+        }
 
-        <div class="empty-state" *ngIf="filteredUpcoming.length === 0">
+        @if (filteredUpcoming.length === 0) {
+        <div class="empty-state">
           <div class="empty-icon">📭</div>
           <p>No sessions match your filters.</p>
           <button class="btn-clear-sm" (click)="clearFilters()">Clear Filters</button>
         </div>
+        }
       </div>
+      }
 
       <!-- ═══════════════════════════════════════════════════════════════════ -->
       <!-- VIEW: TIMELINE                                                       -->
       <!-- ═══════════════════════════════════════════════════════════════════ -->
-      <div class="view-panel" *ngIf="activeView === 'timeline'">
+      @if (activeView === 'timeline') {
+      <div class="view-panel">
         <div class="panel-header">
           <h3 class="panel-title">
             <i class="fas fa-calendar-day"></i>
@@ -335,19 +365,22 @@ import { PartnerService, Activity } from '../../../services/partner.service';
             <div class="timeline-header">
               <div class="room-label-col"></div>
               <div class="time-grid">
-                <div class="time-label" *ngFor="let t of timeLabels">{{ t }}</div>
+                @for (t of timeLabels; track $index) {
+                <div class="time-label">{{ t }}</div>
+                }
               </div>
             </div>
 
             <!-- Room rows -->
             <div class="timeline-body">
-              <div class="timeline-row" *ngFor="let room of timelineRooms">
+              @for (room of timelineRooms; track $index) {
+              <div class="timeline-row">
                 <div class="room-label">
                   <span class="room-name">{{ room }}</span>
                 </div>
                 <div class="session-track">
+                  @for (session of getSessionsForRoom(room); track $index) {
                   <div class="session-block"
-                       *ngFor="let session of getSessionsForRoom(room)"
                        [ngStyle]="getSessionStyle(session)"
                        [ngClass]="{
                          'status-live':      session.status === 'Live',
@@ -360,8 +393,10 @@ import { PartnerService, Activity } from '../../../services/partner.service';
                     <span class="block-course">{{ session.courseName }}</span>
                     <span class="block-teacher">{{ session.teacherName }}</span>
                   </div>
+                  }
                 </div>
               </div>
+              }
             </div>
 
           </div>
@@ -387,11 +422,14 @@ import { PartnerService, Activity } from '../../../services/partner.service';
         </div>
 
         <!-- Alert: no sessions today -->
-        <div class="empty-state" *ngIf="timelineRooms.length === 0">
+        @if (timelineRooms.length === 0) {
+        <div class="empty-state">
           <div class="empty-icon">🗓️</div>
           <p>No room bookings scheduled for today.</p>
         </div>
+        }
       </div>
+      }
 
     </div>
     `,

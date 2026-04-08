@@ -6,7 +6,7 @@ import { IssueService, IssueCategory } from '../../../services/issue.service';
 @Component({
   selector: 'app-issue-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ReactiveFormsModule],
   template: `
     <div class="issue-create-card glass-card">
       <h2 class="form-title">Report New Issue</h2>
@@ -19,13 +19,17 @@ import { IssueService, IssueCategory } from '../../../services/issue.service';
             <label>Category *</label>
             <select formControlName="category" class="form-control">
               <option value="" disabled>Select a category</option>
-              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+              @for (cat of categories; track $index) {
+              <option [value]="cat">{{ cat }}</option>
+              }
             </select>
           </div>
-          <div class="form-group" *ngIf="issueForm.get('category')?.value">
+          @if (issueForm.get('category')?.value) {
+          <div class="form-group">
             <label>Sub-category (Optional)</label>
             <input type="text" formControlName="subCategory" placeholder="e.g. Water Supply, Road Block..." class="form-control">
           </div>
+          }
         </div>
 
         <!-- Section 2: Description -->
@@ -38,11 +42,13 @@ import { IssueService, IssueCategory } from '../../../services/issue.service';
           <div class="form-group">
             <label>Urgency</label>
             <div class="urgency-selector">
-              <button type="button" *ngFor="let u of urgencies" 
+              @for (u of urgencies; track $index) {
+              <button type="button"
                       [class.active]="issueForm.get('urgency')?.value === u"
                       (click)="issueForm.get('urgency')?.setValue(u)">
                 {{ u }}
               </button>
+              }
             </div>
           </div>
         </div>
@@ -55,15 +61,23 @@ import { IssueService, IssueCategory } from '../../../services/issue.service';
             <p>Click to upload images or videos</p>
             <input #fileInput type="file" (change)="onFileSelected($event)" multiple hidden accept="image/*,video/*">
           </div>
-          <div class="media-previews" *ngIf="previews().length > 0">
-            <div *ngFor="let p of previews(); let i = index" class="preview-item">
-              <img [src]="p" *ngIf="!isVideo(p)">
-              <div class="video-placeholder" *ngIf="isVideo(p)">
+          @if (previews().length > 0) {
+          <div class="media-previews">
+            @for (p of previews(); track $index; let i = $index) {
+            <div class="preview-item">
+              @if (!isVideo(p)) {
+              <img [src]="p">
+              }
+              @if (isVideo(p)) {
+              <div class="video-placeholder">
                 <i class="fas fa-video"></i>
               </div>
+              }
               <button type="button" class="remove-btn" (click)="removePreview(i)">&times;</button>
             </div>
+            }
           </div>
+          }
         </div>
 
         <!-- Section 4: Contact -->

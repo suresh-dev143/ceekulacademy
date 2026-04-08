@@ -20,15 +20,18 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
       </div>
 
       <!-- Assign Task Form -->
-      <div class="assign-form animate-slide-down" *ngIf="showAssignForm()">
+      @if (showAssignForm()) {
+      <div class="assign-form animate-slide-down">
         <div class="form-grid">
           <div class="form-group">
             <label>Target Issue (Optional)</label>
             <select [(ngModel)]="newTask.issueId" (change)="onIssueSelect()">
               <option value="">-- General Task --</option>
-              <option *ngFor="let issue of activeIssues()" [value]="issue.id">
+              @for (issue of activeIssues(); track issue.id) {
+              <option [value]="issue.id">
                 {{ issue.id }} - {{ issue.category }}
               </option>
+              }
             </select>
           </div>
 
@@ -44,9 +47,11 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
             <label>Assignee</label>
             <select [(ngModel)]="newTask.assigneeId">
               <option value="">Select Person</option>
-              <option *ngFor="let person of availableAssignees()" [value]="person.id">
+              @for (person of availableAssignees(); track person.id) {
+              <option [value]="person.id">
                 {{ person.name }} ({{ 'area' in person ? person.area : person.specialization }})
               </option>
+              }
             </select>
           </div>
 
@@ -70,11 +75,13 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
           </div>
         </div>
       </div>
+      }
 
       <!-- Active Tasks List -->
       <div class="tasks-list">
         <h4>Active Local Tasks</h4>
-        <div class="task-card" *ngFor="let task of activeTasks()">
+        @for (task of activeTasks(); track $index) {
+        <div class="task-card">
           <div class="task-status" [class]="task.status.toLowerCase().replace(' ', '-')">
             {{ task.status }}
           </div>
@@ -89,11 +96,13 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
             
             <p class="outcome"><strong>Goal:</strong> {{ task.expectedOutcome }}</p>
             
-            <div class="progress-section" *ngIf="task.progressNotes.length">
+            @if (task.progressNotes.length) {
+            <div class="progress-section">
               <h6>Latest Update:</h6>
               <p class="highlight">"{{ task.progressNotes[task.progressNotes.length - 1].note }}"</p>
               <small>{{ task.progressNotes[task.progressNotes.length - 1].timestamp | date:'short' }}</small>
             </div>
+            }
           </div>
 
           <div class="task-actions">
@@ -101,10 +110,13 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
              <button class="btn-action">Hold</button>
           </div>
         </div>
-        
-        <div class="empty-state" *ngIf="activeTasks().length === 0">
+        }
+
+        @if (activeTasks().length === 0) {
+        <div class="empty-state">
            <p>No active tasks assigned.</p>
         </div>
+        }
       </div>
     </div>
   `,

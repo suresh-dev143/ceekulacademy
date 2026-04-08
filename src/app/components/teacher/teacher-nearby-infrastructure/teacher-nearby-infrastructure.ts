@@ -16,22 +16,25 @@ import { NearbyProvider } from '../../../services/teacher-dashboard.service';
       </div>
 
       <div class="infra-list">
-        <div class="infra-item glass-card" *ngFor="let infra of infrastructure">
+        @for (infra of infrastructure; track infra.id) {
+        <div class="infra-item glass-card">
           <div class="infra-main">
             <div class="brand-box">
               <span class="brand-icon">{{ getIcon(infra.type) }}</span>
               <div class="pulse-ring"></div>
             </div>
-            
+
             <div class="info">
               <div class="name-row">
                 <h4 class="name">{{ infra.name }}</h4>
                 <span class="type-pill">{{ infra.type }}</span>
               </div>
               <div class="tags">
-                <span class="tag" *ngFor="let tag of infra.facilities">
+                @for (tag of infra.facilities; track $index) {
+                <span class="tag">
                    <i class="fas fa-check-circle"></i> {{ tag }}
                 </span>
+                }
               </div>
             </div>
 
@@ -57,13 +60,16 @@ import { NearbyProvider } from '../../../services/teacher-dashboard.service';
             </button>
           </div>
         </div>
+        }
       </div>
 
-      <div class="empty-state glass-card" *ngIf="infrastructure.length === 0">
+      @if (infrastructure.length === 0) {
+      <div class="empty-state glass-card">
         <i class="fas fa-map-marked-alt"></i>
         <p>No infrastructure assets detected in current range.</p>
         <span class="hint">Try expanding your search radius to discover more facilities.</span>
       </div>
+      }
     </div>
   `,
   styles: [`

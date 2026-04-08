@@ -14,7 +14,8 @@ import { DistrictActivity } from '../../../services/director.service';
       </div>
 
       <div class="activity-grid">
-        <div class="activity-card" *ngFor="let activity of activities">
+        @for (activity of activities; track $index) {
+        <div class="activity-card">
           <div class="activity-header">
             <span class="type-tag">{{ activity.type }}</span>
             <span class="status-dot" [attr.data-status]="activity.status"></span>
@@ -38,6 +39,7 @@ import { DistrictActivity } from '../../../services/director.service';
             <button class="btn-action">Reschedule</button>
           </div>
         </div>
+        }
       </div>
     </div>
   `,

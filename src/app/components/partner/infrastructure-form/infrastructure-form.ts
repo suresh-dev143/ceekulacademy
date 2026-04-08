@@ -14,7 +14,7 @@ import { HourlySlot } from '../../../core/models/infrastructure.model';
 @Component({
   selector: 'app-infrastructure-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AppValidationErrorComponent],
+  imports: [ReactiveFormsModule, AppValidationErrorComponent],
   templateUrl: './infrastructure-form.html',
   styles: [`
     .form-container { background: #000; padding: 2.5rem; border: 1px solid #333; color: #fff; max-height: 85vh; overflow-y: auto; border-radius: 4px; }

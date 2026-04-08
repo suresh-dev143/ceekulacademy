@@ -8,6 +8,7 @@ import { StudentDashboardOverviewComponent } from '../../components/student/stud
 import { StudentEnrolledCoursesComponent } from '../../components/student/student-enrolled-courses/student-enrolled-courses';
 import { StudentCourseSearchComponent } from '../../components/student/student-course-search/student-course-search';
 import { StudentTeacherSearchComponent } from '../../components/student/student-teacher-search/student-teacher-search';
+import { NeuronWalletComponent } from '../../components/neuron-wallet/neuron-wallet';
 import { StudentInfrastructureSearchComponent } from '../../components/student/student-infrastructure-search/student-infrastructure-search';
 import { StudentProfileEditComponent } from '../../components/student/student-profile-edit/student-profile-edit';
 
@@ -15,7 +16,6 @@ import { StudentProfileEditComponent } from '../../components/student/student-pr
   selector: 'app-student-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
     LayoutComponent,
     StudentDashboardOverviewComponent,
     StudentEnrolledCoursesComponent,

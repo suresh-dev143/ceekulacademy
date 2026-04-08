@@ -7,7 +7,6 @@ import { LayoutComponent } from '../../components/layout/layout';
   selector: 'app-contact',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     LayoutComponent
   ],

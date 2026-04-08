@@ -22,7 +22,8 @@ import { IssueService, Issue } from '../../../services/issue.service';
       </div>
 
       <div class="issue-grid">
-        <div *ngFor="let issue of issues()" class="issue-card-compact glass-card" (click)="selectIssue.emit(issue)">
+        @for (issue of issues(); track issue.id) {
+        <div class="issue-card-compact glass-card" (click)="selectIssue.emit(issue)">
           <div class="card-header">
             <span class="issue-id">{{ issue.id }}</span>
             <span class="status-badge" [ngClass]="issue.status.toLowerCase().replace(' ', '-')">{{ issue.status }}</span>
@@ -34,12 +35,15 @@ import { IssueService, Issue } from '../../../services/issue.service';
             <span class="urgency" [ngClass]="issue.urgency.toLowerCase()">{{ issue.urgency }}</span>
           </div>
         </div>
+        }
       </div>
 
-      <div *ngIf="issues().length === 0" class="empty-list">
+      @if (issues().length === 0) {
+      <div class="empty-list">
         <i class="fas fa-search"></i>
         <p>No issues found matching your filters.</p>
       </div>
+      }
     </div>
   `,
     styles: [`

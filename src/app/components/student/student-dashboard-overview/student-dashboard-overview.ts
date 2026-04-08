@@ -15,7 +15,9 @@ import { CommonModule } from '@angular/common';
           <p class="sub-title">{{ profile.grade }} &nbsp;·&nbsp; {{ profile.city }}</p>
         </div>
         <div class="interests-strip">
-          <span class="interest-chip" *ngFor="let i of profile.interests">{{ i }}</span>
+          @for (i of profile.interests; track $index) {
+          <span class="interest-chip">{{ i }}</span>
+          }
         </div>
       </div>
 
@@ -55,7 +57,8 @@ import { CommonModule } from '@angular/common';
       <div class="section">
         <h2 class="section-title"><i class="fas fa-history"></i> Recent Activity</h2>
         <div class="activity-list">
-          <div class="activity-row" *ngFor="let c of enrolledCourses | slice:0:4">
+          @for (c of (enrolledCourses | slice:0:4); track $index) {
+          <div class="activity-row">
             <div class="activity-thumb">{{ c.thumbnail }}</div>
             <div class="activity-info">
               <span class="activity-name">{{ c.title }}</span>
@@ -69,6 +72,7 @@ import { CommonModule } from '@angular/common';
             </div>
             <span class="status-pill" [attr.data-status]="c.status">{{ c.status }}</span>
           </div>
+          }
         </div>
       </div>
     </div>

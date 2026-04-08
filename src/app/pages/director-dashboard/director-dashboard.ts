@@ -18,7 +18,6 @@ import { AdvisorService } from '../../services/advisor.service';
   selector: 'app-director-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
     LayoutComponent,
     DirectorOverviewComponent,
     PartnerManagementComponent,
@@ -58,48 +57,60 @@ import { AdvisorService } from '../../services/advisor.service';
             </button>
             <button class="tab-btn" [class.active]="activeTab() === 'support'" (click)="activeTab.set('support')">
                 <i class="fas fa-network-wired"></i> Local Support
-                <span class="badge" *ngIf="activeTasksCount() > 0">{{ activeTasksCount() }}</span>
+                @if (activeTasksCount() > 0) {
+                <span class="badge">{{ activeTasksCount() }}</span>
+                }
             </button>
             <button class="tab-btn" [class.active]="activeTab() === 'advisors'" (click)="activeTab.set('advisors')">
                 <i class="fas fa-user-graduate"></i> Advisor Management
-                <span class="badge" *ngIf="pendingInstructionsCount() > 0">{{ pendingInstructionsCount() }}</span>
+                @if (pendingInstructionsCount() > 0) {
+                <span class="badge">{{ pendingInstructionsCount() }}</span>
+                }
             </button>
         </div>
 
         <app-director-overview [stats]="dashboardStats()"></app-director-overview>
 
         <div class="dashboard-content">
-          
+
           <!-- Tab: Overview -->
-          <div *ngIf="activeTab() === 'overview'" class="tab-pane animate-fade-in">
+          @if (activeTab() === 'overview') {
+          <div class="tab-pane animate-fade-in">
             <app-district-activity-manager [activities]="stateActivities()"></app-district-activity-manager>
-            
+
             <div class="management-grid">
-                <app-partner-management 
+                <app-partner-management
                 [partners]="statePartners()"
                 (approve)="handlePartnerApproval($event)">
                 </app-partner-management>
-                
+
                 <app-manager-management [managers]="stateManagers()"></app-manager-management>
-                
+
                 <app-volunteer-management [volunteers]="stateVolunteers()"></app-volunteer-management>
             </div>
           </div>
+          }
 
           <!-- Tab: Strategic Guidance -->
-          <div *ngIf="activeTab() === 'guidance'" class="tab-pane animate-fade-in">
+          @if (activeTab() === 'guidance') {
+          <div class="tab-pane animate-fade-in">
             <app-director-guidance-panel></app-director-guidance-panel>
           </div>
+          }
 
           <!-- Tab: Local Support -->
-          <div *ngIf="activeTab() === 'support'" class="tab-pane animate-fade-in">
+          @if (activeTab() === 'support') {
+          <div class="tab-pane animate-fade-in">
             <app-local-support-coordinator></app-local-support-coordinator>
           </div>
+          }
 
           <!-- Tab: Advisor Management -->
-          <div *ngIf="activeTab() === 'advisors'" class="tab-pane animate-fade-in">
+          @if (activeTab() === 'advisors') {
+          <div class="tab-pane animate-fade-in">
             <app-advisor-assignment-panel></app-advisor-assignment-panel>
           </div>
+          }
 
         </div>
 
@@ -115,21 +126,27 @@ import { AdvisorService } from '../../services/advisor.service';
               <span class="label">Volunteer Retention</span>
               <div class="mini-progress"><div class="fill" style="width: 92%"></div></div>
             </div>
-            
+
             <div class="district-alerts">
               <h4>Active Alerts</h4>
-              <div class="alert warn" *ngIf="pendingPartnersCount() > 0">
+              @if (pendingPartnersCount() > 0) {
+              <div class="alert warn">
                 <i class="fas fa-exclamation-triangle"></i>
                 <small>{{ pendingPartnersCount() }} Partners awaiting verification</small>
               </div>
-              <div class="alert info" *ngIf="stateActivities().length > 0">
+              }
+              @if (stateActivities().length > 0) {
+              <div class="alert info">
                 <i class="fas fa-calendar-check"></i>
                 <small>{{ stateActivities().length }} activities scheduled</small>
               </div>
-              <div class="alert success" *ngIf="pendingInstructionsCount() > 0">
+              }
+              @if (pendingInstructionsCount() > 0) {
+              <div class="alert success">
                 <i class="fas fa-check-double"></i>
                 <small>{{ pendingInstructionsCount() }} Advisor recommendations to review</small>
               </div>
+              }
             </div>
           </div>
         </div>

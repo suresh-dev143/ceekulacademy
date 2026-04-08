@@ -16,18 +16,23 @@ import { NearbyTeacher } from '../../../services/student-discovery.service';
       </div>
 
       <div class="teacher-scroll">
-        <div class="teacher-card" *ngFor="let teacher of teachers">
+        @for (teacher of teachers; track teacher.id) {
+        <div class="teacher-card">
           <div class="card-top">
             <div class="avatar-box">
               <span class="avatar-text">{{ teacher.name[0] }}</span>
-              <i class="fas fa-check-circle verified-icon" *ngIf="teacher.verified" title="Verified Expert"></i>
+              @if (teacher.verified) {
+              <i class="fas fa-check-circle verified-icon" title="Verified Expert"></i>
+              }
             </div>
             <div class="teacher-info">
               <h4 class="name">{{ teacher.name }}</h4>
               <span class="specialization">{{ teacher.specialization }}</span>
-              <div *ngIf="teacher.distance < 5" class="near-you-badge">
+              @if (teacher.distance < 5) {
+              <div class="near-you-badge">
                 <i class="fas fa-map-marker-alt"></i> Near You
               </div>
+              }
             </div>
             <div class="distance-badge">{{ teacher.distance }} km</div>
           </div>
@@ -52,11 +57,14 @@ import { NearbyTeacher } from '../../../services/student-discovery.service';
             <button class="btn-icon" title="Save for later"><i class="far fa-bookmark"></i></button>
           </div>
         </div>
+        }
       </div>
 
-      <div class="empty-state" *ngIf="teachers.length === 0">
+      @if (teachers.length === 0) {
+      <div class="empty-state">
         <p>No expert teachers found within this radius.</p>
       </div>
+      }
     </div>
   `,
   styles: [`

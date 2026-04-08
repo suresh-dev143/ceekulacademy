@@ -12,7 +12,7 @@ import { RazorpayService } from '../../../services/razorpay.service';
 @Component({
     selector: 'app-create-workshop',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [ReactiveFormsModule],
     templateUrl: './create-workshop.html',
     styleUrl: './create-workshop.scss',
 })

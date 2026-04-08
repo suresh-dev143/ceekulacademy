@@ -6,7 +6,7 @@ import { SearchableTeacher } from '../../../services/student-dashboard.service';
 @Component({
     selector: 'app-student-teacher-search',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule],
     template: `
     <div class="section-wrap animate-fade-in">
       <div class="section-header">
@@ -55,12 +55,16 @@ import { SearchableTeacher } from '../../../services/student-dashboard.service';
       </div>
 
       <!-- Teacher Cards -->
-      <div class="teachers-grid" *ngIf="teachers.length > 0">
-        <div class="teacher-card" *ngFor="let t of teachers">
+      @if (teachers.length > 0) {
+      <div class="teachers-grid">
+        @for (t of teachers; track t.id) {
+        <div class="teacher-card">
           <div class="card-top">
             <div class="avatar-wrap">
               <div class="avatar">{{ t.name[0] }}</div>
-              <i class="fas fa-check-circle verified-badge" *ngIf="t.verified" title="Verified Expert"></i>
+              @if (t.verified) {
+              <i class="fas fa-check-circle verified-badge" title="Verified Expert"></i>
+              }
             </div>
             <div class="teacher-info">
               <h3 class="teacher-name">{{ t.name }}</h3>
@@ -79,7 +83,9 @@ import { SearchableTeacher } from '../../../services/student-dashboard.service';
           </div>
 
           <div class="subjects-row">
-            <span class="subj-chip" *ngFor="let s of t.subjects">{{ s }}</span>
+            @for (s of t.subjects; track $index) {
+            <span class="subj-chip">{{ s }}</span>
+            }
           </div>
 
           <div class="details-block">
@@ -106,12 +112,16 @@ import { SearchableTeacher } from '../../../services/student-dashboard.service';
             </button>
           </div>
         </div>
+        }
       </div>
+      }
 
-      <div class="empty-state" *ngIf="teachers.length === 0">
+      @if (teachers.length === 0) {
+      <div class="empty-state">
         <i class="fas fa-user-slash"></i>
         <p>No teachers match your search.</p>
       </div>
+      }
     </div>
   `,
     styles: [`

@@ -13,21 +13,26 @@ import { NearbyInfrastructure } from '../../../services/student-discovery.servic
       </div>
 
       <div class="infra-grid">
-        <div class="infra-card" *ngFor="let infra of infrastructure">
+        @for (infra of infrastructure; track infra.id) {
+        <div class="infra-card">
           <div class="card-header">
             <div class="infra-icon">{{ getIcon(infra.type) }}</div>
             <div class="infra-info">
               <h4 class="infra-name">{{ infra.name }}</h4>
               <span class="infra-type">{{ infra.type }}</span>
-              <div *ngIf="infra.distance < 5" class="near-you-pill">
+              @if (infra.distance < 5) {
+              <div class="near-you-pill">
                 <i class="fas fa-bolt"></i> Nearby Hub
               </div>
+              }
             </div>
             <div class="dist-tag">{{ infra.distance }} km</div>
           </div>
 
           <div class="facilities-cloud">
-            <span class="facility-chip" *ngFor="let f of infra.facilities">{{ f }}</span>
+            @for (f of infra.facilities; track $index) {
+            <span class="facility-chip">{{ f }}</span>
+            }
           </div>
 
           <div class="infra-stats">
@@ -35,9 +40,11 @@ import { NearbyInfrastructure } from '../../../services/student-discovery.servic
               <i class="fas fa-book-open"></i>
               <span>{{ infra.activePrograms }} Active Programs</span>
             </div>
-            <div class="verified-status" *ngIf="infra.verified">
+            @if (infra.verified) {
+            <div class="verified-status">
               <i class="fas fa-certificate"></i> Verified Hub
             </div>
+            }
           </div>
 
           <div class="card-footer">
@@ -45,11 +52,14 @@ import { NearbyInfrastructure } from '../../../services/student-discovery.servic
             <button class="btn-ghost-sm">View Details</button>
           </div>
         </div>
+        }
       </div>
 
-      <div class="empty-state" *ngIf="infrastructure.length === 0">
+      @if (infrastructure.length === 0) {
+      <div class="empty-state">
         <p>No learning hubs found in your area yet.</p>
       </div>
+      }
     </div>
   `,
   styles: [`

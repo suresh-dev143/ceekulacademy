@@ -223,7 +223,8 @@
                                 <div class="slot-grid-section">
                                     <label class="form-label" style="font-size: 0.7rem; color: #888; margin-top: 0.5rem;">Hourly Slots (Click to toggle status, then select to edit pricing)</label>
                                     <div class="slot-grid-container" formArrayName="slots">
-                                        <div *ngFor="let s of getSlots(getSchedule(classroom), dayIndex).controls; let sid = index" [formGroupName]="sid" class="slot-item" 
+                                        @for (s of getSlots(getSchedule(classroom), dayIndex).controls; track $index; let sid = $index) {
+                                        <div [formGroupName]="sid" class="slot-item"
                                             [class.available]="s.get('status')?.value === 'Available'"
                                             [class.booked]="s.get('status')?.value === 'Booked'"
                                             [class.closed]="s.get('status')?.value === 'Closed'"
@@ -231,11 +232,13 @@
                                             (click)="toggleSlot(getSchedule(classroom), dayIndex, sid, 'classrooms', facIndex)">
                                             {{ s.get('time')?.value.split('-')[0] }}
                                         </div>
+                                        }
                                     </div>
                                 </div>
 
                                 <!-- Active Slot Editor -->
-                                <div *ngIf="activeSlot()?.type === 'classrooms' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex" class="nested-section animate-fade-in" style="margin-top: 1rem; padding: 0.8rem; background: rgba(239, 157, 87, 0.05); border-style: dashed;">
+                                @if (activeSlot()?.type === 'classrooms' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex) {
+                                <div class="nested-section animate-fade-in" style="margin-top: 1rem; padding: 0.8rem; background: rgba(239, 157, 87, 0.05); border-style: dashed;">
                                     <div [formGroup]="$any(getSlots(getSchedule(classroom), dayIndex).at(activeSlot()!.slotIndex))">
                                         <h6 style="font-size: 0.7rem; color: #ef9d57; margin-bottom: 0.5rem; text-transform: uppercase;">Pricing for {{ getSlots(getSchedule(classroom), dayIndex).at(activeSlot()!.slotIndex).get('time')?.value }}</h6>
                                         <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.8rem;">
@@ -246,12 +249,15 @@
                                                     <option value="Share">Revenue Share %</option>
                                                 </select>
                                             </div>
-                                            <div *ngIf="getSlots(getSchedule(classroom), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value !== 'Free'">
+                                            @if (getSlots(getSchedule(classroom), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value !== 'Free') {
+                                            <div>
                                                 <input type="number" class="form-control" formControlName="amount" style="padding: 0.3rem; font-size: 0.75rem;" [placeholder]="getSlots(getSchedule(classroom), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value === 'Share' ? '%' : '₹'">
                                             </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
+                                }
 
                                 <!-- Day-level Bulk Pricing -->
                                 <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 0.8rem; margin-top: 1rem; border-top: 1px solid #333; padding-top: 0.8rem;">
@@ -375,7 +381,8 @@
                             <div class="slot-grid-section">
                                 <label class="form-label" style="font-size: 0.7rem; color: #888; margin-top: 0.5rem;">Hourly Slots (Click to toggle status, then select to edit pricing)</label>
                                 <div class="slot-grid-container" formArrayName="slots">
-                                    <div *ngFor="let s of getSlots(getSchedule(lab), dayIndex).controls; let sid = index" [formGroupName]="sid" class="slot-item" 
+                                    @for (s of getSlots(getSchedule(lab), dayIndex).controls; track $index; let sid = $index) {
+                                    <div [formGroupName]="sid" class="slot-item"
                                         [class.available]="s.get('status')?.value === 'Available'"
                                         [class.booked]="s.get('status')?.value === 'Booked'"
                                         [class.closed]="s.get('status')?.value === 'Closed'"
@@ -383,11 +390,13 @@
                                         (click)="toggleSlot(getSchedule(lab), dayIndex, sid, 'computerLabs', facIndex)">
                                         {{ s.get('time')?.value.split('-')[0] }}
                                     </div>
+                                    }
                                 </div>
                             </div>
 
                             <!-- Active Slot Editor -->
-                            <div *ngIf="activeSlot()?.type === 'computerLabs' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex" class="nested-section animate-fade-in" style="margin-top: 1rem; padding: 0.8rem; background: rgba(239, 157, 87, 0.05); border-style: dashed;">
+                            @if (activeSlot()?.type === 'computerLabs' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex) {
+                            <div class="nested-section animate-fade-in" style="margin-top: 1rem; padding: 0.8rem; background: rgba(239, 157, 87, 0.05); border-style: dashed;">
                                 <div [formGroup]="$any(getSlots(getSchedule(lab), dayIndex).at(activeSlot()!.slotIndex))">
                                     <h6 style="font-size: 0.7rem; color: #ef9d57; margin-bottom: 0.5rem; text-transform: uppercase;">Pricing for {{ getSlots(getSchedule(lab), dayIndex).at(activeSlot()!.slotIndex).get('time')?.value }}</h6>
                                     <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.8rem;">
@@ -398,12 +407,15 @@
                                                 <option value="Share">Revenue Share %</option>
                                             </select>
                                         </div>
-                                        <div *ngIf="getSlots(getSchedule(lab), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value !== 'Free'">
+                                        @if (getSlots(getSchedule(lab), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value !== 'Free') {
+                                        <div>
                                             <input type="number" class="form-control" formControlName="amount" style="padding: 0.3rem; font-size: 0.75rem;" [placeholder]="getSlots(getSchedule(lab), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value === 'Share' ? '%' : '₹'">
                                         </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
+                            }
 
                             <!-- Day-level Bulk Pricing -->
                             <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 0.8rem; margin-top: 1rem; border-top: 1px solid #333; padding-top: 0.8rem;">
@@ -528,7 +540,8 @@
                             <div class="slot-grid-section">
                                 <label class="form-label" style="font-size: 0.7rem; color: #888; margin-top: 0.5rem;">Hourly Slots (Click to toggle status, then select to edit pricing)</label>
                                 <div class="slot-grid-container" formArrayName="slots">
-                                    <div *ngFor="let s of getSlots(getSchedule(fac), dayIndex).controls; let sid = index" [formGroupName]="sid" class="slot-item" 
+                                    @for (s of getSlots(getSchedule(fac), dayIndex).controls; track $index; let sid = $index) {
+                                    <div [formGroupName]="sid" class="slot-item"
                                         [class.available]="s.get('status')?.value === 'Available'"
                                         [class.booked]="s.get('status')?.value === 'Booked'"
                                         [class.closed]="s.get('status')?.value === 'Closed'"
@@ -536,11 +549,13 @@
                                         (click)="toggleSlot(getSchedule(fac), dayIndex, sid, 'otherFacilities', facIndex)">
                                         {{ s.get('time')?.value.split('-')[0] }}
                                     </div>
+                                    }
                                 </div>
                             </div>
 
                             <!-- Active Slot Editor -->
-                            <div *ngIf="activeSlot()?.type === 'otherFacilities' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex" class="nested-section animate-fade-in" style="margin-top: 1rem; padding: 0.8rem; background: rgba(239, 157, 87, 0.05); border-style: dashed;">
+                            @if (activeSlot()?.type === 'otherFacilities' && activeSlot()?.facIndex === facIndex && activeSlot()?.dayIndex === dayIndex) {
+                            <div class="nested-section animate-fade-in" style="margin-top: 1rem; padding: 0.8rem; background: rgba(239, 157, 87, 0.05); border-style: dashed;">
                                 <div [formGroup]="$any(getSlots(getSchedule(fac), dayIndex).at(activeSlot()!.slotIndex))">
                                     <h6 style="font-size: 0.7rem; color: #ef9d57; margin-bottom: 0.5rem; text-transform: uppercase;">Pricing for {{ getSlots(getSchedule(fac), dayIndex).at(activeSlot()!.slotIndex).get('time')?.value }}</h6>
                                     <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.8rem;">
@@ -551,12 +566,15 @@
                                                 <option value="Share">Revenue Share %</option>
                                             </select>
                                         </div>
-                                        <div *ngIf="getSlots(getSchedule(fac), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value !== 'Free'">
+                                        @if (getSlots(getSchedule(fac), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value !== 'Free') {
+                                        <div>
                                             <input type="number" class="form-control" formControlName="amount" style="padding: 0.3rem; font-size: 0.75rem;" [placeholder]="getSlots(getSchedule(fac), dayIndex).at(activeSlot()!.slotIndex).get('pricing.type')?.value === 'Share' ? '%' : '₹'">
                                         </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
+                            }
 
                             <!-- Day-level Bulk Pricing -->
                             <div formGroupName="pricing" style="display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 0.8rem; margin-top: 1rem; border-top: 1px solid #333; padding-top: 0.8rem;">

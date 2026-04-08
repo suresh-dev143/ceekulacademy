@@ -6,7 +6,7 @@ import { IssuesSidebarTickerComponent } from '../../../components/issues-sidebar
 @Component({
     selector: 'app-home-sidebar-left',
     standalone: true,
-    imports: [CommonModule, RouterLink, IssuesSidebarTickerComponent],
+    imports: [RouterLink, IssuesSidebarTickerComponent],
     templateUrl: './home-sidebar-left.html',
     styleUrl: './home-sidebar-left.scss'
 })

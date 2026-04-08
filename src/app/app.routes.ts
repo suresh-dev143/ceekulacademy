@@ -1,71 +1,43 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home';
-import { LiveRoomComponent } from './pages/workshops/live-room/live-room';
-import { AboutComponent } from './pages/about/about';
-import { LoginComponent } from './pages/login/login';
-import { RegisterComponent } from './pages/register/register';
-import { ProfileComponent } from './pages/profile/profile';
-import { DistrictComponent } from './pages/district/district';
-import { InnovativeComponent } from './pages/innovative/innovative';
-import { ProgramsComponent } from './pages/programs/programs';
-import { CentersComponent } from './pages/centers/centers';
-import { TransformationComponent } from './pages/transformation/transformation';
-import { DashboardHomeComponent } from './pages/dashboard/dashboard-home';
-import { CoursesComponent } from './pages/courses/courses';
-import { DirectorDashboardComponent } from './pages/director-dashboard/director-dashboard';
-import { PartnerDashboardComponent } from './pages/partner-dashboard/partner-dashboard';
-import { StudentNearbyComponent } from './pages/student-nearby/student-nearby';
-import { TeacherDashboardComponent } from './pages/teacher-dashboard/teacher-dashboard';
-import { ContactPageComponent } from './pages/contact/contact';
-import { PublicWorkshopsPageComponent } from './pages/workshops/workshops';
-import { IssuesPageComponent } from './pages/issues/issues';
-import { DonatePageComponent } from './pages/donate/donate';
-import { InvestPageComponent } from './pages/invest/invest';
-import { StudentDashboardComponent } from './pages/student-dashboard/student-dashboard';
-import { HealthConnectComponent } from './pages/health-connect/health-connect';
-import { MyScheduleComponent } from './pages/my-schedule/my-schedule';
-import { MyProfileComponent } from './pages/my-profile/my-profile';
-import { ProgramDetailComponent } from './pages/program-detail/program-detail';
-import { ResearchPageComponent } from './pages/research/research';
-import { ResearchNewComponent } from './pages/research/research-new/research-new';
-import { MyWorkshopsComponent } from './pages/workshops/my-workshops/my-workshops';
-import { EnrolledWorkshopsComponent } from './pages/workshops/enrolled-workshops/enrolled-workshops';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent },
-    { path: 'dashboard', component: DashboardHomeComponent },
-    { path: 'dashboard/courses', component: CoursesComponent },
-    { path: 'dashboard/director', component: DirectorDashboardComponent },
-    { path: 'dashboard/partner', component: PartnerDashboardComponent },
-    { path: 'dashboard/student', component: StudentDashboardComponent },
-    { path: 'dashboard/student/nearby', component: StudentNearbyComponent },
-    { path: 'dashboard/teacher', component: TeacherDashboardComponent },
+    { path: '', loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent) },
+    { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard-home').then(m => m.DashboardHomeComponent) },
+    { path: 'dashboard/courses', loadComponent: () => import('./pages/courses/courses').then(m => m.CoursesComponent) },
+    { path: 'dashboard/director', loadComponent: () => import('./pages/director-dashboard/director-dashboard').then(m => m.DirectorDashboardComponent) },
+    { path: 'dashboard/partner', loadComponent: () => import('./pages/partner-dashboard/partner-dashboard').then(m => m.PartnerDashboardComponent) },
+    { path: 'dashboard/student', loadComponent: () => import('./pages/student-dashboard/student-dashboard').then(m => m.StudentDashboardComponent) },
+    { path: 'dashboard/student/nearby', loadComponent: () => import('./pages/student-nearby/student-nearby').then(m => m.StudentNearbyComponent) },
+    { path: 'dashboard/teacher', loadComponent: () => import('./pages/teacher-dashboard/teacher-dashboard').then(m => m.TeacherDashboardComponent) },
     { path: 'dashboard/teacher/workshops', redirectTo: 'workshops', pathMatch: 'full' },
-    { path: 'dashboard/my-workshops', component: MyWorkshopsComponent },
-    { path: 'dashboard/enrolled-workshops', component: EnrolledWorkshopsComponent },
-    { path: 'about', component: AboutComponent },
-    { path: 'login', component: LoginComponent },
-    { path: 'register', component: RegisterComponent },
-    { path: 'profile', component: ProfileComponent },
-    { path: 'contact', component: ContactPageComponent },
-    { path: 'district', component: DistrictComponent },
-    { path: 'issues', component: IssuesPageComponent },
-    { path: 'donate', component: DonatePageComponent },
-    { path: 'invest', component: InvestPageComponent },
-    { path: 'innovative', component: InnovativeComponent },
-    { path: 'courses', component: InnovativeComponent },
-    { path: 'programs', component: ProgramsComponent },
-    { path: 'programs/:programId', component: ProgramDetailComponent },
-    { path: 'programs/:programId/:sectionId', component: ProgramDetailComponent },
-    { path: 'programs/:programId/:sectionId/:subSectionId', component: ProgramDetailComponent },
-    { path: 'workshops', component: PublicWorkshopsPageComponent },
-    { path: 'workshops/:workshopId/live/:scheduleId', component: LiveRoomComponent },
-    { path: 'transformation', component: TransformationComponent },
-    { path: 'centers', component: CentersComponent },
-    { path: 'health-connect', component: HealthConnectComponent },
-    { path: 'my-schedule', component: MyScheduleComponent },
-    { path: 'my-profile', component: MyProfileComponent },
-    { path: 'research/new', component: ResearchNewComponent },
-    { path: 'research', component: ResearchPageComponent },
+    { path: 'dashboard/my-workshops', loadComponent: () => import('./pages/workshops/my-workshops/my-workshops').then(m => m.MyWorkshopsComponent) },
+    { path: 'dashboard/enrolled-workshops', loadComponent: () => import('./pages/workshops/enrolled-workshops/enrolled-workshops').then(m => m.EnrolledWorkshopsComponent) },
+    { path: 'about', loadComponent: () => import('./pages/about/about').then(m => m.AboutComponent) },
+    { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
+    { path: 'register', loadComponent: () => import('./pages/register/register').then(m => m.RegisterComponent) },
+    { path: 'profile', loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent) },
+    { path: 'contact', loadComponent: () => import('./pages/contact/contact').then(m => m.ContactPageComponent) },
+    { path: 'district', loadComponent: () => import('./pages/district/district').then(m => m.DistrictComponent) },
+    { path: 'issues', loadComponent: () => import('./pages/issues/issues').then(m => m.IssuesPageComponent) },
+    { path: 'donate', loadComponent: () => import('./pages/donate/donate').then(m => m.DonatePageComponent) },
+    { path: 'invest', loadComponent: () => import('./pages/invest/invest').then(m => m.InvestPageComponent) },
+    { path: 'innovative', loadComponent: () => import('./pages/innovative/innovative').then(m => m.InnovativeComponent) },
+    { path: 'courses', loadComponent: () => import('./pages/innovative/innovative').then(m => m.InnovativeComponent) },
+    { path: 'programs', loadComponent: () => import('./pages/programs/programs').then(m => m.ProgramsComponent) },
+    { path: 'programs/:programId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
+    { path: 'programs/:programId/:sectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
+    { path: 'programs/:programId/:sectionId/:subSectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
+    { path: 'workshops', loadComponent: () => import('./pages/workshops/workshops').then(m => m.PublicWorkshopsPageComponent) },
+    { path: 'workshops/:workshopId/live/:scheduleId', loadComponent: () => import('./pages/workshops/live-room/live-room').then(m => m.LiveRoomComponent) },
+    { path: 'transformation', loadComponent: () => import('./pages/transformation/transformation').then(m => m.TransformationComponent) },
+    { path: 'centers', loadComponent: () => import('./pages/centers/centers').then(m => m.CentersComponent) },
+    { path: 'health-connect', loadComponent: () => import('./pages/health-connect/health-connect').then(m => m.HealthConnectComponent) },
+    { path: 'my-schedule', loadComponent: () => import('./pages/my-schedule/my-schedule').then(m => m.MyScheduleComponent) },
+    { path: 'my-profile', loadComponent: () => import('./pages/my-profile/my-profile').then(m => m.MyProfileComponent) },
+    { path: 'research/new', loadComponent: () => import('./pages/research/research-new/research-new').then(m => m.ResearchNewComponent) },
+    { path: 'research', loadComponent: () => import('./pages/research/research').then(m => m.ResearchPageComponent) },
+    // ==================== AD PLATFORM ====================
+    { path: 'dashboard/advertiser', loadComponent: () => import('./pages/advertiser-dashboard/advertiser-dashboard').then(m => m.AdvertiserDashboardComponent) },
+    { path: 'lectures/:lectureId/watch', loadComponent: () => import('./pages/lecture-watch/lecture-watch').then(m => m.LectureWatchComponent) },
     { path: '**', redirectTo: '' }
 ];

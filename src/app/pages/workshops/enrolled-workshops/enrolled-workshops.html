@@ -12,13 +12,16 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="isLoading()" class="loading-state">
+    @if (isLoading()) {
+    <div class="loading-state">
       <div class="spinner"></div>
       <p>Loading your workshops...</p>
     </div>
+    }
 
     <!-- Empty State -->
-    <div *ngIf="!isLoading() && enrollments().length === 0" class="empty-state">
+    @if (!isLoading() && enrollments().length === 0) {
+    <div class="empty-state">
       <div class="empty-icon">
         <i class="fas fa-graduation-cap"></i>
       </div>
@@ -27,10 +30,13 @@
         started!</p>
       <button class="btn-primary" routerLink="/workshops">Browse Workshops</button>
     </div>
+    }
 
     <!-- Workshops List -->
-    <div *ngIf="!isLoading() && enrollments().length > 0" class="workshops-grid">
-      <div *ngFor="let enrollment of enrollments()" class="workshop-card">
+    @if (!isLoading() && enrollments().length > 0) {
+    <div class="workshops-grid">
+      @for (enrollment of enrollments(); track $index) {
+      <div class="workshop-card">
         <div class="card-status" [attr.data-status]="enrollment.status">
           {{ enrollment.status | titlecase }}
         </div>
@@ -74,7 +80,9 @@
           </div>
         </div>
       </div>
+      }
     </div>
+    }
     }
   </div>
 </app-layout>

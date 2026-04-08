@@ -14,7 +14,8 @@ import { NearbyUser } from '../../../services/partner.service';
       </div>
 
       <div class="user-grid">
-        <div class="user-card" *ngFor="let teacher of teachers">
+        @for (teacher of teachers; track teacher.id) {
+        <div class="user-card">
           <div class="dist-tag">{{ teacher.distance }} km away</div>
           <div class="card-header">
             <div class="user-avatar">{{ teacher.name[0] }}</div>
@@ -23,7 +24,7 @@ import { NearbyUser } from '../../../services/partner.service';
               <span class="user-role">{{ teacher.specialization }}</span>
             </div>
           </div>
-          
+
           <div class="info-list">
             <div class="info-item">
               <i class="fas fa-flask"></i>
@@ -44,12 +45,15 @@ import { NearbyUser } from '../../../services/partner.service';
             <button class="btn-ghost-sm">Profile</button>
           </div>
         </div>
+        }
       </div>
 
-      <div class="empty-state" *ngIf="teachers.length === 0">
+      @if (teachers.length === 0) {
+      <div class="empty-state">
         <div class="empty-icon">📍</div>
         <p>No teachers found in this radius. Try expanding your search area.</p>
       </div>
+      }
     </div>
   `,
   styles: [`

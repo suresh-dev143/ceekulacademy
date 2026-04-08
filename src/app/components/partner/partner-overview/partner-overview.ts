@@ -6,7 +6,7 @@ import { Address } from '../../../core/models/address.model';
 @Component({
   selector: 'app-partner-overview',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   template: `
     <div class="partner-header-card animate-fade-in">
       <div class="header-main">

@@ -7,7 +7,7 @@ import { HomeSidebarLeftComponent } from './home-sidebar-left/home-sidebar-left'
 
 @Component({
     selector: 'app-home',
-    imports: [CommonModule, LayoutComponent, ProgramsSectionComponent, HomeSidebarLeftComponent],
+    imports: [LayoutComponent, ProgramsSectionComponent, HomeSidebarLeftComponent],
     templateUrl: './home.html',
     styleUrl: './home.scss'
 })

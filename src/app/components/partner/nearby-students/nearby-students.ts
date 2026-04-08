@@ -14,7 +14,8 @@ import { NearbyUser } from '../../../services/partner.service';
       </div>
 
       <div class="user-grid">
-        <div class="user-card" *ngFor="let student of students">
+        @for (student of students; track student.id) {
+        <div class="user-card">
           <div class="dist-tag">{{ student.distance }} km away</div>
           <div class="card-header">
             <div class="user-avatar student">{{ student.name[0] }}</div>
@@ -23,7 +24,7 @@ import { NearbyUser } from '../../../services/partner.service';
               <span class="user-interest">Interested in: {{ student.learningInterest }}</span>
             </div>
           </div>
-          
+
           <div class="info-list">
             <div class="info-item">
               <i class="fas fa-book-reader"></i>
@@ -40,12 +41,15 @@ import { NearbyUser } from '../../../services/partner.service';
             <button class="btn-ghost-sm">Summary</button>
           </div>
         </div>
+        }
       </div>
 
-      <div class="empty-state" *ngIf="students.length === 0">
+      @if (students.length === 0) {
+      <div class="empty-state">
         <div class="empty-icon">🎓</div>
         <p>No students found in this radius. Try expanding your search area.</p>
       </div>
+      }
     </div>
   `,
   styles: [`

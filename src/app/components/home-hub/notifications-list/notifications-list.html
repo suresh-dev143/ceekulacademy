@@ -5,10 +5,13 @@
     </div>
 
     <div class="notifications-container">
-        <div class="notification-item" *ngFor="let notification of notifications" [class.unread]="notification.unread">
+        @for (notification of notifications; track $index) {
+        <div class="notification-item" [class.unread]="notification.unread">
             <div class="notif-icon-wrapper" [attr.data-type]="notification.type">
                 <i class="fas" [ngClass]="getIcon(notification.type)"></i>
-                <div class="unread-dot" *ngIf="notification.unread"></div>
+                @if (notification.unread) {
+                <div class="unread-dot"></div>
+                }
             </div>
 
             <div class="notif-content">
@@ -23,6 +26,7 @@
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
+        }
 
         <button class="show-more-btn">
             See all notifications

@@ -8,10 +8,12 @@
         <div class="roles-panel glass-card">
             <h4 class="panel-subtitle">My Active Roles</h4>
             <div class="roles-tags">
-                <div class="role-tag" *ngFor="let role of roles">
+                @for (role of roles; track $index) {
+                <div class="role-tag">
                     <i class="fas" [ngClass]="getRoleIcon(role)"></i>
                     {{ role }}
                 </div>
+                }
             </div>
         </div>
 

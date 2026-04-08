@@ -9,7 +9,8 @@ import { AuthService } from '../../../services/auth.service';
     standalone: true,
     imports: [CommonModule, FormsModule],
     template: `
-    <div class="issue-detail-card glass-card animated-fade-up" *ngIf="issue">
+    @if (issue) {
+    <div class="issue-detail-card glass-card animated-fade-up">
       <button class="btn-back" (click)="close.emit()">
         <i class="fas fa-arrow-left"></i> Back to List
       </button>
@@ -32,14 +33,22 @@ import { AuthService } from '../../../services/auth.service';
         <section class="description-section">
           <h3>Description</h3>
           <p>{{ issue.description }}</p>
-          <div class="media-gallary" *ngIf="issue.mediaUrls.length > 0">
-            <div *ngFor="let url of issue.mediaUrls" class="media-item">
-              <img [src]="url" *ngIf="!url.startsWith('data:video')">
-              <div class="video-preview" *ngIf="url.startsWith('data:video')">
+          @if (issue.mediaUrls.length > 0) {
+          <div class="media-gallary">
+            @for (url of issue.mediaUrls; track $index) {
+            <div class="media-item">
+              @if (!url.startsWith('data:video')) {
+              <img [src]="url">
+              }
+              @if (url.startsWith('data:video')) {
+              <div class="video-preview">
                 <i class="fas fa-play-circle"></i>
               </div>
+              }
             </div>
+            }
           </div>
+          }
         </section>
 
         <section class="info-grid">
@@ -51,24 +60,26 @@ import { AuthService } from '../../../services/auth.service';
           </div>
           <div class="info-block contact-block">
             <h3><i class="fas fa-user-shield"></i> Submitter Contact</h3>
-            <div *ngIf="isAuthorized(); else privateContact">
+            @if (isAuthorized()) {
+            <div>
               <p><strong>Name:</strong> {{ issue.contact.name }}</p>
               <p><strong>Phone:</strong> {{ issue.contact.phone }}</p>
               <p><strong>Email:</strong> {{ issue.contact.email }}</p>
             </div>
-            <ng-template #privateContact>
-              <div class="private-overlay">
-                <i class="fas fa-lock"></i>
-                <span>Private Information</span>
-              </div>
-            </ng-template>
+            } @else {
+            <div class="private-overlay">
+              <i class="fas fa-lock"></i>
+              <span>Private Information</span>
+            </div>
+            }
           </div>
         </section>
 
         <section class="history-section">
           <h3>Resolution Tracking</h3>
           <div class="timeline">
-            <div *ngFor="let event of issue.history" class="timeline-event">
+            @for (event of issue.history; track $index) {
+            <div class="timeline-event">
               <div class="event-marker"></div>
               <div class="event-content">
                 <div class="event-header">
@@ -76,14 +87,18 @@ import { AuthService } from '../../../services/auth.service';
                   <span class="event-time">{{ event.timestamp | date:'short' }}</span>
                 </div>
                 <p class="event-meta">Action by {{ event.byRole }}</p>
-                <p class="event-remarks" *ngIf="event.remarks">"{{ event.remarks }}"</p>
+                @if (event.remarks) {
+                <p class="event-remarks">"{{ event.remarks }}"</p>
+                }
               </div>
             </div>
+            }
           </div>
         </section>
 
         <!-- Role-Based Action Panel -->
-        <section class="action-panel" *ngIf="canVerify()">
+        @if (canVerify()) {
+        <section class="action-panel">
           <h3>Update Verification Status</h3>
           <div class="action-form">
             <textarea [(ngModel)]="remarks" placeholder="Add verification remarks, site visit notes, or resolution plan..." class="form-control"></textarea>
@@ -94,14 +109,18 @@ import { AuthService } from '../../../services/auth.service';
               <button class="btn-danger" (click)="performAction('Rejected')">
                 <i class="fas fa-times-circle"></i> Reject / Close
               </button>
-              <button class="btn-warning" (click)="performAction('Clarify')" *ngIf="userRole() === 'Manager'">
+              @if (userRole() === 'Manager') {
+              <button class="btn-warning" (click)="performAction('Clarify')">
                 <i class="fas fa-question-circle"></i> Needs Clarification
               </button>
+              }
             </div>
           </div>
         </section>
+        }
       </div>
     </div>
+    }
   `,
     styles: [`
     .issue-detail-card { padding: 2.5rem; border-radius: 28px; }

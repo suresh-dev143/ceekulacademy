@@ -8,22 +8,24 @@
         <div class="form-group">
             <label for="title">Course Title</label>
             <input id="title" type="text" formControlName="title" placeholder="e.g., Master Advanced Web Development">
-            <div class="error-msg" *ngIf="courseForm.get('title')?.touched && courseForm.get('title')?.invalid">
+            @if (courseForm.get('title')?.touched && courseForm.get('title')?.invalid) {
+            <div class="error-msg">
                 Title must be at least 5 characters long.
             </div>
+            }
         </div>
 
         <div class="form-row">
             <div class="form-group half">
                 <label for="category">Category</label>
                 <select id="category" formControlName="category">
-                    <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                    @for (cat of categories; track cat) { <option [value]="cat">{{ cat }}</option> }
                 </select>
             </div>
             <div class="form-group half">
                 <label for="level">Level</label>
                 <select id="level" formControlName="level">
-                    <option *ngFor="let lvl of levels" [value]="lvl">{{ lvl }}</option>
+                    @for (lvl of levels; track lvl) { <option [value]="lvl">{{ lvl }}</option> }
                 </select>
             </div>
         </div>
@@ -38,7 +40,7 @@
             <div class="form-group half">
                 <label for="mode">Mode</label>
                 <select id="mode" formControlName="mode">
-                    <option *ngFor="let m of modes" [value]="m">{{ m }}</option>
+                    @for (m of modes; track m) { <option [value]="m">{{ m }}</option> }
                 </select>
             </div>
             <div class="form-group half">
@@ -51,7 +53,7 @@
             <div class="form-group half">
                 <label for="pricing">Pricing</label>
                 <select id="pricing" formControlName="pricing">
-                    <option *ngFor="let p of pricingOptions" [value]="p">{{ p }}</option>
+                    @for (p of pricingOptions; track p) { <option [value]="p">{{ p }}</option> }
                 </select>
             </div>
             <div class="form-group half">

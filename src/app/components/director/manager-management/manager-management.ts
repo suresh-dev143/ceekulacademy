@@ -25,7 +25,8 @@ import { Manager } from '../../../services/director.service';
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let manager of managers">
+            @for (manager of managers; track $index) {
+            <tr>
               <td>
                 <div class="user-cell">
                   <div class="user-avatar">{{ manager.name[0] }}</div>
@@ -45,6 +46,7 @@ import { Manager } from '../../../services/director.service';
                 </div>
               </td>
             </tr>
+            }
           </tbody>
         </table>
       </div>

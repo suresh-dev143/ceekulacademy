@@ -13,7 +13,7 @@ import { HourlySlot } from '../../../core/models/infrastructure.model';
 @Component({
   selector: 'app-computer-lab-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AppValidationErrorComponent],
+  imports: [ReactiveFormsModule, AppValidationErrorComponent],
   templateUrl: './computer-lab-form.component.html',
   styles: [`
     .form-container { background: #000; padding: 2rem; border: 1px solid #333; color: #fff; max-height: 80vh; overflow-y: auto; }

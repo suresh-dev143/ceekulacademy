@@ -24,7 +24,7 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
               [class.active]="activeTab() === 'pending'" 
               (click)="activeTab.set('pending')">
               Pending Review
-              <span class="badge" *ngIf="pendingInstructions().length">{{ pendingInstructions().length }}</span>
+              @if (pendingInstructions().length) { <span class="badge">{{ pendingInstructions().length }}</span> }
             </button>
             <button 
               [class.active]="activeTab() === 'history'" 
@@ -37,12 +37,13 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
 
       <div class="panel-content">
         <!-- Tab 1: Assign Advisor -->
-        <div *ngIf="activeTab() === 'assign'" class="tab-content animate-fade-in">
+        @if (activeTab() === 'assign') {
+        <div class="tab-content animate-fade-in">
           <div class="assign-grid">
             <div class="issues-list">
               <h4>Issues Needing Expertise</h4>
-              <div class="list-item" 
-                   *ngFor="let issue of issuesNeedingAdvisor()" 
+              @for (issue of issuesNeedingAdvisor(); track issue.id) {
+              <div class="list-item"
                    [class.selected]="selectedIssue()?.id === issue.id"
                    (click)="selectedIssue.set(issue)">
                 <div class="item-header">
@@ -52,36 +53,48 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
                 <h5>{{ issue.category }}</h5>
                 <p>{{ issue.description | slice:0:80 }}...</p>
               </div>
+              }
             </div>
 
-            <div class="advisors-list" *ngIf="selectedIssue()">
+            @if (selectedIssue()) {
+            <div class="advisors-list">
               <h4>Select Advisor for {{ selectedIssue()?.id }}</h4>
-              
+
               <!-- Filter advisors by matching domain if possible -->
-              <div class="advisor-card" *ngFor="let advisor of advisors()">
+              @for (advisor of advisors(); track advisor.id) {
+              <div class="advisor-card">
                 <div class="advisor-info">
                   <h5>{{ advisor.name }}</h5>
                   <span class="domain">{{ advisor.domain }}</span>
                   <div class="expertise">
-                    <span *ngFor="let exp of advisor.expertise" class="tag">{{ exp }}</span>
+                    @for (exp of advisor.expertise; track $index) {
+                    <span class="tag">{{ exp }}</span>
+                    }
                   </div>
                 </div>
                 <button class="btn-sm btn-primary" (click)="assignAdvisor(advisor)">
                   Assign
                 </button>
               </div>
+              }
             </div>
+            }
 
-            <div class="empty-state" *ngIf="!selectedIssue()">
+            @if (!selectedIssue()) {
+            <div class="empty-state">
               <p>Select an issue from the left to view recommended advisors</p>
             </div>
+            }
           </div>
         </div>
+        }
 
         <!-- Tab 2: Pending Instructions -->
-        <div *ngIf="activeTab() === 'pending'" class="tab-content animate-fade-in">
+        @if (activeTab() === 'pending') {
+        <div class="tab-content animate-fade-in">
           <div class="review-list">
-            <div class="instruction-card" *ngFor="let instruction of pendingInstructions()">
+            @for (instruction of pendingInstructions(); track instruction.id) {
+            <div class="instruction-card">
               <div class="card-header">
                 <div class="user-info">
                   <span class="avatar">{{ instruction.advisorName | slice:0:1 }}</span>
@@ -96,12 +109,16 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
               <div class="card-body">
                 <h6>Recommendation for {{ instruction.issueId }}</h6>
                 <p>{{ instruction.recommendation }}</p>
-                <div class="references" *ngIf="instruction.supportingReferences?.length">
+                @if (instruction.supportingReferences?.length) {
+                <div class="references">
                   <strong>References:</strong>
                   <ul>
-                    <li *ngFor="let ref of instruction.supportingReferences">{{ ref }}</li>
+                    @for (ref of instruction.supportingReferences; track $index) {
+                    <li>{{ ref }}</li>
+                    }
                   </ul>
                 </div>
+                }
               </div>
 
               <div class="card-actions">
@@ -113,11 +130,15 @@ import { AuditTrailService } from '../../../services/audit-trail.service';
                 </div>
               </div>
             </div>
+            }
           </div>
-           <div class="empty-state" *ngIf="pendingInstructions().length === 0">
+           @if (pendingInstructions().length === 0) {
+           <div class="empty-state">
               <p>No pending instructions to review</p>
             </div>
+            }
         </div>
+        }
       </div>
     </div>
   `,

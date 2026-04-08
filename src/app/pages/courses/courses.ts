@@ -10,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
     selector: 'app-courses-management',
     standalone: true,
-    imports: [CommonModule, FormsModule, LayoutComponent, CourseListItemComponent, CourseFormComponent],
+    imports: [FormsModule, LayoutComponent, CourseListItemComponent, CourseFormComponent],
     templateUrl: './courses.html',
     styleUrl: './courses.scss'
 })

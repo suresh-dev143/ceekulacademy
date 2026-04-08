@@ -1,7 +1,8 @@
 <app-layout [showLeftSidebar]="true" [showRightSidebar]="true">
     <div class="donate-container">
         <!-- Success State -->
-        <div class="success-card glass-card animated-fade-in" *ngIf="submissionSuccess()">
+        @if (submissionSuccess()) {
+        <div class="success-card glass-card animated-fade-in">
             <div class="icon-circle">
                 <i class="fas fa-check"></i>
             </div>
@@ -17,17 +18,21 @@
                     <span>Impact Area:</span>
                     <span class="value">{{ donation.donationArea }}</span>
                 </div>
-                <div class="detail-row" *ngIf="donation.locationScope === 'Local' && donation.location">
+                @if (donation.locationScope === 'Local' && donation.location) {
+                <div class="detail-row">
                     <span>Location:</span>
                     <span class="value">{{ donation.location.city || donation.location.district }}</span>
                 </div>
+                }
             </div>
             <button class="btn-primary" (click)="resetForm()">Make Another Donation</button>
         </div>
+        }
 
 
         <!-- Donation Form -->
-        <div class="donation-form glass-card animated-fade-in" *ngIf="!submissionSuccess()">
+        @if (!submissionSuccess()) {
+        <div class="donation-form glass-card animated-fade-in">
             <header class="form-header">
                 <h1>Make a Difference</h1>
                 <p>Empower communities through direct, transparent contribution.</p>
@@ -58,7 +63,9 @@
                     <div class="form-group">
                         <label>Impact Area <span class="required">*</span></label>
                         <select [(ngModel)]="donation.donationArea" name="donationArea" required>
-                            <option *ngFor="let area of areas" [value]="area">{{ area }}</option>
+                            @for (area of areas; track $index) {
+                            <option [value]="area">{{ area }}</option>
+                            }
                         </select>
                         <p class="hint-text">Your donation will be strictly allocated to <strong>{{
                                 donation.donationArea }}</strong>.</p>
@@ -74,7 +81,8 @@
                         </div>
                     </div>
 
-                    <div class="location-fields animated-fade-down" *ngIf="donation.locationScope === 'Local'">
+                    @if (donation.locationScope === 'Local') {
+                    <div class="location-fields animated-fade-down">
                         <div class="form-row">
                             <div class="form-group">
                                 <label>State</label>
@@ -96,6 +104,7 @@
                                 name="city" placeholder="e.g. Noida, Sector 62">
                         </div>
                     </div>
+                    }
                 </div>
 
                 <!-- Section 3: Amount & Payment -->
@@ -106,7 +115,9 @@
                         <div class="form-group col-currency">
                             <label>Currency</label>
                             <select [(ngModel)]="donation.currency" name="currency">
-                                <option *ngFor="let curr of currencies" [value]="curr">{{ curr }}</option>
+                                @for (curr of currencies; track $index) {
+                                <option [value]="curr">{{ curr }}</option>
+                                }
                             </select>
                         </div>
                         <div class="form-group col-amount">
@@ -116,21 +127,25 @@
                     </div>
 
                     <div class="presets">
-                        <button type="button" *ngFor="let amt of amountPresets" (click)="setAmount(amt)"
+                        @for (amt of amountPresets; track $index) {
+                        <button type="button" (click)="setAmount(amt)"
                             [class.selected]="donation.amount === amt">
                             {{ amt }}
                         </button>
+                        }
                     </div>
 
                     <div class="form-group payment-methods">
                         <label>Payment Method</label>
                         <div class="radio-grid">
-                            <div class="radio-card" *ngFor="let method of paymentMethods"
+                            @for (method of paymentMethods; track $index) {
+                            <div class="radio-card"
                                 (click)="donation.paymentMethod = method"
                                 [class.selected]="donation.paymentMethod === method">
                                 <span class="radio-circle"></span>
                                 <span>{{ method }}</span>
                             </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -174,12 +189,17 @@
                 <!-- Actions -->
                 <div class="form-actions">
                     <button type="submit" class="btn-primary submit-btn" [disabled]="isSubmitting() || !hasConsented">
-                        <span *ngIf="!isSubmitting()">Complete Donation <i class="fas fa-heart"></i></span>
-                        <span *ngIf="isSubmitting()"><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+                        @if (!isSubmitting()) {
+                        <span>Complete Donation <i class="fas fa-heart"></i></span>
+                        }
+                        @if (isSubmitting()) {
+                        <span><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+                        }
                     </button>
                 </div>
 
             </form>
         </div>
+        }
     </div>
 </app-layout>

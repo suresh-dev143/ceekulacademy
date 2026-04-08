@@ -13,18 +13,24 @@ import { CommonModule } from '@angular/common';
       </div>
 
       <div class="availability-list">
-        <div class="day-slot glass-card" *ngFor="let item of availability">
+        @for (item of availability; track $index) {
+        <div class="day-slot glass-card">
           <div class="day-name">{{ item.day }}</div>
           <div class="slots">
-            <span class="slot-tag" *ngFor="let slot of item.slots">{{ slot }}</span>
+            @for (slot of item.slots; track $index) {
+            <span class="slot-tag">{{ slot }}</span>
+            }
           </div>
         </div>
+        }
       </div>
 
-      <div class="empty-state" *ngIf="availability.length === 0">
+      @if (availability.length === 0) {
+      <div class="empty-state">
         <p>No availability entries found. Set your schedule to help others find you.</p>
         <button class="btn-primary">Add Availability</button>
       </div>
+      }
     </div>
   `,
     styles: [`

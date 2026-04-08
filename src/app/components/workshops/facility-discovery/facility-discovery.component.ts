@@ -1,5 +1,5 @@
 import { Component, inject, signal, input, output, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe} from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FacilityBookingService, PartnerLocationSearchResult, FacilityDetail } from '../../../services/facility-booking.service';
 import { ToastService } from '../../../core/services/toast.service';
@@ -13,7 +13,8 @@ import { HourlySlot } from '../../../core/models/infrastructure.model';
 @Component({
     selector: 'app-facility-discovery',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [FormsModule,
+    DatePipe],
     templateUrl: './facility-discovery.component.html',
     styleUrl: './facility-discovery.component.scss'
 })

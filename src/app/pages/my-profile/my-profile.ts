@@ -25,7 +25,7 @@ function passwordMatchValidator(form: AbstractControl) {
 @Component({
     selector: 'app-my-profile',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, LayoutComponent],
+    imports: [ReactiveFormsModule, LayoutComponent],
     templateUrl: './my-profile.html',
     styleUrl: './my-profile.scss'
 })

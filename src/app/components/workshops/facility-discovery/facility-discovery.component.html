@@ -33,9 +33,11 @@
                 <div class="sidebar-section">
                     <div class="section-title-row">
                         <h3>Geographic Search</h3>
-                        <button class="btn-clear-filters" (click)="clearLocationFilters()" *ngIf="searchAddress() || searchCity() || searchDistrict() || searchPincode()">
+                        @if (searchAddress() || searchCity() || searchDistrict() || searchPincode()) {
+                        <button class="btn-clear-filters" (click)="clearLocationFilters()">
                             Clear
                         </button>
+                        }
                     </div>
                     
                     <div class="search-box main-search">

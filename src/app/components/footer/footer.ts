@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-footer',
-    imports: [CommonModule, RouterLink],
+    imports: [RouterLink],
     templateUrl: './footer.html',
     styleUrl: './footer.scss'
 })

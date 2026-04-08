@@ -4,7 +4,7 @@ import { LayoutComponent } from '../../components/layout/layout';
 
 @Component({
     selector: 'app-about',
-    imports: [CommonModule, LayoutComponent],
+    imports: [LayoutComponent],
     templateUrl: './about.html',
     styleUrl: './about.scss'
 })

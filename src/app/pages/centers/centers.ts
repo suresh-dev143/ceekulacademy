@@ -1,5 +1,5 @@
 import { Component, signal, computed, inject, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe, DecimalPipe} from '@angular/common';
 import { ChatPanelComponent } from '../../components/chat-panel/chat-panel';
 import { interval } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -172,7 +172,9 @@ export interface AdvisorInsight {
 // ═══════════════════════════════════════════════════════════════
 @Component({
     selector: 'app-centers',
-    imports: [CommonModule, ChatPanelComponent, NavbarComponent, GlobalSearchComponent],
+    imports: [ChatPanelComponent, NavbarComponent, GlobalSearchComponent,
+    DatePipe,
+    DecimalPipe],
     templateUrl: './centers.html',
     styleUrl: './centers.scss'
 })
