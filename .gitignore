@@ -3,20 +3,22 @@ dist/
 out-tsc/
 tmp/
 coverage/
-/e2e/test-output/
+e2e/test-output/
 .angular/
 
 # Node modules and dependency files
 node_modules/
-package-lock.json
 yarn.lock
 
-# Environment files
+# Environment and Local Settings
 .env
+*.local.json
 
-# Angular CLI and build artefacts
-/.angular-cli.json
-/.ng/
+# OS and Tool artifacts
+.DS_Store
+.backup/
+.angular-cli.json
+.ng/
 
 # TypeScript cache
 *.tsbuildinfo
