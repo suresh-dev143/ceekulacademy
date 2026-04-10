@@ -39,5 +39,12 @@ export const routes: Routes = [
     // ==================== AD PLATFORM ====================
     { path: 'dashboard/advertiser', loadComponent: () => import('./pages/advertiser-dashboard/advertiser-dashboard').then(m => m.AdvertiserDashboardComponent) },
     { path: 'lectures/:lectureId/watch', loadComponent: () => import('./pages/lecture-watch/lecture-watch').then(m => m.LectureWatchComponent) },
+    { path: 'lectures/:lectureId/edit',  loadComponent: () => import('./pages/live-editor/live-editor').then(m => m.LiveEditorComponent) },
+    { path: 'lectures/:lectureId/chat',  loadComponent: () => import('./pages/lecture-chat/lecture-chat').then(m => m.LectureChatComponent) },
+    // ==================== AI / ADAPTIVE CONTENT ====================
+    { path: 'dashboard/digital-twin', loadComponent: () => import('./pages/digital-twin-dashboard/digital-twin-dashboard').then(m => m.DigitalTwinDashboardComponent) },
+    { path: 'dashboard/innovation',   loadComponent: () => import('./pages/innovation-pipeline/innovation-pipeline').then(m => m.InnovationPipelineComponent) },
+    // ==================== ADAPTIVE CONTENT ENGINE ====================
+    { path: 'learn/:topicId', loadComponent: () => import('./pages/adaptive-content/adaptive-content').then(m => m.AdaptiveContentComponent) },
     { path: '**', redirectTo: '' }
 ];

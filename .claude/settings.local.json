@@ -5,7 +5,8 @@
       "Bash(xxd /private/tmp/claude-501/-Users-gs-Documents-GitHub-ceekulmission/4560c707-bdc1-469e-99d3-d1dbfb5c6e44/tasks/bqfpxqtof.output)",
       "Bash(node -e \"require\\('./src/services/pricingService'\\); console.log\\('pricing ok'\\)\")",
       "Bash(node -e \"require\\('./src/services/eventService'\\); console.log\\('events ok'\\)\")",
-      "Bash(node -e \"require\\('./src/routers/ad.route'\\); console.log\\('ad routes ok'\\)\")"
+      "Bash(node -e \"require\\('./src/routers/ad.route'\\); console.log\\('ad routes ok'\\)\")",
+      "Bash(git check-ignore:*)"
     ]
   }
 }

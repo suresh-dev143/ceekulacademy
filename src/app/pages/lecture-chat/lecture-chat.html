@@ -1,0 +1,72 @@
+<div class="lcp-shell">
+
+  <!-- ── Top bar ── -->
+  <header class="lcp-topbar">
+    <div class="lcp-topbar-left">
+      <span class="lcp-title">
+        @if (lecture()) { {{ lecture()!.title }} }
+        @else { Loading… }
+      </span>
+      <span class="lcp-lecture-id">{{ lectureId }}</span>
+    </div>
+    <div class="lcp-topbar-right">
+      @if (isTeacher) { <span class="lcp-role-badge teacher">Teacher</span> }
+      @else           { <span class="lcp-role-badge student">Student</span> }
+    </div>
+  </header>
+
+  <!-- ── Main split-screen body ── -->
+  @if (loading()) {
+    <div class="lcp-loading">
+      <div class="lcp-spinner"></div>
+      <span>Loading session…</span>
+    </div>
+  }
+
+  @if (!loading()) {
+    <div class="lcp-body">
+
+      <!-- ── TOP: Content pane ── -->
+      <section class="lcp-content-pane" [style.height.%]="splitRatio()">
+
+        @if (lecture()!.videoUrl) {
+          <!-- Video player when a stream URL is available -->
+          <video class="lcp-video"
+            [src]="lecture()!.videoUrl"
+            controls
+            autoplay
+            playsinline>
+          </video>
+        } @else {
+          <!-- Placeholder when no video URL is set yet -->
+          <div class="lcp-content-placeholder">
+            <div class="lcp-placeholder-icon">🎓</div>
+            <h2 class="lcp-placeholder-title">{{ lecture()!.title }}</h2>
+            <p class="lcp-placeholder-desc">{{ lecture()!.description }}</p>
+            <p class="lcp-placeholder-instructor">{{ lecture()!.instructor }}</p>
+            <p class="lcp-placeholder-hint">
+              The live stream will appear here once the teacher goes live.
+            </p>
+          </div>
+        }
+
+      </section>
+
+      <!-- ── Drag divider ── -->
+      <div class="lcp-divider" (mousedown)="onDividerMousedown($event)">
+        <div class="lcp-divider-handle"></div>
+      </div>
+
+      <!-- ── BOTTOM: Chat pane ── -->
+      <section class="lcp-chat-pane" [style.height.%]="100 - splitRatio()">
+        <app-live-chat
+          [lectureId]="lectureId"
+          [lectureTitle]="lecture()!.title"
+          [isTeacher]="isTeacher">
+        </app-live-chat>
+      </section>
+
+    </div>
+  }
+
+</div>

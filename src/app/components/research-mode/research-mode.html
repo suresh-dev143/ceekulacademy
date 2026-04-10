@@ -1,0 +1,146 @@
+<div class="res-shell">
+
+  <!-- Header -->
+  <div class="res-header">
+    <div class="res-header-left">
+      <span class="res-badge">🔬 Research Mode</span>
+      <h2 class="res-title">{{ atom?.title }}</h2>
+    </div>
+    <div class="res-header-right">
+      <button class="res-xr-btn" (click)="onGoXR()">🌐 XR View</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="res-tabs">
+    <button class="res-tab" [class.res-tab--active]="activeTab() === 'questions'" (click)="setTab('questions')">
+      Open Questions <span class="res-count">{{ ext?.openQuestions?.length || 0 }}</span>
+    </button>
+    <button class="res-tab" [class.res-tab--active]="activeTab() === 'hypotheses'" (click)="setTab('hypotheses')">
+      Hypotheses <span class="res-count">{{ ext?.hypotheses?.length || 0 }}</span>
+    </button>
+    <button class="res-tab" [class.res-tab--active]="activeTab() === 'papers'" (click)="setTab('papers')">
+      Papers <span class="res-count">{{ ext?.relatedPapers?.length || 0 }}</span>
+    </button>
+  </div>
+
+  <!-- Tab content -->
+  <div class="res-body">
+
+    <!-- Open Questions tab -->
+    @if (activeTab() === 'questions') {
+      <div class="res-panel">
+
+        <!-- Future directions -->
+        @if (ext?.futureDirections?.length) {
+          <div class="res-section">
+            <h3 class="res-section-title">Future Directions</h3>
+            <ul class="res-list res-list--future">
+              @for (dir of ext.futureDirections; track dir) {
+                <li class="res-list-item">🚀 {{ dir }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        <!-- Open questions -->
+        <div class="res-section">
+          <h3 class="res-section-title">Open Questions</h3>
+          <ul class="res-list res-list--questions">
+            @for (q of (ext?.openQuestions || []); track q) {
+              <li class="res-list-item">
+                <span class="res-q-icon">?</span>
+                <span>{{ q }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <!-- Ask your own question -->
+        <div class="res-ask-box">
+          <h3 class="res-section-title">Your Question</h3>
+          <div class="res-ask-row">
+            <input type="text"
+              class="res-ask-input"
+              placeholder="What are you curious about?"
+              [(ngModel)]="userQuestion"
+              (keyup.enter)="onAskQuestion()">
+            <button class="res-ask-btn" (click)="onAskQuestion()" [disabled]="!userQuestion.trim()">Ask</button>
+          </div>
+          @if (submittedQuestion()) {
+            <div class="res-submitted-q">
+              <span class="res-q-icon">✓</span>
+              {{ submittedQuestion() }}
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- Hypotheses tab -->
+    @if (activeTab() === 'hypotheses') {
+      <div class="res-panel">
+        <div class="res-section">
+          <h3 class="res-section-title">Testable Hypotheses</h3>
+          @for (hyp of (ext?.hypotheses || []); track hyp; let i = $index) {
+            <div class="res-hypothesis-card">
+              <span class="res-hyp-num">H{{ i + 1 }}</span>
+              <p class="res-hyp-text">{{ hyp }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- AI-generate a new hypothesis -->
+        <div class="res-gen-box">
+          <h3 class="res-section-title">AI-Generated Hypothesis</h3>
+          @if (!aiHypothesis()) {
+            <button class="res-gen-btn" (click)="onGenerateHypothesis()" [disabled]="generatingHyp()">
+              {{ generatingHyp() ? '⟳ Generating…' : '✦ Generate New Hypothesis' }}
+            </button>
+          } @else {
+            <div class="res-hypothesis-card res-hypothesis-card--ai">
+              <span class="res-hyp-num">AI</span>
+              <p class="res-hyp-text">{{ aiHypothesis() }}</p>
+            </div>
+            <button class="res-gen-btn res-gen-btn--secondary" (click)="onGenerateHypothesis()">
+              Generate Another
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Papers tab -->
+    @if (activeTab() === 'papers') {
+      <div class="res-panel">
+        @if (!(ext?.relatedPapers?.length)) {
+          <div class="res-empty">No papers linked yet. Use the research pipeline to enrich this atom.</div>
+        } @else {
+          @for (paper of ext.relatedPapers; track paper.title) {
+            <div class="res-paper-card">
+              <div class="res-paper-meta">
+                <span class="res-paper-year">{{ paper.year }}</span>
+                @if (paper.doi) {
+                  <a [href]="'https://doi.org/' + paper.doi" target="_blank" class="res-paper-doi">DOI</a>
+                }
+              </div>
+              <h4 class="res-paper-title">{{ paper.title }}</h4>
+              <p class="res-paper-authors">{{ paper.authors?.join(', ') }}</p>
+              @if (paper.summary) {
+                <p class="res-paper-summary">{{ paper.summary }}</p>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+
+  </div>
+
+  <!-- Footer actions -->
+  <div class="res-footer">
+    <button class="res-footer-btn res-footer-btn--primary" (click)="onContinue()">Continue →</button>
+  </div>
+
+</div>

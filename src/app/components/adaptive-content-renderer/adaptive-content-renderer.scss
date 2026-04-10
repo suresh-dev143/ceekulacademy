@@ -1,0 +1,312 @@
+// ── Shell ─────────────────────────────────────────────────────────────────────
+.acr-shell {
+  display:        grid;
+  grid-template-columns: 260px 1fr;
+  gap:            0;
+  height:         100%;
+  background:     #111;
+  color:          #e8e8e8;
+  border-radius:  12px;
+  overflow:       hidden;
+}
+
+// ── Loading / Error ───────────────────────────────────────────────────────────
+.acr-loading {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             12px;
+  padding:         60px;
+  color:           rgba(255,255,255,0.5);
+  font-size:       14px;
+}
+
+.spinner {
+  width:         32px;
+  height:        32px;
+  border:        3px solid rgba(255,255,255,0.1);
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation:     spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.acr-error {
+  padding:     24px;
+  color:       #f87171;
+  background:  rgba(239,68,68,0.1);
+  border-radius: 8px;
+  font-size:   14px;
+}
+
+// ── Segment Navigator ─────────────────────────────────────────────────────────
+.segment-nav {
+  background:   #1a1a1a;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  overflow-y:   auto;
+  padding:      16px 0;
+}
+
+.nav-header {
+  display:      flex;
+  gap:          8px;
+  align-items:  center;
+  padding:      0 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 8px;
+}
+
+.version-chip {
+  font-size:    11px;
+  font-weight:  700;
+  background:   rgba(79,70,229,0.25);
+  color:        #818cf8;
+  padding:      2px 8px;
+  border-radius: 20px;
+}
+
+.quality-chip {
+  font-size:   11px;
+  padding:     2px 8px;
+  border-radius: 20px;
+  &.approved {
+    background: rgba(74,222,128,0.2);
+    color:      #4ade80;
+  }
+}
+
+.seg-btn {
+  display:        flex;
+  align-items:    center;
+  gap:            10px;
+  width:          100%;
+  padding:        10px 16px;
+  background:     none;
+  border:         none;
+  color:          rgba(255,255,255,0.6);
+  font-size:      13px;
+  text-align:     left;
+  cursor:         pointer;
+  transition:     background 0.15s;
+
+  &:hover  { background: rgba(255,255,255,0.04); color: #fff; }
+  &.active { background: rgba(79,70,229,0.15); color: #c7d2fe; }
+}
+
+.seg-title { flex: 1; }
+
+.seg-type-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  &[data-type="concept"]    { background: #60a5fa; }
+  &[data-type="example"]    { background: #34d399; }
+  &[data-type="case_study"] { background: #f472b6; }
+  &[data-type="quiz"]       { background: #fbbf24; }
+  &[data-type="summary"]    { background: #a78bfa; }
+}
+
+.badge {
+  font-size:     10px;
+  padding:       1px 6px;
+  border-radius: 10px;
+  font-weight:   600;
+  flex-shrink:   0;
+  &-added    { background: rgba(74,222,128,0.2);  color: #4ade80; }
+  &-modified { background: rgba(251,191,36,0.2);  color: #fbbf24; }
+  &-removed  { background: rgba(248,113,113,0.2); color: #f87171; }
+}
+
+// ── Segment Body ──────────────────────────────────────────────────────────────
+.segment-body {
+  overflow-y:  auto;
+  padding:     28px 32px;
+  display:     flex;
+  flex-direction: column;
+  gap:         24px;
+}
+
+.seg-header { display: flex; flex-direction: column; gap: 8px; }
+.seg-meta   { display: flex; gap: 10px; align-items: center; }
+
+.seg-type-label {
+  font-size:   11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.4);
+}
+.seg-order {
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+}
+.depth-badge {
+  font-size:   11px;
+  padding:     2px 8px;
+  border-radius: 10px;
+  background:  rgba(99,102,241,0.2);
+  color:       #a5b4fc;
+  margin-left: auto;
+}
+
+.seg-title {
+  font-size:   22px;
+  font-weight: 700;
+  color:       #f1f5f9;
+  margin:      0;
+}
+
+// ── Depth Selector ────────────────────────────────────────────────────────────
+.depth-selector {
+  display:    flex;
+  gap:        8px;
+  flex-wrap:  wrap;
+  align-items: center;
+}
+.ds-label {
+  font-size:  12px;
+  color:      rgba(255,255,255,0.4);
+  flex-shrink: 0;
+}
+.ds-btn {
+  padding:      5px 12px;
+  border-radius: 20px;
+  border:       1px solid rgba(255,255,255,0.12);
+  background:   transparent;
+  color:        rgba(255,255,255,0.6);
+  font-size:    12px;
+  cursor:       pointer;
+  transition:   all 0.15s;
+
+  &:hover:not([disabled]) { border-color: #6366f1; color: #a5b4fc; }
+  &.active { background: rgba(99,102,241,0.25); border-color: #6366f1; color: #c7d2fe; }
+  &.unavailable, &[disabled] { opacity: 0.3; cursor: not-allowed; }
+}
+
+// ── Content text ──────────────────────────────────────────────────────────────
+.seg-content {
+  font-size:      15px;
+  line-height:    1.75;
+  color:          #d1d5db;
+  white-space:    pre-wrap;
+  background:     rgba(255,255,255,0.03);
+  border-radius:  10px;
+  padding:        20px 24px;
+  border-left:    3px solid #4f46e5;
+}
+
+// ── Media: Images ─────────────────────────────────────────────────────────────
+.media-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.img-block {
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1e1e2e;
+  img { width: 100%; height: 140px; object-fit: cover; display: block; }
+  figcaption { font-size: 12px; color: rgba(255,255,255,0.5); padding: 8px 12px; }
+}
+.img-placeholder {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  height:          140px;
+  color:           rgba(255,255,255,0.3);
+  font-size:       12px;
+  padding:         12px;
+  text-align:      center;
+  .img-ph-icon { font-size: 32px; }
+}
+
+// ── Media: Video Clips ────────────────────────────────────────────────────────
+.media-section-title {
+  font-size:   13px;
+  font-weight: 600;
+  color:       rgba(255,255,255,0.5);
+  margin:      0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.clip-card {
+  background:    #1e1e2e;
+  border-radius: 10px;
+  overflow:      hidden;
+  video { width: 100%; max-height: 220px; display: block; }
+}
+.clip-meta {
+  display:     flex;
+  justify-content: space-between;
+  padding:     10px 14px;
+  font-size:   12px;
+}
+.clip-label { color: rgba(255,255,255,0.7); }
+.clip-range { color: rgba(255,255,255,0.35); }
+
+// ── Media: Interactive ────────────────────────────────────────────────────────
+.interactive-card {
+  background:    rgba(99,102,241,0.08);
+  border:        1px solid rgba(99,102,241,0.2);
+  border-radius: 12px;
+  padding:       16px 20px;
+  display:       flex;
+  flex-direction: column;
+  gap:           8px;
+}
+.ic-header {
+  display:     flex;
+  gap:         8px;
+  align-items: center;
+}
+.ic-icon { font-size: 18px; }
+.ic-type {
+  font-size:   12px;
+  font-weight: 700;
+  color:       #a5b4fc;
+  text-transform: capitalize;
+}
+.ic-prompt {
+  font-size:   14px;
+  color:       #e2e8f0;
+  margin:      0;
+}
+
+// ── Citations ─────────────────────────────────────────────────────────────────
+.citations-block {
+  font-size: 13px;
+  summary { cursor: pointer; color: rgba(255,255,255,0.5); user-select: none; }
+}
+.citation-item {
+  padding:      8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  a { color: #60a5fa; text-decoration: none; &:hover { text-decoration: underline; } }
+}
+.cite-authors { color: rgba(255,255,255,0.4); margin-left: 6px; }
+.cite-summary { color: rgba(255,255,255,0.5); margin: 4px 0 0; line-height: 1.5; }
+
+// ── Quality ───────────────────────────────────────────────────────────────────
+.quality-block {
+  font-size: 13px;
+  summary { cursor: pointer; color: rgba(255,255,255,0.4); user-select: none; display: flex; gap: 8px; align-items: center; }
+}
+.score-ok   { color: #4ade80; font-weight: 700; }
+.score-warn { color: #fbbf24; font-weight: 700; }
+.quality-issues { margin: 8px 0 0; padding: 0 0 0 16px; display: flex; flex-direction: column; gap: 6px; }
+.quality-issues li { color: rgba(255,255,255,0.6); line-height: 1.5; }
+.issue-type { font-weight: 700; color: #fbbf24; margin-right: 6px; text-transform: capitalize; }
+.no-issues  { color: #4ade80; font-size: 12px; margin: 8px 0 0; }
+
+// ── Change Notice ─────────────────────────────────────────────────────────────
+.change-notice {
+  font-size:    13px;
+  color:        rgba(255,255,255,0.5);
+  background:   rgba(251,191,36,0.06);
+  border-left:  3px solid #fbbf24;
+  padding:      10px 14px;
+  border-radius: 0 8px 8px 0;
+  strong { color: #fbbf24; }
+}

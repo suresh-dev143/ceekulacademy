@@ -1,0 +1,35 @@
+<div class="trigger-shell" [class]="colorClass" [class.trigger--visible]="visible()">
+  <!-- Particle canvas backdrop -->
+  <canvas #canvas class="trigger-canvas"></canvas>
+
+  <!-- Hook content -->
+  <div class="trigger-content" [class.trigger-content--revealed]="textRevealed()">
+
+    <!-- Pulse ring -->
+    <div class="trigger-ring">
+      <div class="trigger-ring__inner"></div>
+    </div>
+
+    <!-- Hook text -->
+    <p class="trigger-text">{{ hook.text }}</p>
+
+    <!-- Actions -->
+    <div class="trigger-actions">
+      <button class="trigger-btn trigger-btn--primary" (click)="onEngage()">
+        <span class="trigger-btn__icon">⚡</span>
+        Show me
+      </button>
+      <button class="trigger-btn trigger-btn--ghost" (click)="onSkip()">
+        Skip ({{ countdown() }}s)
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Countdown bar -->
+  <div class="trigger-progress">
+    <div class="trigger-progress__bar"
+      [style.animation-duration.ms]="hook.durationMs || 8000">
+    </div>
+  </div>
+</div>

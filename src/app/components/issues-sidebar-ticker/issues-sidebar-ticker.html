@@ -7,7 +7,7 @@
     <div class="ticker-window">
         <div class="ticker-track">
             <!-- First set of items -->
-            @for (issue of tickerIssues(); track issue.id) {
+            @for (issue of tickerIssues(); track 'a' + $index) {
             <div class="ticker-item" (click)="onIssueClick(issue)">
                 <div class="issue-card glass-panel">
                     <div class="issue-header">
@@ -32,7 +32,7 @@
             }
 
             <!-- Duplicate set for seamless loop (CSS animation trick) -->
-            @for (issue of tickerIssues(); track $index) {
+            @for (issue of tickerIssues(); track 'b' + $index) {
             <div class="ticker-item" (click)="onIssueClick(issue)">
                 <div class="issue-card glass-panel">
                     <div class="issue-header">

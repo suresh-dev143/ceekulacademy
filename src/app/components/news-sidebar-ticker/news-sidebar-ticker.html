@@ -7,7 +7,7 @@
     <div class="ticker-window">
         <div class="ticker-track">
             <!-- First set of items -->
-            @for (item of latestNews(); track item) {
+            @for (item of latestNews(); track 'a' + $index) {
             <div class="ticker-item" (click)="onNewsClick(item)">
                 <div class="news-card glass-panel">
                     <div class="news-header">
@@ -25,7 +25,7 @@
             }
 
             <!-- Duplicate set for seamless loop -->
-            @for (item of latestNews(); track $index) {
+            @for (item of latestNews(); track 'b' + $index) {
             <div class="ticker-item" (click)="onNewsClick(item)">
                 <div class="news-card glass-panel">
                     <div class="news-header">

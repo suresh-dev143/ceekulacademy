@@ -1,0 +1,154 @@
+<div class="cep-panel">
+
+  <!-- Tab bar -->
+  <nav class="cep-tabs">
+    <button class="cep-tab" [class.active]="activeTab() === 'history'"  (click)="activeTab.set('history')">
+      📜 Version History
+    </button>
+    <button class="cep-tab" [class.active]="activeTab() === 'research'" (click)="activeTab.set('research')">
+      🔬 Research Update
+    </button>
+    <button class="cep-tab" [class.active]="activeTab() === 'quality'"  (click)="activeTab.set('quality')">
+      ✅ Quality Check
+    </button>
+  </nav>
+
+  <!-- ── Version History ── -->
+  @if (activeTab() === 'history') {
+    <div class="cep-body">
+
+      @if (historyLoading()) {
+        <div class="cep-loading">Loading history…</div>
+      }
+
+      @if (!historyLoading() && !history().length) {
+        <p class="cep-empty">No versions yet. Initialise content to begin.</p>
+      }
+
+      <div class="timeline">
+        @for (v of history(); track v.version) {
+          <div class="tl-item" [class.active-version]="v.isActive">
+            <div class="tl-icon">{{ getChangeIcon(v.changeType) }}</div>
+            <div class="tl-content">
+              <div class="tl-top">
+                <span class="tl-version">v{{ v.version }}</span>
+                <span class="tl-type">{{ v.changeType | titlecase }}</span>
+                @if (v.isActive) { <span class="tl-live">● ACTIVE</span> }
+              </div>
+              @if (v.changeReason) {
+                <p class="tl-reason">{{ v.changeReason }}</p>
+              }
+              <span class="tl-date">{{ v.createdAt | date:'dd MMM yyyy, HH:mm' }}</span>
+
+              @if (v.outcome) {
+                <div class="tl-outcome">
+                  <span [class]="v.outcome.avgWatchRatioDelta >= 0 ? 'delta-pos' : 'delta-neg'">
+                    👁 {{ v.outcome.avgWatchRatioDelta > 0 ? '+' : '' }}{{ v.outcome.avgWatchRatioDelta | number:'1.1-1' }}%
+                  </span>
+                  <span [class]="v.outcome.avgQuizScoreDelta >= 0 ? 'delta-pos' : 'delta-neg'">
+                    📝 {{ v.outcome.avgQuizScoreDelta > 0 ? '+' : '' }}{{ v.outcome.avgQuizScoreDelta | number:'1.1-1' }}%
+                  </span>
+                  <span [class]="v.outcome.completionRateDelta >= 0 ? 'delta-pos' : 'delta-neg'">
+                    🏁 {{ v.outcome.completionRateDelta > 0 ? '+' : '' }}{{ v.outcome.completionRateDelta | number:'1.1-1' }}%
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Media enrich section (inside history tab) -->
+      <div class="enrich-section">
+        <h4>🎬 Enrich Segment Media</h4>
+        <p class="hint">Claude generates images, interactive elements, and animation cues for one segment.</p>
+        <div class="enrich-form">
+          <label>Segment #</label>
+          <input type="number" [(ngModel)]="enrichOrder" min="1" />
+          <button class="btn-action" (click)="runEnrich()" [disabled]="enrichLoading()">
+            @if (enrichLoading()) { Enriching… } @else { Run Enrichment }
+          </button>
+        </div>
+        @if (enrichResult()) {
+          <div class="result-ok">
+            ✅ Media assets generated — new version v{{ enrichResult()!.version }} created.
+          </div>
+        }
+        @if (enrichError()) {
+          <div class="result-err">{{ enrichError() }}</div>
+        }
+      </div>
+
+    </div>
+  }
+
+  <!-- ── Research Update ── -->
+  @if (activeTab() === 'research') {
+    <div class="cep-body">
+      <p class="hint">Paste a research paper. Claude maps it to affected segments and injects citations.</p>
+
+      <div class="form-group">
+        <label>Paper Title</label>
+        <input type="text" [(ngModel)]="researchTitle" placeholder="e.g. Attention Is All You Need" />
+      </div>
+      <div class="form-group">
+        <label>Abstract</label>
+        <textarea [(ngModel)]="researchAbstract" rows="6"
+          placeholder="Paste the paper abstract here…"></textarea>
+      </div>
+      <button class="btn-action" (click)="submitResearch()"
+        [disabled]="researchLoading() || !researchTitle.trim() || !researchAbstract.trim()">
+        @if (researchLoading()) { Integrating… } @else { Integrate Research }
+      </button>
+
+      @if (researchResult()) {
+        @if (researchResult()!.skipped) {
+          <div class="result-warn">⚠️ Low relevance score — research not applied to this content.</div>
+        } @else {
+          <div class="result-ok">✅ Research integrated — new version v{{ researchResult()!.version }} created.</div>
+        }
+      }
+      @if (researchError()) {
+        <div class="result-err">{{ researchError() }}</div>
+      }
+    </div>
+  }
+
+  <!-- ── Quality Check ── -->
+  @if (activeTab() === 'quality') {
+    <div class="cep-body">
+      <p class="hint">Claude evaluates grammar and clarity for every segment. Poor-scoring segments are rewritten automatically.</p>
+
+      <button class="btn-action" (click)="runQualityCheck()" [disabled]="qualityLoading()">
+        @if (qualityLoading()) { Running check… } @else { Run Quality Check }
+      </button>
+
+      @if (qualityError()) {
+        <div class="result-err">{{ qualityError() }}</div>
+      }
+
+      @if (qualityResults()) {
+        <p class="result-ok">Quality check complete — version v{{ qualityVersion() }}</p>
+        <div class="quality-table">
+          <div class="qt-header">
+            <span>#</span><span>Segment</span><span>Grammar</span><span>Clarity</span><span>Verdict</span>
+          </div>
+          @for (r of qualityResults()!; track r.order) {
+            <div class="qt-row">
+              <span class="qt-order">{{ r.order }}</span>
+              <span class="qt-title">{{ r.title }}</span>
+              <span class="qt-score" [class.score-ok]="r.grammarScore >= 70" [class.score-warn]="r.grammarScore < 70">
+                {{ r.grammarScore }}
+              </span>
+              <span class="qt-score" [class.score-ok]="r.clarityScore >= 70" [class.score-warn]="r.clarityScore < 70">
+                {{ r.clarityScore }}
+              </span>
+              <span class="qt-verdict" [ngClass]="getVerdictClass(r.verdict)">{{ r.verdict }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+</div>

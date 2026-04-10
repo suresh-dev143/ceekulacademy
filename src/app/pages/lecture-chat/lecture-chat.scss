@@ -1,0 +1,106 @@
+// ── Shell ─────────────────────────────────────────────────────────────────────
+.lcp-shell {
+  display:        flex;
+  flex-direction: column;
+  height:         100vh;
+  background:     #0d0d17;
+  color:          #e2e8f0;
+  font-size:      14px;
+  overflow:       hidden;
+}
+
+// ── Top bar ───────────────────────────────────────────────────────────────────
+.lcp-topbar {
+  display:       flex;
+  align-items:   center;
+  padding:       0 20px;
+  height:        48px;
+  background:    #12121e;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink:   0;
+}
+.lcp-topbar-left  { display: flex; align-items: center; gap: 10px; flex: 1; }
+.lcp-topbar-right { display: flex; align-items: center; gap: 8px; }
+
+.lcp-title      { font-size: 15px; font-weight: 700; color: #a5b4fc; }
+.lcp-lecture-id { font-size: 11px; color: rgba(255,255,255,0.3); font-family: monospace; }
+
+.lcp-role-badge {
+  font-size: 11px; padding: 2px 10px; border-radius: 20px; font-weight: 600;
+  &.teacher { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+  &.student { background: rgba(5,150,105,0.2);  color: #34d399; }
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+.lcp-loading {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+  color: rgba(255,255,255,0.4); font-size: 13px;
+}
+.lcp-spinner {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.08); border-top-color: #6366f1;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Body — vertical split ─────────────────────────────────────────────────────
+.lcp-body {
+  flex: 1;
+  display:        flex;
+  flex-direction: column;
+  overflow:       hidden;
+}
+
+// ── Content pane (top) ────────────────────────────────────────────────────────
+.lcp-content-pane {
+  overflow:   hidden;
+  background: #0f0f1a;
+  flex-shrink: 0;
+}
+
+.lcp-video {
+  width: 100%; height: 100%;
+  object-fit: contain; background: #000;
+}
+
+.lcp-content-placeholder {
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+  padding: 24px;
+}
+.lcp-placeholder-icon   { font-size: 48px; }
+.lcp-placeholder-title  { font-size: 22px; font-weight: 700; color: #f1f5f9; margin: 0; text-align: center; }
+.lcp-placeholder-desc   { font-size: 14px; color: rgba(255,255,255,0.55); margin: 0; text-align: center; max-width: 500px; }
+.lcp-placeholder-instructor { font-size: 13px; color: #a5b4fc; margin: 0; }
+.lcp-placeholder-hint   { font-size: 12px; color: rgba(255,255,255,0.3); margin: 0; text-align: center; }
+
+// ── Drag divider ──────────────────────────────────────────────────────────────
+.lcp-divider {
+  height:     6px;
+  background: #0d0d17;
+  cursor:     row-resize;
+  display:    flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+  transition: background 0.15s;
+  &:hover { background: rgba(99,102,241,0.12); }
+}
+.lcp-divider-handle {
+  width: 40px; height: 3px; border-radius: 2px;
+  background: rgba(255,255,255,0.15);
+}
+
+// ── Chat pane (bottom) ────────────────────────────────────────────────────────
+.lcp-chat-pane {
+  overflow: hidden;
+  flex-shrink: 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+
+  app-live-chat {
+    display: block;
+    height:  100%;
+  }
+}

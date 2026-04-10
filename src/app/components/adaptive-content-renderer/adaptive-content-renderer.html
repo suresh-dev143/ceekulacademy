@@ -1,0 +1,190 @@
+<!-- Loading state -->
+@if (loading()) {
+  <div class="acr-loading">
+    <div class="spinner"></div>
+    <span>Adapting content to your level…</span>
+  </div>
+}
+
+<!-- Error state -->
+@if (error()) {
+  <div class="acr-error">{{ error() }}</div>
+}
+
+<!-- Content loaded -->
+@if (!loading() && content()) {
+  <div class="acr-shell">
+
+    <!-- ── Left: Segment Navigator ── -->
+    <nav class="segment-nav">
+      <div class="nav-header">
+        <span class="version-chip">v{{ content()!.version }}</span>
+        @if (content()!.qualityApproved) {
+          <span class="quality-chip approved">✓ Quality</span>
+        }
+      </div>
+
+      @for (seg of content()!.segments; track seg.order; let i = $index) {
+        <button
+          class="seg-btn"
+          [class.active]="i === activeIndex()"
+          (click)="selectSegment(i)">
+          <span class="seg-type-dot" [attr.data-type]="seg.type"></span>
+          <span class="seg-title">{{ seg.title }}</span>
+
+          @if (getChangeBadge(seg.changeFlag); as badge) {
+            <span class="badge" [ngClass]="badge.cls">{{ badge.label }}</span>
+          }
+        </button>
+      }
+    </nav>
+
+    <!-- ── Right: Active Segment ── -->
+    <section class="segment-body">
+
+      @if (activeSegment(); as seg) {
+
+        <!-- Segment header -->
+        <header class="seg-header">
+          <div class="seg-meta">
+            <span class="seg-type-label">{{ seg.type | titlecase }}</span>
+            <span class="seg-order">#{{ seg.order }}</span>
+            <span class="depth-badge">{{ seg.usedDepth }}</span>
+          </div>
+          <h2 class="seg-title">{{ seg.title }}</h2>
+        </header>
+
+        <!-- Depth selector -->
+        <div class="depth-selector">
+          <span class="ds-label">View as:</span>
+          <button
+            class="ds-btn"
+            [class.active]="!selectedDepth()"
+            (click)="clearDepth()">
+            Auto ({{ learnerLevel }})
+          </button>
+          @for (d of depths; track d.value) {
+            <button
+              class="ds-btn"
+              [class.active]="selectedDepth() === d.value"
+              [class.unavailable]="!isDepthAvailable(d.value)"
+              [disabled]="!isDepthAvailable(d.value)"
+              (click)="switchDepth(d.value)"
+              [title]="isDepthAvailable(d.value) ? '' : 'Layer not available for this segment'">
+              {{ d.icon }} {{ d.label }}
+            </button>
+          }
+        </div>
+
+        <!-- Main content text -->
+        <article class="seg-content">{{ seg.content }}</article>
+
+        <!-- ── Images ── -->
+        @if (seg.mediaAssets.images.length) {
+          <div class="media-images">
+            @for (img of seg.mediaAssets.images; track img.order) {
+              <figure class="img-block">
+                @if (img.url) {
+                  <img [src]="img.url" [alt]="img.alt" loading="lazy" />
+                } @else {
+                  <div class="img-placeholder" [title]="img.alt">
+                    <span class="img-ph-icon">🖼️</span>
+                    <span class="img-ph-alt">{{ img.alt }}</span>
+                  </div>
+                }
+                @if (img.caption) {
+                  <figcaption>{{ img.caption }}</figcaption>
+                }
+              </figure>
+            }
+          </div>
+        }
+
+        <!-- ── Video Clips ── -->
+        @if (seg.mediaAssets.videoClips.length) {
+          <div class="media-clips">
+            <h4 class="media-section-title">📹 Video Clips</h4>
+            @for (clip of seg.mediaAssets.videoClips; track clip.label) {
+              <div class="clip-card">
+                @if (clip.url) {
+                  <video [src]="clip.url" controls preload="metadata"
+                    [currentTime]="clip.startSec"></video>
+                }
+                <div class="clip-meta">
+                  <span class="clip-label">{{ clip.label }}</span>
+                  <span class="clip-range">{{ clip.startSec }}s – {{ clip.endSec }}s</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ── Interactive Elements ── -->
+        @if (seg.mediaAssets.interactiveElements.length) {
+          <div class="media-interactive">
+            <h4 class="media-section-title">⚡ Interactive</h4>
+            @for (el of seg.mediaAssets.interactiveElements; track el.elementType) {
+              <div class="interactive-card" [attr.data-type]="el.elementType">
+                <div class="ic-header">
+                  <span class="ic-icon">{{ getInteractiveIcon(el.elementType) }}</span>
+                  <span class="ic-type">{{ el.elementType | titlecase }}</span>
+                </div>
+                <p class="ic-prompt">{{ el.prompt }}</p>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- ── Citations ── -->
+        @if (seg.citations.length) {
+          <details class="citations-block">
+            <summary>📚 {{ seg.citations.length }} Citation{{ seg.citations.length > 1 ? 's' : '' }}</summary>
+            @for (cite of seg.citations; track cite.title) {
+              <div class="citation-item">
+                <a [href]="cite.url || '#'" target="_blank" rel="noopener">{{ cite.title }}</a>
+                @if (cite.authors) { <span class="cite-authors">— {{ cite.authors }}</span> }
+                @if (cite.summary) { <p class="cite-summary">{{ cite.summary }}</p> }
+              </div>
+            }
+          </details>
+        }
+
+        <!-- ── Quality Metrics (teacher-visible diagnostic) ── -->
+        @if (seg.qualityMetrics) {
+          <details class="quality-block">
+            <summary>
+              🔍 Quality Scores
+              <span [class]="seg.qualityMetrics.grammarScore >= 70 ? 'score-ok' : 'score-warn'">
+                G:{{ seg.qualityMetrics.grammarScore }}
+              </span>
+              <span [class]="seg.qualityMetrics.clarityScore >= 70 ? 'score-ok' : 'score-warn'">
+                C:{{ seg.qualityMetrics.clarityScore }}
+              </span>
+            </summary>
+            @if (seg.qualityMetrics.issues.length) {
+              <ul class="quality-issues">
+                @for (issue of seg.qualityMetrics.issues; track issue.location) {
+                  <li>
+                    <span class="issue-type">{{ issue.issueType }}</span>
+                    <em>"{{ issue.location }}"</em> → {{ issue.suggestion }}
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="no-issues">No issues found.</p>
+            }
+          </details>
+        }
+
+        <!-- Change summary (if this segment was modified) -->
+        @if (seg.changeSummary) {
+          <div class="change-notice">
+            ✏️ <strong>What changed:</strong> {{ seg.changeSummary }}
+          </div>
+        }
+
+      }
+    </section>
+
+  </div>
+}

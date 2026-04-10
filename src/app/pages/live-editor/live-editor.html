@@ -1,0 +1,224 @@
+<div class="le-shell">
+
+  <!-- ── Top Bar ── -->
+  <header class="le-topbar">
+    <div class="le-topbar-left">
+      <span class="le-title">Live Editor</span>
+      <span class="le-lecture-id">{{ lectureId }}</span>
+    </div>
+
+    <div class="le-topbar-center">
+      <!-- Connection status -->
+      <span class="conn-dot" [class.online]="connected()"></span>
+      <span class="conn-label">{{ connected() ? 'Live' : 'Connecting…' }}</span>
+    </div>
+
+    <div class="le-topbar-right">
+      <!-- Connected participants avatars -->
+      @for (p of participants(); track p.socketId) {
+        <div class="participant-avatar"
+          [title]="p.userName + ' (' + p.role + ')'"
+          [style.background]="p.role === 'teacher' ? '#6366f1' : '#059669'">
+          {{ getParticipantInitials(p.userName) }}
+        </div>
+      }
+      <span class="participant-count">{{ participants().length }} online</span>
+    </div>
+  </header>
+
+  <!-- ── Loading ── -->
+  @if (loading()) {
+    <div class="le-loading">
+      <div class="spinner"></div>
+      <span>Loading content…</span>
+    </div>
+  }
+
+  @if (!loading()) {
+    <div class="le-body">
+
+      <!-- ── Left: Segment Navigator ── -->
+      <nav class="le-nav">
+        <p class="le-nav-title">Segments</p>
+        @for (seg of segments(); track seg.order; let i = $index) {
+          <button
+            class="le-seg-btn"
+            [class.active]="i === activeIndex()"
+            (click)="selectSegment(i)">
+            <span class="seg-dot"
+              [style.background]="getSegmentTypeColor(seg.type)"></span>
+            <span class="seg-btn-title">{{ seg.title }}</span>
+            <span class="seg-btn-type">{{ seg.type }}</span>
+          </button>
+        }
+      </nav>
+
+      <!-- ── Centre: Editor ── -->
+      <main class="le-editor-area">
+
+        @if (activeSegment) {
+          <div class="editor-header">
+            <h2 class="editor-segment-title">{{ activeSegment!.title }}</h2>
+            <div class="editor-meta">
+              <span class="meta-pill" [style.background]="getSegmentTypeColor(activeSegment!.type) + '33'"
+                [style.color]="getSegmentTypeColor(activeSegment!.type)">
+                {{ activeSegment!.type }}
+              </span>
+              <span class="meta-pill cognitive">{{ activeSegment!.cognitiveTarget }}</span>
+            </div>
+          </div>
+
+          <!-- Teacher: editable textarea -->
+          @if (isTeacher) {
+            <div class="editor-wrap">
+              <textarea
+                #editorArea
+                class="le-textarea"
+                [value]="activeSegment!.content"
+                (input)="onContentInput($event)"
+                (mouseup)="onSelectionChange()"
+                (keyup)="onSelectionChange(); onCursorMove()"
+                placeholder="Start editing this segment…">
+              </textarea>
+
+              <!-- Floating suggestion menu on text selection -->
+              @if (showSuggMenu() && selectedText()) {
+                <div class="sugg-menu">
+                  <p class="sugg-menu-label">AI Suggestions for selection:</p>
+                  <div class="sugg-menu-grid">
+                    @for (item of MENU; track item.type) {
+                      <button class="sugg-menu-btn" (click)="requestSuggestion(item.type)"
+                        [title]="item.hint">
+                        {{ item.icon }} {{ item.label }}
+                      </button>
+                    }
+                  </div>
+                  <div class="sugg-menu-divider"></div>
+                  <div class="sugg-menu-annotations">
+                    <button class="ann-btn note"      (click)="addHighlight('note')">📝 Note</button>
+                    <button class="ann-btn question"  (click)="addHighlight('question')">❓ Question</button>
+                    <button class="ann-btn highlight" (click)="addHighlight('highlight')">🖊 Highlight</button>
+                  </div>
+                </div>
+              }
+
+              <!-- Loading indicator while Claude works -->
+              @if (pendingRequest()) {
+                <div class="sugg-loading">
+                  <div class="sugg-spinner"></div>
+                  <span>Claude is generating a {{ pendingRequest()!.type }}…</span>
+                </div>
+              }
+
+              <!-- Commit button -->
+              <div class="editor-actions">
+                <button class="btn-commit" (click)="commitSegment()" [disabled]="saving()">
+                  @if (saving()) { ✓ Saved } @else { 💾 Save Segment }
+                </button>
+              </div>
+            </div>
+          }
+
+          <!-- Student: read-only view of live content -->
+          @if (!isTeacher) {
+            <div class="le-readonly">
+              <div class="readonly-badge">👁 Observing live edit</div>
+              <pre class="le-content">{{ activeSegment!.content }}</pre>
+
+              <!-- Live annotations -->
+              @if (highlights().length) {
+                <div class="annotation-list">
+                  @for (hl of highlights(); track hl.ts) {
+                    <div class="annotation-item" [attr.data-type]="hl.type">
+                      <span class="ann-badge">
+                        @switch (hl.type) {
+                          @case ('note')      { 📝 }
+                          @case ('question')  { ❓ }
+                          @case ('highlight') { 🖊 }
+                        }
+                        {{ hl.userName }}
+                      </span>
+                      <blockquote class="ann-quote">{{ hl.text }}</blockquote>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+      </main>
+
+      <!-- ── Right: AI Suggestion Panel ── -->
+      <aside class="le-ai-panel">
+        <div class="ai-panel-header">
+          <span class="ai-panel-title">✨ AI Suggestions</span>
+          <span class="ai-count">{{ suggestions().length }}</span>
+        </div>
+
+        @if (!suggestions().length && !pendingRequest()) {
+          <div class="ai-empty">
+            @if (isTeacher) {
+              <p>Select text in the editor and choose a suggestion type.</p>
+            } @else {
+              <p>Suggestions requested by the teacher will appear here.</p>
+            }
+          </div>
+        }
+
+        @if (pendingRequest()) {
+          <div class="ai-pending-card">
+            <div class="ai-pending-top">
+              <span class="ai-type-badge" [style.background]="getSuggestionTypeColor(pendingRequest()!.type) + '33'"
+                [style.color]="getSuggestionTypeColor(pendingRequest()!.type)">
+                {{ pendingRequest()!.type }}
+              </span>
+              <div class="ai-dots"><span></span><span></span><span></span></div>
+            </div>
+            <p class="ai-selected-text">"{{ pendingRequest()!.selectedText | slice:0:80 }}…"</p>
+          </div>
+        }
+
+        @for (s of suggestions(); track s.requestId) {
+          <div class="ai-suggestion-card">
+            <div class="ai-sugg-top">
+              <span class="ai-type-badge"
+                [style.background]="getSuggestionTypeColor(s.type) + '33'"
+                [style.color]="getSuggestionTypeColor(s.type)">
+                {{ s.type }}
+              </span>
+              <span class="ai-insertion">→ {{ s.insertionHint }}</span>
+              <button class="ai-dismiss" (click)="dismissSuggestion(s.requestId)" title="Dismiss">×</button>
+            </div>
+
+            <p class="ai-rationale">{{ s.rationale }}</p>
+            <p class="ai-selected-text">"{{ s.selectedText | slice:0:60 }}{{ s.selectedText.length > 60 ? '…' : '' }}"</p>
+            <div class="ai-sugg-body">{{ s.suggestion }}</div>
+
+            @if (isTeacher) {
+              <div class="ai-sugg-actions">
+                <button class="btn-accept" (click)="acceptSuggestion(s)">✓ Accept</button>
+                <button class="btn-reject" (click)="dismissSuggestion(s.requestId)">✕ Reject</button>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Highlights / Annotations panel -->
+        @if (highlights().length) {
+          <div class="annotations-header">📌 Annotations</div>
+          @for (hl of highlights(); track hl.ts) {
+            <div class="ann-card" [attr.data-type]="hl.type">
+              <div class="ann-top">
+                <span class="ann-type">{{ hl.type }}</span>
+                <span class="ann-author">{{ hl.userName }}</span>
+              </div>
+              <p class="ann-text">{{ hl.text }}</p>
+            </div>
+          }
+        }
+      </aside>
+
+    </div>
+  }
+
+</div>

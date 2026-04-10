@@ -2,12 +2,16 @@ import { Component, inject, signal, OnInit, OnDestroy, PLATFORM_ID } from '@angu
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { AdPlatformService, MatchedAd } from '../../services/ad-platform.service';
 import { AuthService } from '../../services/auth.service';
+import { PageService } from '../../services/page.service';
+import { SchedulerClientService, AdSlot } from '../../services/scheduler-client.service';
+import { PhaseTimerComponent } from '../../components/phase-timer/phase-timer';
 @Component({
   selector: 'app-lecture-watch',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, PhaseTimerComponent],
   template: `
     <div class="watch-container">
       <!-- Video Player Area -->
@@ -86,6 +90,9 @@ import { AuthService } from '../../services/auth.service';
 
       <!-- Sidebar -->
       <div class="watch-sidebar">
+        <!-- Server-authoritative phase countdown -->
+        <app-phase-timer />
+
         @if (lectureData()) {
         <div class="lecture-info">
           <h2>{{ lectureData()?.title }}</h2>
@@ -121,7 +128,7 @@ import { AuthService } from '../../services/auth.service';
         @if (phase() === 'ads' && matchedAds().length > 0) {
           <div class="ad-queue">
             <h4>Ad Queue</h4>
-            @for (ad of matchedAds(); track ad.adId; let i = $index) {
+            @for (ad of matchedAds(); track i; let i = $index) {
               <div class="queue-item" [class.current]="i === currentAdIndex()">
                 <span class="queue-num">{{ i + 1 }}</span>
                 <span class="queue-title">{{ ad.category }}</span>
@@ -179,13 +186,19 @@ import { AuthService } from '../../services/auth.service';
 export class LectureWatchComponent implements OnInit, OnDestroy {
   protected readonly Math = Math;
 
-  private route = inject(ActivatedRoute);
-  private adService = inject(AdPlatformService);
+  private route      = inject(ActivatedRoute);
+  private adService  = inject(AdPlatformService);
   private authService = inject(AuthService);
+  private pageService = inject(PageService);
+  private scheduler  = inject(SchedulerClientService);
   private platformId = inject(PLATFORM_ID);
-  private isBrowser = isPlatformBrowser(this.platformId);
+  private isBrowser  = isPlatformBrowser(this.platformId);
+
+  private schedulerSub!: Subscription;
 
   lectureId = '';
+  /** pageId is set after loadLecture() resolves the linked page */
+  pageId    = '';
   sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2)}`;
 
   phase = signal<'lecture' | 'ads' | 'ended'>('lecture');
@@ -226,6 +239,8 @@ export class LectureWatchComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (!this.isBrowser) return;
     this.clearTimers();
+    this.schedulerSub?.unsubscribe();
+    this.scheduler.disconnect();
     if (this.lectureId) this.adService.leaveLecture(this.lectureId).subscribe();
   }
 
@@ -237,6 +252,55 @@ export class LectureWatchComponent implements OnInit, OnDestroy {
         this.isLive.set(res.data.isLive || false);
         this.matchedAds.set(res.data.ads || []);
         this.showAdPrefs.set(!this.isLive());
+
+        // Resolve the page, then connect the server-side scheduler
+        this.pageService.getPageForLecture(this.lectureId).subscribe({
+          next: (pageRes) => {
+            this.pageId = pageRes.data._id;
+            this.connectScheduler();
+          },
+          error: () => {
+            // No page configured — connect scheduler without a pageId
+            this.connectScheduler();
+          }
+        });
+      }
+    });
+  }
+
+  /**
+   * Connect to the server-side scheduler WebSocket.
+   * From this point, phase transitions are server-authoritative:
+   *   ADVERTISEMENT event → start ad phase with pre-computed slots
+   *   CONTENT event       → return to lecture phase
+   * The video timeupdate trigger is kept as a safety net for edge cases.
+   */
+  private connectScheduler(): void {
+    this.scheduler.connect(this.sessionId, this.pageId);
+
+    this.schedulerSub = this.scheduler.phase$.subscribe(serverPhase => {
+      if (serverPhase === 'ADVERTISEMENT' && this.phase() === 'lecture') {
+        // Use the slots the server pre-computed — map to the MatchedAd shape
+        const slots = this.scheduler.adSlots$.getValue();
+        if (slots.length) {
+          this.matchedAds.set(
+            slots.map(s => ({
+              adId:          s.advertisement._id,
+              title:         s.advertisement.title,
+              videoUrl:      s.advertisement.videoUrl,
+              duration:      s.advertisement.duration,
+              category:      s.advertisement.category,
+              effectiveRate: s.advertisement.ratePerSecondPerStudent,
+              multiplier:    1
+            }))
+          );
+        }
+        this._beginAdPhase();
+      }
+
+      if (serverPhase === 'CONTENT' && this.phase() === 'ads') {
+        // Server says content resumed — return to lecture view
+        this.phase.set('lecture');
       }
     });
   }
@@ -266,13 +330,28 @@ export class LectureWatchComponent implements OnInit, OnDestroy {
   }
 
   async startAdPlayback() {
+    // If a page is linked, re-fetch personalised ads using page-aware matching
+    if (this.pageId) {
+      this.pageService.getAdsForPage(this.pageId).subscribe({
+        next: (res) => {
+          this.matchedAds.set(res.data.ads ?? []);
+          this._beginAdPhase();
+        },
+        error: () => this._beginAdPhase() // Fall back to pre-fetched ads
+      });
+    } else {
+      this._beginAdPhase();
+    }
+  }
+
+  private _beginAdPhase() {
     if (this.matchedAds().length === 0) {
       this.phase.set('ended');
       return;
     }
     this.phase.set('ads');
     this.currentAdIndex.set(0);
-    await this.startCurrentAd();
+    this.startCurrentAd();
   }
 
   async startCurrentAd() {

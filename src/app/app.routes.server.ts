@@ -10,6 +10,11 @@ export const serverRoutes: ServerRoute[] = [
   // Auth-gated dashboard routes — skip SSR (require live API + auth token)
   { path: 'dashboard/advertiser',                          renderMode: RenderMode.Client },
   { path: 'lectures/:lectureId/watch',                     renderMode: RenderMode.Client },
+  { path: 'lectures/:lectureId/edit',                      renderMode: RenderMode.Client },
+  { path: 'lectures/:lectureId/chat',                      renderMode: RenderMode.Client },
+  { path: 'learn/:topicId',                                renderMode: RenderMode.Client },
+  { path: 'dashboard/digital-twin',                        renderMode: RenderMode.Client },
+  { path: 'dashboard/innovation',                          renderMode: RenderMode.Client },
   {
     path: '**',
     renderMode: RenderMode.Prerender

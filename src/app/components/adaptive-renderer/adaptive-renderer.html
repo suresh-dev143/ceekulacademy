@@ -1,0 +1,100 @@
+<div class="ar-shell">
+
+  <!-- ── HUD bar (always visible) ── -->
+  <div class="ar-hud">
+    <div class="ar-hud-left">
+      <div class="ar-attention">
+        <div class="ar-attention-fill" [style.width.%]="attentionPct"
+          [class.ar-attention-fill--low]="attentionPct < 35"
+          [class.ar-attention-fill--mid]="attentionPct >= 35 && attentionPct < 65"
+          [class.ar-attention-fill--high]="attentionPct >= 65">
+        </div>
+        <span class="ar-attention-label">{{ attentionLabel }}</span>
+      </div>
+    </div>
+
+    <div class="ar-hud-center">
+      <span class="ar-mode-pill ar-mode-pill--{{ currentMode() }}">
+        {{ currentMode() }}
+      </span>
+    </div>
+
+    <div class="ar-hud-right">
+      <span class="ar-tier-badge">{{ tierLabel }}</span>
+    </div>
+  </div>
+
+  <!-- ── Tier upgrade toast ── -->
+  @if (tierToast()) {
+    <div class="ar-tier-toast">
+      <span class="ar-tier-toast-icon">🎉</span>
+      <span>{{ tierToast()?.message }}</span>
+    </div>
+  }
+
+  <!-- ── Main content area ── -->
+  <div class="ar-content" [class.ar-content--transitioning]="transitioning()">
+
+    <!-- IDLE -->
+    @if (currentMode() === 'idle' || !hasAtom) {
+      <div class="ar-idle">
+        <div class="ar-idle-icon">🧠</div>
+        <h2 class="ar-idle-title">Adaptive Learning Ready</h2>
+        <p class="ar-idle-desc">Loading your personalised experience…</p>
+        <div class="ar-idle-spinner"></div>
+      </div>
+    }
+
+    <!-- TRIGGER -->
+    @if (currentMode() === 'trigger' && hasAtom) {
+      <app-trigger-mode
+        [hook]="currentAtom()!.microHook"
+        [animationProfile]="animProfile()"
+        (engaged)="onTriggerEngaged()"
+        (skipped)="onTriggerSkipped()">
+      </app-trigger-mode>
+    }
+
+    <!-- CINEMATIC -->
+    @if (currentMode() === 'cinematic' && hasAtom) {
+      <app-cinematic-mode
+        [atom]="currentAtom()!"
+        [animationProfile]="animProfile()"
+        (completed)="onCinematicComplete()"
+        (modeSwitch)="onCinematicModeSwitch($event)">
+      </app-cinematic-mode>
+    }
+
+    <!-- SIMULATION -->
+    @if (currentMode() === 'simulation' && hasAtom) {
+      <app-simulation-mode
+        [atom]="currentAtom()!"
+        [animationProfile]="animProfile()"
+        (completed)="onSimulationComplete()"
+        (modeSwitch)="onSimulationModeSwitch($event)">
+      </app-simulation-mode>
+    }
+
+    <!-- RESEARCH -->
+    @if (currentMode() === 'research' && hasAtom) {
+      <app-research-mode
+        [atom]="currentAtom()!"
+        [animationProfile]="animProfile()"
+        (completed)="onResearchComplete()"
+        (modeSwitch)="onResearchModeSwitch($event)">
+      </app-research-mode>
+    }
+
+    <!-- XR -->
+    @if (currentMode() === 'xr' && hasAtom) {
+      <app-xr-mode
+        [atom]="currentAtom()!"
+        [animationProfile]="animProfile()"
+        (completed)="onXrComplete()"
+        (modeSwitch)="onXrModeSwitch($event)">
+      </app-xr-mode>
+    }
+
+  </div>
+
+</div>

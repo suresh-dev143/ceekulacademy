@@ -27,6 +27,9 @@ import { FormsModule } from '@angular/forms';
           <button class="nav-tab" [class.active]="activeTab === 'schedule'" (click)="tabChange.emit('schedule')">
             <i class="fas fa-calendar-alt"></i> Schedule
           </button>
+          <button class="nav-tab" [class.active]="activeTab === 'ad-control'" (click)="tabChange.emit('ad-control')">
+            <i class="fas fa-film"></i> Ad Control
+          </button>
         </div>
 
         <div class="radius-selector">

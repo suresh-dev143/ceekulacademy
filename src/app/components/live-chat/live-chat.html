@@ -1,0 +1,214 @@
+<div class="lc-shell">
+
+  <!-- ── Tab bar ── -->
+  <div class="lc-tabs">
+    <button class="lc-tab" [class.active]="activeTab() === 'chat'" (click)="activeTab.set('chat')">
+      💬 Chat
+      <span class="lc-tab-badge">{{ messages().length }}</span>
+    </button>
+
+    @if (isTeacher) {
+      <button class="lc-tab" [class.active]="activeTab() === 'summary'" (click)="requestSummary()">
+        📋 Summary
+        @if (summaryLoading()) { <span class="lc-tab-dot loading"></span> }
+        @else if (summary()) { <span class="lc-tab-dot ready"></span> }
+      </button>
+      <button class="lc-tab" [class.active]="activeTab() === 'insights'" (click)="requestInsights()">
+        🧠 Insights
+        @if (insightsLoading()) { <span class="lc-tab-dot loading"></span> }
+        @else if (insights()) { <span class="lc-tab-dot ready"></span> }
+      </button>
+    }
+
+    <!-- Connection status -->
+    <span class="lc-conn-dot" [class.online]="connected()" [title]="connected() ? 'Connected' : 'Connecting…'"></span>
+  </div>
+
+  <!-- ── CHAT TAB ── -->
+  @if (activeTab() === 'chat') {
+    <div class="lc-messages" #messageList>
+
+      @if (!messages().length) {
+        <div class="lc-empty">
+          <span>No messages yet.</span>
+          <span>{{ isTeacher ? 'Students will appear here once they join.' : 'Be the first to say something!' }}</span>
+        </div>
+      }
+
+      @for (msg of messages(); track msg._id) {
+        <div class="lc-msg" [class.flagged]="getModerationClass(msg)" [class.is-question]="msg.isQuestion">
+          <div class="lc-msg-avatar" [class]="'role-' + msg.role">
+            {{ getInitials(msg.authorName) }}
+          </div>
+          <div class="lc-msg-body">
+            <div class="lc-msg-meta">
+              <span class="lc-msg-author">{{ msg.authorName }}</span>
+              <span class="lc-msg-role">{{ msg.role }}</span>
+              @if (msg.isQuestion) { <span class="lc-msg-question-badge">❓ Question</span> }
+              @if (msg.moderation.status === 'flagged') {
+                <span class="lc-msg-flag" [title]="msg.moderation.reason">⚑ Flagged</span>
+              }
+              <span class="lc-msg-sentiment">{{ getSentimentIcon(msg.sentiment) }}</span>
+              <span class="lc-msg-time">{{ msg.createdAt | date:'HH:mm' }}</span>
+            </div>
+            <p class="lc-msg-text">{{ msg.content }}</p>
+            @if (msg.keywords.length) {
+              <div class="lc-msg-keywords">
+                @for (kw of msg.keywords; track kw) {
+                  <span class="lc-kw">{{ kw }}</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Blocked notification -->
+    @if (showBlocked()) {
+      <div class="lc-blocked-notice">
+        🚫 Message blocked: {{ blockedReason() }}
+      </div>
+    }
+
+    <!-- Input bar -->
+    <div class="lc-input-bar">
+      <input
+        #chatInput
+        class="lc-input"
+        type="text"
+        [(ngModel)]="inputText"
+        (keydown)="onKeydown($event)"
+        placeholder="{{ connected() ? 'Type a message…' : 'Connecting…' }}"
+        [disabled]="!connected()"
+        maxlength="1000">
+      <button class="lc-send-btn" (click)="sendMessage()" [disabled]="!inputText.trim() || !connected()">
+        Send
+      </button>
+    </div>
+  }
+
+  <!-- ── SUMMARY TAB ── -->
+  @if (activeTab() === 'summary') {
+    <div class="lc-panel">
+      @if (summaryLoading()) {
+        <div class="lc-loading-state">
+          <div class="lc-spinner"></div>
+          <span>Claude is summarising the chat…</span>
+        </div>
+      } @else if (summary()) {
+        <div class="lc-summary">
+          <p class="lc-summary-text">{{ summary()!.summary }}</p>
+
+          @if (summary()!.keyQuestions.length) {
+            <div class="lc-section">
+              <h4 class="lc-section-title">❓ Key Questions</h4>
+              <ul class="lc-list">
+                @for (q of summary()!.keyQuestions; track q) {
+                  <li>{{ q }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          @if (summary()!.themes.length) {
+            <div class="lc-section">
+              <h4 class="lc-section-title">🏷️ Themes</h4>
+              <div class="lc-tag-row">
+                @for (t of summary()!.themes; track t) {
+                  <span class="lc-tag">{{ t }}</span>
+                }
+              </div>
+            </div>
+          }
+
+          <p class="lc-summary-meta">
+            Based on {{ summary()!.messageCount }} messages ·
+            {{ summary()!.generatedAt | date:'HH:mm' }}
+          </p>
+        </div>
+      } @else {
+        <div class="lc-empty">
+          <span>No summary yet.</span>
+          <span>Click the Summary tab to generate one.</span>
+        </div>
+      }
+
+      <button class="lc-refresh-btn" (click)="requestSummary()" [disabled]="summaryLoading()">
+        ↺ Refresh Summary
+      </button>
+    </div>
+  }
+
+  <!-- ── INSIGHTS TAB ── -->
+  @if (activeTab() === 'insights') {
+    <div class="lc-panel">
+      @if (insightsLoading()) {
+        <div class="lc-loading-state">
+          <div class="lc-spinner"></div>
+          <span>Extracting pedagogical insights…</span>
+        </div>
+      } @else if (insights()) {
+        <div class="lc-insights">
+
+          <!-- Engagement meter -->
+          <div class="lc-engagement">
+            <span class="lc-engagement-label">Engagement</span>
+            <span class="lc-engagement-badge"
+              [style.color]="getEngagementColor(insights()!.engagementLevel)"
+              [style.borderColor]="getEngagementColor(insights()!.engagementLevel)">
+              {{ insights()!.engagementLevel | titlecase }}
+            </span>
+            <span class="lc-engagement-stats">
+              {{ insights()!.questionCount }} questions ·
+              {{ insights()!.participationRate }}% participation
+            </span>
+          </div>
+
+          @if (insights()!.insights.length) {
+            <div class="lc-section">
+              <h4 class="lc-section-title">💡 Observations</h4>
+              <ul class="lc-list">
+                @for (obs of insights()!.insights; track obs) {
+                  <li>{{ obs }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          @if (insights()!.confusionPoints.length) {
+            <div class="lc-section">
+              <h4 class="lc-section-title confusion">⚠️ Confusion Points</h4>
+              <ul class="lc-list confusion">
+                @for (pt of insights()!.confusionPoints; track pt) {
+                  <li>{{ pt }}</li>
+                }
+              </ul>
+            </div>
+          }
+
+          @if (insights()!.recommendedActions.length) {
+            <div class="lc-section">
+              <h4 class="lc-section-title action">✅ Recommended Actions</h4>
+              <ul class="lc-list action">
+                @for (act of insights()!.recommendedActions; track act) {
+                  <li>{{ act }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="lc-empty">
+          <span>No insights yet.</span>
+          <span>Click Insights once the chat has some messages.</span>
+        </div>
+      }
+
+      <button class="lc-refresh-btn" (click)="requestInsights()" [disabled]="insightsLoading()">
+        ↺ Refresh Insights
+      </button>
+    </div>
+  }
+
+</div>

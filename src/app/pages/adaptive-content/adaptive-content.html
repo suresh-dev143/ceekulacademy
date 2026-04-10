@@ -1,0 +1,14 @@
+<div class="acp-shell">
+  @if (ready()) {
+    <app-adaptive-renderer
+      [userId]="userId"
+      [sessionId]="sessionId"
+      [topicId]="topicId">
+    </app-adaptive-renderer>
+  } @else {
+    <div class="acp-loading">
+      <div class="acp-spinner"></div>
+      <p>Preparing adaptive session…</p>
+    </div>
+  }
+</div>

@@ -22,10 +22,15 @@ function decodeHtml(str: string): string {
 
 // ── CREATE types ──────────────────────────────────────────────────────────────
 
+export interface WorkshopHourMedia {
+    videos?: string[];
+    images?: string[];
+}
+
 export interface WorkshopThreeHourPlan {
-    hour1: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean };
-    hour2: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean };
-    hour3: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean };
+    hour1: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean } & WorkshopHourMedia;
+    hour2: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean } & WorkshopHourMedia;
+    hour3: { title: string; description: string; expertAllowed?: boolean; instructorAllowed?: boolean } & WorkshopHourMedia;
 }
 
 export type StreamMode = 'live_broadcast' | 'interactive_class';

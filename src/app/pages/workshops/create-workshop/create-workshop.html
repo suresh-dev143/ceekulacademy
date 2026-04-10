@@ -11,6 +11,117 @@
         </button>
     </div>
 
+    <!-- ══ AI Generator ═══════════════════════════════════════════════════ -->
+    <div class="cwf-ai-bar">
+        <button type="button" class="cwf-ai-toggle" (click)="showAiPanel.set(!showAiPanel())">
+            <span class="cwf-ai-spark">✦</span>
+            Generate with AI
+            @if (aiGenerated()) { <span class="cwf-ai-done-badge"><i class="fas fa-check"></i> Filled</span> }
+            <i class="fas" [class.fa-chevron-down]="!showAiPanel()" [class.fa-chevron-up]="showAiPanel()"></i>
+        </button>
+
+        @if (showAiPanel()) {
+        <div class="cwf-ai-panel">
+            <div class="cwf-ai-panel-header">
+                <span class="cwf-ai-spark-lg">✦</span>
+                <div>
+                    <div class="cwf-ai-panel-title">AI Workshop Generator</div>
+                    <div class="cwf-ai-panel-sub">Describe your topic and audience — Claude will draft the complete 3-hour plan for you.</div>
+                </div>
+            </div>
+
+            <div class="cwf-ai-grid">
+                <!-- Topic -->
+                <div class="cwf-field cwf-ai-topic-field">
+                    <label class="cwf-label">Workshop Topic *</label>
+                    <input type="text" class="cwf-input" [value]="aiTopic()"
+                        (input)="aiTopic.set($any($event.target).value)"
+                        placeholder="e.g., Introduction to Machine Learning with Python">
+                </div>
+
+                <!-- Language -->
+                <div class="cwf-field">
+                    <label class="cwf-label">Language</label>
+                    <input type="text" class="cwf-input" [value]="aiLanguage()"
+                        (input)="aiLanguage.set($any($event.target).value)"
+                        placeholder="English">
+                </div>
+
+                <!-- Audience -->
+                <div class="cwf-field">
+                    <label class="cwf-label">Target Audience</label>
+                    <select class="cwf-input cwf-select" [value]="aiAudience()"
+                        (change)="aiAudience.set($any($event.target).value)">
+                        <option value="BEGINNER">Beginner</option>
+                        <option value="INTERMEDIATE">Intermediate</option>
+                        <option value="ADVANCED">Advanced</option>
+                    </select>
+                </div>
+
+                <!-- Mode -->
+                <div class="cwf-field">
+                    <label class="cwf-label">Workshop Mode</label>
+                    <div class="cwf-ai-mode-toggle">
+                        <button type="button" class="cwf-ai-mode-btn"
+                            [class.active]="aiMode() === 'ONLINE'"
+                            (click)="aiMode.set('ONLINE')">
+                            <i class="fas fa-wifi"></i> Online
+                        </button>
+                        <button type="button" class="cwf-ai-mode-btn"
+                            [class.active]="aiMode() === 'OFFLINE'"
+                            (click)="aiMode.set('OFFLINE')">
+                            <i class="fas fa-building"></i> Offline
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cwf-ai-actions">
+                <div class="cwf-ai-note">
+                    <i class="fas fa-info-circle"></i>
+                    Generated content fills the form — review and edit before saving.
+                </div>
+                <button type="button" class="cwf-ai-generate-btn"
+                    [disabled]="isGenerating() || !aiTopic().trim()"
+                    (click)="generateWithAI()">
+                    @if (isGenerating()) {
+                        <i class="fas fa-spinner fa-spin"></i> Generating…
+                    } @else {
+                        <span class="cwf-ai-spark">✦</span> Generate Workshop
+                    }
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- ══ Symbol Picker ═══════════════════════════════════════════════════ -->
+    <div class="cwf-sym-bar">
+        <button type="button" class="cwf-sym-toggle" (click)="toggleSymbols()">
+            <span class="cwf-sym-sigma">Σ</span>
+            Math &amp; Physics Symbols
+            <i class="fas" [class.fa-chevron-down]="!showSymbols()" [class.fa-chevron-up]="showSymbols()"></i>
+        </button>
+        @if (showSymbols()) {
+        <div class="cwf-sym-panel">
+            <div class="cwf-sym-tabs">
+                @for (cat of symbolCategories; track $index) {
+                <button type="button" class="cwf-sym-tab" [class.active]="activeSymbolTab() === $index"
+                    (click)="activeSymbolTab.set($index)">{{ cat.label }}</button>
+                }
+            </div>
+            <div class="cwf-sym-grid">
+                @for (sym of symbolCategories[activeSymbolTab()].symbols; track $index) {
+                <button type="button" class="cwf-sym-btn" (click)="insertSymbol(sym)" [title]="sym">{{ sym }}</button>
+                }
+            </div>
+            <div class="cwf-sym-hint">
+                <i class="fas fa-info-circle"></i> Focus any text field, then click a symbol to insert it at the cursor
+            </div>
+        </div>
+        }
+    </div>
+
     <form [formGroup]="workshopForm" (ngSubmit)="onSubmit()" novalidate>
 
         <!-- ══ 1. WORKSHOP DETAILS ═══════════════════════════════════════════ -->
@@ -23,7 +134,8 @@
                 <div class="cwf-input-wrap">
                     <input type="text" class="cwf-input" formControlName="workshopTitle"
                         [class.is-error]="fieldError('workshopTitle')"
-                        placeholder="e.g., Advanced AI Development Bootcamp" maxlength="100">
+                        placeholder="e.g., Advanced AI Development Bootcamp" maxlength="100"
+                        (focus)="onFieldFocus($any($event.target))">
                     <span class="cwf-char">
                         {{ workshopForm.get('workshopTitle')?.value?.length ?? 0 }}/100
                     </span>
@@ -49,7 +161,7 @@
                     <textarea class="cwf-input cwf-textarea" formControlName="workshopDescription"
                         [class.is-error]="fieldError('workshopDescription')"
                         placeholder="Describe what participants will learn, prerequisites, and outcomes..." rows="4"
-                        maxlength="1000"></textarea>
+                        maxlength="1000" (focus)="onFieldFocus($any($event.target))"></textarea>
                     <span class="cwf-char">
                         {{ workshopForm.get('workshopDescription')?.value?.length ?? 0 }}/1000
                     </span>
@@ -82,7 +194,8 @@
                         <div class="cwf-input-wrap">
                             <input type="text" class="cwf-input cwf-input--large" formControlName="title"
                                 placeholder="e.g., Introduction to AI Systems"
-                                [class.is-error]="workshopForm.get('threeHourPlan.hour1.title')?.invalid && workshopForm.get('threeHourPlan.hour1.title')?.touched">
+                                [class.is-error]="workshopForm.get('threeHourPlan.hour1.title')?.invalid && workshopForm.get('threeHourPlan.hour1.title')?.touched"
+                                (focus)="onFieldFocus($any($event.target))">
                         </div>
                         @if (workshopForm.get('threeHourPlan.hour1.title')?.hasError('required') &&
                         workshopForm.get('threeHourPlan.hour1.title')?.touched) {
@@ -93,11 +206,52 @@
                         <label class="cwf-label">Description *</label>
                         <textarea class="cwf-input cwf-textarea cwf-textarea--large" formControlName="description"
                             placeholder="What will be covered in Hour 1..." rows="4"
-                            [class.is-error]="workshopForm.get('threeHourPlan.hour1.description')?.invalid && workshopForm.get('threeHourPlan.hour1.description')?.touched"></textarea>
+                            [class.is-error]="workshopForm.get('threeHourPlan.hour1.description')?.invalid && workshopForm.get('threeHourPlan.hour1.description')?.touched"
+                            (focus)="onFieldFocus($any($event.target))"></textarea>
                         @if (workshopForm.get('threeHourPlan.hour1.description')?.hasError('required') &&
                         workshopForm.get('threeHourPlan.hour1.description')?.touched) {
                         <div class="cwf-error">Description is required for Hour 1</div>
                         }
+                    </div>
+                    <!-- Hour 1 Media -->
+                    <div class="cwf-media-section">
+                        <div class="cwf-media-label"><i class="fas fa-photo-video"></i> Media Resources <span>(Optional)</span></div>
+                        <div class="cwf-field">
+                            <label class="cwf-label"><i class="fas fa-video"></i> Videos</label>
+                            <div formArrayName="videos">
+                                @for (ctrl of getHourVideos('hour1').controls; track $index) {
+                                <div class="cwf-url-row">
+                                    <input type="url" class="cwf-input" [formControlName]="$index"
+                                        placeholder="e.g., https://youtube.com/watch?v=..."
+                                        (focus)="onFieldFocus($any($event.target))">
+                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourVideo('hour1', $index)" title="Remove video">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                            <button type="button" class="cwf-add-media-btn" (click)="addHourVideo('hour1')">
+                                <i class="fas fa-plus"></i> Add Video
+                            </button>
+                        </div>
+                        <div class="cwf-field" style="margin-top: 0.75rem;">
+                            <label class="cwf-label"><i class="fas fa-image"></i> Images</label>
+                            <div formArrayName="images">
+                                @for (ctrl of getHourImages('hour1').controls; track $index) {
+                                <div class="cwf-url-row">
+                                    <input type="url" class="cwf-input" [formControlName]="$index"
+                                        placeholder="e.g., https://example.com/diagram.png"
+                                        (focus)="onFieldFocus($any($event.target))">
+                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourImage('hour1', $index)" title="Remove image">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                            <button type="button" class="cwf-add-media-btn" (click)="addHourImage('hour1')">
+                                <i class="fas fa-plus"></i> Add Image
+                            </button>
+                        </div>
                     </div>
                 </div>
             </details>
@@ -121,7 +275,8 @@
                         <label class="cwf-label">Description *</label>
                         <textarea class="cwf-input cwf-textarea cwf-textarea--large" formControlName="description"
                             placeholder="Describe the hands-on activity..." rows="4"
-                            [class.is-error]="workshopForm.get('threeHourPlan.hour2.description')?.invalid && workshopForm.get('threeHourPlan.hour2.description')?.touched"></textarea>
+                            [class.is-error]="workshopForm.get('threeHourPlan.hour2.description')?.invalid && workshopForm.get('threeHourPlan.hour2.description')?.touched"
+                            (focus)="onFieldFocus($any($event.target))"></textarea>
                         @if (workshopForm.get('threeHourPlan.hour2.description')?.hasError('required') &&
                         workshopForm.get('threeHourPlan.hour2.description')?.touched) {
                         <div class="cwf-error">Hands-On session description is required</div>
@@ -142,6 +297,46 @@
                             </label>
                         </div>
                     </div>
+                    <!-- Hour 2 Media -->
+                    <div class="cwf-media-section">
+                        <div class="cwf-media-label"><i class="fas fa-photo-video"></i> Media Resources <span>(Optional)</span></div>
+                        <div class="cwf-field">
+                            <label class="cwf-label"><i class="fas fa-video"></i> Videos</label>
+                            <div formArrayName="videos">
+                                @for (ctrl of getHourVideos('hour2').controls; track $index) {
+                                <div class="cwf-url-row">
+                                    <input type="url" class="cwf-input" [formControlName]="$index"
+                                        placeholder="e.g., https://youtube.com/watch?v=..."
+                                        (focus)="onFieldFocus($any($event.target))">
+                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourVideo('hour2', $index)" title="Remove video">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                            <button type="button" class="cwf-add-media-btn" (click)="addHourVideo('hour2')">
+                                <i class="fas fa-plus"></i> Add Video
+                            </button>
+                        </div>
+                        <div class="cwf-field" style="margin-top: 0.75rem;">
+                            <label class="cwf-label"><i class="fas fa-image"></i> Images</label>
+                            <div formArrayName="images">
+                                @for (ctrl of getHourImages('hour2').controls; track $index) {
+                                <div class="cwf-url-row">
+                                    <input type="url" class="cwf-input" [formControlName]="$index"
+                                        placeholder="e.g., https://example.com/diagram.png"
+                                        (focus)="onFieldFocus($any($event.target))">
+                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourImage('hour2', $index)" title="Remove image">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                            <button type="button" class="cwf-add-media-btn" (click)="addHourImage('hour2')">
+                                <i class="fas fa-plus"></i> Add Image
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </details>
 
@@ -158,7 +353,8 @@
                         <div class="cwf-input-wrap">
                             <input type="text" class="cwf-input cwf-input--large" formControlName="title"
                                 placeholder="Project details or discussion topics..."
-                                [class.is-error]="workshopForm.get('threeHourPlan.hour3.title')?.invalid && workshopForm.get('threeHourPlan.hour3.title')?.touched">
+                                [class.is-error]="workshopForm.get('threeHourPlan.hour3.title')?.invalid && workshopForm.get('threeHourPlan.hour3.title')?.touched"
+                                (focus)="onFieldFocus($any($event.target))">
                         </div>
                         @if (workshopForm.get('threeHourPlan.hour3.title')?.hasError('required') &&
                         workshopForm.get('threeHourPlan.hour3.title')?.touched) {
@@ -169,7 +365,8 @@
                         <label class="cwf-label">Description *</label>
                         <textarea class="cwf-input cwf-textarea cwf-textarea--large" formControlName="description"
                             placeholder="Project details or discussion topics..." rows="4"
-                            [class.is-error]="workshopForm.get('threeHourPlan.hour3.description')?.invalid && workshopForm.get('threeHourPlan.hour3.description')?.touched"></textarea>
+                            [class.is-error]="workshopForm.get('threeHourPlan.hour3.description')?.invalid && workshopForm.get('threeHourPlan.hour3.description')?.touched"
+                            (focus)="onFieldFocus($any($event.target))"></textarea>
                         @if (workshopForm.get('threeHourPlan.hour3.description')?.hasError('required') &&
                         workshopForm.get('threeHourPlan.hour3.description')?.touched) {
                         <div class="cwf-error">Please provide details for Hour 3</div>
@@ -190,6 +387,46 @@
                             </label>
                         </div>
                     </div>
+                    <!-- Hour 3 Media -->
+                    <div class="cwf-media-section">
+                        <div class="cwf-media-label"><i class="fas fa-photo-video"></i> Media Resources <span>(Optional)</span></div>
+                        <div class="cwf-field">
+                            <label class="cwf-label"><i class="fas fa-video"></i> Videos</label>
+                            <div formArrayName="videos">
+                                @for (ctrl of getHourVideos('hour3').controls; track $index) {
+                                <div class="cwf-url-row">
+                                    <input type="url" class="cwf-input" [formControlName]="$index"
+                                        placeholder="e.g., https://youtube.com/watch?v=..."
+                                        (focus)="onFieldFocus($any($event.target))">
+                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourVideo('hour3', $index)" title="Remove video">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                            <button type="button" class="cwf-add-media-btn" (click)="addHourVideo('hour3')">
+                                <i class="fas fa-plus"></i> Add Video
+                            </button>
+                        </div>
+                        <div class="cwf-field" style="margin-top: 0.75rem;">
+                            <label class="cwf-label"><i class="fas fa-image"></i> Images</label>
+                            <div formArrayName="images">
+                                @for (ctrl of getHourImages('hour3').controls; track $index) {
+                                <div class="cwf-url-row">
+                                    <input type="url" class="cwf-input" [formControlName]="$index"
+                                        placeholder="e.g., https://example.com/diagram.png"
+                                        (focus)="onFieldFocus($any($event.target))">
+                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourImage('hour3', $index)" title="Remove image">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                            <button type="button" class="cwf-add-media-btn" (click)="addHourImage('hour3')">
+                                <i class="fas fa-plus"></i> Add Image
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </details>
             </div>
@@ -200,7 +437,7 @@
                     <textarea class="cwf-input cwf-textarea" formControlName="expertDescription"
                         [class.is-error]="fieldError('expertDescription')"
                         placeholder="Describe your expertise, qualifications, and relevant experience..." rows="3"
-                        maxlength="500"></textarea>
+                        maxlength="500" (focus)="onFieldFocus($any($event.target))"></textarea>
                     <span class="cwf-char">
                         {{ workshopForm.get('expertDescription')?.value?.length ?? 0 }}/500
                     </span>

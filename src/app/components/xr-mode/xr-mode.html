@@ -1,0 +1,88 @@
+<div class="xr-shell">
+
+  <!-- Lighting overlay -->
+  <div class="xr-lighting" [ngStyle]="lightingStyle"></div>
+
+  <!-- Header -->
+  <div class="xr-header">
+    <span class="xr-badge">🌐 XR Mode</span>
+    <h2 class="xr-title">{{ atom.title }}</h2>
+    <div class="xr-header-actions">
+      <span class="xr-scene-type">{{ xr.sceneType }}</span>
+    </div>
+  </div>
+
+  <!-- Main XR area -->
+  <div class="xr-viewport">
+
+    <!-- 3-D canvas (wireframe cube, drag-to-rotate) -->
+    <canvas #xrCanvas class="xr-canvas"
+      [class.xr-canvas--loaded]="sceneLoaded()"
+      (mousedown)="onMouseDown($event)"
+      (mousemove)="onMouseMove($event)"
+      (mouseup)="onMouseUp()"
+      (mouseleave)="onMouseUp()">
+    </canvas>
+
+    <!-- Scene loading state -->
+    @if (!sceneLoaded()) {
+      <div class="xr-loading">
+        <div class="xr-spinner"></div>
+        <span>Initialising scene…</span>
+      </div>
+    }
+
+    <!-- Interaction overlay -->
+    @if (sceneLoaded()) {
+      <div class="xr-overlay">
+        <div class="xr-hint">Drag to rotate · Click points to explore</div>
+        <div class="xr-rotation">
+          rx: {{ rotationX() | number:'1.2-2' }} ·
+          ry: {{ rotationY() | number:'1.2-2' }}
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- Side panel: interaction points + active annotation -->
+  <div class="xr-sidebar">
+
+    <div class="xr-section">
+      <h3 class="xr-section-title">Interaction Points</h3>
+      @if (xr.interactionPoints.length) {
+        <div class="xr-points">
+          @for (pt of xr.interactionPoints; track pt) {
+            <button class="xr-point-btn" [class.xr-point-btn--active]="activePoint() === pt"
+              (click)="onPointClick(pt)">
+              {{ pt }}
+            </button>
+          }
+        </div>
+      } @else {
+        <p class="xr-empty">No interaction points defined.</p>
+      }
+    </div>
+
+    <!-- Annotations -->
+    @if (xr.annotations.length) {
+      <div class="xr-section">
+        <h3 class="xr-section-title">Annotations</h3>
+        @for (ann of xr.annotations; track ann.label) {
+          <div class="xr-annotation" [class.xr-annotation--active]="activePoint() === ann.label">
+            <span class="xr-ann-label">{{ ann.label }}</span>
+            <p class="xr-ann-content">{{ ann.content }}</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Actions -->
+    <div class="xr-actions">
+      <button class="xr-btn xr-btn--research" (click)="onGoResearch()">🔬 Research Mode</button>
+      <button class="xr-btn xr-btn--continue" (click)="onContinue()">Continue →</button>
+    </div>
+
+  </div>
+
+</div>

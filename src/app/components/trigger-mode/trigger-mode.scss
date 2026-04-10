@@ -1,0 +1,152 @@
+// ── Shell ─────────────────────────────────────────────────────────────────────
+.trigger-shell {
+  position:        relative;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  height:          100%;
+  background:      #090910;
+  overflow:        hidden;
+  opacity:         0;
+  transform:       scale(0.96);
+  transition:      opacity 0.4s ease, transform 0.4s ease;
+
+  &.trigger--visible {
+    opacity:   1;
+    transform: scale(1);
+  }
+}
+
+// ── Canvas ────────────────────────────────────────────────────────────────────
+.trigger-canvas {
+  position: absolute;
+  inset:    0;
+  width:    100%;
+  height:   100%;
+  pointer-events: none;
+}
+
+// ── Content ───────────────────────────────────────────────────────────────────
+.trigger-content {
+  position:        relative;
+  z-index:         2;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             28px;
+  padding:         40px 32px;
+  text-align:      center;
+  max-width:       600px;
+  opacity:         0;
+  transform:       translateY(16px);
+  transition:      opacity 0.5s ease 0.2s, transform 0.5s ease 0.2s;
+
+  &.trigger-content--revealed {
+    opacity:   1;
+    transform: translateY(0);
+  }
+}
+
+// ── Pulse ring ────────────────────────────────────────────────────────────────
+.trigger-ring {
+  width:         72px;
+  height:        72px;
+  border-radius: 50%;
+  border:        2px solid rgba(255,255,255,0.15);
+  display:       flex;
+  align-items:   center;
+  justify-content: center;
+  animation:     ring-pulse 2s ease-in-out infinite;
+
+  &__inner {
+    width:         40px;
+    height:        40px;
+    border-radius: 50%;
+    background:    rgba(255,255,255,0.06);
+    animation:     inner-pulse 2s ease-in-out infinite 0.3s;
+  }
+}
+
+@keyframes ring-pulse {
+  0%, 100% { transform: scale(1);    opacity: 1;   }
+  50%       { transform: scale(1.12); opacity: 0.7; }
+}
+@keyframes inner-pulse {
+  0%, 100% { transform: scale(1);    }
+  50%       { transform: scale(1.18); }
+}
+
+// ── Text ──────────────────────────────────────────────────────────────────────
+.trigger-text {
+  font-size:   22px;
+  font-weight: 600;
+  line-height: 1.5;
+  color:       #f1f5f9;
+  margin:      0;
+  letter-spacing: -0.01em;
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+.trigger-actions {
+  display:  flex;
+  gap:      12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.trigger-btn {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  padding:     10px 24px;
+  border-radius: 40px;
+  font-size:   14px;
+  font-weight: 600;
+  cursor:      pointer;
+  border:      none;
+  transition:  all 0.2s;
+
+  &--primary {
+    background: #4f46e5;
+    color:      #fff;
+    &:hover { background: #4338ca; transform: translateY(-1px); }
+  }
+  &--ghost {
+    background: rgba(255,255,255,0.05);
+    color:      rgba(255,255,255,0.5);
+    border:     1px solid rgba(255,255,255,0.1);
+    &:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
+  }
+
+  &__icon { font-size: 16px; }
+}
+
+// ── Progress bar ──────────────────────────────────────────────────────────────
+.trigger-progress {
+  position:   absolute;
+  bottom:     0;
+  left:       0;
+  right:      0;
+  height:     3px;
+  background: rgba(255,255,255,0.06);
+
+  &__bar {
+    height:     100%;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
+    animation:  progress-drain linear forwards;
+    width:      100%;
+  }
+}
+
+@keyframes progress-drain {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+// ── Color themes ──────────────────────────────────────────────────────────────
+.trigger--indigo  { .trigger-btn--primary { background: #4f46e5; &:hover { background: #4338ca; } } .trigger-progress__bar { background: linear-gradient(90deg, #6366f1, #818cf8); } }
+.trigger--emerald { .trigger-btn--primary { background: #059669; &:hover { background: #047857; } } .trigger-progress__bar { background: linear-gradient(90deg, #10b981, #34d399); } }
+.trigger--amber   { .trigger-btn--primary { background: #d97706; &:hover { background: #b45309; } } .trigger-progress__bar { background: linear-gradient(90deg, #f59e0b, #fbbf24); } }
+.trigger--rose    { .trigger-btn--primary { background: #e11d48; &:hover { background: #be123c; } } .trigger-progress__bar { background: linear-gradient(90deg, #f43f5e, #fb7185); } }
+.trigger--cyan    { .trigger-btn--primary { background: #0e7490; &:hover { background: #0c4a6e; } } .trigger-progress__bar { background: linear-gradient(90deg, #06b6d4, #67e8f9); } }

@@ -1,0 +1,83 @@
+<div class="cin-shell" [class]="speedClass">
+
+  <!-- Reading progress -->
+  <div class="cin-progressbar">
+    <div class="cin-progressbar__fill" [style.width.%]="progress()"></div>
+  </div>
+
+  <!-- Header -->
+  <div class="cin-header">
+    <div class="cin-header__left">
+      <span class="cin-mode-badge">🎬 Cinematic</span>
+      <h1 class="cin-title">{{ atom?.title }}</h1>
+    </div>
+    <div class="cin-header__right">
+      <button class="cin-action-btn" (click)="onTrySimulation()">
+        Try Simulation →
+      </button>
+    </div>
+  </div>
+
+  <!-- Scrollable content -->
+  <div #scrollContainer class="cin-scroll">
+
+    <!-- Core concept card -->
+    <div class="cin-concept-card cin-section" [class.cin-section--revealed]="isRevealed(0)">
+      <div class="cin-concept-label">Core Concept</div>
+      <p class="cin-concept-summary">{{ atom?.coreConcept?.summary }}</p>
+      @if (atom.coreConcept.formalDefinition) {
+        <div class="cin-definition">
+          <span class="cin-definition-label">Definition</span>
+          <p class="cin-definition-text">{{ atom.coreConcept.formalDefinition }}</p>
+        </div>
+      }
+      <div class="cin-keywords">
+        @for (kw of (atom.coreConcept.keywords || []); track kw) {
+          <span class="cin-kw">{{ kw }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Narrative sections -->
+    @for (section of sections; track section.heading; let i = $index) {
+      <div class="cin-section" [class.cin-section--revealed]="isRevealed(i + 1)"
+        [class.cin-section--active]="activeSection() === i + 1">
+        <div class="cin-section-connector"></div>
+        <div class="cin-section-card">
+          <h2 class="cin-section-heading">{{ section.heading }}</h2>
+          <p class="cin-section-body">{{ section.body }}</p>
+          @if (section.visualHint) {
+            <div class="cin-visual-hint">
+              <span class="cin-visual-icon">🖼</span>
+              <span class="cin-visual-text">{{ section.visualHint }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Full narrative (if no sections) -->
+    @if (!sections.length && cinematic.narrative) {
+      <div class="cin-section cin-section--single" [class.cin-section--revealed]="isRevealed(1)">
+        <div class="cin-section-card">
+          <p class="cin-narrative">{{ cinematic.narrative }}</p>
+        </div>
+      </div>
+    }
+
+    <!-- CTA row -->
+    <div class="cin-section cin-cta-row" [class.cin-section--revealed]="isRevealed(99)">
+      <button class="cin-cta-btn cin-cta-btn--primary" (click)="onTrySimulation()">
+        ⚗ Interactive Simulation
+      </button>
+      <button class="cin-cta-btn cin-cta-btn--secondary" (click)="onExploreResearch()">
+        🔬 Research Mode
+      </button>
+      <button class="cin-cta-btn cin-cta-btn--ghost" (click)="onComplete()">
+        Continue →
+      </button>
+    </div>
+
+  </div>
+
+</div>

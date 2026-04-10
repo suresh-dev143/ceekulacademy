@@ -11,6 +11,8 @@ import { CourseFormComponent } from '../../components/course-management/course-f
 import { NeuronWalletComponent } from '../../components/neuron-wallet/neuron-wallet';
 import { TeacherDashboardService } from '../../services/teacher-dashboard.service';
 import { CourseService, Course } from '../../services/course.service';
+import { TeacherPageControlComponent } from '../../components/teacher/teacher-page-control/teacher-page-control';
+import { PageService } from '../../services/page.service';
 
 @Component({
   selector: 'app-teacher-dashboard',
@@ -22,7 +24,8 @@ import { CourseService, Course } from '../../services/course.service';
     TeacherNearbyStudentsComponent,
     TeacherNearbyInfrastructureComponent,
     WorkshopManagerComponent,
-    CourseFormComponent
+    CourseFormComponent,
+    TeacherPageControlComponent
   ],
   template: `
     <app-layout>
@@ -64,7 +67,9 @@ import { CourseService, Course } from '../../services/course.service';
             </app-teacher-nearby-infrastructure>
           } @else if (activeTab() === 'workshops') {
             <app-workshop-manager></app-workshop-manager>
-          } 
+          } @else if (activeTab() === 'ad-control') {
+            <app-teacher-page-control></app-teacher-page-control>
+          }
         </div>
 
         <!-- Right Side Panel Content -->

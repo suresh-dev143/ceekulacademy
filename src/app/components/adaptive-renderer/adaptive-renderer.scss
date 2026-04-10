@@ -1,0 +1,148 @@
+// ── Shell ─────────────────────────────────────────────────────────────────────
+.ar-shell {
+  display:        flex;
+  flex-direction: column;
+  height:         100%;
+  background:     #09090f;
+  color:          #e2e8f0;
+  overflow:       hidden;
+}
+
+// ── HUD ───────────────────────────────────────────────────────────────────────
+.ar-hud {
+  display:       flex;
+  align-items:   center;
+  gap:           16px;
+  padding:       8px 20px;
+  background:    rgba(0,0,0,0.4);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  flex-shrink:   0;
+  backdrop-filter: blur(10px);
+
+  &-left   { display: flex; align-items: center; gap: 8px; flex: 1; }
+  &-center { display: flex; align-items: center; justify-content: center; flex: 1; }
+  &-right  { display: flex; align-items: center; justify-content: flex-end; flex: 1; }
+}
+
+// Attention bar
+.ar-attention {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  width:       100px;
+  position:    relative;
+
+  &::before {
+    content:       '';
+    display:       block;
+    height:        4px;
+    width:         100%;
+    background:    rgba(255,255,255,0.07);
+    border-radius: 2px;
+    position:      absolute;
+    left:          0;
+  }
+}
+.ar-attention-fill {
+  height:        4px;
+  border-radius: 2px;
+  transition:    width 1s ease, background 0.5s;
+  position:      absolute;
+  left:          0;
+
+  &--low  { background: #f87171; }
+  &--mid  { background: #fbbf24; }
+  &--high { background: #4ade80; }
+}
+.ar-attention-label {
+  font-size:   10px;
+  color:       rgba(255,255,255,0.4);
+  white-space: nowrap;
+  margin-left: 108px;
+}
+
+// Mode pill
+.ar-mode-pill {
+  font-size:     11px;
+  font-weight:   700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding:       3px 12px;
+  border-radius: 20px;
+  border:        1px solid;
+  transition:    all 0.3s;
+
+  &--idle       { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1);  color: rgba(255,255,255,0.3); }
+  &--trigger    { background: rgba(251,191,36,0.12);  border-color: rgba(251,191,36,0.3);   color: #fbbf24; }
+  &--cinematic  { background: rgba(99,102,241,0.12);  border-color: rgba(99,102,241,0.3);   color: #a5b4fc; }
+  &--simulation { background: rgba(16,185,129,0.12);  border-color: rgba(16,185,129,0.3);   color: #34d399; }
+  &--research   { background: rgba(6,182,212,0.12);   border-color: rgba(6,182,212,0.3);    color: #67e8f9; }
+  &--xr         { background: rgba(168,85,247,0.12);  border-color: rgba(168,85,247,0.3);   color: #c084fc; }
+}
+
+// Tier badge
+.ar-tier-badge {
+  font-size:   11px;
+  font-weight: 600;
+  color:       rgba(255,255,255,0.5);
+}
+
+// ── Tier toast ────────────────────────────────────────────────────────────────
+.ar-tier-toast {
+  position:      fixed;
+  bottom:        24px;
+  left:          50%;
+  transform:     translateX(-50%);
+  display:       flex;
+  align-items:   center;
+  gap:           10px;
+  padding:       12px 24px;
+  background:    rgba(20,20,40,0.95);
+  border:        1px solid rgba(99,102,241,0.4);
+  border-radius: 40px;
+  font-size:     13px;
+  font-weight:   600;
+  color:         #a5b4fc;
+  z-index:       9999;
+  backdrop-filter: blur(16px);
+  animation:     toast-in 0.3s ease;
+
+  &-icon { font-size: 18px; }
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+// ── Content area ──────────────────────────────────────────────────────────────
+.ar-content {
+  flex:       1;
+  overflow:   hidden;
+  position:   relative;
+  transition: opacity 0.3s ease;
+
+  &--transitioning { opacity: 0.4; }
+}
+
+// ── Idle state ────────────────────────────────────────────────────────────────
+.ar-idle {
+  height:          100%;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             16px;
+  color:           rgba(255,255,255,0.4);
+  text-align:      center;
+  padding:         40px;
+
+  &-icon  { font-size: 56px; }
+  &-title { font-size: 22px; font-weight: 800; color: #f1f5f9; margin: 0; }
+  &-desc  { font-size: 15px; margin: 0; }
+}
+.ar-idle-spinner {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid rgba(99,102,241,0.15); border-top-color: #6366f1;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

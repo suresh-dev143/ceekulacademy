@@ -1,0 +1,30 @@
+.acp-shell {
+  height:   100vh;
+  overflow: hidden;
+  display:  flex;
+  flex-direction: column;
+
+  app-adaptive-renderer {
+    flex:    1;
+    display: block;
+    overflow: hidden;
+  }
+}
+
+.acp-loading {
+  height:          100vh;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             16px;
+  background:      #09090f;
+  color:           rgba(255,255,255,0.4);
+  font-size:       14px;
+}
+.acp-spinner {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 3px solid rgba(99,102,241,0.15); border-top-color: #6366f1;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

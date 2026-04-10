@@ -1,0 +1,25 @@
+<div class="phase-bar" [ngClass]="{ 'ad-phase': isAdPhase }">
+
+  <div class="phase-label">
+    <span class="dot" [ngClass]="{ live: !isAdPhase, ad: isAdPhase }"></span>
+    <span class="label-text">
+      {{ isAdPhase ? 'Advertisement Break' : 'Content Phase' }}
+    </span>
+  </div>
+
+  <div class="timer">
+    <span class="timer-value">{{ formattedTime }}</span>
+    <span class="timer-suffix">remaining</span>
+  </div>
+
+  <!-- Progress bar: fills as time passes, resets on phase change -->
+  <div class="progress-track">
+    <div
+      class="progress-fill"
+      [style.width.%]="isAdPhase
+        ? (1 - remaining / 600) * 100
+        : (1 - remaining / 3000) * 100"
+    ></div>
+  </div>
+
+</div>

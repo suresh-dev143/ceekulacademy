@@ -1,0 +1,95 @@
+.phase-bar {
+  display:         flex;
+  align-items:     center;
+  gap:             12px;
+  padding:         8px 16px;
+  background:      rgba(255, 255, 255, 0.06);
+  border-radius:   10px;
+  font-size:       13px;
+  color:           rgba(255, 255, 255, 0.85);
+  position:        relative;
+  overflow:        hidden;
+  transition:      background 0.4s ease;
+
+  &.ad-phase {
+    background: rgba(255, 215, 0, 0.08);
+    color:      rgba(255, 215, 0, 0.95);
+  }
+}
+
+.phase-label {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  flex:        1;
+}
+
+.dot {
+  width:         8px;
+  height:        8px;
+  border-radius: 50%;
+  flex-shrink:   0;
+
+  &.live {
+    background: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25);
+    animation:  pulse-green 2s infinite;
+  }
+
+  &.ad {
+    background: #ffd700;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.25);
+    animation:  pulse-gold 2s infinite;
+  }
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25); }
+  50%       { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0.10); }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.25); }
+  50%       { box-shadow: 0 0 0 6px rgba(255, 215, 0, 0.10); }
+}
+
+.label-text {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.timer {
+  display:     flex;
+  align-items: baseline;
+  gap:         4px;
+}
+
+.timer-value {
+  font-size:   16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-suffix {
+  font-size:   11px;
+  opacity:     0.6;
+}
+
+.progress-track {
+  position:   absolute;
+  bottom:     0;
+  left:       0;
+  right:      0;
+  height:     3px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.progress-fill {
+  height:     100%;
+  background: var(--fill-color, #4ade80);
+  transition: width 1s linear;
+
+  .ad-phase & {
+    background: #ffd700;
+  }
+}
