@@ -4,12 +4,12 @@
   <div class="sim-header">
     <div class="sim-header-left">
       <span class="sim-badge">⚗ Simulation</span>
-      <h2 class="sim-title">{{ atom?.title }}</h2>
+      <h2 class="sim-title">{{ atom.title }}</h2>
     </div>
     <div class="sim-header-right">
       <span class="sim-difficulty">
         @for (star of [1,2,3,4,5]; track star) {
-          <span [class.active]="star <= (sim?.difficulty || 2)">★</span>
+        <span [class.active]="star <= (sim.difficulty || 2)">★</span>
         }
       </span>
     </div>
@@ -18,120 +18,109 @@
   <!-- Objective banner -->
   <div class="sim-objective">
     <span class="sim-objective-label">Objective</span>
-    <p class="sim-objective-text">{{ sim?.objective }}</p>
+    <p class="sim-objective-text">{{ sim.objective }}</p>
   </div>
 
   <!-- IDLE state -->
   @if (simState() === 'idle') {
-    <div class="sim-start-screen">
-      <div class="sim-start-icon">⚗</div>
-      <p class="sim-start-desc">{{ sim?.successCriteria }}</p>
-      <button class="sim-btn sim-btn--primary" (click)="onStart()">Start Simulation</button>
-    </div>
+  <div class="sim-start-screen">
+    <div class="sim-start-icon">⚗</div>
+    <p class="sim-start-desc">{{ sim.successCriteria }}</p>
+    <button class="sim-btn sim-btn--primary" (click)="onStart()">Start Simulation</button>
+  </div>
   }
 
   <!-- ACTIVE state -->
   @if (simState() === 'active') {
 
-    <!-- Slider-params sim type -->
-    @if (sim?.simType === 'slider-params' && sim?.config?.sliders) {
-      <div class="sim-sliders">
-        @for (s of sim.config.sliders; track s.key) {
-          <div class="sim-slider-row">
-            <label class="sim-slider-label">{{ s.label }}</label>
-            <div class="sim-slider-track">
-              <input type="range"
-                [min]="s.min"
-                [max]="s.max"
-                [step]="s.step || 1"
-                [ngModel]="sliderValues[s.key]"
-                (ngModelChange)="onSliderChange(s.key, $event)"
-                class="sim-range">
-              <span class="sim-slider-val">{{ sliderValues[s.key] }} {{ s.unit || '' }}</span>
-            </div>
-          </div>
-        }
-      </div>
-    }
-
-    <!-- Quiz-flow sim type -->
-    @if (sim?.simType === 'quiz-flow' || sim?.simType === 'decision-tree') {
-      <div class="sim-quiz">
-        <p class="sim-question">{{ sim?.config?.question || 'Answer based on what you have learned:' }}</p>
-        <textarea
-          class="sim-answer-input"
-          placeholder="Your answer..."
-          [(ngModel)]="quizAnswer"
-          rows="4">
-        </textarea>
-
-        @if (feedback()) {
-          <div class="sim-feedback" [class.sim-feedback--error]="quizCorrect() === false">
-            {{ feedback() }}
-          </div>
-        }
-
-        <div class="sim-quiz-actions">
-          <button class="sim-btn sim-btn--primary" (click)="onSubmitQuiz()"
-            [disabled]="!quizAnswer.trim()">
-            Submit
-          </button>
-          @if (hintsUsed() < (sim?.hints?.length || 0)) {
-            <button class="sim-btn sim-btn--ghost" (click)="onHint()">
-              Hint ({{ (sim?.hints?.length || 0) - hintsUsed() }} left)
-            </button>
-          }
-        </div>
-
-        @if (currentHint()) {
-          <div class="sim-hint">💡 {{ currentHint() }}</div>
-        }
-      </div>
-    }
-
-    <!-- Generic / graph sim type — placeholder -->
-    @if (sim?.simType === 'graph' || sim?.simType === 'physics') {
-      <div class="sim-generic">
-        <div class="sim-generic-canvas">
-          <span class="sim-generic-placeholder">Interactive {{ sim.simType }} renders here</span>
-        </div>
-      </div>
-    }
-
-    <!-- Attempts tracker -->
-    <div class="sim-attempts">
-      <span class="sim-attempts-label">Attempts: {{ attempts() }} / {{ sim.maxAttempts || 5 }}</span>
-      <div class="sim-attempts-bar">
-        <div class="sim-attempts-fill" [style.width.%]="progressPct"></div>
+  <!-- Slider-params sim type -->
+  @if (sim.simType === 'slider-params' && sim.config.sliders) {
+  <div class="sim-sliders">
+    @for (s of sim.config.sliders; track s.key) {
+    <div class="sim-slider-row">
+      <label class="sim-slider-label">{{ s.label }}</label>
+      <div class="sim-slider-track">
+        <input type="range" [min]="s.min" [max]="s.max" [step]="s.step || 1" [ngModel]="sliderValues[s.key]"
+          (ngModelChange)="onSliderChange(s.key, $event)" class="sim-range">
+        <span class="sim-slider-val">{{ sliderValues[s.key] }} {{ s.unit || '' }}</span>
       </div>
     </div>
+    }
+  </div>
+  }
+
+  <!-- Quiz-flow sim type -->
+  @if (sim.simType === 'quiz-flow' || sim.simType === 'decision-tree') {
+  <div class="sim-quiz">
+    <p class="sim-question">{{ sim.config.question || 'Answer based on what you have learned:' }}</p>
+    <textarea class="sim-answer-input" placeholder="Your answer..." [(ngModel)]="quizAnswer" rows="4">
+        </textarea>
+
+    @if (feedback()) {
+    <div class="sim-feedback" [class.sim-feedback--error]="quizCorrect() === false">
+      {{ feedback() }}
+    </div>
+    }
+
+    <div class="sim-quiz-actions">
+      <button class="sim-btn sim-btn--primary" (click)="onSubmitQuiz()" [disabled]="!quizAnswer.trim()">
+        Submit
+      </button>
+      @if (hintsUsed() < (sim.hints.length || 0)) { <button class="sim-btn sim-btn--ghost" (click)="onHint()">
+        Hint ({{ (sim.hints.length || 0) - hintsUsed() }} left)
+        </button>
+        }
+    </div>
+
+    @if (currentHint()) {
+    <div class="sim-hint">💡 {{ currentHint() }}</div>
+    }
+  </div>
+  }
+
+  <!-- Generic / graph sim type — placeholder -->
+  @if (sim.simType === 'graph' || sim.simType === 'physics') {
+  <div class="sim-generic">
+    <div class="sim-generic-canvas">
+      <span class="sim-generic-placeholder">Interactive {{ sim.simType }} renders here</span>
+    </div>
+  </div>
+  }
+
+  <!-- Attempts tracker -->
+  <div class="sim-attempts">
+    <span class="sim-attempts-label">Attempts: {{ attempts() }} / {{ sim.maxAttempts || 5 }}</span>
+    <div class="sim-attempts-bar">
+      <div class="sim-attempts-fill" [style.width.%]="progressPct"></div>
+    </div>
+  </div>
   }
 
   <!-- PASSED state -->
   @if (simState() === 'passed') {
-    <div class="sim-result sim-result--pass">
-      <div class="sim-result-icon">✅</div>
-      <h3 class="sim-result-title">Well done!</h3>
-      <p class="sim-result-desc">{{ feedback() }}</p>
-      <div class="sim-result-actions">
-        <button class="sim-btn sim-btn--primary" (click)="onComplete()">Continue →</button>
-        <button class="sim-btn sim-btn--secondary" (click)="onGoResearch()">🔬 Research Mode</button>
-        <button class="sim-btn sim-btn--ghost" (click)="onGoXR()">🌐 Explore in XR</button>
-      </div>
+  <div class="sim-result sim-result--pass">
+    <div class="sim-result-icon">✅</div>
+    <h3 class="sim-result-title">Well done!</h3>
+    <p class="sim-result-desc">{{ feedback() }}</p>
+    <div class="sim-result-actions">
+      <button class="sim-btn sim-btn--primary" (click)="onComplete()">Continue →</button>
+      <button class="sim-btn sim-btn--secondary" (click)="onGoResearch()">🔬 Research Mode</button>
+      <button class="sim-btn sim-btn--ghost" (click)="onGoXR()">🌐 Explore in XR</button>
     </div>
+  </div>
   }
 
   <!-- FAILED state -->
   @if (simState() === 'failed') {
-    <div class="sim-result sim-result--fail">
-      <div class="sim-result-icon">🔁</div>
-      <h3 class="sim-result-title">Keep going</h3>
-      <p class="sim-result-desc">Review the cinematic explanation, then try again.</p>
-      <div class="sim-result-actions">
-        <button class="sim-btn sim-btn--primary" (click)="onRetry()">Try Again</button>
-        <button class="sim-btn sim-btn--ghost" (click)="onComplete()">Skip</button>
-      </div>
+  <div class="sim-result sim-result--fail">
+    <div class="sim-result-icon">🔁</div>
+    <h3 class="sim-result-title">Keep going</h3>
+    <p class="sim-result-desc">Review the cinematic explanation, then try again.</p>
+    <div class="sim-result-actions">
+      <button class="sim-btn sim-btn--primary" (click)="onRetry()">Try Again</button>
+      <button class="sim-btn sim-btn--ghost" (click)="onComplete()">Skip</button>
     </div>
+  </div>
   }
 
 </div>

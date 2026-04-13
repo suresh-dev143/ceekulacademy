@@ -331,7 +331,7 @@ export class AdvertiserDashboardComponent implements OnInit {
   today = new Date().toISOString().split('T')[0];
 
   statusFilters = ['all', 'active', 'paused', 'pending_review', 'exhausted', 'expired'];
-  categories = ['Technology', 'Finance', 'Health', 'Education', 'Entertainment', 'Fitness', 'Travel', 'Food', 'Fashion', 'Sports'];
+  categories = ['Technology', 'Finance', 'Health', 'Education', 'Entertainment', 'Fitness', 'Travel', 'Food', 'Fashion', 'Sports','Other'];
 
   adForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],

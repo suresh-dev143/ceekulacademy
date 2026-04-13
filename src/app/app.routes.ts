@@ -45,6 +45,8 @@ export const routes: Routes = [
     { path: 'dashboard/digital-twin', loadComponent: () => import('./pages/digital-twin-dashboard/digital-twin-dashboard').then(m => m.DigitalTwinDashboardComponent) },
     { path: 'dashboard/innovation',   loadComponent: () => import('./pages/innovation-pipeline/innovation-pipeline').then(m => m.InnovationPipelineComponent) },
     // ==================== ADAPTIVE CONTENT ENGINE ====================
+    { path: 'learn', redirectTo: 'learn/default', pathMatch: 'full' },
     { path: 'learn/:topicId', loadComponent: () => import('./pages/adaptive-content/adaptive-content').then(m => m.AdaptiveContentComponent) },
+    { path: 'interactive-learning', loadComponent: () => import('./components/orchestration/split-screen-layout.component').then(m => m.SplitScreenLayoutComponent) },
     { path: '**', redirectTo: '' }
 ];

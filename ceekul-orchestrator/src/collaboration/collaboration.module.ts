@@ -1,3 +1,4 @@
+import { Module } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -7,6 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { EvolutionService } from '../evolution/evolution.service';
+import { EvolutionModule } from '../evolution/evolution.module';
 
 @WebSocketGateway({
   cors: {
@@ -15,7 +17,7 @@ import { EvolutionService } from '../evolution/evolution.service';
 })
 export class CollaborationGateway {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   constructor(private readonly evolutionService: EvolutionService) {}
 
@@ -44,12 +46,8 @@ export class CollaborationGateway {
   }
 }
 
-// Module definition
-import { Module } from '@nestjs/common';
-
 @Module({
   providers: [CollaborationGateway],
   imports: [EvolutionModule],
 })
 export class CollaborationModule {}
-import { EvolutionModule } from '../evolution/evolution.module';
