@@ -52,13 +52,19 @@ import { PhaseTimerComponent } from '../../components/phase-timer/phase-timer';
               <button class="skip-btn" (click)="skipAd()">Skip Ad →</button>
               }
             </div>
-            <video class="video-player"
-              [src]="currentAd()?.videoUrl || ''"
-              autoplay
-              (timeupdate)="onAdTimeUpdate($event)"
-              (ended)="onAdEnded()"
-              #adVideo>
-            </video>
+            @if (currentAd()?.adType === 'image') {
+              <img class="video-player ad-image"
+                [src]="currentAd()?.mediaUrl || ''"
+                [alt]="currentAd()?.title">
+            } @else {
+              <video class="video-player"
+                [src]="currentAd()?.mediaUrl || ''"
+                autoplay
+                (timeupdate)="onAdTimeUpdate($event)"
+                (ended)="onAdEnded()"
+                #adVideo>
+              </video>
+            }
             @if (currentSessionEarnings() > 0) {
             <div class="ad-earnings-ticker">
               ⚡ +{{ currentSessionEarnings() | number:'1.4-4' }} Neurons earned
@@ -285,13 +291,15 @@ export class LectureWatchComponent implements OnInit, OnDestroy {
         if (slots.length) {
           this.matchedAds.set(
             slots.map(s => ({
-              adId:          s.advertisement._id,
-              title:         s.advertisement.title,
-              videoUrl:      s.advertisement.videoUrl,
-              duration:      s.advertisement.duration,
-              category:      s.advertisement.category,
-              effectiveRate: s.advertisement.ratePerSecondPerStudent,
-              multiplier:    1
+              adId:            s.advertisement._id,
+              title:           s.advertisement.title,
+              adType:          s.advertisement.adType,
+              mediaUrl:        s.advertisement.mediaUrl,
+              clickThroughUrl: s.advertisement.clickThroughUrl,
+              duration:        s.advertisement.duration,
+              category:        s.advertisement.category,
+              effectiveRate:   s.advertisement.ratePerSecondPerStudent,
+              multiplier:      1
             }))
           );
         }

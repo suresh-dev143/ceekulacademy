@@ -7,8 +7,10 @@ export interface Advertisement {
   _id: string;
   title: string;
   description?: string;
-  videoUrl: string;
+  adType: 'image' | 'video';
+  mediaUrl: string;
   thumbnailUrl?: string;
+  clickThroughUrl?: string;
   duration: number;
   category: string;
   ratePerSecondPerStudent: number;
@@ -66,7 +68,9 @@ export interface NeuronWallet {
 export interface MatchedAd {
   adId: string;
   title: string;
-  videoUrl: string;
+  adType: 'image' | 'video';
+  mediaUrl: string;
+  clickThroughUrl?: string;
   duration: number;
   effectiveRate: number;
   multiplier: number;
@@ -98,6 +102,12 @@ export class AdPlatformService {
   private readonly api = `${environment.apiUrl}/api`;
 
   // ==================== ADVERTISER ====================
+
+  uploadAdMedia(file: File): Observable<{ status: boolean; data: { mediaUrl: string; adType: 'image' | 'video'; filename: string; size: number } }> {
+    const formData = new FormData();
+    formData.append('media', file);
+    return this.http.post<any>(`${this.api}/advertiser/ads/upload-media`, formData);
+  }
 
   createAd(adData: Partial<Advertisement>): Observable<any> {
     return this.http.post(`${this.api}/advertiser/ads`, adData);

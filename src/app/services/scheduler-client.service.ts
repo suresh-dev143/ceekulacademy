@@ -11,11 +11,13 @@ export type Phase = 'CONTENT' | 'ADVERTISEMENT';
 
 export interface AdSlot {
   advertisement: {
-    _id:                  string;
-    title:                string;
-    videoUrl:             string;
-    duration:             number;
-    category:             string;
+    _id:                     string;
+    title:                   string;
+    adType:                  'image' | 'video';
+    mediaUrl:                string;
+    clickThroughUrl?:        string;
+    duration:                number;
+    category:                string;
     ratePerSecondPerStudent: number;
   };
   startTime:   number;   // seconds from ad-break start

@@ -8,11 +8,12 @@ import { AgoraService } from '../../../services/agora.service';
 import { AgoraChatService } from '../../../services/agora-chat.service';
 import { WorkshopService, WorkshopApiSchedule } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
+import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.component';
 
 @Component({
     selector: 'app-live-room',
     standalone: true,
-    imports: [FormsModule],
+    imports: [FormsModule, AdOverlayComponent],
     templateUrl: './live-room.html',
     styles: [`
         :host {
@@ -245,6 +246,7 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
     private readonly router = inject(Router);
 
     @ViewChild('chatMessages') private chatMessagesEl?: ElementRef<HTMLElement>;
+    @ViewChild('adOverlay') private adOverlay?: AdOverlayComponent;
 
     workshopId = '';
     scheduleId = '';
@@ -356,10 +358,40 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
             );
 
             this.loading.set(false);
+
+            // Schedule ad overlay for the last 10 minutes of this session
+            this._scheduleAdOverlay(sched);
         } catch (err: any) {
             this.errorMsg.set(err?.message ?? 'Unable to join the live room.');
             this.loading.set(false);
         }
+    }
+
+    /**
+     * Computes the remaining seconds in the schedule and arms the ad overlay
+     * to fire when 10 minutes remain. Uses a random session ID since workshops
+     * don't have a separate lecture session concept.
+     */
+    private _scheduleAdOverlay(sched: WorkshopApiSchedule): void {
+        // Parse HH:mm end time relative to today
+        const [endH, endM] = sched.endTime.split(':').map(Number);
+        const now = new Date();
+        const end = new Date(now);
+        end.setHours(endH, endM, 0, 0);
+
+        // If the end time has already passed (e.g. late join), bail out
+        const remainingSecs = Math.floor((end.getTime() - now.getTime()) / 1000);
+        if (remainingSecs <= 0) return;
+
+        // Wait for the view to render the overlay element, then arm it
+        Promise.resolve().then(() => {
+            if (!this.adOverlay) return;
+            const sessionId = `ws-${this.scheduleId}-${Date.now()}`;
+            this.adOverlay.startLiveModeWatch(
+                { contentId: this.workshopId, sessionId },
+                remainingSecs
+            );
+        });
     }
 
     async ngOnDestroy(): Promise<void> {

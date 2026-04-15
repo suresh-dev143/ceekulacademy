@@ -122,6 +122,9 @@
 
 </div>
 
+<!-- Ad overlay — renders above stream, blurs background, does NOT disconnect Agora -->
+<app-ad-overlay #adOverlay></app-ad-overlay>
+
 <!-- Controls bar -->
 <div class="controls-bar">
   @if (agora.isJoined()) {

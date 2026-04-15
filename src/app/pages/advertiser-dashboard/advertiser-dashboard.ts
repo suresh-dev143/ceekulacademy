@@ -15,6 +15,20 @@ import { AuthService } from '../../services/auth.service';
     <app-layout>
       <div class="advertiser-dashboard">
 
+        <!-- Notifications -->
+        @if (errorMessage()) {
+          <div class="alert alert-error" role="alert">
+            <span>{{ errorMessage() }}</span>
+            <button class="alert-close" (click)="errorMessage.set(null)" aria-label="Dismiss">&#x2715;</button>
+          </div>
+        }
+        @if (successMessage()) {
+          <div class="alert alert-success" role="alert">
+            <span>{{ successMessage() }}</span>
+            <button class="alert-close" (click)="successMessage.set(null)" aria-label="Dismiss">&#x2715;</button>
+          </div>
+        }
+
         <!-- Header -->
         <div class="dashboard-header">
           <h1 class="page-title">Advertiser Dashboard</h1>
@@ -179,13 +193,52 @@ import { AuthService } from '../../services/auth.service';
                     }
                   </select>
                 </div>
+
+                <!-- Media Upload -->
                 <div class="form-group full-width">
-                  <label>Ad Video URL *</label>
-                  <input type="url" formControlName="videoUrl" placeholder="https://cdn.example.com/ad.mp4">
+                  <label>Ad Media (Image or Video) *</label>
+                  <div class="upload-area" [class.has-file]="uploadedMediaUrl()" [class.uploading]="isUploading()">
+                    @if (!uploadedMediaUrl() && !isUploading()) {
+                      <label class="upload-label" for="mediaFileInput">
+                        <span class="upload-icon">&#8679;</span>
+                        <span>Click to upload image or video</span>
+                        <small>JPG, PNG, WebP, MP4, WebM &bull; Max 20 MB</small>
+                      </label>
+                      <input id="mediaFileInput" type="file" class="file-input"
+                        accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
+                        (change)="onMediaSelected($event)">
+                    } @else if (isUploading()) {
+                      <div class="upload-progress">
+                        <div class="spinner"></div>
+                        <span>Uploading...</span>
+                      </div>
+                    } @else {
+                      <div class="upload-preview">
+                        @if (uploadedAdType() === 'video') {
+                          <video [src]="uploadedMediaUrl()!" controls class="media-preview"></video>
+                        } @else {
+                          <img [src]="uploadedMediaUrl()!" alt="Ad preview" class="media-preview">
+                        }
+                        <button type="button" class="remove-media" (click)="removeMedia()">&#x2715; Remove</button>
+                      </div>
+                    }
+                  </div>
+                  @if (uploadError()) {
+                    <small class="error-text">{{ uploadError() }}</small>
+                  }
                 </div>
+
+                <div class="form-group full-width">
+                  <label>Click-Through URL</label>
+                  <input type="url" formControlName="clickThroughUrl"
+                    placeholder="https://yoursite.com/landing-page">
+                  <small>Users will be directed here when they tap/click the ad</small>
+                </div>
+
                 <div class="form-group">
                   <label>Duration (seconds) *</label>
-                  <input type="number" formControlName="duration" min="5" max="600">
+                  <input type="number" formControlName="duration" min="10" max="60" step="10">
+                  <small>Min 10s &bull; Max 60s &bull; Must be a multiple of 10</small>
                 </div>
                 <div class="form-group">
                   <label>Rate per Second per Student (⚡) *</label>
@@ -208,8 +261,9 @@ import { AuthService } from '../../services/auth.service';
 
               <div class="form-actions">
                 <button type="button" class="btn-outline" (click)="activeTab.set('ads')">Cancel</button>
-                <button type="submit" class="btn-primary" [disabled]="adForm.invalid || isSubmitting()">
-                  {{ isSubmitting() ? 'Uploading...' : 'Submit for Review' }}
+                <button type="submit" class="btn-primary"
+                  [disabled]="adForm.invalid || isSubmitting() || isUploading() || !uploadedMediaUrl()">
+                  {{ isSubmitting() ? 'Submitting...' : 'Submit for Review' }}
                 </button>
               </div>
             </form>
@@ -239,6 +293,11 @@ import { AuthService } from '../../services/auth.service';
   `,
   styles: [`
     .advertiser-dashboard { padding: 24px 0; max-width: 1200px; margin: 0 auto; }
+    .alert { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; font-weight: 500; }
+    .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+    .alert-close { background: none; border: none; cursor: pointer; font-size: 16px; line-height: 1; opacity: 0.6; color: inherit; padding: 0 0 0 12px; }
+    .alert-close:hover { opacity: 1; }
     .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
     .page-title { font-size: 28px; font-weight: 700; color: var(--text-primary, #1a1a1a); }
     .wallet-summary-bar { display: flex; gap: 24px; align-items: center; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 16px 24px; border-radius: 12px; margin-bottom: 24px; flex-wrap: wrap; }
@@ -271,7 +330,7 @@ import { AuthService } from '../../services/auth.service';
     .budget-bar { height: 6px; background: #e5e7eb; border-radius: 3px; margin-bottom: 12px; overflow: hidden; }
     .budget-fill { height: 100%; background: linear-gradient(90deg, #4f46e5, #10b981); border-radius: 3px; transition: width 0.3s; }
     .ad-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-sm { padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; background: white; cursor: pointer; font-size: 13px; }
+    .btn-sm { padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; background: white; cursor: pointer; font-size: 13px; color:#6b7280; }
     .btn-sm:hover { background: #f3f4f6; }
     .btn-warning { border-color: #f59e0b; color: #92400e; }
     .btn-success { border-color: #10b981; color: #065f46; }
@@ -285,6 +344,20 @@ import { AuthService } from '../../services/auth.service';
     .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .chart-bar { width: 100%; min-height: 2px; border-radius: 3px 3px 0 0; transition: height 0.3s; }
     .chart-label { font-size: 10px; color: #9ca3af; }
+    .upload-area { border: 2px dashed #d1d5db; border-radius: 10px; min-height: 140px; display: flex; align-items: center; justify-content: center; background: white; position: relative; transition: border-color 0.2s; }
+    .upload-area.has-file { border-style: solid; border-color: #10b981; }
+    .upload-area.uploading { border-color: #4f46e5; }
+    .upload-label { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; padding: 24px; text-align: center; color: #6b7280; width: 100%; }
+    .upload-icon { font-size: 32px; color: #9ca3af; }
+    .upload-label small { color: #9ca3af; font-size: 12px; }
+    .file-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .upload-progress { display: flex; flex-direction: column; align-items: center; gap: 10px; color: #4f46e5; }
+    .spinner { width: 32px; height: 32px; border: 3px solid #e5e7eb; border-top-color: #4f46e5; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .upload-preview { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px; width: 100%; }
+    .media-preview { max-height: 160px; max-width: 100%; border-radius: 8px; object-fit: contain; }
+    .remove-media { background: none; border: 1px solid #ef4444; color: #ef4444; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-size: 13px; }
+    .error-text { color: #ef4444; font-size: 12px; }
     .create-ad-form { background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f0fdf4 100%); border-radius: 16px; padding: 32px; box-shadow: 0 4px 24px rgba(79,70,229,0.08); border: 1px solid rgba(79,70,229,0.1); position: relative; overflow: hidden; }
     .create-ad-form::before { content: ''; position: absolute; top: -60px; right: -60px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(79,70,229,0.08) 0%, transparent 70%); pointer-events: none; }
     .create-ad-form::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(16,185,129,0.07) 0%, transparent 70%); pointer-events: none; }
@@ -325,10 +398,33 @@ export class AdvertiserDashboardComponent implements OnInit {
   analytics = signal<any>(null);
   isLoading = signal(false);
   isSubmitting = signal(false);
+  isUploading = signal(false);
+  uploadedMediaUrl = signal<string | null>(null);
+  uploadedAdType = signal<'image' | 'video' | null>(null);
+  uploadError = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
   showDepositModal = signal(false);
   selectedStatus = signal('all');
   depositAmount = 1000;
   today = new Date().toISOString().split('T')[0];
+
+  private _notifyTimer: any;
+  private notify(type: 'error' | 'success', msg: string) {
+    clearTimeout(this._notifyTimer);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+    if (type === 'error') this.errorMessage.set(msg);
+    else this.successMessage.set(msg);
+    this._notifyTimer = setTimeout(() => {
+      this.errorMessage.set(null);
+      this.successMessage.set(null);
+    }, 5000);
+  }
+
+  private serverError(err: any, fallback: string): string {
+    return err?.error?.message || fallback;
+  }
 
   statusFilters = ['all', 'active', 'paused', 'pending_review', 'exhausted', 'expired'];
   categories = ['Technology', 'Finance', 'Health', 'Education', 'Entertainment', 'Fitness', 'Travel', 'Food', 'Fashion', 'Sports','Other'];
@@ -336,8 +432,8 @@ export class AdvertiserDashboardComponent implements OnInit {
   adForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
     category: ['', Validators.required],
-    videoUrl: ['', [Validators.required, Validators.pattern(/^https?:\/\/.+/)]],
-    duration: [30, [Validators.required, Validators.min(5), Validators.max(600)]],
+    clickThroughUrl: ['', [Validators.pattern(/^https?:\/\/.+/)]],
+    duration: [30, [Validators.required, Validators.min(10), Validators.max(60)]],
     ratePerSecondPerStudent: [0.01, [Validators.required, Validators.min(0.001)]],
     totalBudget: [1000, [Validators.required, Validators.min(1)]],
     expiryDate: ['', Validators.required],
@@ -356,7 +452,10 @@ export class AdvertiserDashboardComponent implements OnInit {
         this.wallet.set(res.data.wallet);
         this.isLoading.set(false);
       },
-      error: () => this.isLoading.set(false)
+      error: (err) => {
+        this.isLoading.set(false);
+        this.notify('error', this.serverError(err, 'Could not load your dashboard. Please refresh the page.'));
+      }
     });
     this.loadAds();
   }
@@ -369,7 +468,10 @@ export class AdvertiserDashboardComponent implements OnInit {
         this.ads.set(res.data.ads || []);
         this.isLoading.set(false);
       },
-      error: () => this.isLoading.set(false)
+      error: (err) => {
+        this.isLoading.set(false);
+        this.notify('error', this.serverError(err, 'Could not load your ads. Please try again.'));
+      }
     });
   }
 
@@ -382,35 +484,94 @@ export class AdvertiserDashboardComponent implements OnInit {
     this.selectedAd.set(ad);
     this.activeTab.set('analytics');
     this.adService.getAdAnalytics(ad._id).subscribe({
-      next: (res) => this.analytics.set(res.data.analytics)
+      next: (res) => this.analytics.set(res.data.analytics),
+      error: (err) => this.notify('error', this.serverError(err, 'Could not load analytics for this ad. Please try again.'))
     });
   }
 
   toggleAdStatus(ad: Advertisement, status: 'active' | 'paused') {
     this.adService.updateAd(ad._id, { status }).subscribe({
-      next: () => this.loadAds(this.selectedStatus())
+      next: () => this.loadAds(this.selectedStatus()),
+      error: (err) => this.notify('error', this.serverError(err,
+        `Could not ${status === 'active' ? 'resume' : 'pause'} "${ad.title}". Please try again.`))
     });
   }
 
   topUpBudget(ad: Advertisement) {
-    const amount = prompt('Enter additional budget (Neurons):');
-    if (!amount || isNaN(Number(amount))) return;
-    this.adService.updateAd(ad._id, { additionalBudget: Number(amount) }).subscribe({
-      next: () => this.loadAds()
+    const input = prompt('Enter additional budget (Neurons):');
+    if (!input) return;
+    const amount = Number(input);
+    if (isNaN(amount) || amount <= 0) {
+      this.notify('error', 'Please enter a valid amount greater than 0.');
+      return;
+    }
+    this.adService.updateAd(ad._id, { additionalBudget: amount }).subscribe({
+      next: () => {
+        this.notify('success', `Budget topped up by ${amount} Neurons.`);
+        this.loadAds();
+      },
+      error: (err) => this.notify('error', this.serverError(err,
+        'Budget top-up failed. Make sure your wallet has enough balance and try again.'))
     });
   }
 
+  onMediaSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.uploadError.set(null);
+    this.isUploading.set(true);
+
+    this.adService.uploadAdMedia(file).subscribe({
+      next: (res) => {
+        this.uploadedMediaUrl.set(res.data.mediaUrl);
+        this.uploadedAdType.set(res.data.adType);
+        this.isUploading.set(false);
+      },
+      error: (err) => {
+        const status = err?.status;
+        let msg = 'Upload failed. Please try again.';
+        if (status === 413) msg = 'File is too large. Maximum allowed size is 20 MB.';
+        else if (status === 400) msg = this.serverError(err, 'Invalid file type. Please upload an image or video.');
+        else if (status === 0)  msg = 'Upload failed. Check your internet connection and try again.';
+        this.uploadError.set(msg);
+        this.isUploading.set(false);
+        input.value = '';
+      }
+    });
+  }
+
+  removeMedia() {
+    this.uploadedMediaUrl.set(null);
+    this.uploadedAdType.set(null);
+    this.uploadError.set(null);
+  }
+
   submitAd() {
-    if (this.adForm.invalid) return;
+    if (this.adForm.invalid || !this.uploadedMediaUrl() || !this.uploadedAdType()) return;
     this.isSubmitting.set(true);
-    this.adService.createAd(this.adForm.value).subscribe({
+
+    const payload = {
+      ...this.adForm.value,
+      mediaUrl: this.uploadedMediaUrl(),
+      adType: this.uploadedAdType(),
+      clickThroughUrl: this.adForm.value.clickThroughUrl || undefined
+    };
+
+    this.adService.createAd(payload).subscribe({
       next: () => {
         this.isSubmitting.set(false);
         this.adForm.reset();
+        this.removeMedia();
         this.activeTab.set('ads');
         this.loadAds();
+        this.notify('success', 'Your ad has been submitted for review. We\'ll activate it once approved.');
       },
-      error: () => this.isSubmitting.set(false)
+      error: (err) => {
+        this.isSubmitting.set(false);
+        this.notify('error', this.serverError(err, 'Could not submit your ad. Please check your details and try again.'));
+      }
     });
   }
 
@@ -420,15 +581,27 @@ export class AdvertiserDashboardComponent implements OnInit {
 
   processDeposit() {
     const amount = this.depositAmount;
-    this.razorpayService.createOrder(amount).subscribe(order => {
-      this.razorpayService.openCheckout(order, (response: any) => {
-        this.adService.depositToWallet(amount, response.razorpay_payment_id).subscribe({
-          next: () => {
-            this.showDepositModal.set(false);
-            this.loadDashboard();
-          }
+    if (!amount || amount <= 0) {
+      this.notify('error', 'Please enter a valid amount to top up.');
+      return;
+    }
+    this.razorpayService.createOrder(amount).subscribe({
+      next: order => {
+        this.razorpayService.openCheckout(order, (response: any) => {
+          this.adService.depositToWallet(amount, response.razorpay_payment_id).subscribe({
+            next: () => {
+              this.showDepositModal.set(false);
+              this.loadDashboard();
+              this.notify('success', `${amount} Neurons added to your wallet.`);
+            },
+            error: (err) => {
+              this.showDepositModal.set(false);
+              this.notify('error', this.serverError(err, 'Payment was received but wallet credit failed. Please contact support.'));
+            }
+          });
         });
-      });
+      },
+      error: (err) => this.notify('error', this.serverError(err, 'Could not initiate payment. Please try again.'))
     });
   }
 

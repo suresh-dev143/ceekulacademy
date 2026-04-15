@@ -4,7 +4,7 @@
   <div class="res-header">
     <div class="res-header-left">
       <span class="res-badge">🔬 Research Mode</span>
-      <h2 class="res-title">{{ atom?.title }}</h2>
+      <h2 class="res-title">{{ atom.title }}</h2>
     </div>
     <div class="res-header-right">
       <button class="res-xr-btn" (click)="onGoXR()">🌐 XR View</button>
@@ -14,13 +14,13 @@
   <!-- Tabs -->
   <div class="res-tabs">
     <button class="res-tab" [class.res-tab--active]="activeTab() === 'questions'" (click)="setTab('questions')">
-      Open Questions <span class="res-count">{{ ext?.openQuestions?.length || 0 }}</span>
+      Open Questions <span class="res-count">{{ ext.openQuestions.length || 0 }}</span>
     </button>
     <button class="res-tab" [class.res-tab--active]="activeTab() === 'hypotheses'" (click)="setTab('hypotheses')">
-      Hypotheses <span class="res-count">{{ ext?.hypotheses?.length || 0 }}</span>
+      Hypotheses <span class="res-count">{{ ext.hypotheses.length || 0 }}</span>
     </button>
     <button class="res-tab" [class.res-tab--active]="activeTab() === 'papers'" (click)="setTab('papers')">
-      Papers <span class="res-count">{{ ext?.relatedPapers?.length || 0 }}</span>
+      Papers <span class="res-count">{{ ext.relatedPapers.length || 0 }}</span>
     </button>
   </div>
 
@@ -32,7 +32,7 @@
       <div class="res-panel">
 
         <!-- Future directions -->
-        @if (ext?.futureDirections?.length) {
+        @if (ext.futureDirections.length) {
           <div class="res-section">
             <h3 class="res-section-title">Future Directions</h3>
             <ul class="res-list res-list--future">
@@ -47,7 +47,7 @@
         <div class="res-section">
           <h3 class="res-section-title">Open Questions</h3>
           <ul class="res-list res-list--questions">
-            @for (q of (ext?.openQuestions || []); track q) {
+            @for (q of (ext.openQuestions || []); track q) {
               <li class="res-list-item">
                 <span class="res-q-icon">?</span>
                 <span>{{ q }}</span>
@@ -83,7 +83,7 @@
       <div class="res-panel">
         <div class="res-section">
           <h3 class="res-section-title">Testable Hypotheses</h3>
-          @for (hyp of (ext?.hypotheses || []); track hyp; let i = $index) {
+          @for (hyp of (ext.hypotheses || []); track hyp; let i = $index) {
             <div class="res-hypothesis-card">
               <span class="res-hyp-num">H{{ i + 1 }}</span>
               <p class="res-hyp-text">{{ hyp }}</p>
@@ -114,7 +114,7 @@
     <!-- Papers tab -->
     @if (activeTab() === 'papers') {
       <div class="res-panel">
-        @if (!(ext?.relatedPapers?.length)) {
+        @if (!(ext.relatedPapers.length)) {
           <div class="res-empty">No papers linked yet. Use the research pipeline to enrich this atom.</div>
         } @else {
           @for (paper of ext.relatedPapers; track paper.title) {
@@ -126,7 +126,7 @@
                 }
               </div>
               <h4 class="res-paper-title">{{ paper.title }}</h4>
-              <p class="res-paper-authors">{{ paper.authors?.join(', ') }}</p>
+              <p class="res-paper-authors">{{ paper.authors.join(', ') }}</p>
               @if (paper.summary) {
                 <p class="res-paper-summary">{{ paper.summary }}</p>
               }
