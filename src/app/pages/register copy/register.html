@@ -1,0 +1,162 @@
+<app-navbar class="landing-layout__navbar" [isLandingPage]="true"></app-navbar>
+<div class="register">
+  <!-- Left Sidebar -->
+  <aside class="register__sidebar">
+    <div class="register__sidebar-content">
+      <div class="register__brand">
+        <div class="register__brand-title">MY CEEVOLUTION</div>
+        <div class="register__brand-dqrg">D Q R G</div>
+      </div>
+      <div class="register__sidebar-info">
+        <p>Join the future of human evolution. Create your Ceebrain ID today.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="register__main">
+    <div class="register__container">
+      <div class="register__header">
+        <h1 class="register__title">Pl fill the following data to get registered :</h1>
+      </div>
+
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="register__form">
+        <!-- Mobile No -->
+        <div class="register__field">
+          <label class="register__label" for="mobileNo">Your mobile no</label>
+          <input type="tel" id="mobileNo" formControlName="mobileNo" class="register__input"
+            placeholder="Enter 10-digit mobile number" />
+          @if (registrationForm.get('mobileNo')?.touched && registrationForm.get('mobileNo')?.errors?.['pattern']) {
+            <div class="register__error">Please enter a valid 10-digit mobile number</div>
+          }
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="register__field">
+          <label class="register__label" for="dateOfBirth">Your date of birth</label>
+          <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="register__input" />
+        </div>
+
+        <!-- Place of Birth -->
+        <div class="register__field">
+          <label class="register__label" for="placeOfBirth">Your place of birth</label>
+          <input type="text" id="placeOfBirth" formControlName="placeOfBirth" class="register__input"
+            placeholder="Enter place of birth" />
+        </div>
+
+        <!-- Identity Dropdown -->
+        <div class="register__field">
+          <label class="register__label" for="identity">Your identity</label>
+          <select id="identity" formControlName="identity" class="register__input register__select">
+            <option value="" disabled>Select Identity</option>
+            <option value="homo_sapiens">Member of human species (homo sapiens)</option>
+            <option value="others">Others</option>
+          </select>
+        </div>
+
+        <!-- Gender Dropdown -->
+        <div class="register__field">
+          <label class="register__label" for="gender">Your gender</label>
+          <select id="gender" formControlName="gender" class="register__input register__select">
+            <option value="" disabled>Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="transgender">Transgender</option>
+          </select>
+        </div>
+
+        <!-- BPL Category -->
+        <div class="register__field">
+          <label class="register__label" for="bplCategory">Do you belong to below poverty line category?</label>
+          <select id="bplCategory" formControlName="bplCategory" class="register__input register__select">
+            <option value="" disabled>Select Yes/No</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <!-- Underprivileged Category -->
+        <div class="register__field">
+          <label class="register__label" for="underprivilegedCategory">Do you belong to the underprivileged
+            category?</label>
+          <select id="underprivilegedCategory" formControlName="underprivilegedCategory"
+            class="register__input register__select">
+            <option value="" disabled>Select Yes/No</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <!-- Ceebrain ID Display -->
+        <div class="register__ceebrain-info">
+          Your Ceebrain ID is : <span class="register__accent">{{ ceebrainId() }}</span>
+        </div>
+
+        <!-- Password -->
+        <div class="register__field">
+          <label class="register__label" for="password">Password</label>
+          <input type="password" id="password" formControlName="password" class="register__input"
+            placeholder="Minimum 8 characters, 1 uppercase, 1 number" />
+          @if (registrationForm.get('password')?.touched && registrationForm.get('password')?.errors?.['pattern']) {
+            <div class="register__error">Must include one uppercase letter and one number</div>
+          }
+        </div>
+
+        <!-- Document Upload Section -->
+        <div class="register__upload-section">
+          <p class="register__upload-text">
+            Please upload the documents. You may get your data verified by any Manager (or Director) of Ceekul Academy
+            whenever you wish.
+            If you don't have a mobile number or any ID Proof then pl get the video of your visual identity verified by
+            her/him.
+          </p>
+          <app-document-upload />
+        </div>
+
+        <!-- Self Regulatory Framework -->
+        <div class="register__framework-section">
+          <a href="#" class="register__link">Pl read the self regulatory framework :</a>
+          <div class="register__framework-container">
+            <label class="register__checkbox-label">
+              <input type="checkbox" formControlName="agreeToFramework" class="register__checkbox" />
+              I agree with the self regulatory framework.
+            </label>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        @if (errorMessage()) {
+          <div class="register__error register__error--block">{{ errorMessage() }}</div>
+        }
+
+        <!-- Register Button -->
+        <div class="register__actions">
+          <button type="submit" class="register__submit-btn" [disabled]="isLoading()">
+            {{ isLoading() ? 'Registering...' : 'Register' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Right Sidebar: Widgets -->
+  <aside class="register__widgets">
+    <div class="register__widget">
+      <div class="register__widget-header">
+        <h3>Support</h3>
+        <span class="register__status-badge">
+          <span class="register__status-dot"></span> Online
+        </span>
+      </div>
+      <div class="register__widget-body">
+        <p>Complete your registration to unlock full potential of Ceekul Civilisation.</p>
+        <p class="register__help-note">Need assistance? Our advisors are here to help.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Success Message -->
+  @if (showSuccess()) {
+    <div class="register__snackbar">Registration Successful!</div>
+  }
+</div>

@@ -11,34 +11,41 @@ import { AuthService } from '../../services/auth.service';
   template: `
     <div class="neuron-wallet">
 
-      <!-- Wallet Card -->
+      <!-- Ad Revenue Credits Card
+           ──────────────────────────────────────────────────────────────
+           IMPORTANT: These are ad-revenue credits representing real INR
+           earned through the advertising platform. They are processed and
+           settled via Razorpay (an external, licensed payment gateway)
+           and are ENTIRELY SEPARATE from Ceekul's non-monetary
+           participation Neurons tracked in the Neuron Hub (/neurons).
+           ─────────────────────────────────────────────────────────────── -->
       <div class="wallet-card">
         <div class="wallet-header">
-          <span class="wallet-icon">⚡</span>
+          <span class="wallet-icon">📊</span>
           <div>
-            <h3>Neuron Wallet</h3>
-            <p class="wallet-sub">1 Neuron = 1 INR</p>
+            <h3>Ad Revenue Credits</h3>
+            <p class="wallet-sub">INR earnings from the ad platform · Settled via Razorpay</p>
           </div>
         </div>
         @if (wallet()) {
           <div class="wallet-balances">
             <div class="balance-item main">
-              <span class="balance-label">Available</span>
-              <span class="balance-value">{{ wallet()!.balance | number:'1.2-2' }} ⚡</span>
+              <span class="balance-label">Available (INR)</span>
+              <span class="balance-value">₹{{ wallet()!.balance | number:'1.2-2' }}</span>
             </div>
             <div class="balance-item">
-              <span class="balance-label">Pending</span>
-              <span class="balance-value pending">{{ wallet()!.pendingBalance | number:'1.2-2' }} ⚡</span>
+              <span class="balance-label">Pending (INR)</span>
+              <span class="balance-value pending">₹{{ wallet()!.pendingBalance | number:'1.2-2' }}</span>
             </div>
             @if (userRole === 'advertiser') {
               <div class="balance-item">
-                <span class="balance-label">Locked</span>
-                <span class="balance-value locked">{{ wallet()!.lockedBalance | number:'1.2-2' }} ⚡</span>
+                <span class="balance-label">Locked (INR)</span>
+                <span class="balance-value locked">₹{{ wallet()!.lockedBalance | number:'1.2-2' }}</span>
               </div>
             }
           </div>
           <div class="wallet-total">
-            Total Earned: <strong>{{ wallet()!.totalEarned | number:'1.2-2' }} ⚡</strong>
+            Total Earned: <strong>₹{{ wallet()!.totalEarned | number:'1.2-2' }} INR</strong>
           </div>
           @if (!wallet()!.bankAccountVerified) {
             <div class="bank-alert">
@@ -64,12 +71,12 @@ import { AuthService } from '../../services/auth.service';
         @if (earnings()) {
           <div class="earnings-kpis">
             <div class="ekpi">
-              <span>{{ earnings()!.lifetime.totalEarnings | number:'1.2-2' }} ⚡</span>
-              <small>Lifetime</small>
+              <span>₹{{ earnings()!.lifetime.totalEarnings | number:'1.2-2' }}</span>
+              <small>Lifetime (INR)</small>
             </div>
             <div class="ekpi">
-              <span>{{ getPeriodEarnings() | number:'1.2-2' }} ⚡</span>
-              <small>This Period</small>
+              <span>₹{{ getPeriodEarnings() | number:'1.2-2' }}</span>
+              <small>This Period (INR)</small>
             </div>
           </div>
           <div class="mini-chart">
@@ -99,7 +106,7 @@ import { AuthService } from '../../services/auth.service';
                   <span class="txn-date">{{ txn.createdAt | date:'MMM d, h:mm a' }}</span>
                 </div>
                 <div class="txn-amount" [class.credit]="isCredit(txn)" [class.debit]="!isCredit(txn)">
-                  {{ isCredit(txn) ? '+' : '-' }}{{ txn.amount | number:'1.4-4' }} ⚡
+                  {{ isCredit(txn) ? '+' : '-' }}₹{{ txn.amount | number:'1.4-4' }}
                 </div>
               </div>
             }
@@ -109,11 +116,11 @@ import { AuthService } from '../../services/auth.service';
 
       <!-- Settlements -->
       <div class="settlements-section">
-        <h4>Monthly Settlements</h4>
+        <h4>Monthly Settlements (via Razorpay)</h4>
         @for (s of settlements(); track s._id) {
           <div class="settlement-row">
             <div class="settlement-period">{{ getMonthName(s.month) }} {{ s.year }}</div>
-            <div class="settlement-amount">{{ s.netAmount | number:'1.2-2' }} ⚡</div>
+            <div class="settlement-amount">₹{{ s.netAmount | number:'1.2-2' }}</div>
             <span class="settlement-status" [class]="'status-' + s.status">{{ s.status }}</span>
           </div>
         }

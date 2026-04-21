@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { OrchestrationModule } from './orchestration/orchestration.module';
 import { EvolutionModule } from './evolution/evolution.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
+import { NeuronModule } from './neurons/neuron.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { CollaborationModule } from './collaboration/collaboration.module';
     OrchestrationModule,
     EvolutionModule,
     CollaborationModule,
+    NeuronModule,
   ],
   controllers: [AppController],
   providers: [AppService],

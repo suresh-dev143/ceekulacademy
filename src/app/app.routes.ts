@@ -1,7 +1,21 @@
 import { Routes } from '@angular/router';
+import { LandingLayout } from './components/landing-layout/landing-layout';
+import { Landing } from './pages/landing/landing';
+import { PersonalLayout } from './components/personal-layout/personal-layout';
+import { Advertise } from './pages/personal/advertise/advertise';
+import { Create } from './pages/personal/create/create';
+import { Demand } from './pages/personal/demand/demand';
+import { Edit } from './pages/personal/edit/edit';
+import { Future } from './pages/personal/future/future';
+import { Kutumb } from './pages/personal/kutumb/kutumb';
+import { Neurons } from './pages/personal/neurons/neurons';
+import { Potential } from './pages/personal/potential/potential';
+import { Projects } from './pages/personal/projects/projects';
+import { Supply } from './pages/personal/supply/supply';
+import { Register } from './pages/register copy/register';
 
 export const routes: Routes = [
-    { path: '', loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent) },
+    { path: 'home', loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent) },
     { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard-home').then(m => m.DashboardHomeComponent) },
     { path: 'dashboard/courses', loadComponent: () => import('./pages/courses/courses').then(m => m.CoursesComponent) },
     { path: 'dashboard/director', loadComponent: () => import('./pages/director-dashboard/director-dashboard').then(m => m.DirectorDashboardComponent) },
@@ -14,7 +28,7 @@ export const routes: Routes = [
     { path: 'dashboard/enrolled-workshops', loadComponent: () => import('./pages/workshops/enrolled-workshops/enrolled-workshops').then(m => m.EnrolledWorkshopsComponent) },
     { path: 'about', loadComponent: () => import('./pages/about/about').then(m => m.AboutComponent) },
     { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
-    { path: 'register', loadComponent: () => import('./pages/register/register').then(m => m.RegisterComponent) },
+    // { path: 'register', loadComponent: () => import('./pages/register/register').then(m => m.RegisterComponent) },
     { path: 'profile', loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent) },
     { path: 'contact', loadComponent: () => import('./pages/contact/contact').then(m => m.ContactPageComponent) },
     { path: 'district', loadComponent: () => import('./pages/district/district').then(m => m.DistrictComponent) },
@@ -23,13 +37,8 @@ export const routes: Routes = [
     { path: 'invest', loadComponent: () => import('./pages/invest/invest').then(m => m.InvestPageComponent) },
     { path: 'innovative', loadComponent: () => import('./pages/innovative/innovative').then(m => m.InnovativeComponent) },
     { path: 'courses', loadComponent: () => import('./pages/innovative/innovative').then(m => m.InnovativeComponent) },
-    { path: 'programs', loadComponent: () => import('./pages/programs/programs').then(m => m.ProgramsComponent) },
-    { path: 'programs/:programId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
-    { path: 'programs/:programId/:sectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
-    { path: 'programs/:programId/:sectionId/:subSectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
-    { path: 'workshops', loadComponent: () => import('./pages/workshops/workshops').then(m => m.PublicWorkshopsPageComponent) },
-    { path: 'workshops/:workshopId/live/:scheduleId', loadComponent: () => import('./pages/workshops/live-room/live-room').then(m => m.LiveRoomComponent) },
-    { path: 'transformation', loadComponent: () => import('./pages/transformation/transformation').then(m => m.TransformationComponent) },
+   
+   { path: 'transformation', loadComponent: () => import('./pages/transformation/transformation').then(m => m.TransformationComponent) },
     { path: 'centers', loadComponent: () => import('./pages/centers/centers').then(m => m.CentersComponent) },
     { path: 'health-connect', loadComponent: () => import('./pages/health-connect/health-connect').then(m => m.HealthConnectComponent) },
     { path: 'my-schedule', loadComponent: () => import('./pages/my-schedule/my-schedule').then(m => m.MyScheduleComponent) },
@@ -48,5 +57,45 @@ export const routes: Routes = [
     { path: 'learn', redirectTo: 'learn/default', pathMatch: 'full' },
     { path: 'learn/:topicId', loadComponent: () => import('./pages/adaptive-content/adaptive-content').then(m => m.AdaptiveContentComponent) },
     { path: 'interactive-learning', loadComponent: () => import('./components/orchestration/split-screen-layout.component').then(m => m.SplitScreenLayoutComponent) },
-    { path: '**', redirectTo: '' }
+    // ==================== NEURON PARTICIPATION HUB ====================
+    { path: 'neurons', loadComponent: () => import('./pages/neuron-hub/neuron-hub').then(m => m.NeuronHubComponent) },
+
+    {
+    path: '',
+    component: LandingLayout,
+    children: [
+      { path: '', component: Landing }
+    ]
+  },
+    {
+    path: 'personal',
+    component: PersonalLayout,
+    children: [
+      { path: '', redirectTo: 'potential', pathMatch: 'full' },
+       { path: 'workshops', loadComponent: () => import('./pages/workshops/workshops').then(m => m.PublicWorkshopsPageComponent) },
+    { path: 'workshops/:workshopId/live/:scheduleId', loadComponent: () => import('./pages/workshops/live-room/live-room').then(m => m.LiveRoomComponent) },
+    
+      // Left sidebar routes
+       { path: 'programs', loadComponent: () => import('./pages/programs/programs').then(m => m.ProgramsComponent) },
+    { path: 'programs/:programId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
+    { path: 'programs/:programId/:sectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
+    { path: 'programs/:programId/:sectionId/:subSectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
+      { path: 'potential', component: Potential },
+      { path: 'projects', component: Projects },
+      { path: 'neurons', component: Neurons },
+      { path: 'kutumb', component: Kutumb },
+      { path: 'future', component: Future },
+      // Top navbar routes
+      { path: 'create', component: Create },
+      { path: 'advertise', component: Advertise },
+      { path: 'demand', component: Demand },
+      { path: 'supply', component: Supply },
+      { path: 'edit', component: Edit },
+    ]
+  },
+  {
+    path: 'register',
+    component: Register
+  },
+  { path: '**', redirectTo: '' },
 ];

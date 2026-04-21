@@ -1,0 +1,36 @@
+<div class="step-indicator">
+  <div class="step-indicator__label">{{ stepLabel() }}</div>
+
+  <div class="step-indicator__progress">
+    <div
+      class="step-indicator__bar"
+      [style.width.%]="progressPercentage()">
+    </div>
+  </div>
+
+  <div class="step-indicator__steps">
+    @for (step of steps(); track step.number) {
+      <div
+        class="step-indicator__step"
+        [class.step-indicator__step--active]="step.isActive"
+        [class.step-indicator__step--completed]="step.isCompleted">
+        <div class="step-indicator__dot">
+          @if (step.isCompleted) {
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          } @else {
+            {{ step.number }}
+          }
+        </div>
+        <span class="step-indicator__step-label">
+          @if (step.number === 1) {
+            Account
+          } @else {
+            Profile
+          }
+        </span>
+      </div>
+    }
+  </div>
+</div>

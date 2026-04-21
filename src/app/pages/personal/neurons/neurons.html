@@ -1,0 +1,681 @@
+<div class="workspace">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="workspace__header">
+    <div class="workspace__header-top">
+      <div class="workspace__title-block">
+        <h1 class="workspace__title">My Neuron Workspace</h1>
+        <p class="workspace__subtitle">Participation · Contribution · Growth</p>
+      </div>
+      <div class="workspace__total">
+        <span class="workspace__total-label">All Buckets</span>
+        <span class="workspace__total-value">{{ totalAcrossBuckets() | number }}</span>
+        <span class="workspace__total-unit">neurons</span>
+      </div>
+    </div>
+    <div class="workspace__disclaimer" role="note">
+      <span class="workspace__disclaimer-icon">&#9432;</span>
+      {{ disclaimer }}
+    </div>
+  </header>
+
+  <!-- ── Four Bucket Cards ──────────────────────────────────────────────── -->
+  <section class="buckets" aria-label="Neuron buckets">
+    @for (meta of bucketMeta; track meta.key) {
+      <div class="bucket-card" [style.border-color]="meta.borderColor">
+        <div class="bucket-card__header" [style.background]="meta.color + '22'">
+          <span class="bucket-card__label" [style.color]="meta.color">{{ meta.label }}</span>
+          <span class="bucket-card__fullname">{{ meta.fullName }}</span>
+        </div>
+        <div class="bucket-card__body">
+          @if (meta.key === 'my_neurons') {
+            <div class="bucket-card__balance">{{ neuronService.myNeuronsBalance() | number }}</div>
+          } @else if (meta.key === 'fun') {
+            <div class="bucket-card__balance">{{ neuronService.funBalance() | number }}</div>
+          } @else if (meta.key === 'cun') {
+            <div class="bucket-card__balance">{{ neuronService.cunBalance() | number }}</div>
+          } @else {
+            <div class="bucket-card__balance">{{ neuronService.sunBalance() | number }}</div>
+          }
+          <p class="bucket-card__desc">{{ meta.description }}</p>
+          <div class="bucket-card__meta">
+            <span class="bucket-card__meta-row"><b>Receives:</b> {{ meta.receiveFrom }}</span>
+            <span class="bucket-card__meta-row"><b>Used for:</b> {{ meta.usedFor }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- Locked pool + support debt indicators -->
+  <div class="status-strip">
+    @if (neuronService.lockedBalance() > 0) {
+      <div class="status-strip__item status-strip__item--locked">
+        <span>&#128274;</span>
+        <span>{{ neuronService.lockedBalance() | number }} neurons locked in investments</span>
+      </div>
+    }
+    @if (neuronService.supportDebt() > 0) {
+      <div class="status-strip__item status-strip__item--debt">
+        <span>&#9888;</span>
+        <span>Support debt: {{ neuronService.supportDebt() | number }} neurons</span>
+      </div>
+    }
+    @if (neuronService.contributorGrade()) {
+      <div class="status-strip__item status-strip__item--grade">
+        <span>&#11088;</span>
+        <span>Contributor Grade: {{ neuronService.contributorGrade() }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- ── Tab Navigation ────────────────────────────────────────────────── -->
+  <nav class="workspace__tabs" aria-label="Workspace sections">
+    @for (tab of [
+      { id: 'overview',    label: 'Overview' },
+      { id: 'contribute',  label: 'Contribute' },
+      { id: 'transfer',    label: 'Transfer' },
+      { id: 'invest',      label: 'Invest' },
+      { id: 'send',        label: 'Send Neurons' },
+      { id: 'groups',      label: 'CEEGROUPs' },
+      { id: 'history',     label: 'History' },
+      { id: 'support',     label: 'Support' }
+    ]; track tab.id) {
+      <button class="workspace__tab"
+              [class.workspace__tab--active]="activeTab() === tab.id"
+              (click)="setTab($any(tab.id))">
+        {{ tab.label }}
+        @if (tab.id === 'contribute' && neuronService.pendingContributions().length > 0) {
+          <span class="workspace__badge">{{ neuronService.pendingContributions().length }}</span>
+        }
+        @if (tab.id === 'invest' && neuronService.lockedInvestments().length > 0) {
+          <span class="workspace__badge">{{ neuronService.lockedInvestments().length }}</span>
+        }
+        @if (tab.id === 'groups' && ceegroupService.myGroupCount() > 0) {
+          <span class="workspace__badge">{{ ceegroupService.myGroupCount() }}</span>
+        }
+      </button>
+    }
+  </nav>
+
+  <!-- ── Tab Panels ────────────────────────────────────────────────────── -->
+  <div class="workspace__panel">
+
+    <!-- ─── OVERVIEW ─── -->
+    @if (activeTab() === 'overview') {
+      <div class="panel-overview">
+        <h2 class="panel__heading">Transfer Rules</h2>
+        <div class="rules-grid">
+          <div class="rule rule--allowed">FUN → CUN &nbsp;✅</div>
+          <div class="rule rule--allowed">FUN → SUN &nbsp;✅</div>
+          <div class="rule rule--allowed">CUN → SUN &nbsp;✅</div>
+          <div class="rule rule--allowed">SUN → CUN &nbsp;✅</div>
+          <div class="rule rule--blocked">CUN → FUN &nbsp;❌</div>
+          <div class="rule rule--blocked">SUN → FUN &nbsp;❌</div>
+        </div>
+
+        <h2 class="panel__heading" style="margin-top:2rem">Monthly Allocation</h2>
+        <div class="allocation-info">
+          <p>At the end of every month, your <b>My Neurons</b> balance is distributed:</p>
+          <ul>
+            <li><b>Your share (99%)</b> → 33% FUN + 33% CUN + 33% SUN</li>
+            <li><b>Ceekul share (1%)</b> → 33% FUN + 33% CUN + 34% SUN</li>
+          </ul>
+          <p>Project outcome rewards and work rewards are always credited to <b>My Neurons</b> first.</p>
+        </div>
+
+        <h2 class="panel__heading" style="margin-top:2rem">Investment Rules</h2>
+        <div class="rules-grid">
+          <div class="rule rule--allowed">FUN → Any project ✅</div>
+          <div class="rule rule--allowed">CUN → Research / Innovation / Knowledge ✅</div>
+          <div class="rule rule--allowed">SUN → Business / Infrastructure / Social ✅</div>
+        </div>
+
+        <h2 class="panel__heading" style="margin-top:2rem">Recent Activity</h2>
+        @if (recentHistory().length === 0) {
+          <p class="panel__empty">No transactions yet. Make a contribution to get started.</p>
+        } @else {
+          <ul class="tx-list">
+            @for (tx of recentHistory(); track tx.txId) {
+              <li class="tx-item">
+                <span class="tx-item__dot" [style.background]="bucketColor(tx.toBucket)"></span>
+                <span class="tx-item__desc">{{ tx.description }}</span>
+                <span class="tx-item__amount">+{{ tx.amount | number }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    <!-- ─── CONTRIBUTION ─── -->
+    @if (activeTab() === 'contribute') {
+      <div class="panel-form">
+        <h2 class="panel__heading">Submit Contribution</h2>
+        <p class="panel__note">
+          Transfer money from your personal bank account to your selected entity's escrow account
+          <b>outside this portal</b>. Then fill this form with the transaction reference.
+          Once the entity confirms receipt, neurons (1 INR = 1 Neuron) will be credited to your
+          <b>FUN bucket</b> automatically.
+        </p>
+        <p class="panel__compliance">
+          ⚠️ This portal NEVER handles money. Neurons are non-monetary participation units.
+        </p>
+
+        <form [formGroup]="contributionForm" (ngSubmit)="onSubmitContribution()" class="form">
+          <div class="form__field">
+            <label class="form__label">Receiving Entity Type</label>
+            <select formControlName="entityType" class="form__input form__select">
+              <option value="" disabled>Select entity type</option>
+              <option value="Trust">Trust</option>
+              <option value="Section8">Section 8 Company</option>
+              <option value="PvtLtd">Private Limited Company</option>
+            </select>
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Entity Name</label>
+            <input type="text" formControlName="entityName" class="form__input"
+                   placeholder="Full registered name of the entity" />
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Amount Transferred (₹ INR)</label>
+            <input type="number" formControlName="amountINR" class="form__input"
+                   placeholder="e.g. 500" min="1" />
+            @if (contributionForm.get('amountINR')?.value > 0) {
+              <span class="form__hint">= {{ contributionForm.get('amountINR')?.value | number }} neurons will be credited to FUN</span>
+            }
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Transaction Reference / UTR Number</label>
+            <input type="text" formControlName="transactionReference" class="form__input"
+                   placeholder="Bank transaction reference or UTR" />
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Notes (optional)</label>
+            <textarea formControlName="notes" class="form__input form__textarea"
+                      placeholder="Any additional information for the entity"></textarea>
+          </div>
+
+          @if (contributionSuccess()) {
+            <div class="form__success">{{ contributionSuccess() }}</div>
+          }
+          @if (contributionError()) {
+            <div class="form__error">{{ contributionError() }}</div>
+          }
+
+          <button type="submit" class="form__submit" [disabled]="contributionLoading()">
+            {{ contributionLoading() ? 'Submitting…' : 'Submit Contribution' }}
+          </button>
+        </form>
+
+        <!-- Existing contributions -->
+        @if (neuronService.contributions().length > 0) {
+          <h3 class="panel__subheading">My Contributions</h3>
+          <ul class="record-list">
+            @for (c of neuronService.contributions(); track c._id) {
+              <li class="record-item">
+                <div class="record-item__row">
+                  <span class="record-item__name">{{ c.entityName }}</span>
+                  <span class="record-item__amount">₹{{ c.amountINR | number }}</span>
+                </div>
+                <div class="record-item__row record-item__row--meta">
+                  <span class="record-item__type">{{ c.entityType }}</span>
+                  <span class="record-item__status" [class]="statusClass(c.status)">{{ c.status }}</span>
+                  @if (c.status === 'confirmed') {
+                    <span class="record-item__neurons">{{ c.neuronsIssued | number }} neurons credited</span>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    <!-- ─── TRANSFER ─── -->
+    @if (activeTab() === 'transfer') {
+      <div class="panel-form">
+        <h2 class="panel__heading">Transfer Between Buckets</h2>
+        <div class="transfer-rules-banner">
+          <p><b>Allowed:</b> FUN→CUN &nbsp;|&nbsp; FUN→SUN &nbsp;|&nbsp; CUN→SUN &nbsp;|&nbsp; SUN→CUN</p>
+          <p><b>Blocked:</b> CUN→FUN &nbsp;|&nbsp; SUN→FUN &nbsp; (permanent rule — no exceptions)</p>
+        </div>
+
+        <form [formGroup]="transferForm" (ngSubmit)="onSubmitTransfer()" class="form">
+          <div class="form__row">
+            <div class="form__field">
+              <label class="form__label">From Bucket</label>
+              <select formControlName="fromBucket" class="form__input form__select">
+                <option value="fun">FUN — {{ neuronService.funBalance() | number }} available</option>
+                <option value="cun">CUN — {{ neuronService.cunBalance() | number }} available</option>
+                <option value="sun">SUN — {{ neuronService.sunBalance() | number }} available</option>
+              </select>
+            </div>
+
+            <div class="form__arrow">→</div>
+
+            <div class="form__field">
+              <label class="form__label">To Bucket</label>
+              <select formControlName="toBucket" class="form__input form__select">
+                @for (target of transferTargetOptions(); track target) {
+                  <option [value]="target">{{ target.toUpperCase() }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Number of Neurons</label>
+            <input type="number" formControlName="amount" class="form__input"
+                   placeholder="e.g. 100" min="1" />
+          </div>
+
+          @if (transferSuccess()) {
+            <div class="form__success">{{ transferSuccess() }}</div>
+          }
+          @if (transferError()) {
+            <div class="form__error">{{ transferError() }}</div>
+          }
+
+          <button type="submit" class="form__submit" [disabled]="transferLoading()">
+            {{ transferLoading() ? 'Transferring…' : 'Transfer Neurons' }}
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- ─── INVEST ─── -->
+    @if (activeTab() === 'invest') {
+      <div class="panel-form">
+        <h2 class="panel__heading">Invest in a Project</h2>
+        <p class="panel__note">
+          Neurons are locked from your chosen bucket into the project's participation pool.
+          The portal generates a <b>non-financial instruction</b> for the selected entity.
+          The entity then transfers real money from its escrow account to the project's
+          development escrow — entirely outside this portal.
+        </p>
+        <p class="panel__compliance">
+          Returns are <b>variable, outcome-based, and non-guaranteed</b>. Not fixed returns, not interest.
+        </p>
+
+        <form [formGroup]="investForm" (ngSubmit)="onSubmitInvest()" class="form">
+          <div class="form__field">
+            <label class="form__label">Source Bucket</label>
+            <select formControlName="sourceBucket" class="form__input form__select">
+              <option value="fun">FUN (any project) — {{ neuronService.funBalance() | number }} available</option>
+              <option value="cun">CUN (research/innovation/knowledge only) — {{ neuronService.cunBalance() | number }} available</option>
+              <option value="sun">SUN (business/infrastructure/social only) — {{ neuronService.sunBalance() | number }} available</option>
+            </select>
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Project Type</label>
+            <select formControlName="projectType" class="form__input form__select">
+              <option value="research">Research</option>
+              <option value="innovation">Innovation</option>
+              <option value="knowledge">Knowledge Development</option>
+              <option value="business">Business</option>
+              <option value="infrastructure">Infrastructure</option>
+              <option value="social">Social Development</option>
+            </select>
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Project Name</label>
+            <input type="text" formControlName="projectName" class="form__input"
+                   placeholder="Name of the project" />
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Project ID</label>
+            <input type="text" formControlName="projectId" class="form__input"
+                   placeholder="Official project identifier" />
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Entity Type</label>
+            <select formControlName="entityType" class="form__input form__select">
+              <option value="" disabled>Select entity type</option>
+              <option value="Trust">Trust</option>
+              <option value="Section8">Section 8 Company</option>
+              <option value="PvtLtd">Private Limited Company</option>
+            </select>
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Entity Name (optional)</label>
+            <input type="text" formControlName="entityName" class="form__input"
+                   placeholder="Registered name of the entity" />
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Number of Neurons to Invest</label>
+            <input type="number" formControlName="amount" class="form__input"
+                   placeholder="e.g. 500" min="1" />
+          </div>
+
+          @if (investSuccess()) {
+            <div class="form__success">{{ investSuccess() }}</div>
+          }
+          @if (investError()) {
+            <div class="form__error">{{ investError() }}</div>
+          }
+
+          <button type="submit" class="form__submit" [disabled]="investLoading()">
+            {{ investLoading() ? 'Locking Neurons…' : 'Invest Neurons' }}
+          </button>
+        </form>
+
+        <!-- Active investments -->
+        @if (neuronService.investments().length > 0) {
+          <h3 class="panel__subheading">My Investments</h3>
+          <ul class="record-list">
+            @for (inv of neuronService.investments(); track inv._id) {
+              <li class="record-item">
+                <div class="record-item__row">
+                  <span class="record-item__name">{{ inv.projectName }}</span>
+                  <span class="record-item__amount">{{ inv.amount | number }} neurons</span>
+                </div>
+                <div class="record-item__row record-item__row--meta">
+                  <span class="record-item__type">{{ inv.sourceBucket.toUpperCase() }} → {{ inv.projectType }}</span>
+                  <span class="record-item__status" [class]="statusClass(inv.status)">{{ inv.status }}</span>
+                  @if (inv.rewardAmount && inv.rewardAmount > 0) {
+                    <span class="record-item__neurons">+{{ inv.rewardAmount | number }} reward</span>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    <!-- ─── HISTORY ─── -->
+    @if (activeTab() === 'history') {
+      <div class="panel-history">
+        <h2 class="panel__heading">Transaction Ledger</h2>
+        <p class="panel__note">All neuron movements — immutable, append-only audit trail.</p>
+        @if (neuronService.transactions().length === 0) {
+          <p class="panel__empty">No transactions yet.</p>
+        } @else {
+          <ul class="tx-list tx-list--full">
+            @for (tx of neuronService.transactions(); track tx.txId) {
+              <li class="tx-item tx-item--full">
+                <span class="tx-item__dot" [style.background]="bucketColor(tx.toBucket)"></span>
+                <div class="tx-item__info">
+                  <span class="tx-item__type">{{ txLabel(tx.txType) }}</span>
+                  <span class="tx-item__desc">{{ tx.description }}</span>
+                  <span class="tx-item__date">{{ tx.createdAt | date:'dd MMM yyyy, HH:mm' }}</span>
+                </div>
+                <div class="tx-item__right">
+                  <span class="tx-item__amount">{{ tx.amount | number }}</span>
+                  <span class="tx-item__buckets">{{ tx.fromBucket }} → {{ tx.toBucket }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+    <!-- ─── SUPPORT ─── -->
+    @if (activeTab() === 'support') {
+      <div class="panel-form">
+        <h2 class="panel__heading">Support (Debt System)</h2>
+        <p class="panel__note">
+          Borrow up to <b>100,000 neurons</b> when your balance is insufficient.
+          Valid for <b>6 months</b>. Must be repaid via work rewards or contributions.
+        </p>
+
+        @if (neuronService.supportDebt() > 0) {
+          <div class="support-status">
+            <span class="support-status__label">Current Debt</span>
+            <span class="support-status__value">{{ neuronService.supportDebt() | number }} neurons</span>
+          </div>
+        }
+
+        <!-- Borrow -->
+        <h3 class="panel__subheading">Borrow Support</h3>
+        <form [formGroup]="supportBorrowForm" (ngSubmit)="onBorrowSupport()" class="form form--compact">
+          <div class="form__field">
+            <label class="form__label">Amount (max 100,000)</label>
+            <input type="number" formControlName="amount" class="form__input"
+                   placeholder="Neurons needed" min="1" max="100000" />
+          </div>
+          <button type="submit" class="form__submit form__submit--secondary" [disabled]="supportLoading()">
+            {{ supportLoading() ? 'Processing…' : 'Borrow Neurons' }}
+          </button>
+        </form>
+
+        <!-- Repay -->
+        @if (neuronService.supportDebt() > 0) {
+          <h3 class="panel__subheading">Repay Support</h3>
+          <form [formGroup]="supportRepayForm" (ngSubmit)="onRepaySupport()" class="form form--compact">
+            <div class="form__row">
+              <div class="form__field">
+                <label class="form__label">Repay From</label>
+                <select formControlName="fromBucket" class="form__input form__select">
+                  <option value="fun">FUN — {{ neuronService.funBalance() | number }} available</option>
+                  <option value="cun">CUN — {{ neuronService.cunBalance() | number }} available</option>
+                  <option value="sun">SUN — {{ neuronService.sunBalance() | number }} available</option>
+                </select>
+              </div>
+              <div class="form__field">
+                <label class="form__label">Amount</label>
+                <input type="number" formControlName="amount" class="form__input"
+                       placeholder="Neurons to repay" min="1" />
+              </div>
+            </div>
+            <button type="submit" class="form__submit" [disabled]="supportLoading()">
+              {{ supportLoading() ? 'Processing…' : 'Repay Neurons' }}
+            </button>
+          </form>
+        }
+
+        @if (supportSuccess()) {
+          <div class="form__success">{{ supportSuccess() }}</div>
+        }
+        @if (supportError()) {
+          <div class="form__error">{{ supportError() }}</div>
+        }
+      </div>
+    }
+
+    <!-- ─── SEND NEURONS ─── -->
+    @if (activeTab() === 'send') {
+      <div class="panel-form">
+        <h2 class="panel__heading">Send Neurons for a Service or Product</h2>
+        <p class="panel__note">
+          Pay another person (<b>CEEBRAIN</b>, 12-digit ID) or a group (<b>CEEGROUP</b>, 15-digit ID)
+          for any service, product, or infrastructure within the portal.
+          Neurons are deducted from your FUN/CUN/SUN and credited to the receiver's
+          <b>My Neurons</b> (individual) or <b>Group Neurons</b> (CEEGROUP).
+        </p>
+        <p class="panel__compliance">
+          ⚠️ Neurons have no monetary value. This is not a payment — it is a participation record.
+        </p>
+
+        <form [formGroup]="sendForm" (ngSubmit)="onSendNeurons()" class="form">
+
+          <div class="form__field">
+            <label class="form__label">Your Sender ID</label>
+            <input type="text" formControlName="senderEntityId" class="form__input"
+                   placeholder="Your 12-digit CEEBRAIN ID or a 15-digit CEEGROUP ID"
+                   (blur)="resolveId('sender')" />
+            @if (resolvedSender()) {
+              <span class="form__hint">
+                {{ resolvedSender()!.type === 'ceebrain' ? '👤' : '👥' }}
+                {{ resolvedSender()!.name }}
+              </span>
+            }
+            @if (sendForm.get('senderEntityId')?.invalid && sendForm.get('senderEntityId')?.touched) {
+              <span class="form__error" style="font-size:.75rem;padding:.3rem .5rem">
+                Must be exactly 12 digits (CEEBRAIN) or 15 digits (CEEGROUP)
+              </span>
+            }
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Receiver ID</label>
+            <input type="text" formControlName="receiverEntityId" class="form__input"
+                   placeholder="Receiver's 12-digit CEEBRAIN or 15-digit CEEGROUP ID"
+                   (blur)="resolveId('receiver')" />
+            @if (resolvedReceiver()) {
+              <span class="form__hint">
+                {{ resolvedReceiver()!.type === 'ceebrain' ? '👤' : '👥' }}
+                {{ resolvedReceiver()!.name }}
+                — neurons will land in
+                {{ resolvedReceiver()!.type === 'ceebrain' ? 'their My Neurons' : 'Group Neurons' }}
+              </span>
+            }
+            @if (sendForm.get('receiverEntityId')?.invalid && sendForm.get('receiverEntityId')?.touched) {
+              <span class="form__error" style="font-size:.75rem;padding:.3rem .5rem">
+                Must be exactly 12 digits (CEEBRAIN) or 15 digits (CEEGROUP)
+              </span>
+            }
+          </div>
+
+          <div class="form__row">
+            <div class="form__field">
+              <label class="form__label">From Bucket</label>
+              <select formControlName="fromBucket" class="form__input form__select">
+                <option value="fun">FUN — {{ neuronService.funBalance() | number }} available</option>
+                <option value="cun">CUN — {{ neuronService.cunBalance() | number }} available</option>
+                <option value="sun">SUN — {{ neuronService.sunBalance() | number }} available</option>
+              </select>
+            </div>
+            <div class="form__arrow">→</div>
+            <div class="form__field">
+              <label class="form__label">Amount (Neurons)</label>
+              <input type="number" formControlName="amount" class="form__input"
+                     placeholder="e.g. 100" min="1" />
+            </div>
+          </div>
+
+          <div class="form__field">
+            <label class="form__label">Service / Product Description</label>
+            <input type="text" formControlName="serviceDescription" class="form__input"
+                   placeholder="What is this payment for? e.g. 'Course mentorship session'" />
+          </div>
+
+          @if (sendSuccess()) {
+            <div class="form__success">{{ sendSuccess() }}</div>
+          }
+          @if (sendError()) {
+            <div class="form__error">{{ sendError() }}</div>
+          }
+
+          <button type="submit" class="form__submit" [disabled]="sendLoading()">
+            {{ sendLoading() ? 'Sending…' : 'Send Neurons' }}
+          </button>
+        </form>
+      </div>
+    }
+
+    <!-- ─── CEEGROUPS ─── -->
+    @if (activeTab() === 'groups') {
+      <div>
+        <!-- Create group -->
+        <h2 class="panel__heading">Create a CEEGROUP</h2>
+        <p class="panel__note">
+          A CEEGROUP has a unique <b>15-digit ID</b>. Members can deposit neurons into the group's
+          FUN/CUN/SUN buckets. The group can then send service payments and receive neurons
+          into its <b>Group Neurons</b> bucket.
+        </p>
+
+        <form [formGroup]="createGroupForm" (ngSubmit)="onCreateGroup()" class="form form--compact">
+          <div class="form__field">
+            <label class="form__label">Group Name</label>
+            <input type="text" formControlName="name" class="form__input"
+                   placeholder="e.g. Ceekul Research Circle" />
+          </div>
+          <div class="form__field">
+            <label class="form__label">Description (optional)</label>
+            <textarea formControlName="description" class="form__input form__textarea"
+                      placeholder="What is this group for?"></textarea>
+          </div>
+          @if (groupSuccess()) {
+            <div class="form__success">{{ groupSuccess() }}</div>
+          }
+          @if (groupError()) {
+            <div class="form__error">{{ groupError() }}</div>
+          }
+          <button type="submit" class="form__submit" [disabled]="groupLoading()">
+            {{ groupLoading() ? 'Creating…' : 'Create CEEGROUP' }}
+          </button>
+        </form>
+
+        <!-- My groups -->
+        @if (ceegroupService.groups().length > 0) {
+          <h3 class="panel__subheading">My CEEGROUPs</h3>
+          <ul class="record-list">
+            @for (group of ceegroupService.groups(); track group.ceegroupId) {
+              <li class="record-item" style="cursor:pointer"
+                  [style.border-color]="selectedGroupId() === group.ceegroupId ? '#3b82f6' : ''"
+                  (click)="selectGroup(group.ceegroupId)">
+                <div class="record-item__row">
+                  <span class="record-item__name">{{ group.name }}</span>
+                  <span class="record-item__status status--confirmed">
+                    ID: {{ group.ceegroupId }}
+                  </span>
+                </div>
+                <div class="record-item__row record-item__row--meta">
+                  <span class="record-item__type">{{ group.members.length }} member(s)</span>
+                  <span class="record-item__neurons">
+                    FUN {{ group.fun.balance | number }} ·
+                    CUN {{ group.cun.balance | number }} ·
+                    SUN {{ group.sun.balance | number }} ·
+                    Group Neurons {{ group.groupNeurons.balance | number }}
+                  </span>
+                </div>
+              </li>
+            }
+          </ul>
+
+          <!-- Deposit to selected group -->
+          @if (selectedGroup()) {
+            <h3 class="panel__subheading">Deposit to "{{ selectedGroup()!.name }}"</h3>
+            <p class="panel__note">
+              Transfer from your personal FUN/CUN/SUN to the group's matching bucket.
+            </p>
+            <form [formGroup]="depositForm" (ngSubmit)="onGroupDeposit()" class="form form--compact">
+              <div class="form__row">
+                <div class="form__field">
+                  <label class="form__label">From Your Bucket</label>
+                  <select formControlName="fromBucket" class="form__input form__select">
+                    <option value="fun">FUN — {{ neuronService.funBalance() | number }} available</option>
+                    <option value="cun">CUN — {{ neuronService.cunBalance() | number }} available</option>
+                    <option value="sun">SUN — {{ neuronService.sunBalance() | number }} available</option>
+                  </select>
+                </div>
+                <div class="form__arrow">→</div>
+                <div class="form__field">
+                  <label class="form__label">Amount</label>
+                  <input type="number" formControlName="amount" class="form__input"
+                         placeholder="Neurons to deposit" min="1" />
+                </div>
+              </div>
+              @if (depositSuccess()) {
+                <div class="form__success">{{ depositSuccess() }}</div>
+              }
+              @if (depositError()) {
+                <div class="form__error">{{ depositError() }}</div>
+              }
+              <button type="submit" class="form__submit" [disabled]="depositLoading()">
+                {{ depositLoading() ? 'Depositing…' : 'Deposit to Group' }}
+              </button>
+            </form>
+          }
+        } @else {
+          <p class="panel__empty">No CEEGROUPs yet. Create one above to get started.</p>
+        }
+      </div>
+    }
+
+  </div><!-- /workspace__panel -->
+
+</div><!-- /workspace -->

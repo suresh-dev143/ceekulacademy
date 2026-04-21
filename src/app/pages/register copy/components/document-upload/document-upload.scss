@@ -1,0 +1,142 @@
+@use '../../../../../styles/variables' as *;
+
+.document-upload {
+  &__label {
+    display: block;
+    color: $text-secondary;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__input {
+    display: none;
+  }
+
+  &__dropzone {
+    border: 2px dashed $border-color;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    text-align: center;
+    cursor: pointer;
+    transition: all $transition-fast;
+    background: $bg-secondary;
+
+    &:hover {
+      border-color: $accent-primary;
+      background: rgba($accent-primary, 0.05);
+    }
+
+    &--dragging {
+      border-color: $accent-primary;
+      background: rgba($accent-primary, 0.1);
+      transform: scale(1.01);
+    }
+
+    &--disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+
+      &:hover {
+        border-color: $border-color;
+        background: $bg-secondary;
+      }
+    }
+  }
+
+  &__icon {
+    margin-bottom: $spacing-md;
+    color: $text-muted;
+
+    svg {
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  &__text {
+    color: $text-secondary;
+    font-size: 0.875rem;
+    margin-bottom: $spacing-xs;
+
+    &-primary {
+      color: $accent-primary;
+      font-weight: 500;
+    }
+  }
+
+  &__hint {
+    color: $text-muted;
+    font-size: 0.75rem;
+  }
+
+  &__preview {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    background: $bg-secondary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+  }
+
+  &__image {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: $radius-sm;
+    border: 1px solid $border-color;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__filename {
+    color: $text-primary;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__filesize {
+    color: $text-muted;
+    font-size: 0.75rem;
+    margin-top: 2px;
+  }
+
+  &__remove {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    color: $text-muted;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      border-color: $accent-error;
+      color: $accent-error;
+      background: rgba($accent-error, 0.1);
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__error {
+    color: $accent-error;
+    font-size: 0.75rem;
+    margin-top: $spacing-sm;
+  }
+}

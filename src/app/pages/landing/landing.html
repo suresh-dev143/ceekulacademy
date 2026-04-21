@@ -1,0 +1,158 @@
+<div class="landing landing--dark">
+  <!-- Three-Column Layout -->
+  <div class="three-col">
+    <!-- Left Column: Titles -->
+    <aside class="three-col__left" [class.mobile-active]="activeTab() === 'titles'">
+      <div class="title-list">
+        @for (item of titles; track item.id) {
+        <div class="title-item" [class.title-item--active]="selectedId() === item.id" (click)="selectTitle(item.id)">
+          @if(item.title==='FUTURE ACADEMY'
+          ){
+          <span class="main-title">FUTURE ACADEMY</span>
+          } @else { {{ item.title }}}
+
+
+        </div>
+        }
+      </div>
+    </aside>
+
+    <!-- Center Column: Dynamic Content -->
+    <main class="three-col__center" [class.mobile-active]="activeTab() === 'content'">
+      <div class="content-area">
+
+        <div class="content-area__search">
+          <app-global-search></app-global-search>
+        </div>
+
+
+        @if (selectedContent(); as content) {
+
+        <!-- ── Pillar Grid Layout (e.g. Computable Vision) ── -->
+        @if (content.pillars && content.pillars.length > 0) {
+        <div class="cv-section">
+
+          <header class="cv-header">
+            <h2 class="cv-header__title">{{ content.heading }}</h2>
+            @if (content.tagline) {
+            <p class="cv-header__tagline">{{ content.tagline }}</p>
+            }
+            <div class="cv-header__rule"></div>
+          </header>
+
+          <div class="cv-grid">
+            @for (pillar of content.pillars; track pillar.iconId; let i = $index) {
+            <div class="cv-card">
+
+              <h3 class="cv-card__title">{{ pillar.title }}</h3>
+              <p class="cv-card__descriptor">{{ pillar.descriptor }}</p>
+            </div>
+            }
+          </div>
+
+          @if (content.note) {
+          <footer class="cv-footer">
+            <div class="cv-footer__rule"></div>
+            <p class="cv-footer__text">{{ content.note }}</p>
+          </footer>
+          }
+
+        </div>
+
+        } @else {
+
+        <!-- ── Generic Layout (other titles) ── -->
+        <h2 class="content-area__heading">{{ content.heading }}</h2>
+
+        @if (content.items && content.items.length > 0) {
+        <ul class="content-area__list">
+          @for (item of content.items; track $index) {
+          <li>{{ item }}</li>
+          }
+        </ul>
+        }
+
+        @if (content.description) {
+        <p class="content-area__description">{{ content.description }}</p>
+        }
+
+        @if (content.note) {
+        <div class="content-area__note">{{ content.note }}</div>
+        }
+
+        }
+        }
+      </div>
+    </main>
+
+    <!-- Right Column: Chat -->
+    <aside class="three-col__right" [class.mobile-active]="activeTab() === 'chat'">
+      <div class="chat-container">
+        <div class="chat-container__header">
+          <h3>Support Chat</h3>
+          <span class="chat-container__status">
+            <span class="status-dot"></span>
+            Online
+          </span>
+        </div>
+
+        <div class="chat-container__messages">
+          <div class="chat-message chat-message--received">
+            <div class="chat-message__avatar">AI</div>
+            <div class="chat-message__content">
+              <p>Welcome to Ceekul Civilisation. How may I assist you today?</p>
+              <span class="chat-message__time">Now</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-container__input">
+          <textarea placeholder="Type your message..." rows="2"></textarea>
+          <button class="chat-send-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Mobile Tab Bar (visible only on small screens) -->
+  <nav class="mobile-tab-bar">
+    <button class="mobile-tab-bar__tab" [class.mobile-tab-bar__tab--active]="activeTab() === 'titles'"
+      (click)="setActiveTab('titles')" aria-label="View titles">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="8" y1="6" x2="21" y2="6"></line>
+        <line x1="8" y1="12" x2="21" y2="12"></line>
+        <line x1="8" y1="18" x2="21" y2="18"></line>
+        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+      </svg>
+      <span>Titles</span>
+    </button>
+
+    <button class="mobile-tab-bar__tab" [class.mobile-tab-bar__tab--active]="activeTab() === 'content'"
+      (click)="setActiveTab('content')" aria-label="View content">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      <span>Explore</span>
+    </button>
+
+    <button class="mobile-tab-bar__tab" [class.mobile-tab-bar__tab--active]="activeTab() === 'chat'"
+      (click)="setActiveTab('chat')" aria-label="Open chat">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <span>Chat</span>
+    </button>
+  </nav>
+</div>

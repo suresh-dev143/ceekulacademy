@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
+import { NeuronService } from './neuron.service';
 
 // ── HTML entity decoder ───────────────────────────────────────────────────────
 
@@ -371,6 +372,7 @@ export interface GetEnrolledWorkshopsResponse {
 export class WorkshopService {
     private http = inject(HttpClient);
     private auth = inject(AuthService);
+    private neurons = inject(NeuronService);
     private readonly base = environment.apiUrl;
     private readonly STORAGE_KEY = 'gs-local-workshops';
 
@@ -440,6 +442,9 @@ export class WorkshopService {
             tap(res => {
                 if (res.status && res.data) {
                     this.toggleLocalCache(res.data);
+                    // Award neurons for hosting a workshop (non-monetary participation credit)
+                    const userId = this.auth.currentUserProfile()?.id;
+                    if (userId) this.neurons.onWorkCompleted('Workshop hosted', 0, res.data._id);
                 }
             })
         );
@@ -651,6 +656,14 @@ export class WorkshopService {
         return this.http.post<EnrollWorkshopResponse>(
             `${this.base}/api/v1/workshops/${workshopId}/enroll`,
             { role, scheduleId, sessionOrder }
+        ).pipe(
+            tap(res => {
+                if (res.status) {
+                    // Award collaboration neurons for joining a workshop
+                    const userId = this.auth.currentUserProfile()?.id;
+                    if (userId) this.neurons.onWorkCompleted('Workshop attended', 0, workshopId);
+                }
+            })
         );
     }
 

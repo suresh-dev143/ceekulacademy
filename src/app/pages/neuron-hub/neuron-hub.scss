@@ -1,0 +1,934 @@
+// ══════════════════════════════════════════════════════════════════════
+// Neuron Hub — full-page participation dashboard
+// ══════════════════════════════════════════════════════════════════════
+
+.hub {
+  min-height: 100vh;
+  background: #0a0f1e;
+  color: #e2e8f0;
+  font-family: inherit;
+
+  // ── Header ────────────────────────────────────────────────────────
+  &__header {
+    background: linear-gradient(180deg, #0d1a3a 0%, #0a0f1e 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 2rem 1.5rem 1.25rem;
+  }
+
+  &__header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  &__hero {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__hero-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #93c5fd, #e0f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0 0 0.1rem;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  &__disclaimer {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    background: rgba(30, 58, 138, 0.25);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.72rem;
+    color: #7dd3fc;
+    line-height: 1.5;
+  }
+
+  &__disclaimer-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: #60a5fa;
+  }
+
+  // ── Stat bar ──────────────────────────────────────────────────────
+  &__statbar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  // ── Type breakdown ────────────────────────────────────────────────
+  &__types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    max-width: 1100px;
+    margin: 1.25rem auto;
+    padding: 0 1.5rem;
+  }
+
+  // ── Tabs ──────────────────────────────────────────────────────────
+  &__tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 0 1.5rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  &__tab {
+    padding: 0.65rem 1.1rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #64748b;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+
+    &:hover { color: #94a3b8; }
+
+    &--active {
+      color: #60a5fa;
+      border-bottom-color: #60a5fa;
+    }
+  }
+
+  // ── Panel ─────────────────────────────────────────────────────────
+  &__panel {
+    max-width: 1100px;
+    margin: 1.5rem auto;
+    padding: 0 1.5rem 3rem;
+  }
+
+  &__overview {}
+
+  &__two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #cbd5e1;
+    margin: 0 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__pools-intro {
+    margin-bottom: 1.25rem;
+  }
+
+  &__pools-note {
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0.25rem 0 0;
+
+    strong { color: #94a3b8; }
+  }
+
+  &__pool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  &__empty {
+    font-size: 0.82rem;
+    color: #475569;
+    padding: 1rem 0;
+  }
+
+  &__link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-size: 0.78rem;
+    color: #60a5fa;
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  // ── CTA button ─────────────────────────────────────────────────────
+  &__cta {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1.1rem;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    border-radius: 8px;
+    color: #60a5fa;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: background 0.2s, border-color 0.2s;
+
+    &:hover {
+      background: rgba(59, 130, 246, 0.22);
+      border-color: rgba(59, 130, 246, 0.5);
+    }
+  }
+
+  // ── Quick actions ───────────────────────────────────────────────────
+  &__quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  &__quick-btn {
+    padding: 0.4rem 0.9rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #94a3b8;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+    &:hover {
+      background: rgba(59, 130, 246, 0.12);
+      border-color: rgba(59, 130, 246, 0.28);
+      color: #93c5fd;
+    }
+  }
+
+  // ── Debt warning ────────────────────────────────────────────────────
+  &__debt-warning {
+    margin-top: 0.75rem;
+    padding: 0.55rem 0.85rem;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.18);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    color: #fca5a5;
+  }
+
+  // ── Transfer rules block ────────────────────────────────────────────
+  &__rules {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  // ── Transfer-tab rule list ──────────────────────────────────────────
+  &__rule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+  }
+
+  &__rule {
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    &--ok { background: rgba(34, 197, 94, 0.08);  color: #86efac; }
+    &--no { background: rgba(239, 68, 68, 0.08);  color: #fca5a5; }
+  }
+
+  // ── Bucket balance summary (transfer tab) ───────────────────────────
+  &__bucket-balances {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__bucket-bal {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+  }
+
+  &__bucket-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__bucket-name {
+    flex: 1;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+
+  &__bucket-val {
+    font-variant-numeric: tabular-nums;
+    color: #e2e8f0;
+    font-weight: 700;
+  }
+
+  // ── Contribute how-it-works steps ───────────────────────────────────
+  &__info-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  &__info-step {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+
+    p {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.55;
+      padding-top: 0.1rem;
+    }
+  }
+
+  &__info-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.18);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+    font-size: 0.72rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  // ── Compliance note (contribute / invest tabs) ──────────────────────
+  &__compliance-note {
+    margin-top: 1rem;
+    padding: 0.65rem 0.9rem;
+    background: rgba(30, 58, 138, 0.18);
+    border: 1px solid rgba(59, 130, 246, 0.14);
+    border-radius: 8px;
+    font-size: 0.72rem;
+    color: #7dd3fc;
+    line-height: 1.55;
+  }
+
+  // ── Pending contributions note ──────────────────────────────────────
+  &__pending-note {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.85rem;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    color: #fde68a;
+  }
+
+  // ── Invest-tab bucket rules ──────────────────────────────────────────
+  &__invest-rules {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  &__invest-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: #94a3b8;
+  }
+
+  &__invest-bucket {
+    font-weight: 800;
+    font-size: 0.85rem;
+    width: 3rem;
+    flex-shrink: 0;
+  }
+
+  // ── Locked investment indicator ─────────────────────────────────────
+  &__locked-info {
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(99, 179, 237, 0.07);
+    border: 1px solid rgba(99, 179, 237, 0.14);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    color: #7dd3fc;
+  }
+
+  // ── Management forms (transfer / contribute / invest) ────────────────
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  &__form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    flex: 1;
+  }
+
+  &__form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+
+    @media (max-width: 600px) { grid-template-columns: 1fr; }
+  }
+
+  &__form-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__form-input,
+  &__form-select,
+  &__form-textarea {
+    padding: 0.55rem 0.75rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: rgba(96, 165, 250, 0.5);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    option {
+      background: #1e293b;
+      color: #e2e8f0;
+    }
+  }
+
+  &__form-textarea {
+    resize: vertical;
+    min-height: 68px;
+  }
+
+  &__form-btn {
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    align-self: flex-start;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+  }
+
+  &__form-msg {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+
+    &--ok {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      color: #86efac;
+    }
+
+    &--err {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+  }
+}
+
+// ── Stat cards ─────────────────────────────────────────────────────────
+.stat-card {
+  background: #0a0f1e;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+
+  &--primary &__value {
+    background: linear-gradient(135deg, #60a5fa, #93c5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &__label {
+    font-size: 0.72rem;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  &__value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #e2e8f0;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  &__unit {
+    font-size: 0.72rem;
+    color: #475569;
+  }
+}
+
+// ── Type bars ──────────────────────────────────────────────────────────
+.type-bar {
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.35rem;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    flex: 1;
+  }
+
+  &__count {
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+    color: #94a3b8;
+    font-weight: 700;
+  }
+
+  &__track {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 0.3rem;
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+    min-width: 2px;
+  }
+
+  &__desc {
+    font-size: 0.68rem;
+    color: #475569;
+  }
+}
+
+// ── Leaderboard ────────────────────────────────────────────────────────
+.leaderboard {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+
+    &--top {
+      border-color: rgba(251, 191, 36, 0.15);
+      background: rgba(251, 191, 36, 0.04);
+
+      .leaderboard__rank {
+        color: #fbbf24;
+        font-weight: 800;
+      }
+    }
+  }
+
+  &__rank {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #475569;
+    width: 2rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    flex: 1;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+
+  &__types {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  &__type-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__total {
+    font-size: 0.78rem;
+    color: #64748b;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// ── Earning table ──────────────────────────────────────────────────────
+.earn-table {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+
+  &__header {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr;
+    gap: 0;
+    padding: 0.65rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1fr 1fr;
+    gap: 0;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    align-items: center;
+    font-size: 0.8rem;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: rgba(255, 255, 255, 0.03); }
+  }
+
+  &__activity {
+    color: #cbd5e1;
+  }
+
+  &__type {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #94a3b8;
+    text-transform: capitalize;
+  }
+
+  &__type-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__amount {
+    color: #86efac;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__cap {
+    color: #475569;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// ── Bucket progress rows ────────────────────────────────────────────────
+.bucket-row {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    flex: 1;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #cbd5e1;
+  }
+
+  &__value {
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+
+  &__track {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 0.35rem;
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+    min-width: 2px;
+  }
+
+  &__desc {
+    font-size: 0.68rem;
+    color: #475569;
+  }
+}
+
+// ── Hub bucket grid ─────────────────────────────────────────────────────
+.hub__buckets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  max-width: 1100px;
+  margin: 1.25rem auto;
+  padding: 0 1.5rem;
+}
+
+// ── Transfer rules inline (overview tab) ───────────────────────────────
+.rules-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rule {
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  &--ok { background: rgba(34, 197, 94, 0.08);  color: #86efac; }
+  &--no { background: rgba(239, 68, 68, 0.08);  color: #fca5a5; }
+}
+
+// ── Transaction list ────────────────────────────────────────────────────
+.tx-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  &--full { gap: 0.5rem; }
+}
+
+.tx-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+
+  &--full {
+    align-items: flex-start;
+    padding: 0.65rem 0.9rem;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  &__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  &__type {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: capitalize;
+  }
+
+  &__desc {
+    flex: 1;
+    font-size: 0.82rem;
+    color: #cbd5e1;
+  }
+
+  &__buckets {
+    font-size: 0.68rem;
+    color: #475569;
+  }
+
+  &__amount {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #86efac;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+}
+
+// ── System guide ────────────────────────────────────────────────────────
+.guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.guide-step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+
+  &__num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.14);
+    border: 1px solid rgba(59, 130, 246, 0.24);
+    color: #60a5fa;
+    font-size: 0.8rem;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  b {
+    display: block;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  p {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.guide-compliance {
+  padding: 0.75rem 1rem;
+  background: rgba(30, 58, 138, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.14);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: #7dd3fc;
+  line-height: 1.6;
+}

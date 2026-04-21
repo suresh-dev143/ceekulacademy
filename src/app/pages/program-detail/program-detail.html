@@ -1,260 +1,191 @@
 <div class="pd-page">
 
-    <!-- ── Top Navbar ────────────────────────────────────────────────────── -->
-    <app-navbar></app-navbar>
+    <!-- Search -->
+    <div class="pd-search-wrap">
+        <app-global-search></app-global-search>
+    </div>
 
-    <!-- ── 3-Column Grid ─────────────────────────────────────────────────── -->
-    <div class="pd-grid">
+    <!-- Breadcrumb -->
+    @if (content()) {
+    <nav class="pd-breadcrumb" aria-label="breadcrumb">
+        @for (crumb of breadcrumbs(); track crumb.label; let last = $last) {
+        @if (!last) {
+        <button class="pd-bc-link" (click)="navigate(crumb)">{{ crumb.label }}</button>
+        <span class="pd-bc-sep">/</span>
+        } @else {
+        <span class="pd-bc-current">{{ crumb.label }}</span>
+        }
+        }
+    </nav>
+    }
 
-        <!-- LEFT 21% — Program Tree Sidebar ─────────────────────────────── -->
-        <aside class="pd-col pd-col-left" [class.pd-col-left--open]="mobileSidebarOpen()">
-            <app-program-sidebar></app-program-sidebar>
-        </aside>
+    @let c = content();
 
-        <!-- CENTER 55% — Content Area ──────────────────────────────────── -->
-        <main class="pd-col pd-col-center">
+    @if (c) {
 
-            <!-- Mobile Sidebar Toggle (hidden on desktop) ────────────────── -->
-            <div class="pd-mobile-nav-bar">
-                <button class="pd-sidebar-toggle" (click)="mobileSidebarOpen.set(!mobileSidebarOpen())">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                        <path d="M1.5 3.5h12M1.5 7.5h12M1.5 11.5h12" stroke="currentColor" stroke-width="1.5"
-                            stroke-linecap="round" />
-                    </svg>
-                    <span>Program Navigation</span>
-                    <svg class="pd-toggle-chev" [class.pd-toggle-chev--open]="mobileSidebarOpen()" width="10"
-                        height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Search Bar ───────────────────────────────────────────────── -->
-            <div class="pd-search-wrap">
-                <app-global-search></app-global-search>
-            </div>
-
-            @let c = content();
-
-            @if (c) {
-
-            <!-- Breadcrumb ───────────────────────────────────────────────── -->
-            <nav class="pd-breadcrumb" aria-label="breadcrumb">
-                @for (crumb of breadcrumbs(); track crumb.label; let last = $last) {
-                @if (!last) {
-                <button class="pd-bc-link" (click)="navigate(crumb)">{{ crumb.label }}</button>
-                <span class="pd-bc-sep">/</span>
-                } @else {
-                <span class="pd-bc-current">{{ crumb.label }}</span>
-                }
-                }
-            </nav>
-
-            <!-- ╔════════════════════════════════════════════════════════╗ -->
-            <!-- ║  PROGRAM OVERVIEW  (type = 'program')                 ║ -->
-            <!-- ╚════════════════════════════════════════════════════════╝ -->
-            @if (c.type === 'program') {
-
-            <div class="pd-content">
-                <header class="pd-heading">
-                    <h1 class="pd-title">{{ c.program.title }}</h1>
-                    @if (c.program.description) {
-                    <p class="pd-subtitle">{{ c.program.description }}</p>
-                    }
-                </header>
-
-                <div class="pd-section-grid">
-                    @for (node of c.program.children; track node.id) {
-                    <div class="pd-course-card"
-                        (click)="node.link ? navigate({ label: node.label, commands: [node.link] }) : navigate({ label: node.label, commands: ['/programs', c.program.id, node.id] })">
-                        <div class="pcc-index">{{ $index + 1 }}</div>
-                        <div class="pcc-body">
-                            <div class="pcc-title">{{ node.label }}</div>
-                            @if (node.data?.instructor) {
-                            <div class="pcc-meta">{{ node.data.instructor }}</div>
-                            }
-                            @if (node.data?.description) {
-                            <div class="pcc-desc">{{ node.data.description }}</div>
-                            }
-                            <div class="pcc-modules">
-                                <span>{{ node.children.length }} sections</span>
-                            </div>
-                        </div>
-                        <span class="pcc-arrow">›</span>
-                    </div>
-                    }
-                </div>
-            </div>
-
-            }
-
-            <!-- ╔════════════════════════════════════════════════════════╗ -->
-            <!-- ║  COURSE / SECTION OVERVIEW  (type = 'section')        ║ -->
-            <!-- ╚════════════════════════════════════════════════════════╝ -->
-            @if (c.type === 'section') {
-
-            <div class="pd-content">
-                <header class="pd-heading">
-                    <div class="pd-badge">Course</div>
-                    <h1 class="pd-title">{{ c.section.label }}</h1>
-                    @if (c.section.data?.instructor) {
-                    <p class="pd-instructor">
-                        <span class="pd-instructor-lbl">Instructor</span>
-                        {{ c.section.data.instructor }}
-                    </p>
-                    }
-                    @if (c.section.data?.description) {
-                    <p class="pd-subtitle">{{ c.section.data.description }}</p>
-                    }
-                </header>
-
-                <section class="pd-modules-section">
-                    <h2 class="pd-section-title">Curriculum</h2>
-                    <div class="pd-module-list">
-                        @for (sub of c.section.children; track sub.id; let i = $index) {
-                        <div class="pd-module-row"
-                            (click)="sub.link ? navigate({ label: sub.label, commands: [sub.link] }) : navigate({ label: sub.label, commands: ['/programs', c.program.id, c.section.id, sub.id] })">
-                            <div class="pmr-num">{{ i + 1 }}</div>
-                            <div class="pmr-body">
-                                <div class="pmr-title">{{ sub.label }}</div>
-                                <div class="pmr-count">{{ sub.children.length }} topics</div>
-                            </div>
-                            <div class="pmr-items-preview">
-                                @for (item of sub.children | slice:0:3; track item.id) {
-                                <span class="pmr-chip">{{ item.label }}</span>
-                                }
-                                @if (sub.children.length > 3) {
-                                <span class="pmr-chip pmr-chip--more">+{{ sub.children.length - 3 }} more</span>
-                                }
-                            </div>
-                            <span class="pmr-arrow">›</span>
-                        </div>
-                        }
-                    </div>
-                </section>
-            </div>
-
-            }
-
-            <!-- ╔════════════════════════════════════════════════════════╗ -->
-            <!-- ║  SYLLABUS SECTION  (type = 'subsection')              ║ -->
-            <!-- ╚════════════════════════════════════════════════════════╝ -->
-            @if (c.type === 'subsection') {
-
-            <div class="pd-content">
-                <header class="pd-heading">
-                    <div class="pd-badge">Syllabus Section</div>
-                    <h1 class="pd-title">{{ c.sub.label }}</h1>
-                    <p class="pd-subtitle-small">{{ c.section.label }}</p>
-                </header>
-
-                <section class="pd-topics-section">
-                    <h2 class="pd-section-title">Topics in this section</h2>
-                    <ol class="pd-topic-list">
-                        @for (item of c.sub.children; track item.id) {
-                        <li class="pd-topic-item"
-                            (click)="navigate({ label: item.label, commands: ['/programs', c.program.id, c.section.id, c.sub.id] })">
-                            <span class="pti-num">{{ $index + 1 }}</span>
-                            <span class="pti-label">{{ item.label }}</span>
-                            <span class="pti-arrow">›</span>
-                        </li>
-                        }
-                    </ol>
-                </section>
-
-                @if (c.sub.data?.electiveInterests) {
-                <section class="pd-extra-section">
-                    <h2 class="pd-section-title">Elective Interests</h2>
-                    <div class="pd-tag-cloud">
-                        @for (tag of c.sub.data.electiveInterests; track tag) {
-                        <span class="pd-tag">{{ tag }}</span>
-                        }
-                    </div>
-                </section>
-                }
-
-                @if (c.sub.data?.specializedFocus) {
-                <section class="pd-extra-section">
-                    <h2 class="pd-section-title">Specialized Focus Areas</h2>
-                    <div class="pd-tag-cloud">
-                        @for (tag of c.sub.data.specializedFocus; track tag) {
-                        <span class="pd-tag">{{ tag }}</span>
-                        }
-                    </div>
-                </section>
-                }
-
-                @if (c.sub.data?.applicationAreas) {
-                <section class="pd-extra-section">
-                    <h2 class="pd-section-title">Application Areas</h2>
-                    <div class="pd-tag-cloud">
-                        @for (area of c.sub.data.applicationAreas; track area) {
-                        <span class="pd-tag pd-tag--accent">{{ area }}</span>
-                        }
-                    </div>
-                </section>
-                }
-
-                @if (c.sub.data?.footerNotes) {
-                <div class="pd-footnote">
-                    <span class="pd-footnote-icon">✦</span>
-                    <p>{{ c.sub.data.footerNotes }}</p>
-                </div>
-                }
-            </div>
-
-            }
-
-            <!-- ╔════════════════════════════════════════════════════════╗ -->
-            <!-- ║  ITEM DETAIL  (type = 'item')                         ║ -->
-            <!-- ╚════════════════════════════════════════════════════════╝ -->
-            @if (c.type === 'item') {
-
-            <div class="pd-content">
-                <header class="pd-heading">
-                    <div class="pd-badge">Topic</div>
-                    <h1 class="pd-title">{{ c.item.label }}</h1>
-                    <p class="pd-subtitle-small">
-                        {{ c.section.label }} &rsaquo; {{ c.sub.label }}
-                    </p>
-                </header>
-
-                <div class="pd-item-body">
-                    <div class="pd-item-context">
-                        <h3>Context</h3>
-                        <p>This topic is part of <strong>{{ c.sub.label }}</strong> in the
-                            <strong>{{ c.section.label }}</strong> course.
-                        </p>
-                    </div>
-
-                    <div class="pd-item-nav">
-                        <h3>All topics in this section</h3>
-                        <div class="pd-adjacent-list">
-                            @for (item of c.sub.children; track item.id) {
-                            <div class="pal-item" [class.pal-item--active]="item.id === c.item.id"
-                                (click)="navigate({ label: item.label, commands: ['/programs', c.program.id, c.section.id, c.sub.id] })">
-                                <span class="pal-num">{{ $index + 1 }}</span>
-                                <span class="pal-label">{{ item.label }}</span>
-                            </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            }
-
-            } @else {
-            <div class="pd-loading">Loading program…</div>
-            }
-
-        </main>
-
-        <!-- RIGHT 24% — Chat Panel ──────────────────────────────────────── -->
-        <div class="pd-col pd-col-right">
-            <app-chat-panel></app-chat-panel>
+    <!-- ── ROW 1: Title ──────────────────────────────────────────── -->
+    <div class="pd-title-row">
+        @if (c.type !== 'program') {
+        <div class="pd-badge">
+            @if (c.type === 'section') { Course }
+            @else if (c.type === 'subsection') { Syllabus Section }
+            @else { Topic }
         </div>
+        }
+        <h1 class="pd-title">
+            @if (c.type === 'program') { {{ c.program.title }} }
+            @else if (c.type === 'section') { {{ c.section.label }} }
+            @else if (c.type === 'subsection') { {{ c.sub.label }} }
+            @else { {{ c.item.label }} }
+        </h1>
+        @if (c.type === 'program' && c.program.description) {
+        <p class="pd-subtitle">{{ c.program.description }}</p>
+        }
+        @if (c.type === 'section' && c.section.data?.instructor) {
+        <p class="pd-instructor">
+            <span class="pd-instructor-lbl">Instructor</span>
+            {{ c.section.data.instructor }}
+        </p>
+        }
+        @if (c.type === 'section' && c.section.data?.description) {
+        <p class="pd-subtitle">{{ c.section.data.description }}</p>
+        }
+        @if (c.type === 'subsection') {
+        <p class="pd-subtitle-small">{{ c.section.label }}</p>
+        }
+        @if (c.type === 'item') {
+        <p class="pd-subtitle-small">{{ c.section.label }} › {{ c.sub.label }}</p>
+        }
+    </div>
+
+    <!-- ── ROW 2: Children ───────────────────────────────────────── -->
+    <div class="pd-children-row">
+
+        <!-- Program → course cards -->
+        @if (c.type === 'program') {
+        <div class="pd-cards-grid">
+            @for (node of c.program.children; track node.id) {
+            <div class="pd-course-card"
+                (click)="node.link ? navigate({ label: node.label, commands: [node.link] }) : navigate({ label: node.label, commands: ['/personal/programs', c.program.id, node.id] })">
+                <div class="pcc-index">{{ $index + 1 }}</div>
+                <div class="pcc-body">
+                    <div class="pcc-title">{{ node.label }}</div>
+                    @if (node.data?.instructor) {
+                    <div class="pcc-meta">{{ node.data.instructor }}</div>
+                    }
+                    @if (node.data?.description) {
+                    <div class="pcc-desc">{{ node.data.description }}</div>
+                    }
+                    <div class="pcc-modules">{{ node.children.length }} sections</div>
+                </div>
+                <span class="pcc-arrow">›</span>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Section → module rows -->
+        @if (c.type === 'section') {
+        <div class="pd-module-list">
+            @for (sub of c.section.children; track sub.id; let i = $index) {
+            <div class="pd-module-row"
+                (click)="sub.link ? navigate({ label: sub.label, commands: [sub.link] }) : navigate({ label: sub.label, commands: ['/personal/programs', c.program.id, c.section.id, sub.id] })">
+                <div class="pmr-num">{{ i + 1 }}</div>
+                <div class="pmr-body">
+                    <div class="pmr-title">{{ sub.label }}</div>
+                    <div class="pmr-count">{{ sub.children.length }} topics</div>
+                </div>
+                <div class="pmr-items-preview">
+                    @for (item of sub.children | slice:0:3; track item.id) {
+                    <span class="pmr-chip">{{ item.label }}</span>
+                    }
+                    @if (sub.children.length > 3) {
+                    <span class="pmr-chip pmr-chip--more">+{{ sub.children.length - 3 }} more</span>
+                    }
+                </div>
+                <span class="pmr-arrow">›</span>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Subsection → topic list + extras -->
+        @if (c.type === 'subsection') {
+        <ol class="pd-topic-list">
+            @for (item of c.sub.children; track item.id) {
+            <li class="pd-topic-item"
+                (click)="navigate({ label: item.label, commands: ['/personal/programs', c.program.id, c.section.id, c.sub.id] })">
+                <span class="pti-num">{{ $index + 1 }}</span>
+                <span class="pti-label">{{ item.label }}</span>
+                <span class="pti-arrow">›</span>
+            </li>
+            }
+        </ol>
+        @if (c.sub.data?.electiveInterests) {
+        <div class="pd-extra-section">
+            <h2 class="pd-section-title">Elective Interests</h2>
+            <div class="pd-tag-cloud">
+                @for (tag of c.sub.data.electiveInterests; track tag) {
+                <span class="pd-tag">{{ tag }}</span>
+                }
+            </div>
+        </div>
+        }
+        @if (c.sub.data?.specializedFocus) {
+        <div class="pd-extra-section">
+            <h2 class="pd-section-title">Specialized Focus Areas</h2>
+            <div class="pd-tag-cloud">
+                @for (tag of c.sub.data.specializedFocus; track tag) {
+                <span class="pd-tag">{{ tag }}</span>
+                }
+            </div>
+        </div>
+        }
+        @if (c.sub.data?.applicationAreas) {
+        <div class="pd-extra-section">
+            <h2 class="pd-section-title">Application Areas</h2>
+            <div class="pd-tag-cloud">
+                @for (area of c.sub.data.applicationAreas; track area) {
+                <span class="pd-tag pd-tag--accent">{{ area }}</span>
+                }
+            </div>
+        </div>
+        }
+        @if (c.sub.data?.footerNotes) {
+        <div class="pd-footnote">
+            <span class="pd-footnote-icon">✦</span>
+            <p>{{ c.sub.data.footerNotes }}</p>
+        </div>
+        }
+        }
+
+        <!-- Item → context + sibling list -->
+        @if (c.type === 'item') {
+        <div class="pd-item-body">
+            <div class="pd-item-context">
+                <h3>Context</h3>
+                <p>This topic is part of <strong>{{ c.sub.label }}</strong> in the
+                    <strong>{{ c.section.label }}</strong> course.</p>
+            </div>
+            <div class="pd-item-nav">
+                <h3>All topics in this section</h3>
+                <div class="pd-adjacent-list">
+                    @for (item of c.sub.children; track item.id) {
+                    <div class="pal-item" [class.pal-item--active]="item.id === c.item.id"
+                        (click)="navigate({ label: item.label, commands: ['/personal/programs', c.program.id, c.section.id, c.sub.id] })">
+                        <span class="pal-num">{{ $index + 1 }}</span>
+                        <span class="pal-label">{{ item.label }}</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+        }
 
     </div>
+
+    } @else {
+    <div class="pd-loading">Loading program…</div>
+    }
 
 </div>

@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { NeuronService } from './neuron.service';
 
 export interface Course {
     id: number;
@@ -18,6 +19,12 @@ export interface Course {
     providedIn: 'root'
 })
 export class CourseService {
+    private readonly neurons = inject(NeuronService);
+
+    // TODO: replace with AuthService.currentUserProfile()?.id when wired up
+    private readonly _currentUserId = signal<string | null>(null);
+    setCurrentUserId(id: string): void { this._currentUserId.set(id); }
+
     private courses = signal<Course[]>([
         {
             id: 1,
@@ -57,6 +64,11 @@ export class CourseService {
             lastUpdated: new Date().toISOString().split('T')[0]
         };
         this.courses.update(c => [...c, newCourse]);
+        // Award creation neurons for publishing a course (non-monetary participation credit)
+        const userId = this._currentUserId();
+        if (userId && course.status === 'Published') {
+            this.neurons.onWorkCompleted('Course published', 0, String(newCourse.id));
+        }
     }
 
     updateCourse(updatedCourse: Course) {

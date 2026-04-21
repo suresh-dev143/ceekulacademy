@@ -1,0 +1,44 @@
+<div class="projects-page">
+    <p class="intro-text">
+        The projects selected by AutoML for your fastest possible ceevolution will automatically set here.
+    </p>
+
+    <h2 class="orange-heading">My Projects</h2>
+
+    <div class="scrolling-box-container">
+        <div class="scrolling-list">
+            <!-- Duplicated for seamless loop -->
+            @for (item of scrollingItems; track $index) {
+            <div class="scrolling-item">{{ item }}</div>
+            }
+            @for (item of scrollingItems; track $index) {
+            <div class="scrolling-item">{{ item }}</div>
+            }
+        </div>
+    </div>
+
+    <p class="intro-text">The contents of the selected project will set here.</p>
+
+    <h2 class="orange-heading">Create A New Project</h2>
+
+    <div class="action-buttons-grid">
+        @for (action of actions; track action.label) {
+        <div class="dropdown">
+            <button class="action-btn">{{ action.label }}</button>
+            <div class="dropdown-content">
+                @for (link of action.links; track link) {
+                <a href="javascript:void(0)">{{ link }}</a>
+                }
+            </div>
+        </div>
+        }
+    </div>
+
+    <h2 class="orange-heading large">Produce / Manufacture the Project</h2>
+
+    <div class="project-details">
+        <p class="project-detail-item">Write the machine no</p>
+        <p class="project-detail-item">Upload the work for 3D/4D printing</p>
+        <p class="project-detail-item">Monitor and edit the work</p>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+<div class="potential-page">
+    <div class="form-section">
+        <h2 class="section-title">My Ceebrain Potential</h2>
+        <p class="section-subtitle">
+            CEEBRAIN means Creative, Economically productive and Enlightening BRAIN.
+        </p>
+
+        <div class="schedule-list">
+            @for (slot of timeSlots; track $index) {
+            <div class="custom-select-container">
+                <div class="custom-select">{{ slot }}</div>
+            </div>
+            }
+        </div>
+
+    </div>
+</div>

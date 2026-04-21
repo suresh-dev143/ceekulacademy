@@ -1,0 +1,212 @@
+<div class="layout">
+    <!-- ── Top Navbar ── -->
+    <app-navbar [navLinks]="topNavItems" class="layout__navbar"></app-navbar>
+
+    <!-- ── 3-Column Body ── -->
+    <div class="layout__body">
+
+        <!-- ── Left Column: My Ceevolution Navigation ── -->
+        <aside class="layout__sidebar" [class.layout__sidebar--collapsed]="!leftSidebarOpen()">
+            <!-- Collapse / Expand toggle -->
+            <button class="sidebar-toggle sidebar-toggle--left" (click)="toggleLeftSidebar()"
+                [attr.aria-label]="leftSidebarOpen() ? 'Collapse navigation panel' : 'Expand navigation panel'"
+                title="{{ leftSidebarOpen() ? 'Collapse' : 'Expand' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" class="toggle-icon" [class.toggle-icon--flipped]="!leftSidebarOpen()">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+
+            <!-- Sidebar inner content -->
+            <div class="sidebar-inner">
+                <div class="ceevolution-header">
+                    <div class="ceevolution-title">MY CEEVOLUTION</div>
+                   
+                </div>
+
+                <nav class="personal-nav" aria-label="Ceevolution navigation">
+                    <ul class="personal-nav__list">
+                        @for (item of navItems; track item.id) {
+                        <li class="personal-nav__item">
+                            <a [routerLink]="item.route" routerLinkActive="personal-nav__link--active"
+                                class="personal-nav__link">
+                                <span class="personal-nav__dot"></span>
+                                {{ item.label }}
+                            </a>
+                        </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- ── Center Column: Dynamic Content Engine ── -->
+        <main class="layout__main" role="main">
+            <app-global-search></app-global-search>
+            <router-outlet></router-outlet>
+        </main>
+
+        <!-- ── Right Column: Chat Panel ── -->
+        <aside class="layout__chat" [class.layout__chat--collapsed]="!rightPanelOpen()" aria-label="Chat panel">
+            <!-- Collapse / Expand toggle -->
+            <button class="sidebar-toggle sidebar-toggle--right" (click)="toggleRightPanel()"
+                [attr.aria-label]="rightPanelOpen() ? 'Collapse chat panel' : 'Expand chat panel'"
+                title="{{ rightPanelOpen() ? 'Collapse' : 'Expand' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" class="toggle-icon" [class.toggle-icon--flipped]="!rightPanelOpen()">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+
+            <!-- Chat panel content -->
+            <div class="chat-panel">
+                <div class="chat-panel__header">
+                    <h3>Support Chat</h3>
+                    <span class="status-badge">
+                        <span class="status-dot"></span>
+                        Online
+                    </span>
+                </div>
+
+                <div class="chat-panel__body">
+                    <div class="chat-message">
+                        <div class="avatar">AI</div>
+                        <div class="message-bubble">
+                            Welcome to Ceekul Civilisation. How may I assist you today?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-panel__input">
+                    <textarea placeholder="Type your message..." rows="1" aria-label="Chat input"></textarea>
+                    <button type="button" aria-label="Send message">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         MOBILE — Off-canvas overlays + backdrop
+    ══════════════════════════════════════════════════════════ -->
+
+    <!-- Backdrop overlay (mobile) -->
+    @if (mobileLeftOpen() || mobileRightOpen()) {
+    <div class="mobile-backdrop" (click)="closeMobileOverlays()" aria-hidden="true"></div>
+    }
+
+    <!-- Mobile Left Sidebar (slide-in from left) -->
+    <aside class="mobile-panel mobile-panel--left" [class.mobile-panel--open]="mobileLeftOpen()"
+        aria-label="Navigation panel">
+        <div class="mobile-panel__header">
+            <span class="ceevolution-title">MY CEEVOLUTION</span>
+            <button class="mobile-panel__close" (click)="closeMobileOverlays()" aria-label="Close navigation">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="dqrg-labels dqrg-labels--mobile">D &nbsp; Q &nbsp; R &nbsp; G</div>
+        <nav class="personal-nav personal-nav--mobile" aria-label="Mobile Ceevolution navigation">
+            <ul class="personal-nav__list">
+                @for (item of navItems; track item.id) {
+                <li class="personal-nav__item">
+                    <a [routerLink]="item.route" routerLinkActive="personal-nav__link--active"
+                        class="personal-nav__link" (click)="closeMobileOverlays()">
+                        <span class="personal-nav__dot"></span>
+                        {{ item.label }}
+                    </a>
+                </li>
+                }
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Mobile Right Chat Panel (slide-in from right) -->
+    <aside class="mobile-panel mobile-panel--right" [class.mobile-panel--open]="mobileRightOpen()"
+        aria-label="Chat panel">
+        <div class="chat-panel chat-panel--mobile">
+            <div class="chat-panel__header">
+                <h3>Support Chat</h3>
+                <span class="status-badge">
+                    <span class="status-dot"></span>
+                    Online
+                </span>
+                <button class="mobile-panel__close" (click)="closeMobileOverlays()" aria-label="Close chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-panel__body">
+                <div class="chat-message">
+                    <div class="avatar">AI</div>
+                    <div class="message-bubble">
+                        Welcome to Ceekul Civilisation. How may I assist you today?
+                    </div>
+                </div>
+            </div>
+            <div class="chat-panel__input">
+                <textarea placeholder="Type your message..." rows="1" aria-label="Chat input"></textarea>
+                <button type="button" aria-label="Send message">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══════════════════════════════════════════════════════════
+         MOBILE — Bottom Navigation Bar
+    ══════════════════════════════════════════════════════════ -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile bottom navigation">
+        <!-- Left: Toggle left sidebar -->
+        <button class="mobile-bottom-nav__btn" (click)="toggleMobileLeft()"
+            [class.mobile-bottom-nav__btn--active]="mobileLeftOpen()" aria-label="Open navigation panel">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="16" y2="12"></line>
+                <line x1="3" y1="18" x2="11" y2="18"></line>
+            </svg>
+            <span>Navigate</span>
+        </button>
+
+        <!-- Center: Close overlays / back to view -->
+        <button class="mobile-bottom-nav__btn mobile-bottom-nav__btn--center" (click)="closeMobileOverlays()"
+            aria-label="Go to main view">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="3" x2="9" y2="21"></line>
+                <line x1="15" y1="3" x2="15" y2="21"></line>
+            </svg>
+            <span>View</span>
+        </button>
+
+        <!-- Right: Toggle chat panel -->
+        <button class="mobile-bottom-nav__btn" (click)="toggleMobileRight()"
+            [class.mobile-bottom-nav__btn--active]="mobileRightOpen()" aria-label="Open chat panel">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Chat</span>
+        </button>
+    </nav>
+
+    <!-- ── Footer ── -->
+   
+</div>

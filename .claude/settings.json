@@ -9,11 +9,16 @@
       "Bash(find /Users/gs/Documents/GitHub/ceekulmission -name *.md -type f)",
       "Bash(find /Users/gs/Documents/GitHub/ceekulmission/src -type f -name *stream* -o -name *agora* -o -name *video*)",
       "Bash(grep -r \"AgoraService\\\\|agora.service\" /Users/gs/Documents/GitHub/ceekulmission/src --include=*.ts)",
-      "Read(//Users/gs/Documents/GitHub/**)"
+      "Read(//Users/gs/Documents/GitHub/**)",
+      "Bash(npx tsc *)"
     ],
     "additionalDirectories": [
       "/Users/gs/Documents/GitHub/ceekulmissionapi/src/services",
-      "/Users/gs/Documents/GitHub/ceekulmissionapi/src/controllers"
+      "/Users/gs/Documents/GitHub/ceekulmissionapi/src/controllers",
+      "d:\\Github\\ceekulacademyapi\\src\\routers",
+      "d:\\Github\\ceekulacademyapi\\src\\models",
+      "d:\\Github\\ceekulacademyapi\\src\\services",
+      "d:\\Github\\ceekulacademyapi\\src\\controllers"
     ]
   }
 }

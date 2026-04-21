@@ -1,0 +1,89 @@
+@use '../../../../../styles/variables' as *;
+
+.step-indicator {
+  text-align: center;
+  margin-bottom: $spacing-xl;
+
+  &__label {
+    color: $text-secondary;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: $spacing-md;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__progress {
+    height: 4px;
+    background: $bg-tertiary;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__bar {
+    height: 100%;
+    background: linear-gradient(90deg, $accent-primary, lighten($accent-primary, 15%));
+    transition: width $transition-normal;
+    border-radius: 2px;
+  }
+
+  &__steps {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-2xl;
+  }
+
+  &__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $text-muted;
+    transition: color $transition-fast;
+
+    &--active {
+      color: $accent-primary;
+
+      .step-indicator__dot {
+        border-color: $accent-primary;
+        background: rgba($accent-primary, 0.1);
+      }
+    }
+
+    &--completed {
+      color: $accent-success;
+
+      .step-indicator__dot {
+        border-color: $accent-success;
+        background: $accent-success;
+        color: $bg-primary;
+      }
+    }
+  }
+
+  &__dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all $transition-fast;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__step-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}

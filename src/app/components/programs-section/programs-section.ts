@@ -1,5 +1,4 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
@@ -388,7 +387,7 @@ export class ProgramsSectionComponent implements OnInit {
             id: 'workshops',
             title: 'Workshops',
             hideFromGrid: true,
-            link: '/workshops',
+            link: '/personal/workshops',
             description: 'Hands-on practical learning sessions led by industry experts.',
             subSubtitles: ['Online', 'Offline', 'AI', 'Robotics'],
             content: { description: '', sections: [] }
@@ -457,7 +456,7 @@ export class ProgramsSectionComponent implements OnInit {
             return;
         }
         // Navigate to the hierarchical program detail view
-        this.router.navigate(['/programs', program.id]);
+        this.router.navigate(['/personal/programs', program.id]);
     }
 
     goBack() {

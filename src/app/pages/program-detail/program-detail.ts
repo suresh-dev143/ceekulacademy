@@ -1,9 +1,6 @@
 import { Component, computed, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule, SlicePipe} from '@angular/common';
+import { SlicePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NavbarComponent } from '../../components/navbar/navbar';
-import { ChatPanelComponent } from '../../components/chat-panel/chat-panel';
-import { ProgramSidebarComponent } from '../../components/program-sidebar/program-sidebar';
 import { GlobalSearchComponent } from '../../components/global-search/global-search';
 import { ProgramNavService, ActiveContent } from '../../services/program-nav.service';
 import { Subscription } from 'rxjs';
@@ -11,8 +8,7 @@ import { Subscription } from 'rxjs';
 @Component({
     selector: 'app-program-detail',
     standalone: true,
-    imports: [NavbarComponent, ChatPanelComponent, ProgramSidebarComponent, GlobalSearchComponent,
-    SlicePipe],
+    imports: [SlicePipe, GlobalSearchComponent],
     templateUrl: './program-detail.html',
     styleUrl: './program-detail.scss'
 })
@@ -35,7 +31,7 @@ export class ProgramDetailComponent implements OnInit, OnDestroy {
             const ssid = params.get('subSectionId') ?? null;
             const iid = this.route.snapshot.queryParamMap.get('item') ?? null;
 
-            if (!pid) { this.router.navigate(['/programs']); return; }
+            if (!pid) { this.router.navigate(['/personal/programs']); return; }
             this.navService.setActive(pid, sid, ssid, iid);
 
             // If this node has a direct link, go there instead
@@ -59,14 +55,14 @@ export class ProgramDetailComponent implements OnInit, OnDestroy {
         const c = this.content();
         if (!c) return [];
         const crumbs: { label: string; commands: any[] }[] = [
-            { label: 'Programs', commands: ['/programs'] },
-            { label: c.program.title, commands: ['/programs', c.program.id] }
+            { label: 'Programs', commands: ['/personal/programs'] },
+            { label: c.program.title, commands: ['/personal/programs', c.program.id] }
         ];
         if (c.type === 'section' || c.type === 'subsection' || c.type === 'item') {
-            crumbs.push({ label: c.section.label, commands: ['/programs', c.program.id, c.section.id] });
+            crumbs.push({ label: c.section.label, commands: ['/personal/programs', c.program.id, c.section.id] });
         }
         if (c.type === 'subsection' || c.type === 'item') {
-            crumbs.push({ label: c.sub.label, commands: ['/programs', c.program.id, c.section.id, c.sub.id] });
+            crumbs.push({ label: c.sub.label, commands: ['/personal/programs', c.program.id, c.section.id, c.sub.id] });
         }
         if (c.type === 'item') {
             crumbs.push({ label: c.item.label, commands: [] });

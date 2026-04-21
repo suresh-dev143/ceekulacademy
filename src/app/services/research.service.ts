@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { NeuronService } from './neuron.service';
 
 export type ResearchCategory = 'AI' | 'Machine Learning' | 'Physics' | 'Social Science' | 'Biotechnology' | 'Custom';
 export type ResearchStatus   = 'Open' | 'In Progress' | 'Completed';
@@ -34,6 +35,11 @@ export interface MentorshipSession {
 
 @Injectable({ providedIn: 'root' })
 export class ResearchService {
+    private readonly neurons = inject(NeuronService);
+
+    // TODO: replace with AuthService.currentUserProfile()?.id when wired up
+    private readonly _currentUserId = signal<string | null>(null);
+    setCurrentUserId(id: string): void { this._currentUserId.set(id); }
 
     private readonly _researches = signal<Research[]>([
         {
@@ -137,5 +143,8 @@ export class ResearchService {
     addResearch(r: Omit<Research, 'id' | 'participantsCount'>): void {
         const entry: Research = { ...r, id: `r-${Date.now()}`, participantsCount: 0 };
         this._researches.update(list => [entry, ...list]);
+        // Award creation neurons for submitting research (non-monetary participation credit)
+        const userId = this._currentUserId();
+        if (userId) this.neurons.onWorkCompleted('Research submitted', 0, entry.id);
     }
 }

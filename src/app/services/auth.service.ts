@@ -45,6 +45,19 @@ export interface LoginRequest {
     password: string;
 }
 
+export interface CeebrainRegisterRequest {
+    mobileNo: string;
+    dateOfBirth?: string;
+    placeOfBirth?: string;
+    identity?: 'homo_sapiens' | 'others';
+    gender?: 'male' | 'female' | 'transgender';
+    bplCategory?: 'yes' | 'no';
+    underprivilegedCategory?: 'yes' | 'no';
+    password: string;
+    ceebrainId: string;
+    agreeToFramework: boolean;
+}
+
 export interface ChangePasswordRequest {
     currentPassword: string;
     newPassword: string;
@@ -184,6 +197,26 @@ export class AuthService {
                             partnerType: user.partnerType,
                             expertTypes: user.expertTypes,
                             activityType: user.activityType,
+                        } satisfies UserProfile,
+                    };
+                }),
+                tap(res => this.storeSession(res))
+            );
+    }
+
+    ceebrainRegister(payload: CeebrainRegisterRequest): Observable<AuthResponse> {
+        return this.http
+            .post<ApiAuthResponse>(`${this.base}/users/ceebrain-register`, payload)
+            .pipe(
+                map(res => {
+                    const user = res.result.user;
+                    return {
+                        token: res.result.token,
+                        user: {
+                            id: user._id,
+                            name: user.name,
+                            email: user.email,
+                            role: 'Student' as UserRole,
                         } satisfies UserProfile,
                     };
                 }),

@@ -1,0 +1,65 @@
+@use '../../../../../styles/variables' as *;
+
+.otp-input {
+  &__container {
+    display: flex;
+    gap: $spacing-sm;
+    justify-content: center;
+  }
+
+  &__digit {
+    width: 48px;
+    height: 56px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    background: $bg-input;
+    border: 2px solid $border-color;
+    border-radius: $radius-md;
+    color: $text-primary;
+    transition: all $transition-fast;
+    caret-color: $accent-primary;
+
+    &:focus {
+      outline: none;
+      border-color: $accent-primary;
+      background: $bg-input-focus;
+      box-shadow: 0 0 0 3px rgba($accent-primary, 0.2);
+    }
+
+    &--filled {
+      border-color: $accent-primary;
+      background: rgba($accent-primary, 0.1);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    // Hide spinner for number input
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  &__hint {
+    text-align: center;
+    color: $text-muted;
+    font-size: 0.75rem;
+    margin-top: $spacing-md;
+  }
+}
+
+// Responsive
+@media (max-width: 480px) {
+  .otp-input {
+    &__digit {
+      width: 40px;
+      height: 48px;
+      font-size: 1.25rem;
+    }
+  }
+}

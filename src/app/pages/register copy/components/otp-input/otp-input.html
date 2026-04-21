@@ -1,0 +1,21 @@
+<div class="otp-input">
+  <div class="otp-input__container">
+    @for (digit of digits(); track $index; let i = $index) {
+      <input
+        #otpInput
+        type="text"
+        inputmode="numeric"
+        maxlength="1"
+        class="otp-input__digit"
+        [class.otp-input__digit--filled]="digit"
+        [value]="digit"
+        [disabled]="disabled()"
+        (input)="onInput(i, $event)"
+        (keydown)="onKeydown(i, $event)"
+        (paste)="onPaste($event)"
+        autocomplete="one-time-code"
+      />
+    }
+  </div>
+  <p class="otp-input__hint">Enter the 6-digit code sent to you</p>
+</div>
