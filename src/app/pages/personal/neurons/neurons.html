@@ -151,15 +151,15 @@
     <!-- ─── CONTRIBUTION ─── -->
     @if (activeTab() === 'contribute') {
       <div class="panel-form">
-        <h2 class="panel__heading">Submit Contribution</h2>
+        <h2 class="panel__heading">Contribute via Cramib</h2>
         <p class="panel__note">
-          Transfer money from your personal bank account to your selected entity's escrow account
-          <b>outside this portal</b>. Then fill this form with the transaction reference.
-          Once the entity confirms receipt, neurons (1 INR = 1 Neuron) will be credited to your
-          <b>FUN bucket</b> automatically.
+          Select the entity you want to contribute to and enter the amount.
+          You will be redirected to <b>Cramib</b> to complete the payment securely.
+          Neurons (1 INR = 1 Neuron) are credited to your <b>FUN bucket</b>
+          automatically once payment is verified.
         </p>
         <p class="panel__compliance">
-          ⚠️ This portal NEVER handles money. Neurons are non-monetary participation units.
+          ⚠️ Neurons are non-monetary participation units and cannot be withdrawn or converted.
         </p>
 
         <form [formGroup]="contributionForm" (ngSubmit)="onSubmitContribution()" class="form">
@@ -180,7 +180,7 @@
           </div>
 
           <div class="form__field">
-            <label class="form__label">Amount Transferred (₹ INR)</label>
+            <label class="form__label">Amount (₹ INR)</label>
             <input type="number" formControlName="amountINR" class="form__input"
                    placeholder="e.g. 500" min="1" />
             @if (contributionForm.get('amountINR')?.value > 0) {
@@ -189,26 +189,17 @@
           </div>
 
           <div class="form__field">
-            <label class="form__label">Transaction Reference / UTR Number</label>
-            <input type="text" formControlName="transactionReference" class="form__input"
-                   placeholder="Bank transaction reference or UTR" />
-          </div>
-
-          <div class="form__field">
             <label class="form__label">Notes (optional)</label>
             <textarea formControlName="notes" class="form__input form__textarea"
                       placeholder="Any additional information for the entity"></textarea>
           </div>
 
-          @if (contributionSuccess()) {
-            <div class="form__success">{{ contributionSuccess() }}</div>
-          }
           @if (contributionError()) {
             <div class="form__error">{{ contributionError() }}</div>
           }
 
           <button type="submit" class="form__submit" [disabled]="contributionLoading()">
-            {{ contributionLoading() ? 'Submitting…' : 'Submit Contribution' }}
+            {{ contributionLoading() ? 'Processing…' : 'Pay via Cramib' }}
           </button>
         </form>
 

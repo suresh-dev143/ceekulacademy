@@ -1,0 +1,360 @@
+<div class="hub">
+
+  <!-- ── Tab Navigation ── -->
+  <nav class="hub__tabs" role="tablist">
+    <button class="hub__tab" [class.hub__tab--active]="activeTab() === 'create'"
+      (click)="setTab('create')" role="tab" [attr.aria-selected]="activeTab() === 'create'">
+      <span class="hub__tab-label">Create</span>
+    </button>
+    <button class="hub__tab" [class.hub__tab--active]="activeTab() === 'offer'"
+      (click)="setTab('offer')" role="tab" [attr.aria-selected]="activeTab() === 'offer'">
+      <span class="hub__tab-label">Offer</span>
+    </button>
+    <button class="hub__tab" [class.hub__tab--active]="activeTab() === 'advertise'"
+      (click)="setTab('advertise')" role="tab" [attr.aria-selected]="activeTab() === 'advertise'">
+      <span class="hub__tab-label">Advertise</span>
+    </button>
+    <button class="hub__tab" [class.hub__tab--active]="activeTab() === 'explore'"
+      (click)="setTab('explore')" role="tab" [attr.aria-selected]="activeTab() === 'explore'">
+      <span class="hub__tab-label">Explore</span>
+    </button>
+
+    <div class="hub__tab-indicator" [style.left.%]="
+      activeTab() === 'create' ? 0 :
+      activeTab() === 'offer' ? 25 :
+      activeTab() === 'advertise' ? 50 : 75
+    "></div>
+  </nav>
+
+  <!-- ── Tab Content ── -->
+  <div class="hub__content">
+
+    <!-- ═══════════════════════════════════════════════════════ CREATE -->
+    @if (activeTab() === 'create') {
+    <section class="hub__section" role="tabpanel">
+      <header class="hub__section-header">
+        <h2 class="hub__section-title">Create Something New</h2>
+        <p class="hub__section-sub">Choose a format to start creating and contributing to the ecosystem</p>
+      </header>
+
+      <div class="create-grid">
+        @for (opt of createOptions; track opt.label) {
+        <div class="create-card" [class.create-card--disabled]="!opt.available"
+          (click)="handleCreate(opt)" role="button" tabindex="0"
+          (keydown.enter)="handleCreate(opt)">
+          <span class="create-card__tag">{{ opt.tag }}</span>
+          <h3 class="create-card__label">{{ opt.label }}</h3>
+          <p class="create-card__desc">{{ opt.description }}</p>
+          @if (opt.available) {
+          <span class="create-card__cta">Start &rarr;</span>
+          } @else {
+          <span class="create-card__soon">Coming soon</span>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="hub__flow-label">
+        <span>Create</span>
+        <span class="hub__flow-arrow">&rarr;</span>
+        <span>Offer</span>
+        <span class="hub__flow-arrow">&rarr;</span>
+        <span>Advertise</span>
+        <span class="hub__flow-arrow">&rarr;</span>
+        <span>Explore</span>
+        <span class="hub__flow-arrow">&rarr;</span>
+        <span class="hub__flow-accent">Request</span>
+      </div>
+    </section>
+    }
+
+    <!-- ═══════════════════════════════════════════════════════ OFFER -->
+    @if (activeTab() === 'offer') {
+    <section class="hub__section" role="tabpanel">
+      <header class="hub__section-header">
+        <h2 class="hub__section-title">Offer Your Expertise</h2>
+        <p class="hub__section-sub">Supply value to the Ceekul ecosystem — services, knowledge, and infrastructure</p>
+      </header>
+
+      <div class="offer-grid">
+        @for (opt of offerOptions; track opt.label) {
+        <div class="offer-card" [class.offer-card--disabled]="!opt.available"
+          (click)="handleOffer(opt)" role="button" tabindex="0"
+          (keydown.enter)="handleOffer(opt)">
+          <span class="offer-card__tag">{{ opt.tag }}</span>
+          <h3 class="offer-card__label">{{ opt.label }}</h3>
+          <p class="offer-card__desc">{{ opt.description }}</p>
+          @if (opt.available) {
+          <span class="offer-card__cta">Get Started &rarr;</span>
+          } @else {
+          <span class="offer-card__soon">Coming soon</span>
+          }
+        </div>
+        }
+      </div>
+    </section>
+    }
+
+    <!-- ══════════════════════════════════════════════════ ADVERTISE -->
+    @if (activeTab() === 'advertise') {
+    <section class="hub__section" role="tabpanel">
+      <header class="hub__section-header">
+        <h2 class="hub__section-title">Promote Your Content</h2>
+        <p class="hub__section-sub">Reach a wider audience across the Ceekul network</p>
+      </header>
+
+      @if (!adSubmitted()) {
+      <div class="ad-form">
+        <div class="ad-form__group">
+          <label class="ad-form__label" for="ad-title">Ad Title</label>
+          <input id="ad-title" class="ad-form__input" type="text" placeholder="Enter a compelling headline"
+            [value]="adTitle()" (input)="adTitle.set($any($event.target).value)" maxlength="100" />
+          <span class="ad-form__counter">{{ adTitle().length }}/100</span>
+        </div>
+
+        <div class="ad-form__group">
+          <label class="ad-form__label" for="ad-desc">Description</label>
+          <textarea id="ad-desc" class="ad-form__textarea" rows="4"
+            placeholder="Describe your offering or announcement..."
+            [value]="adDescription()"
+            (input)="adDescription.set($any($event.target).value)"
+            maxlength="500"></textarea>
+          <span class="ad-form__counter">{{ adDescription().length }}/500</span>
+        </div>
+
+        <div class="ad-form__group">
+          <label class="ad-form__label" for="ad-audience">Target Audience</label>
+          <select id="ad-audience" class="ad-form__select"
+            [value]="adAudience()" (change)="adAudience.set($any($event.target).value)">
+            <option value="">All users (default)</option>
+            <option value="students">Students</option>
+            <option value="instructors">Instructors</option>
+            <option value="professionals">Professionals</option>
+            <option value="healthcare">Healthcare workers</option>
+            <option value="entrepreneurs">Entrepreneurs</option>
+          </select>
+        </div>
+
+        <div class="ad-form__group">
+          <label class="ad-form__label">Creative (image/video)</label>
+          <div class="ad-form__upload">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.5" class="ad-form__upload-icon">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            <span>Drag &amp; drop or click to upload</span>
+            <small>Image or video — max 50MB</small>
+          </div>
+        </div>
+
+        <div class="ad-form__note">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" width="14" height="14">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+          Budget controls and campaign analytics coming soon.
+        </div>
+
+        <button class="hub-btn hub-btn--primary hub-btn--wide" [disabled]="!adTitle().trim() || adSubmitting()"
+          (click)="submitAd()">
+          @if (adSubmitting()) {
+          Sending to pool...
+          } @else {
+          Send to Ad Pool
+          }
+        </button>
+      </div>
+
+      } @else {
+      <div class="hub-success">
+        <div class="hub-success__icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h3 class="hub-success__title">Ad submitted</h3>
+        <p class="hub-success__text">Your ad has been added to the pool and will be reviewed shortly.</p>
+        <button class="hub-btn hub-btn--ghost" (click)="resetAd()">Create another</button>
+      </div>
+      }
+    </section>
+    }
+
+    <!-- ═══════════════════════════════════════════════════════ EXPLORE -->
+    @if (activeTab() === 'explore') {
+    <section class="hub__section hub__section--explore" role="tabpanel">
+      <!-- Search -->
+      <div class="explore-search">
+        <svg class="explore-search__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input class="explore-search__input" type="text" placeholder="Search content..."
+          [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)"
+          aria-label="Search content" />
+        @if (searchQuery()) {
+        <button class="explore-search__clear" (click)="searchQuery.set('')" aria-label="Clear search">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" width="14" height="14">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        }
+      </div>
+
+      <!-- Category filters -->
+      <div class="explore-filters" role="group" aria-label="Category filters">
+        <button class="filter-chip" [class.filter-chip--active]="activeCategory() === ''"
+          (click)="setCategory('')">All</button>
+        @for (cat of categoryKeys; track cat) {
+        <button class="filter-chip" [class.filter-chip--active]="activeCategory() === cat"
+          (click)="setCategory(cat)">{{ categoryLabels[cat] }}</button>
+        }
+      </div>
+
+      <!-- Loading state -->
+      @if (loading()) {
+      <div class="explore-loading">
+        <div class="explore-loading__spinner"></div>
+        <span>Loading content...</span>
+      </div>
+      }
+
+      <!-- Content grid -->
+      @if (!loading()) {
+      <div class="explore-grid">
+        @for (story of filteredStories(); track story._id) {
+        <article class="explore-card" (click)="openStory(story)" role="button" tabindex="0"
+          (keydown.enter)="openStory(story)">
+          @if (getFirstImage(story); as img) {
+          <div class="explore-card__thumb">
+            <img [src]="img" [alt]="story.title" loading="lazy" />
+          </div>
+          } @else {
+          <div class="explore-card__thumb explore-card__thumb--placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.5" width="28" height="28">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+          </div>
+          }
+
+          <div class="explore-card__body">
+            <span class="explore-card__tag">{{ categoryLabels[story.category] ?? story.category }}</span>
+            <h3 class="explore-card__title">{{ story.title }}</h3>
+            <p class="explore-card__excerpt">{{ story.description | slice:0:100 }}{{ story.description.length > 100 ? '...' : '' }}</p>
+            <div class="explore-card__meta">
+              <span class="explore-card__author">{{ getAuthorName(story) }}</span>
+              <span class="explore-card__sep">&middot;</span>
+              <span class="explore-card__time">{{ getTime(story) }}</span>
+            </div>
+            <div class="explore-card__stats">
+              <button class="explore-card__like" (click)="likeStory(story, $event)" aria-label="Like">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" width="13" height="13">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                {{ story.likes }}
+              </button>
+              <span class="explore-card__views">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" width="13" height="13">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                {{ story.views }}
+              </span>
+            </div>
+          </div>
+        </article>
+        } @empty {
+        <div class="explore-empty">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5" width="40" height="40">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <p>No content found</p>
+          @if (searchQuery() || activeCategory()) {
+          <button class="hub-btn hub-btn--ghost"
+            (click)="searchQuery.set(''); setCategory('')">Clear filters</button>
+          }
+        </div>
+        }
+      </div>
+      }
+    </section>
+    }
+
+  </div><!-- /hub__content -->
+
+  <!-- ── Story Detail Overlay ── -->
+  @if (selectedStory(); as story) {
+  <div class="story-overlay" (click)="closeStory()" role="dialog" aria-modal="true">
+    <div class="story-modal" (click)="$event.stopPropagation()">
+      <button class="story-modal__close" (click)="closeStory()" aria-label="Close">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" width="16" height="16">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      @if (getFirstImage(story); as img) {
+      <div class="story-modal__image">
+        <img [src]="img" [alt]="story.title" />
+      </div>
+      }
+
+      <div class="story-modal__body">
+        <span class="story-modal__tag">{{ categoryLabels[story.category] ?? story.category }}</span>
+        <h2 class="story-modal__title">{{ story.title }}</h2>
+
+        <div class="story-modal__meta">
+          <span>{{ getAuthorName(story) }}</span>
+          <span class="story-modal__sep">&middot;</span>
+          <span>{{ getTime(story) }}</span>
+          <span class="story-modal__sep">&middot;</span>
+          <span>{{ story.views }} views</span>
+        </div>
+
+        <div class="story-modal__description">
+          @for (para of story.description.split('\n\n'); track $index) {
+          <p>{{ para }}</p>
+          }
+        </div>
+
+        <div class="story-modal__actions">
+          <button class="hub-btn hub-btn--primary hub-btn--action">
+            {{ getActionLabel(story.category) }}
+          </button>
+          <button class="hub-btn hub-btn--ghost hub-btn--action"
+            (click)="likeStory(story, $event)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" width="14" height="14">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            {{ story.likes }} Likes
+          </button>
+          <button class="hub-btn hub-btn--ghost hub-btn--action" (click)="closeStory()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ── Toast Notification ── -->
+  @if (toast()) {
+  <div class="hub-toast" role="status">{{ toast() }}</div>
+  }
+
+</div>

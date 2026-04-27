@@ -1,6 +1,6 @@
 // Dark Theme Landing Page
 .landing {
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 5rem);
   background: #0f0f0f;
   color: #e0e0e0;
 
@@ -12,6 +12,7 @@
     text-align: center;
   }
 }
+
 .main-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -20,27 +21,486 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
+
 .three-col {
   display: grid;
   grid-template-columns: 21% 55% 24%;
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 5rem);
   background: #0f0f0f;
 
   &__left {
-    background: #020202;
-    border-right: 1px solid #2a2a2a;
-    padding: 0rem 0;
+    background:
+      radial-gradient(ellipse 140% 22% at 50% 0%, rgba(40, 90, 160, 0.13) 0%, transparent 100%),
+      linear-gradient(180deg, #07090f 0%, #030306 55%, #010103 100%);
+    border-right: 1px solid rgba(50, 72, 110, 0.35);
+    padding: 0;
   }
 
   &__center {
     background: #000000;
-    padding: 1rem 2.5rem;
+    padding: 0rem 2.5rem;
     overflow-y: auto;
   }
 
   &__right {
-    background: #020202;
-    border-left: 1px solid #2a2a2a;
+    background:
+      radial-gradient(ellipse 140% 22% at 50% 100%, rgba(74, 158, 255, 0.07) 0%, transparent 100%),
+      linear-gradient(180deg, #05050a 0%, #030308 55%, #020205 100%);
+    border-left: 1px solid rgba(50, 60, 100, 0.3);
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// ── Left Column: Success Stories Panel ─────────────────────────
+.stories-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__header {
+    padding: 1.8rem 0.875rem 1.04rem;
+    border-bottom: 1px solid #1e1e1e;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #505050;
+  }
+
+  &__list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #2a2a2a transparent;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #2a2a2a;
+      border-radius: 2px;
+    }
+  }
+}
+
+// ── Category Filter Chips ───────────────────────────────────────
+.story-filters {
+  display: flex;
+  gap: 0.375rem;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid #161616;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  flex-shrink: 0;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.story-filter-chip {
+  flex-shrink: 0;
+  padding: 0.25rem 0.625rem;
+  border-radius: 1rem;
+  border: 1px solid #252525;
+  background: transparent;
+  color: #606060;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  &:hover {
+    border-color: #383838;
+    color: #a0a0a0;
+  }
+
+  &--active {
+    background: rgba(255, 153, 0, 0.12);
+    border-color: rgba(255, 153, 0, 0.3);
+    color: #ff9900;
+  }
+}
+
+// ── Skeleton Loader ─────────────────────────────────────────────
+.stories-skeleton {
+  padding: 0.5rem 0;
+}
+
+.story-skeleton-item {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #141414;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+%skeleton-base {
+  background: linear-gradient(90deg, #1a1a1a 25%, #242424 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 0.25rem;
+}
+
+.story-skeleton__badge {
+  @extend %skeleton-base;
+  width: 52px;
+  height: 14px;
+  margin-bottom: 0.5rem;
+}
+
+.story-skeleton__title {
+  @extend %skeleton-base;
+  width: 90%;
+  height: 12px;
+  margin-bottom: 0.35rem;
+}
+
+.story-skeleton__line {
+  @extend %skeleton-base;
+  width: 70%;
+  height: 10px;
+  margin-bottom: 0.5rem;
+}
+
+.story-skeleton__meta {
+  @extend %skeleton-base;
+  width: 50%;
+  height: 9px;
+}
+
+// ── Empty State ─────────────────────────────────────────────────
+.stories-empty {
+  padding: 2.5rem 1.25rem;
+  text-align: center;
+
+  p {
+    font-size: 0.85rem;
+    color: #505050;
+    margin: 0 0 0.35rem;
+    font-weight: 500;
+  }
+
+  span {
+    font-size: 0.72rem;
+    color: #383838;
+  }
+}
+
+// ── Story List Item ─────────────────────────────────────────────
+.story-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid #141414;
+  cursor: pointer;
+  transition: background 0.18s ease;
+  border-left: 2px solid transparent;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-left-color: #2e2e2e;
+  }
+
+  &--active {
+    background: rgba(255, 153, 0, 0.05);
+    border-left-color: #ff9900;
+  }
+
+  &__thumb {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    background: #1a1a1a;
+    border: 1px solid #202020;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__badges {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.3rem;
+  }
+
+  &__sub {
+    font-size: 0.6rem;
+    color: #484848;
+    letter-spacing: 0.03em;
+  }
+
+  &__title {
+    margin: 0 0 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #d0d0d0;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    .story-item--active & {
+      color: #e8e8e8;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  &__author {
+    font-size: 0.62rem;
+    color: #505050;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__stats {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  &__time {
+    font-size: 0.6rem;
+    color: #404040;
+  }
+
+  &__likes {
+    font-size: 0.6rem;
+    color: #5a3a3a;
+  }
+}
+
+// ── Story Category Badge ────────────────────────────────────────
+.story-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+
+  &--education {
+    background: rgba(74, 158, 255, 0.12);
+    color: #4a9eff;
+  }
+
+  &--career {
+    background: rgba(74, 222, 128, 0.12);
+    color: #4ade80;
+  }
+
+  &--growth {
+    background: rgba(167, 139, 250, 0.12);
+    color: #a78bfa;
+  }
+
+  &--technology {
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+  }
+
+  &--community {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+  }
+
+  &--health {
+    background: rgba(52, 211, 153, 0.12);
+    color: #34d399;
+  }
+
+  &--business {
+    background: rgba(255, 153, 0, 0.12);
+    color: #ff9900;
+  }
+}
+
+// ── Center Column: Story Detail ─────────────────────────────────
+.story-detail {
+  padding: 1.5rem 0 2rem;
+  animation: fadeIn 0.3s ease;
+
+  &__badges {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .story-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.55rem;
+  }
+
+  &__sub {
+    font-size: 0.72rem;
+    color: #585858;
+    letter-spacing: 0.04em;
+  }
+
+  &__title {
+    margin: 0.875rem 0 0.75rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f0f0f0;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #1e1e1e;
+    flex-wrap: wrap;
+  }
+
+  &__author {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #ff9900;
+    letter-spacing: 0.02em;
+  }
+
+  &__time {
+    font-size: 0.8rem;
+    color: #484848;
+  }
+
+  &__views {
+    font-size: 0.8rem;
+    color: #404040;
+  }
+
+  &__sep {
+    color: #303030;
+    font-size: 0.8rem;
+  }
+
+  &__body {
+    p {
+      margin: 0 0 1.25rem;
+      font-size: 1rem;
+      line-height: 1.85;
+      color: #b0b0b0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &__media {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #1a1a1a;
+  }
+
+  &__media-item {
+    width: 100%;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    border: 1px solid #1e1e1e;
+    display: block;
+
+    &--video {
+      height: 220px;
+      background: #0a0a0a;
+    }
+  }
+}
+
+// ── Engagement Bar ──────────────────────────────────────────────
+.story-engagement {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #1a1a1a;
+}
+
+.story-like-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: transparent;
+  border: 1px solid #252525;
+  border-radius: 0.5rem;
+  color: #505050;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.5rem 0.875rem;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    transition: color 0.2s, fill 0.2s;
+  }
+
+  &:hover {
+    border-color: #d44;
+    color: #d44;
+  }
+
+  &--liked {
+    border-color: rgba(220, 60, 60, 0.3);
+    background: rgba(220, 60, 60, 0.06);
+    color: #e05555;
+
+    svg {
+      color: #e05555;
+    }
   }
 }
 
@@ -79,10 +539,11 @@
 // Center Column - Content Area
 .content-area {
   animation: fadeIn 0.3s ease;
-&__search{
-      border-bottom: 1px solid #2a2a2a;
-    padding-bottom: 1rem;
-}
+
+  &__search {
+    border-bottom: 1px solid #2a2a2a;
+  }
+
   .search-bar {
     width: 100%;
     position: relative;
@@ -120,7 +581,7 @@
         background: #2a2a2a;
         box-shadow: 0 0 0 4px rgba(74, 158, 255, 0.1);
 
-        & + .search-bar__icon {
+        &+.search-bar__icon {
           color: #4a9eff;
         }
       }
@@ -189,10 +650,11 @@
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 64px);
+  flex: 1;
+  min-height: 0;
 
   &__header {
-    padding: 1.435rem 1.5rem;
+    padding: 1.1rem 1.5rem;
     border-bottom: 1px solid #2a2a2a;
     display: flex;
     align-items: center;
@@ -216,10 +678,22 @@
   }
 
   &__messages {
-    flex: 1;
+    margin-top: 3rem;
+    display:none;
+    flex: 0 1 auto;
     padding: 1.5rem;
     overflow-y: auto;
-    // background: #161616;
+    scrollbar-width: thin;
+    scrollbar-color: #2a2a2a transparent;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #2a2a2a;
+      border-radius: 2px;
+    }
   }
 
   &__input {
@@ -227,6 +701,7 @@
     border-top: 1px solid #2a2a2a;
     display: flex;
     gap: 0.75rem;
+    margin-top: auto;
     align-items: flex-end;
     background: #1a1a1a;
 
@@ -254,12 +729,150 @@
   }
 }
 
+.chat-header-btn {
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  color: #a0a0a0;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.75rem;
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover {
+    border-color: #4a9eff;
+    color: #4a9eff;
+  }
+}
+
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: #4ade80;
   animation: pulse 2s infinite;
+}
+
+// ── Right Column: Formats Panel ────────────────────────────────
+.formats-panel {
+  border-bottom: 1px solid #1c1c1c;
+  flex-shrink: 0;
+
+  &__label {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #383838;
+    padding: 0.875rem 1.25rem 0.5rem;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.format-item {
+  padding: 0.625rem 1.25rem;
+  border-left: 2px solid transparent;
+  cursor: default;
+  transition: background 0.15s ease, border-left-color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  &__name {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.25rem;
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: 0.72rem;
+    color: #484848;
+    line-height: 1.55;
+  }
+
+  // ── Per-format accent colours ──────────────────────────────
+  // Lecture — scholarly blue
+  &:nth-child(1) {
+    &:hover {
+      background: rgba(74, 158, 255, 0.04);
+      border-left-color: rgba(74, 158, 255, 0.3);
+    }
+
+    .format-item__name {
+      color: #4a9eff;
+    }
+  }
+
+  // Discussion — growth green
+  &:nth-child(2) {
+    &:hover {
+      background: rgba(74, 222, 128, 0.04);
+      border-left-color: rgba(74, 222, 128, 0.3);
+    }
+
+    .format-item__name {
+      color: #4ade80;
+    }
+  }
+
+  // Debate — ember orange
+  &:nth-child(3) {
+    &:hover {
+      background: rgba(251, 146, 60, 0.04);
+      border-left-color: rgba(251, 146, 60, 0.3);
+    }
+
+    .format-item__name {
+      color: #fb923c;
+    }
+  }
+
+  // Podcast — soft violet
+  &:nth-child(4) {
+    &:hover {
+      background: rgba(167, 139, 250, 0.04);
+      border-left-color: rgba(167, 139, 250, 0.3);
+    }
+
+    .format-item__name {
+      color: #a78bfa;
+    }
+  }
+
+  // Prototype — electric cyan
+  &:nth-child(5) {
+    &:hover {
+      background: rgba(34, 211, 238, 0.04);
+      border-left-color: rgba(34, 211, 238, 0.3);
+    }
+
+    .format-item__name {
+      color: #22d3ee;
+    }
+  }
+
+  // Futuristic Film — cinematic gold
+  &:nth-child(6) {
+    &:hover {
+      background: rgba(250, 204, 21, 0.04);
+      border-left-color: rgba(250, 204, 21, 0.3);
+    }
+
+    .format-item__name {
+      color: #facc15;
+    }
+  }
 }
 
 .chat-send-btn {
@@ -317,6 +930,7 @@
     padding: 0.875rem 1rem;
     border-radius: 0.75rem;
     background: #2a2a2a;
+    display: block;
 
     p {
       margin: 0 0 0.5rem;
@@ -344,6 +958,7 @@
 }
 
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
@@ -362,24 +977,14 @@
 
 .cv-header {
   text-align: center;
-  margin-bottom: 1rem;
 
   &__title {
     font-family: 'Cinzel', serif;
     font-size: 2.25rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: #f0f0f0;
-    margin: 0 0 1rem;
-
-    &::after {
-      content: '';
-      display: block;
-      width: 6rem;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #ffcc33, #e67300, transparent);
-      margin: 1rem auto 0;
-    }
+    color: var(--accent-primary);
+    margin: 0;
   }
 
   &__tagline {
@@ -428,9 +1033,11 @@
     .cv-card__number {
       color: #b8922c;
     }
+
     .cv-card__title {
       color: #f0f0f0;
     }
+
     .cv-card__descriptor {
       color: #707070;
     }
@@ -562,7 +1169,8 @@
   }
 
   .chat-container {
-    height: calc(100vh - 4rem - 4rem); // viewport minus navbar minus tab bar
+    height: auto;
+    min-height: calc(100vh - 4rem - 4rem);
   }
 
   .mobile-tab-bar {
@@ -574,6 +1182,7 @@
   .cv-card {
     padding: 1.5rem 0.5rem;
   }
+
   .three-col {
     &__center {
       padding: 0rem 0rem;
@@ -585,6 +1194,7 @@
       &__icon {
         right: 0.5rem;
       }
+
       &__input {
         padding: 0.875rem 1rem 0.875rem 3rem;
         width: 100%;

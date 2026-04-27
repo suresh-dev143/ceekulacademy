@@ -1,6 +1,5 @@
 .register {
-  display: grid;
-  grid-template-columns: 21% 55% 24%;
+  display: block;
   background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
   color: #ffffff;
   font-family: 'Outfit', 'Inter', sans-serif;
@@ -120,7 +119,6 @@
     background: rgba(20, 20, 20, 0.4);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 184, 0, 0.1);
-    border-radius: 20px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     animation: containerEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }

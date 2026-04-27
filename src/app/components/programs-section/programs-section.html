@@ -8,7 +8,7 @@
     <div class="view-header centered">
         <h1 class="page-title">
             @if (!selectedProgram()) {
-            Programs
+            My Ceevolution
             } @else if (!selectedCourse()) {
             {{ selectedProgram()?.title }}
             } @else {
@@ -40,7 +40,7 @@
                     <h3>Webinars &</h3>
                 </div>
                 <div style="display: flex; align-items: center; padding: 1.5rem 1.5rem 1.5rem 0.3rem;"
-                    (click)="selectProgram({link: '/workshops'})">
+                    (click)="selectProgram({link: '/personal/workshops'})">
                     <h3>Workshops</h3>
                 </div>
             </div>

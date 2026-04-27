@@ -1,25 +1,10 @@
-<app-navbar class="landing-layout__navbar" [isLandingPage]="true"></app-navbar>
 <div class="register">
-  <!-- Left Sidebar -->
-  <aside class="register__sidebar">
-    <div class="register__sidebar-content">
-      <div class="register__brand">
-        <div class="register__brand-title">MY CEEVOLUTION</div>
-        <div class="register__brand-dqrg">D Q R G</div>
-      </div>
-      <div class="register__sidebar-info">
-        <p>Join the future of human evolution. Create your Ceebrain ID today.</p>
-      </div>
-    </div>
-  </aside>
-
   <!-- Main Content -->
   <main class="register__main">
     <div class="register__container">
       <div class="register__header">
         <h1 class="register__title">Pl fill the following data to get registered :</h1>
       </div>
-
       <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="register__form">
         <!-- Mobile No -->
         <div class="register__field">
@@ -138,22 +123,6 @@
       </form>
     </div>
   </main>
-
-  <!-- Right Sidebar: Widgets -->
-  <aside class="register__widgets">
-    <div class="register__widget">
-      <div class="register__widget-header">
-        <h3>Support</h3>
-        <span class="register__status-badge">
-          <span class="register__status-dot"></span> Online
-        </span>
-      </div>
-      <div class="register__widget-body">
-        <p>Complete your registration to unlock full potential of Ceekul Civilisation.</p>
-        <p class="register__help-note">Need assistance? Our advisors are here to help.</p>
-      </div>
-    </div>
-  </aside>
 
   <!-- Success Message -->
   @if (showSuccess()) {

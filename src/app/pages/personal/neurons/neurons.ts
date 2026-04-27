@@ -1,9 +1,11 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
-import { DecimalPipe, DatePipe } from '@angular/common';
+import { Component, inject, OnInit, signal, computed, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, DecimalPipe, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NeuronService } from '../../../services/neuron.service';
 import { CeegroupService } from '../../../services/ceegroup.service';
+import { PaymentService } from '../../../services/payment.service';
+import { environment } from '../../../../environments/environment';
 import {
   BUCKET_META,
   TRANSFER_TARGETS,
@@ -24,9 +26,11 @@ type WorkspaceTab = 'overview' | 'contribute' | 'transfer' | 'invest' | 'history
   styleUrl: './neurons.scss',
 })
 export class Neurons implements OnInit {
-  readonly neuronService  = inject(NeuronService);
+  readonly neuronService   = inject(NeuronService);
   readonly ceegroupService = inject(CeegroupService);
-  private readonly fb     = inject(FormBuilder);
+  private readonly fb      = inject(FormBuilder);
+  private readonly paymentService = inject(PaymentService);
+  private readonly platformId     = inject(PLATFORM_ID);
 
   readonly bucketMeta    = BUCKET_META;
   readonly disclaimer    = NEURON_DISCLAIMER;
@@ -37,7 +41,6 @@ export class Neurons implements OnInit {
   // ── Contribution form ─────────────────────────────────────────────────
   contributionForm!: FormGroup;
   contributionLoading = signal(false);
-  contributionSuccess = signal<string | null>(null);
   contributionError   = signal<string | null>(null);
 
   // ── Transfer form ─────────────────────────────────────────────────────
@@ -99,18 +102,19 @@ export class Neurons implements OnInit {
   );
 
   ngOnInit(): void {
-    this.neuronService.loadAll();
-    this.ceegroupService.loadMyGroups();
+    if (isPlatformBrowser(this.platformId)) {
+      this.neuronService.loadAll();
+      this.ceegroupService.loadMyGroups();
+    }
     this._buildForms();
   }
 
   private _buildForms(): void {
     this.contributionForm = this.fb.group({
-      entityType:           ['', Validators.required],
-      entityName:           ['', [Validators.required, Validators.minLength(3)]],
-      amountINR:            ['', [Validators.required, Validators.min(1)]],
-      transactionReference: ['', [Validators.required, Validators.minLength(3)]],
-      notes:                [''],
+      entityType: ['', Validators.required],
+      entityName: ['', [Validators.required, Validators.minLength(3)]],
+      amountINR:  ['', [Validators.required, Validators.min(1)]],
+      notes:      [''],
     });
 
     this.transferForm = this.fb.group({
@@ -164,22 +168,22 @@ export class Neurons implements OnInit {
     });
   }
 
-  // ── Contribution submit ────────────────────────────────────────────────
+  // ── Contribution submit — redirects to Cramib, which auto-opens payment ──
   onSubmitContribution(): void {
     if (this.contributionForm.invalid) { this.contributionForm.markAllAsTouched(); return; }
     this.contributionLoading.set(true);
-    this.contributionSuccess.set(null);
     this.contributionError.set(null);
 
-    this.neuronService.submitContribution(this.contributionForm.value).subscribe({
-      next: () => {
+    this.paymentService.initiatePayment(this.contributionForm.value).subscribe({
+      next: (session) => {
         this.contributionLoading.set(false);
-        this.contributionSuccess.set('Contribution recorded. Once the entity confirms receipt, your FUN neurons will be credited (1 INR = 1 Neuron).');
-        this.contributionForm.reset();
+        const returnUrl = `${environment.appUrl}/payment/return`;
+        const params = new URLSearchParams({ sess: session.sessionId, returnUrl });
+        window.location.href = `${environment.crasmibUrl}/pay?${params.toString()}`;
       },
       error: (e) => {
         this.contributionLoading.set(false);
-        this.contributionError.set(e?.error?.message ?? 'Failed to submit contribution. Please try again.');
+        this.contributionError.set(e?.error?.message ?? 'Failed to initiate payment. Please try again.');
       },
     });
   }

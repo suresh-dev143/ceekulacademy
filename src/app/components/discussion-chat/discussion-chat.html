@@ -1,0 +1,175 @@
+<div class="dc">
+
+  <!-- ── ROOMS VIEW ──────────────────────────────────────────────────── -->
+  @if (view() === 'rooms') {
+  <div class="dc__rooms">
+
+    <div class="dc__rooms-header">
+      <span class="dc__rooms-title">Discussions</span>
+      <button class="dc__new-btn" (click)="openCreate()" title="Start a new discussion">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        New
+      </button>
+    </div>
+
+    @if ((rooms | async)?.length === 0) {
+    <div class="dc__empty">
+      <p>No active discussions yet.</p>
+      <button class="dc__start-btn" (click)="openCreate()">Start the first one</button>
+    </div>
+    }
+
+    <div class="dc__room-list">
+      @for (room of (rooms | async) ?? []; track trackByRoomId($index, room)) {
+      <button class="dc__room-item" (click)="openRoom(room)">
+        <div class="dc__room-item-top">
+          <span class="dc__room-name">{{ room.title }}</span>
+          <span class="dc__room-badge dc__room-badge--{{ room.type }}">{{ room.type }}</span>
+        </div>
+        @if (room.topic) {
+        <p class="dc__room-topic">{{ room.topic }}</p>
+        }
+        <div class="dc__room-meta">
+          <span>{{ room.messageCount }} messages</span>
+          @if (room.lastMessageAt) {
+          <span>{{ formatDate(room.lastMessageAt) }}</span>
+          }
+        </div>
+      </button>
+      }
+    </div>
+
+  </div>
+  }
+
+  <!-- ── CREATE ROOM VIEW ───────────────────────────────────────────── -->
+  @if (view() === 'create') {
+  <div class="dc__create">
+
+    <div class="dc__create-header">
+      <button class="dc__back-btn" (click)="closeCreate()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <span>New Discussion</span>
+    </div>
+
+    <div class="dc__create-form">
+      <label class="dc__field">
+        <span>Title</span>
+        <input type="text" [value]="newRoomTitle()"
+          (input)="newRoomTitle.set($any($event.target).value)"
+          placeholder="e.g. AI for Healthcare" maxlength="120" />
+      </label>
+
+      <label class="dc__field">
+        <span>Topic (optional)</span>
+        <input type="text" [value]="newRoomTopic()"
+          (input)="newRoomTopic.set($any($event.target).value)"
+          placeholder="Describe the discussion focus" maxlength="300" />
+      </label>
+
+      <label class="dc__field">
+        <span>Type</span>
+        <select [value]="newRoomType()" (change)="newRoomType.set($any($event.target).value)">
+          <option value="public">Public — open to everyone</option>
+          <option value="group">Group — invite-based</option>
+          @if (contextId) {
+          <option value="contextual">Contextual — linked to this content</option>
+          }
+        </select>
+      </label>
+
+      <button class="dc__create-submit" [disabled]="!newRoomTitle().trim()" (click)="submitCreate()">
+        Create Room
+      </button>
+    </div>
+
+  </div>
+  }
+
+  <!-- ── CHAT VIEW ──────────────────────────────────────────────────── -->
+  @if (view() === 'chat') {
+  <div class="dc__chat">
+
+    <div class="dc__chat-header">
+      <button class="dc__back-btn" (click)="backToRooms()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <div class="dc__chat-title-wrap">
+        <span class="dc__chat-title">{{ (room | async)?.title }}</span>
+        @if ((room | async)?.topic) {
+        <span class="dc__chat-topic">{{ (room | async)?.topic }}</span>
+        }
+      </div>
+      <div class="dc__online">
+        <span class="dc__online-dot" [class.dc__online-dot--live]="connected | async"></span>
+        @if (onlineCount() > 0) {
+        <span class="dc__online-count">{{ onlineCount() }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="dc__messages" #messageList>
+      @if ((messages | async)?.length === 0) {
+      <div class="dc__messages-empty">
+        <p>No messages yet. Say hello!</p>
+      </div>
+      }
+
+      @for (msg of (messages | async) ?? []; track trackByMsgId($index, msg)) {
+      <div class="dc__msg" [class.dc__msg--own]="isOwn(msg)">
+        @if (!isOwn(msg)) {
+        <div class="dc__msg-avatar">{{ msg.senderName.charAt(0).toUpperCase() }}</div>
+        }
+        <div class="dc__msg-body">
+          @if (!isOwn(msg)) {
+          <span class="dc__msg-sender">{{ msg.senderName }}</span>
+          }
+          <div class="dc__msg-bubble">{{ msg.content }}</div>
+          <span class="dc__msg-time">{{ formatTime(msg.createdAt) }}</span>
+        </div>
+      </div>
+      }
+
+      @if (typingNames().length > 0) {
+      <div class="dc__typing">
+        <span class="dc__typing-dots"><span></span><span></span><span></span></span>
+        <span class="dc__typing-label">
+          {{ typingNames().join(', ') }} {{ typingNames().length === 1 ? 'is' : 'are' }} typing…
+        </span>
+      </div>
+      }
+    </div>
+
+    <div class="dc__input">
+      <textarea
+        [value]="inputText()"
+        (input)="onInputChange($any($event.target).value)"
+        (keydown)="onKeydown($event)"
+        placeholder="Type a message… (Enter to send)"
+        rows="1"
+        [disabled]="sending()"
+        aria-label="Message input">
+      </textarea>
+      <button class="dc__send-btn"
+        [disabled]="!canSend()"
+        (click)="sendMessage()"
+        aria-label="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+  }
+
+</div>

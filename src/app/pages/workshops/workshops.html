@@ -1,19 +1,10 @@
-<app-layout [showSearch]="true" localPlaceholder="Search workshops & events…">
-    <div class="workshops-container animate-fade-in">
 
+    <div class="workshops-container animate-fade-in">
         <!-- ══ Page header ══════════════════════════════════════════════════════ -->
         <div class="view-header">
             <h1 class="page-title">Workshops</h1>
             <p class="section-subtitle">Explore and enroll in practical learning sessions hosted by experts.</p>
         </div>
-
-
-
-
-
-
-
-
 
         @if (showWorkshopDetail() && selectedWorkshop()) {
         <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="currentUser()?.role ?? ''"
@@ -112,4 +103,3 @@
         }
 
     </div>
-</app-layout>

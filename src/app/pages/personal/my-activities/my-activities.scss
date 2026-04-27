@@ -1,0 +1,541 @@
+// ─── Variables (mirrors personal-layout) ──────────────────────────────────────
+$bg-base:      #0f0f0f;
+$bg-card:      #141414;
+$bg-input:     #1c1c1c;
+$border:       #2a2a2a;
+$border-light: #232323;
+$accent:       #ff9900;
+$text-primary: #e0e0e0;
+$text-muted:   #888;
+$radius:       0.625rem;
+$transition:   0.2s ease;
+
+// ─── Page wrapper ─────────────────────────────────────────────────────────────
+.activities {
+ 
+  margin: 0 auto;
+  padding: 1.5rem 2.5rem 1.5rem;
+  color: $text-primary;
+
+  // ── Header ────────────────────────────────────────────────────────
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__title-block {}
+
+  &__title {
+    margin: 0 0 0.25rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  &__subtitle {
+    margin: 0;
+    font-size: 0.825rem;
+    color: $text-muted;
+    font-weight: 400;
+  }
+
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__legend {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  &__save-btn {
+    padding: 0.55rem 1.25rem;
+    background: $accent;
+    color: #000;
+    border: none;
+    border-radius: $radius;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background $transition, transform $transition, opacity $transition;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+      background: #e68a00;
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) { transform: translateY(0); }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
+
+  // ── Feedback ──────────────────────────────────────────────────────
+  &__feedback {
+    padding: 0.75rem 1rem;
+    border-radius: $radius;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &--success {
+      background: rgba(74, 222, 128, 0.08);
+      border: 1px solid rgba(74, 222, 128, 0.25);
+      color: #4ade80;
+
+      &::before { content: '✓  '; }
+    }
+
+    &--error {
+      background: rgba(248, 113, 113, 0.08);
+      border: 1px solid rgba(248, 113, 113, 0.25);
+      color: #f87171;
+
+      &::before { content: '✕  '; }
+    }
+  }
+
+  // ── Loading ───────────────────────────────────────────────────────
+  &__loading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 3rem 0;
+    color: $text-muted;
+    font-size: 0.875rem;
+  }
+
+  &__loading-dot {
+    width: 8px;
+    height: 8px;
+    background: $accent;
+    border-radius: 50%;
+    animation: pulse-dot 1.4s ease-in-out infinite;
+  }
+
+  // ── Footer ────────────────────────────────────────────────────────
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid $border;
+    margin-top: 0.5rem;
+  }
+}
+
+// ─── Legend ───────────────────────────────────────────────────────────────────
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: $text-muted;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+// ─── Timeline ─────────────────────────────────────────────────────────────────
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  // ── Single row ────────────────────────────────────────────────────
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: $bg-card;
+    border: 1px solid $border-light;
+    border-radius: $radius;
+    margin-bottom: 0.4rem;
+    transition: background $transition, border-color $transition, box-shadow $transition, opacity $transition;
+    cursor: default;
+    user-select: none;
+    overflow: hidden;
+
+    &:hover {
+      border-color: #333;
+      background: #181818;
+    }
+
+    &--editing {
+      border-color: rgba($accent, 0.4);
+      background: rgba($accent, 0.03);
+      box-shadow: 0 0 0 2px rgba($accent, 0.08);
+    }
+
+    &--dragging {
+      opacity: 0.4;
+    }
+
+    &--drag-over {
+      border-color: $accent;
+      box-shadow: 0 0 0 2px rgba($accent, 0.25);
+      background: rgba($accent, 0.04);
+    }
+
+    &--new {
+      border-color: rgba($accent, 0.3);
+      background: rgba($accent, 0.025);
+    }
+  }
+
+  // ── Drag handle ───────────────────────────────────────────────────
+  &__handle {
+    width: 2rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0;
+    color: #363636;
+    cursor: grab;
+    transition: color $transition;
+    align-self: stretch;
+
+    &:hover { color: #555; }
+    &:active { cursor: grabbing; }
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &--placeholder {
+      cursor: default;
+    }
+  }
+
+  // ── Type accent bar ───────────────────────────────────────────────
+  &__accent {
+    width: 3px;
+    align-self: stretch;
+    flex-shrink: 0;
+    border-radius: 0;
+    transition: background $transition;
+
+    &--new {
+      background: $accent;
+      opacity: 0.4;
+    }
+  }
+
+  // ── Time column ───────────────────────────────────────────────────
+  &__time {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.75rem 0.75rem 0.75rem 0.6rem;
+    flex-shrink: 0;
+    width: 13rem;
+  }
+
+  &__time-text {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: $text-muted;
+    white-space: nowrap;
+    font-family: 'Outfit', monospace;
+    letter-spacing: 0.03em;
+  }
+
+  &__sep {
+    font-size: 0.7rem;
+    color: #444;
+    flex-shrink: 0;
+    padding: 0 0.1rem;
+  }
+
+  // ── Content column ────────────────────────────────────────────────
+  &__content {
+    flex: 1;
+    min-width: 0;
+    padding: 0.65rem 0.75rem 0.65rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  &__title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.1rem 0.45rem;
+    border-radius: 0.25rem;
+    border: 1px solid;
+    line-height: 1.6;
+    flex-shrink: 0;
+  }
+
+  &__desc {
+    font-size: 0.72rem;
+    color: $text-muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__edit-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  &__error {
+    font-size: 0.72rem;
+    color: #f87171;
+    display: block;
+    margin-top: 0.15rem;
+  }
+
+  // ── Shared inputs ─────────────────────────────────────────────────
+  &__input {
+    background: $bg-input;
+    border: 1px solid $border;
+    border-radius: 0.375rem;
+    color: $text-primary;
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 0.375rem 0.6rem;
+    outline: none;
+    transition: border-color $transition, box-shadow $transition;
+
+    &::placeholder { color: #444; }
+
+    &:focus {
+      border-color: rgba($accent, 0.5);
+      box-shadow: 0 0 0 2px rgba($accent, 0.07);
+    }
+
+    &--time {
+      width: 6rem;
+      text-align: center;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.4rem;
+      color-scheme: dark;
+    }
+
+    &--title {
+      width: 100%;
+      font-weight: 600;
+    }
+
+    &--select {
+      background: $bg-input;
+      flex-shrink: 0;
+      cursor: pointer;
+      font-size: 0.75rem;
+
+      option { background: #1c1c1c; }
+    }
+
+    &--desc {
+      flex: 1;
+      min-width: 8rem;
+    }
+  }
+
+  // ── Action buttons ────────────────────────────────────────────────
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0 0.5rem;
+    flex-shrink: 0;
+  }
+
+  &__btn {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background $transition, color $transition;
+    flex-shrink: 0;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &--edit {
+      background: transparent;
+      color: #555;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: $text-muted;
+      }
+    }
+
+    &--done {
+      background: rgba(74, 222, 128, 0.1);
+      color: #4ade80;
+
+      &:hover {
+        background: rgba(74, 222, 128, 0.2);
+      }
+    }
+
+    &--delete {
+      background: transparent;
+      color: #444;
+
+      &:hover {
+        background: rgba(248, 113, 113, 0.1);
+        color: #f87171;
+      }
+    }
+  }
+
+  // ── Add row & button ──────────────────────────────────────────────
+  &__add-row {
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem 0 0.25rem;
+  }
+
+  &__add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1px dashed #2e2e2e;
+    border-radius: $radius;
+    color: #555;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.5rem;
+    cursor: pointer;
+    transition: border-color $transition, color $transition, background $transition;
+    width: 100%;
+    justify-content: center;
+
+    svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      border-color: rgba($accent, 0.4);
+      color: $accent;
+      background: rgba($accent, 0.03);
+    }
+  }
+}
+
+// ─── Animations ───────────────────────────────────────────────────────────────
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(0.75); opacity: 0.5; }
+}
+
+// ─── Mobile ───────────────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .activities {
+    padding: 1rem 0.75rem 3rem;
+
+    &__header {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    &__header-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    &__title { font-size: 1.35rem; }
+
+    &__save-btn { font-size: 0.75rem; padding: 0.5rem 1rem; }
+  }
+
+  .timeline {
+    &__row {
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    &__handle { align-self: center; }
+
+    &__time {
+      width: auto;
+      padding: 0.6rem 0.5rem 0.3rem 0.5rem;
+      flex-basis: calc(100% - 3rem - 3px);
+      order: 1;
+    }
+
+    &__accent {
+      width: 3px;
+      align-self: stretch;
+      order: 0;
+    }
+
+    &__content {
+      flex-basis: 100%;
+      order: 3;
+      padding: 0.1rem 0.75rem 0.65rem 3.5rem;
+    }
+
+    &__actions {
+      order: 2;
+      margin-left: auto;
+      padding: 0.6rem 0.5rem 0.3rem 0;
+    }
+
+    &__input--time { width: 5rem; }
+  }
+}

@@ -1,0 +1,336 @@
+<div class="canvas-editor">
+
+  <!-- ── SUCCESS STATE ─────────────────────────────────────────────────────── -->
+  @if (submitSuccess()) {
+  <div class="canvas-success">
+    <div class="canvas-success__icon">✓</div>
+    <h2 class="canvas-success__heading">
+      @if (validationResult()?.status === 'APPROVED') { Published! } @else { Submitted! }
+    </h2>
+    <p class="canvas-success__text">
+      @if (validationResult()?.status === 'APPROVED') {
+        Your page passed AI review and is now live.
+      } @else {
+        Your page is queued for human review. We'll notify you once it's live.
+      }
+    </p>
+
+    @if (validationResult(); as vr) {
+    <div class="canvas-validation">
+      <span class="canvas-validation__label">AI Content Analysis</span>
+      @if (vr.category_match_score > 0 || vr.safety_score > 0 || vr.quality_score > 0) {
+      <div class="canvas-validation__scores">
+        <div class="canvas-validation__row">
+          <span class="canvas-validation__name">Relevance</span>
+          <div class="canvas-validation__bar"><span class="canvas-validation__fill" [style.width.%]="vr.category_match_score" [style.background]="scoreColor(vr.category_match_score)"></span></div>
+          <span class="canvas-validation__val" [style.color]="scoreColor(vr.category_match_score)">{{ vr.category_match_score }}</span>
+        </div>
+        <div class="canvas-validation__row">
+          <span class="canvas-validation__name">Safety</span>
+          <div class="canvas-validation__bar"><span class="canvas-validation__fill" [style.width.%]="vr.safety_score" [style.background]="scoreColor(vr.safety_score)"></span></div>
+          <span class="canvas-validation__val" [style.color]="scoreColor(vr.safety_score)">{{ vr.safety_score }}</span>
+        </div>
+        <div class="canvas-validation__row">
+          <span class="canvas-validation__name">Quality</span>
+          <div class="canvas-validation__bar"><span class="canvas-validation__fill" [style.width.%]="vr.quality_score" [style.background]="scoreColor(vr.quality_score)"></span></div>
+          <span class="canvas-validation__val" [style.color]="scoreColor(vr.quality_score)">{{ vr.quality_score }}</span>
+        </div>
+      </div>
+      }
+      <p class="canvas-validation__reason">{{ vr.reason }}</p>
+    </div>
+    }
+
+    <button class="canvas-btn canvas-btn--primary" (click)="resetEditor()">Create Another Page</button>
+  </div>
+
+  } @else {
+
+  <!-- ── TOP BAR ────────────────────────────────────────────────────────────── -->
+  <div class="canvas-topbar">
+    <div class="canvas-topbar__left">
+      <span class="canvas-topbar__brand">Canvas Editor</span>
+      @if (savedFlash()) { <span class="canvas-topbar__saved">Saved</span> }
+    </div>
+    <div class="canvas-topbar__actions">
+      <button class="canvas-btn canvas-btn--ghost" (click)="saveDraft()" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : 'Save Draft' }}
+      </button>
+      <button class="canvas-btn canvas-btn--primary" (click)="onSubmit()" [disabled]="!canSubmit() || submitting()">
+        {{ submitting() ? 'Submitting…' : 'Submit' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ── HEADER: TITLE + CATEGORY ──────────────────────────────────────────── -->
+  <div class="canvas-header">
+    <input
+      class="canvas-title-input"
+      type="text"
+      [value]="title()"
+      (input)="title.set($any($event.target).value)"
+      placeholder="Title your page..."
+      maxlength="120"
+    />
+    <div class="canvas-header__meta">
+      <select
+        class="canvas-category-select"
+        [value]="category()"
+        (change)="category.set($any($event.target).value)"
+      >
+        <option value="">Select Category</option>
+        @for (key of categoryKeys; track key) {
+        <option [value]="key">{{ getCategoryLabel(key) }}</option>
+        }
+      </select>
+      <span class="canvas-header__char">{{ title().length }} / 120</span>
+    </div>
+  </div>
+
+  <!-- ── PITSSS WARNINGS ───────────────────────────────────────────────────── -->
+  @if (pitsssErrors().length > 0) {
+  <div class="canvas-pitsss">
+    <p class="canvas-pitsss__title">⚠️ Quality Checklist</p>
+    @for (err of pitsssErrors(); track err) {
+    <p class="canvas-pitsss__item">{{ err }}</p>
+    }
+    <div class="canvas-pitsss__actions">
+      <button class="canvas-btn canvas-btn--ghost canvas-btn--sm" (click)="pitsssErrors.set([])">I'll fix it</button>
+      <button class="canvas-btn canvas-btn--warn canvas-btn--sm" (click)="acknowledgePITSSS()">Submit anyway</button>
+    </div>
+  </div>
+  }
+
+  <!-- ── SUBMIT ERROR ──────────────────────────────────────────────────────── -->
+  @if (submitError()) {
+  <div class="canvas-error">{{ submitError() }}</div>
+  }
+
+  <!-- ── CANVAS BLOCKS ─────────────────────────────────────────────────────── -->
+  <div class="canvas-body">
+
+    @for (block of blocks(); track block.id; let i = $index) {
+    <div
+      class="canvas-block"
+      [class.canvas-block--dragging]="dragFromIndex() === i"
+      [class.canvas-block--dragover]="dragOverIndex() === i"
+      draggable="true"
+      (dragstart)="onDragStart(i, $event)"
+      (dragover)="onDragOver(i, $event)"
+      (drop)="onDrop(i, $event)"
+      (dragend)="onDragEnd()"
+    >
+      <!-- Block toolbar -->
+      <div class="canvas-block__toolbar">
+        <span class="canvas-block__handle" title="Drag to reorder">⠿</span>
+        <span class="canvas-block__type-badge">{{ block.type }}</span>
+        <div class="canvas-block__controls">
+          <button class="canvas-block__ctrl" (click)="moveBlock(i, -1)" [disabled]="i === 0" title="Move up">↑</button>
+          <button class="canvas-block__ctrl" (click)="moveBlock(i, 1)" [disabled]="i === blocks().length - 1" title="Move down">↓</button>
+          <button class="canvas-block__ctrl" (click)="duplicateBlock(block.id)" title="Duplicate">❐</button>
+          <button class="canvas-block__ctrl canvas-block__ctrl--delete" (click)="deleteBlock(block.id)" title="Delete">✕</button>
+        </div>
+      </div>
+
+      <!-- Block content -->
+      <div class="canvas-block__body">
+
+        <!-- TEXT BLOCK -->
+        @if (block.type === 'text') {
+        <textarea
+          class="canvas-text"
+          [value]="block.content['html']"
+          (input)="updateBlockContent(block.id, 'html', $any($event.target).value)"
+          placeholder="Start writing... Use 'Problem:' to describe the issue you are addressing."
+          rows="5"
+        ></textarea>
+        }
+
+        <!-- CODE BLOCK -->
+        @if (block.type === 'code') {
+        <div class="canvas-code">
+          <div class="canvas-code__header">
+            <select
+              class="canvas-code__lang"
+              [value]="block.content['language']"
+              (change)="updateBlockContent(block.id, 'language', $any($event.target).value)"
+            >
+              <option value="javascript">JavaScript</option>
+              <option value="typescript">TypeScript</option>
+              <option value="python">Python</option>
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="bash">Bash</option>
+              <option value="sql">SQL</option>
+              <option value="json">JSON</option>
+            </select>
+            <button
+              class="canvas-code__copy"
+              (click)="copyCode(block.id, block.content['code'])"
+            >
+              {{ copiedBlockId() === block.id ? 'Copied' : 'Copy' }}
+            </button>
+          </div>
+          <textarea
+            class="canvas-code__input"
+            [value]="block.content['code']"
+            (input)="updateBlockContent(block.id, 'code', $any($event.target).value)"
+            placeholder="// Paste or write your code here..."
+            spellcheck="false"
+            rows="8"
+          ></textarea>
+        </div>
+        }
+
+        <!-- IMAGE BLOCK -->
+        @if (block.type === 'image') {
+        <div class="canvas-media">
+          @if (block.content['url']) {
+          <div class="canvas-media__preview">
+            <img [src]="block.content['url']" [alt]="block.content['alt'] || 'Image'" class="canvas-media__img" />
+            <button class="canvas-media__clear" (click)="clearMedia(block.id)">Remove</button>
+          </div>
+          <input
+            class="canvas-caption"
+            type="text"
+            [value]="block.content['caption']"
+            (input)="updateBlockContent(block.id, 'caption', $any($event.target).value)"
+            placeholder="Image caption..."
+          />
+          <input
+            class="canvas-caption"
+            type="text"
+            [value]="block.content['alt']"
+            (input)="updateBlockContent(block.id, 'alt', $any($event.target).value)"
+            placeholder="Alt text for accessibility..."
+          />
+          } @else {
+          <label class="canvas-upload">
+            <input type="file" accept="image/*" class="canvas-upload__input" (change)="onFileChange(block.id, $event, 'url')" />
+            <span class="canvas-upload__icon">📸</span>
+            <span class="canvas-upload__label">Drop or select an image</span>
+            <span class="canvas-upload__hint">PNG, JPG, WEBP up to 50MB</span>
+          </label>
+          }
+        </div>
+        }
+
+        <!-- VIDEO BLOCK -->
+        @if (block.type === 'video') {
+        <div class="canvas-media">
+          @if (block.content['url']) {
+          <div class="canvas-media__preview">
+            <video [src]="block.content['url']" controls class="canvas-media__video"></video>
+            <button class="canvas-media__clear" (click)="clearMedia(block.id)">Remove</button>
+          </div>
+          <input
+            class="canvas-caption"
+            type="text"
+            [value]="block.content['caption']"
+            (input)="updateBlockContent(block.id, 'caption', $any($event.target).value)"
+            placeholder="Video description..."
+          />
+          } @else {
+          <label class="canvas-upload">
+            <input type="file" accept="video/*" class="canvas-upload__input" (change)="onFileChange(block.id, $event, 'url')" />
+            <span class="canvas-upload__icon">🎬</span>
+            <span class="canvas-upload__label">Drop or select a video</span>
+            <span class="canvas-upload__hint">MP4, WEBM, MOV up to 50MB</span>
+          </label>
+          }
+        </div>
+        }
+
+        <!-- AUDIO BLOCK -->
+        @if (block.type === 'audio') {
+        <div class="canvas-media">
+          @if (block.content['url']) {
+          <div class="canvas-media__preview canvas-media__preview--audio">
+            <audio [src]="block.content['url']" controls class="canvas-media__audio"></audio>
+            <span class="canvas-media__filename">{{ block.content['fileName'] }}</span>
+            <button class="canvas-media__clear" (click)="clearMedia(block.id)">Remove</button>
+          </div>
+          <input
+            class="canvas-caption"
+            type="text"
+            [value]="block.content['caption']"
+            (input)="updateBlockContent(block.id, 'caption', $any($event.target).value)"
+            placeholder="Audio description..."
+          />
+          } @else {
+          <label class="canvas-upload">
+            <input type="file" accept="audio/*" class="canvas-upload__input" (change)="onFileChange(block.id, $event, 'url')" />
+            <span class="canvas-upload__icon">🎵</span>
+            <span class="canvas-upload__label">Drop or select an audio file</span>
+            <span class="canvas-upload__hint">MP3, WAV, OGG up to 50MB</span>
+          </label>
+          }
+        </div>
+        }
+
+        <!-- DIVIDER BLOCK -->
+        @if (block.type === 'divider') {
+        <div class="canvas-divider"><span class="canvas-divider__dot"></span></div>
+        }
+
+        <!-- COLUMNS BLOCK -->
+        @if (block.type === 'columns') {
+        <div class="canvas-columns">
+          <textarea
+            class="canvas-columns__col"
+            [value]="block.content['col1']"
+            (input)="updateBlockContent(block.id, 'col1', $any($event.target).value)"
+            placeholder="Column 1..."
+            rows="4"
+          ></textarea>
+          <textarea
+            class="canvas-columns__col"
+            [value]="block.content['col2']"
+            (input)="updateBlockContent(block.id, 'col2', $any($event.target).value)"
+            placeholder="Column 2..."
+            rows="4"
+          ></textarea>
+          <textarea
+            class="canvas-columns__col"
+            [value]="block.content['col3']"
+            (input)="updateBlockContent(block.id, 'col3', $any($event.target).value)"
+            placeholder="Column 3..."
+            rows="4"
+          ></textarea>
+        </div>
+        }
+
+      </div><!-- /canvas-block__body -->
+    </div><!-- /canvas-block -->
+    }
+
+    <!-- ── ADD BLOCK ──────────────────────────────────────────────────────── -->
+    <button class="canvas-add-block" (click)="showBlockPicker.set(true)">
+      <span class="canvas-add-block__plus">+</span> New Block
+    </button>
+
+  </div><!-- /canvas-body -->
+
+  <!-- ── BLOCK PICKER MODAL ─────────────────────────────────────────────────── -->
+  @if (showBlockPicker()) {
+  <div class="canvas-picker-overlay" (click)="showBlockPicker.set(false)">
+    <div class="canvas-picker" (click)="$event.stopPropagation()">
+      <div class="canvas-picker__header">
+        <span class="canvas-picker__title">Choose a block</span>
+        <button class="canvas-picker__close" (click)="showBlockPicker.set(false)">✕</button>
+      </div>
+      <div class="canvas-picker__grid">
+        @for (bt of BLOCK_TYPES; track bt.type) {
+        <button class="canvas-picker__item" (click)="addBlock(bt.type)">
+          <span class="canvas-picker__icon">{{ bt.icon }}</span>
+          <span class="canvas-picker__label">{{ bt.label }}</span>
+          <span class="canvas-picker__desc">{{ bt.desc }}</span>
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+  }
+
+  }<!-- /else success -->
+</div>

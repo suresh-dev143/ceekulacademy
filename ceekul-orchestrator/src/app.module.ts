@@ -6,6 +6,7 @@ import { OrchestrationModule } from './orchestration/orchestration.module';
 import { EvolutionModule } from './evolution/evolution.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
 import { NeuronModule } from './neurons/neuron.module';
+import { DemandModule } from './demand/demand.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { NeuronModule } from './neurons/neuron.module';
     EvolutionModule,
     CollaborationModule,
     NeuronModule,
+    DemandModule,
   ],
   controllers: [AppController],
   providers: [AppService],

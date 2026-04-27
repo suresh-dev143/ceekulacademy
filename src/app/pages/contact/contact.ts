@@ -1,17 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LayoutComponent } from '../../components/layout/layout';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    LayoutComponent
+   
   ],
   template: `
-    <app-layout>
+   
       <div class="contact-container">
         <!-- Main Form Area (Center) -->
         <div class="contact-header">
@@ -87,7 +86,6 @@ import { LayoutComponent } from '../../components/layout/layout';
           </div>
         </div>
       </div>
-    </app-layout>
   `,
   styles: [`
     .contact-container { padding: 3rem 2rem; max-width: 1200px; margin: 0 auto; }

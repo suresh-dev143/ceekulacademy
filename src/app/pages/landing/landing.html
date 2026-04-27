@@ -1,23 +1,86 @@
 <div class="landing landing--dark">
-  <!-- Three-Column Layout -->
   <div class="three-col">
-    <!-- Left Column: Titles -->
-    <aside class="three-col__left" [class.mobile-active]="activeTab() === 'titles'">
-      <div class="title-list">
-        @for (item of titles; track item.id) {
-        <div class="title-item" [class.title-item--active]="selectedId() === item.id" (click)="selectTitle(item.id)">
-          @if(item.title==='FUTURE ACADEMY'
-          ){
-          <span class="main-title">FUTURE ACADEMY</span>
-          } @else { {{ item.title }}}
 
+    <!-- Left Column: Success Stories -->
+    <aside class="three-col__left" [class.mobile-active]="activeTab() === 'titles'">
+      <div class="stories-panel">
+
+        <div class="stories-panel__header">
+          <h3 class="stories-panel__title">Success Stories</h3>
+        </div>
+
+        <!-- Category Filter Chips -->
+        <div class="story-filters">
+          <button class="story-filter-chip"
+                  [class.story-filter-chip--active]="activeCategory() === ''"
+                  (click)="setCategory('')">All</button>
+          @for (key of categoryKeys; track key) {
+          <button class="story-filter-chip"
+                  [class.story-filter-chip--active]="activeCategory() === key"
+                  (click)="setCategory(key)">{{ categoryLabels[key] }}</button>
+          }
+        </div>
+
+        <div class="stories-panel__list">
+
+          @if (loading()) {
+          <div class="stories-skeleton">
+            @for (i of [1,2,3,4]; track i) {
+            <div class="story-skeleton-item">
+              <div class="story-skeleton__badge"></div>
+              <div class="story-skeleton__title"></div>
+              <div class="story-skeleton__line"></div>
+              <div class="story-skeleton__meta"></div>
+            </div>
+            }
+          </div>
+          } @else if (stories().length === 0) {
+          <div class="stories-empty">
+            <p>No stories yet.</p>
+            <span>Be the first to share your journey.</span>
+          </div>
+          } @else {
+          @for (item of stories(); track item._id) {
+          <div class="story-item"
+               [class.story-item--active]="selectedStory()?._id === item._id"
+               (click)="selectStoryItem(item._id)"
+               role="button"
+               [attr.aria-label]="item.title">
+
+            @if (item.media.length > 0 && item.media[0].type === 'image') {
+            <div class="story-item__thumb">
+              <img [src]="item.media[0].url" [alt]="item.title" />
+            </div>
+            }
+
+            <div class="story-item__body">
+              <div class="story-item__badges">
+                <span class="story-badge story-badge--{{ item.category }}">{{ getCategoryLabel(item.category) }}</span>
+                @if (item.subCategory) {
+                <span class="story-item__sub">{{ item.subCategory }}</span>
+                }
+              </div>
+              <p class="story-item__title">{{ item.title }}</p>
+              <div class="story-item__meta">
+                <span class="story-item__author">{{ getAuthorName(item) }}</span>
+                <div class="story-item__stats">
+                  <span class="story-item__time">{{ formatRelativeTime(item.createdAt) }}</span>
+                  @if (item.likes > 0) {
+                  <span class="story-item__likes">&#9829; {{ item.likes }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+
+          </div>
+          }
+          }
 
         </div>
-        }
       </div>
     </aside>
 
-    <!-- Center Column: Dynamic Content -->
+    <!-- Center Column: Story Detail or Default Content -->
     <main class="three-col__center" [class.mobile-active]="activeTab() === 'content'">
       <div class="content-area">
 
@@ -25,43 +88,95 @@
           <app-global-search></app-global-search>
         </div>
 
+        @if (selectedStory(); as story) {
+
+        <!-- ── Story Detail ── -->
+        <article class="story-detail" role="article">
+
+          <div class="story-detail__badges">
+            <span class="story-badge story-badge--{{ story.category }}">{{ getCategoryLabel(story.category) }}</span>
+            @if (story.subCategory) {
+            <span class="story-detail__sub">{{ story.subCategory }}</span>
+            }
+          </div>
+
+          <h1 class="story-detail__title">{{ story.title }}</h1>
+
+          <div class="story-detail__meta">
+            <span class="story-detail__author">{{ getAuthorName(story) }}</span>
+            <span class="story-detail__sep">·</span>
+            <span class="story-detail__time">{{ formatRelativeTime(story.createdAt) }}</span>
+            <span class="story-detail__sep">·</span>
+            <span class="story-detail__views">{{ story.views }} views</span>
+          </div>
+
+          <div class="story-detail__body">
+            @for (para of getContentParagraphs(story.description); track $index) {
+            <p>{{ para }}</p>
+            }
+          </div>
+
+          <!-- Media Gallery -->
+          @if (story.media.length > 0) {
+          <div class="story-detail__media">
+            @for (m of story.media; track m.url) {
+            @if (m.type === 'image') {
+            <img [src]="m.url" alt="Story photo" class="story-detail__media-item" loading="lazy" />
+            } @else {
+            <video [src]="m.url" class="story-detail__media-item story-detail__media-item--video"
+                   controls preload="metadata"></video>
+            }
+            }
+          </div>
+          }
+
+          <!-- Engagement Bar -->
+          <div class="story-engagement">
+            <button class="story-like-btn"
+                    [class.story-like-btn--liked]="isLiked(story._id)"
+                    (click)="toggleLike(story._id, $event)"
+                    aria-label="Like this story">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                   [attr.fill]="isLiked(story._id) ? 'currentColor' : 'none'"
+                   stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              <span>{{ story.likes }} {{ story.likes === 1 ? 'Like' : 'Likes' }}</span>
+            </button>
+          </div>
+
+        </article>
+
+        } @else {
 
         @if (selectedContent(); as content) {
 
-        <!-- ── Pillar Grid Layout (e.g. Computable Vision) ── -->
         @if (content.pillars && content.pillars.length > 0) {
         <div class="cv-section">
-
           <header class="cv-header">
             <h2 class="cv-header__title">{{ content.heading }}</h2>
             @if (content.tagline) {
             <p class="cv-header__tagline">{{ content.tagline }}</p>
             }
-            <div class="cv-header__rule"></div>
           </header>
-
           <div class="cv-grid">
-            @for (pillar of content.pillars; track pillar.iconId; let i = $index) {
+            @for (pillar of content.pillars; track pillar.iconId) {
             <div class="cv-card">
-
               <h3 class="cv-card__title">{{ pillar.title }}</h3>
               <p class="cv-card__descriptor">{{ pillar.descriptor }}</p>
             </div>
             }
           </div>
-
           @if (content.note) {
           <footer class="cv-footer">
             <div class="cv-footer__rule"></div>
             <p class="cv-footer__text">{{ content.note }}</p>
           </footer>
           }
-
         </div>
 
         } @else {
 
-        <!-- ── Generic Layout (other titles) ── -->
         <h2 class="content-area__heading">{{ content.heading }}</h2>
 
         @if (content.items && content.items.length > 0) {
@@ -82,6 +197,8 @@
 
         }
         }
+
+        }
       </div>
     </main>
 
@@ -89,50 +206,65 @@
     <aside class="three-col__right" [class.mobile-active]="activeTab() === 'chat'">
       <div class="chat-container">
         <div class="chat-container__header">
-          <h3>Support Chat</h3>
-          <span class="chat-container__status">
-            <span class="status-dot"></span>
-            Online
-          </span>
+          <button class="chat-header-btn" (click)="onRegister()" aria-label="Register">REGISTER</button>
+          <h3>Chat</h3>
+          <button class="chat-header-btn" (click)="onContact()" aria-label="Contact">CONTACT</button>
         </div>
 
-        <div class="chat-container__messages">
-          <div class="chat-message chat-message--received">
-            <div class="chat-message__avatar">AI</div>
-            <div class="chat-message__content">
-              <p>Welcome to Ceekul Civilisation. How may I assist you today?</p>
-              <span class="chat-message__time">Now</span>
+        <!-- Formats Panel -->
+        <div class="formats-panel">
+          <span class="formats-panel__label">Formats</span>
+          <div class="formats-panel__list">
+
+            <div class="format-item">
+              <span class="format-item__name">Lecture</span>
+              <p class="format-item__desc">Structured knowledge sessions led by domain experts.</p>
             </div>
+
+            <div class="format-item">
+              <span class="format-item__name">Discussion</span>
+              <p class="format-item__desc">Open dialogue exploring ideas across multiple perspectives.</p>
+            </div>
+
+            <div class="format-item">
+              <span class="format-item__name">Debate</span>
+              <p class="format-item__desc">Structured argument presenting contrasting views on key issues.</p>
+            </div>
+
+            <div class="format-item">
+              <span class="format-item__name">Podcast</span>
+              <p class="format-item__desc">Conversational sessions capturing insights and lived narratives.</p>
+            </div>
+
+            <div class="format-item">
+              <span class="format-item__name">Prototype</span>
+              <p class="format-item__desc">Hands-on demonstrations of emerging concepts and solutions.</p>
+            </div>
+
+            <div class="format-item">
+              <span class="format-item__name">Futuristic Film</span>
+              <p class="format-item__desc">Visual storytelling that envisions tomorrow's civilisation.</p>
+            </div>
+
           </div>
         </div>
 
-        <div class="chat-container__input">
-          <textarea placeholder="Type your message..." rows="2"></textarea>
-          <button class="chat-send-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-          </button>
-        </div>
+        <app-discussion-chat></app-discussion-chat>
       </div>
     </aside>
   </div>
 
-  <!-- Mobile Tab Bar (visible only on small screens) -->
+  <!-- Mobile Tab Bar -->
   <nav class="mobile-tab-bar">
     <button class="mobile-tab-bar__tab" [class.mobile-tab-bar__tab--active]="activeTab() === 'titles'"
-      (click)="setActiveTab('titles')" aria-label="View titles">
+      (click)="setActiveTab('titles')" aria-label="View stories">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="8" y1="6" x2="21" y2="6"></line>
-        <line x1="8" y1="12" x2="21" y2="12"></line>
-        <line x1="8" y1="18" x2="21" y2="18"></line>
-        <line x1="3" y1="6" x2="3.01" y2="6"></line>
-        <line x1="3" y1="12" x2="3.01" y2="12"></line>
-        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
       </svg>
-      <span>Titles</span>
+      <span>Stories</span>
     </button>
 
     <button class="mobile-tab-bar__tab" [class.mobile-tab-bar__tab--active]="activeTab() === 'content'"
@@ -142,9 +274,8 @@
         <polyline points="14 2 14 8 20 8"></polyline>
         <line x1="16" y1="13" x2="8" y2="13"></line>
         <line x1="16" y1="17" x2="8" y2="17"></line>
-        <polyline points="10 9 9 9 8 9"></polyline>
       </svg>
-      <span>Explore</span>
+      <span>Read</span>
     </button>
 
     <button class="mobile-tab-bar__tab" [class.mobile-tab-bar__tab--active]="activeTab() === 'chat'"

@@ -1,0 +1,485 @@
+// ── Demand Intelligence Engine ────────────────────────────────────────────────
+
+.demand {
+  margin: 0 auto;
+  padding: 2rem 0rem 2rem;
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+// ── Shared Button ─────────────────────────────────────────────────────────────
+
+.demand-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 2rem;
+  border-radius: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+
+  &--primary {
+    background: #ff9900;
+    color: #000;
+    border-color: #ff9900;
+
+    &:hover:not(:disabled) {
+      background: #e68a00;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: #606060;
+    border-color: #252525;
+
+    &:hover {
+      color: #e0e0e0;
+      border-color: #404040;
+    }
+  }
+}
+
+// ── INPUT STATE ───────────────────────────────────────────────────────────────
+
+.demand-input {
+  animation: demand-fade 0.3s ease;
+
+  &__header {
+    margin-bottom: 2.5rem;
+  }
+
+  &__eyebrow {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #404040;
+    margin: 0 0 0.75rem;
+  }
+
+  &__heading {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.625rem;
+  }
+
+  &__sub {
+    font-size: 0.875rem;
+    color: #505050;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  &__field {
+    position: relative;
+
+    &--error .demand-input__textarea {
+      border-color: rgba(255, 107, 107, 0.4);
+    }
+  }
+
+  &__textarea {
+    width: 100%;
+    background: #0d0d0d;
+    border: 1px solid #1e1e1e;
+    border-radius: 0.75rem;
+    color: #e0e0e0;
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.7;
+    padding: 0.4rem 1rem;
+    outline: none;
+    resize: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #282828;
+    }
+
+    &:focus {
+      border-color: #2e2e2e;
+      box-shadow: 0 0 0 3px rgba(255, 153, 0, 0.06);
+    }
+  }
+
+  &__error {
+    display: block;
+    font-size: 0.72rem;
+    color: #ff6b6b;
+    margin-top: 0.4rem;
+  }
+
+  &__context-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  &__context-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #353535;
+
+    span {
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: #2a2a2a;
+    }
+  }
+
+  &__context {
+    background: #0d0d0d;
+    border: 1px solid #181818;
+    border-radius: 0.5rem;
+    color: #909090;
+    font-family: inherit;
+    font-size: 0.875rem;
+    padding: 0.6rem 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &::placeholder {
+      color: #252525;
+    }
+
+    &:focus {
+      border-color: #2a2a2a;
+    }
+  }
+}
+
+// ── EVALUATING STATE ──────────────────────────────────────────────────────────
+
+.demand-eval {
+  padding: 3rem 0;
+  animation: demand-fade 0.25s ease;
+
+  &__title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #383838;
+    margin: 0 0 2rem;
+  }
+
+  &__layers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  &__layer {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    opacity: 0.25;
+    transition: opacity 0.3s;
+
+    &--active {
+      opacity: 1;
+    }
+
+    &--done {
+      opacity: 0.55;
+    }
+  }
+
+  &__layer-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__check {
+    font-size: 0.75rem;
+    color: #22c55e;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #252525;
+    display: block;
+    margin: auto;
+  }
+
+  &__spinner {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #252525;
+    border-top-color: #ff9900;
+    animation: demand-spin 0.7s linear infinite;
+  }
+
+  &__layer-label {
+    font-size: 0.85rem;
+    color: #808080;
+    font-weight: 500;
+  }
+
+  &__layer--active &__layer-label {
+    color: #e0e0e0;
+  }
+
+  &__layer--done &__layer-label {
+    text-decoration: line-through;
+    color: #404040;
+  }
+}
+
+// ── RESULT STATE ──────────────────────────────────────────────────────────────
+
+.demand-result {
+  animation: demand-slide 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__badge-icon {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  &__badge-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  &__request {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #505050;
+    font-style: italic;
+    margin: 0;
+    line-height: 1.5;
+    border-left: 2px solid #222;
+    padding-left: 1rem;
+  }
+
+  &__message {
+    font-size: 0.95rem;
+    color: #909090;
+    line-height: 1.75;
+    margin: 0;
+    white-space: pre-line;
+  }
+
+  // Decision colour variants
+  &--approved {
+
+    .demand-result__badge-icon,
+    .demand-result__badge-label {
+      color: #22c55e;
+    }
+
+    .demand-result__request {
+      border-color: rgba(34, 197, 94, 0.25);
+    }
+  }
+
+  &--suggest {
+
+    .demand-result__badge-icon,
+    .demand-result__badge-label {
+      color: #f59e0b;
+    }
+
+    .demand-result__request {
+      border-color: rgba(245, 158, 11, 0.25);
+    }
+  }
+
+  &--restricted {
+
+    .demand-result__badge-icon,
+    .demand-result__badge-label {
+      color: #f87171;
+    }
+
+    .demand-result__request {
+      border-color: rgba(248, 113, 113, 0.2);
+    }
+  }
+}
+
+// ── Alternatives Grid ─────────────────────────────────────────────────────────
+
+.demand-result__alts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.demand-result__alt {
+  background: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  border-radius: 0.75rem;
+  padding: 1rem 1.125rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: #2a2a2a;
+  }
+
+  &--better {
+    border-top: 2px solid rgba(167, 139, 250, 0.4);
+  }
+
+  &--safer {
+    border-top: 2px solid rgba(34, 197, 94, 0.3);
+  }
+
+  &--growth {
+    border-top: 2px solid rgba(255, 153, 0, 0.4);
+  }
+}
+
+.demand-result__alt-type {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  .demand-result__alt--better & {
+    color: #a78bfa;
+  }
+
+  .demand-result__alt--safer & {
+    color: #22c55e;
+  }
+
+  .demand-result__alt--growth & {
+    color: #ff9900;
+  }
+}
+
+.demand-result__alt-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #c0c0c0;
+  margin: 0;
+}
+
+.demand-result__alt-desc {
+  font-size: 0.75rem;
+  color: #505050;
+  margin: 0;
+  line-height: 1.55;
+}
+
+// ── Confidence Bar ────────────────────────────────────────────────────────────
+
+.demand-result__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  &-label {
+    font-size: 0.65rem;
+    color: #303030;
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  &-bar {
+    flex: 1;
+    height: 3px;
+    background: #141414;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  &-fill {
+    height: 100%;
+    background: #ff9900;
+    border-radius: 2px;
+    opacity: 0.5;
+    transition: width 0.8s ease;
+  }
+
+  &-val {
+    font-size: 0.65rem;
+    color: #383838;
+    font-variant-numeric: tabular-nums;
+    min-width: 2.5rem;
+    text-align: right;
+    font-weight: 700;
+  }
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+
+@keyframes demand-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes demand-slide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes demand-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

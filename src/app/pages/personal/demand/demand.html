@@ -1,0 +1,112 @@
+<div class="demand">
+
+  <!-- ══ INPUT STATE ══════════════════════════════════════════════════════════ -->
+  @if (pageState() === 'input') {
+  <div class="demand-input" >
+    <header class="demand-input__header">
+      <p class="demand-input__eyebrow">Demand Intelligence</p>
+      <h1 class="demand-input__heading">What do you want?</h1>
+      <p class="demand-input__sub">Express it freely — the engine will interpret, evaluate, and guide.</p>
+    </header>
+
+    <div class="demand-input__form">
+      <div class="demand-input__field" [class.demand-input__field--error]="inputError()">
+        <textarea
+          class="demand-input__textarea"
+          [value]="userInput()"
+          (input)="userInput.set($any($event.target).value); inputError.set('')"
+          placeholder="I want to buy a new phone… I want to learn guitar… I want to quit my job…"
+          rows="4"
+        ></textarea>
+        @if (inputError()) {
+        <span class="demand-input__error">{{ inputError() }}</span>
+        }
+      </div>
+<!-- 
+      <div class="demand-input__context-row">
+        <label class="demand-input__context-label">Context <span>(optional)</span></label>
+        <input
+          class="demand-input__context"
+          type="text"
+          [value]="context()"
+          (input)="context.set($any($event.target).value)"
+          placeholder="Purpose or situation behind this desire…"
+        />
+      </div> -->
+
+      <button
+        class="demand-btn demand-btn--primary"
+        (click)="onEvaluate()"
+        [disabled]="!canEvaluate()"
+      >
+        Evaluate &rarr;
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- ══ EVALUATING STATE ══════════════════════════════════════════════════════ -->
+  @if (pageState() === 'evaluating') {
+  <div class="demand-eval">
+    <p class="demand-eval__title">Evaluating your request&hellip;</p>
+
+    <div class="demand-eval__layers">
+      @for (layer of layers(); track layer.label) {
+      <div class="demand-eval__layer" [class.demand-eval__layer--active]="layer.state === 'active'" [class.demand-eval__layer--done]="layer.state === 'done'">
+        <div class="demand-eval__layer-icon">
+          @if (layer.state === 'done')   { <span class="demand-eval__check">✓</span> }
+          @if (layer.state === 'active') { <span class="demand-eval__spinner"></span> }
+          @if (layer.state === 'pending'){ <span class="demand-eval__dot"></span> }
+        </div>
+        <span class="demand-eval__layer-label">{{ layer.label }}</span>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- ══ RESULT STATE ══════════════════════════════════════════════════════════ -->
+  @if (pageState() === 'result') {
+  @if (result(); as res) {
+  <div class="demand-result" [class]="'demand-result--' + decisionMeta().css">
+
+    <!-- Decision Badge -->
+    <div class="demand-result__badge">
+      <span class="demand-result__badge-icon">{{ decisionMeta().icon }}</span>
+      <span class="demand-result__badge-label">{{ decisionMeta().label }}</span>
+    </div>
+
+    <!-- Original request -->
+    <p class="demand-result__request">"{{ userInput() }}"</p>
+
+    <!-- AI message -->
+    <p class="demand-result__message">{{ res.message }}</p>
+
+    <!-- Alternatives grid (when not fully approved) -->
+    @if (res.alternatives.length > 0) {
+    <div class="demand-result__alts">
+      @for (alt of res.alternatives; track alt.title) {
+      <div class="demand-result__alt" [class]="'demand-result__alt--' + alt.type">
+        <span class="demand-result__alt-type">{{ altTypeLabel[alt.type] }}</span>
+        <p class="demand-result__alt-title">{{ alt.title }}</p>
+        <p class="demand-result__alt-desc">{{ alt.description }}</p>
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Confidence -->
+    <div class="demand-result__meta">
+      <span class="demand-result__meta-label">Engine confidence</span>
+      <div class="demand-result__meta-bar">
+        <div class="demand-result__meta-fill" [style.width.%]="res.confidence_score * 100"></div>
+      </div>
+      <span class="demand-result__meta-val">{{ (res.confidence_score * 100) | number:'1.0-0' }}%</span>
+    </div>
+
+    <button class="demand-btn demand-btn--ghost" (click)="reset()">Try Another</button>
+  </div>
+  }
+  }
+
+</div>

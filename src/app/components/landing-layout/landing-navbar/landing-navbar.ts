@@ -6,6 +6,7 @@ import { ThemeService } from '../../../services/theme/theme';
 export interface NavLink {
   label: string;
   route: string;
+  exact?: boolean;
 }
 
 @Component({

@@ -1,0 +1,715 @@
+// ── Life Orchestrator Dashboard ────────────────────────────────────────────────
+
+.orch {
+  padding: 0 0.5rem 4rem;
+  color: #e0e0e0;
+  min-height: 100vh;
+  font-size: 0.875rem;
+
+  &--sleep {
+    background: #020408;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+}
+
+// ── Sleep Mode ────────────────────────────────────────────────────────────────
+
+.orch-sleep {
+  text-align: center;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  &__orb {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1a3a6e 0%, #0a1929 60%, transparent 100%);
+    border: 1px solid rgba(74, 144, 217, 0.2);
+    box-shadow: 0 0 40px rgba(74, 144, 217, 0.15), 0 0 80px rgba(74, 144, 217, 0.05);
+    animation: orch-pulse 4s ease-in-out infinite;
+    margin-bottom: 1.5rem;
+  }
+
+  &__label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #4a90d9;
+    opacity: 0.7;
+  }
+
+  &__time {
+    font-size: 2rem;
+    font-weight: 200;
+    color: #1e3d5c;
+    letter-spacing: 0.1em;
+  }
+
+  &__hint {
+    font-size: 0.75rem;
+    color: #1a2a3a;
+    letter-spacing: 0.06em;
+    margin: 0;
+  }
+
+  &__devices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 1rem;
+  }
+
+  &__device {
+    font-size: 0.7rem;
+    color: #1a3a5c;
+    letter-spacing: 0.04em;
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.orch-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0 1.25rem;
+  border-bottom: 1px solid #141414;
+  margin-bottom: 1.25rem;
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  &__label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #404040;
+  }
+
+  &__date {
+    font-size: 0.78rem;
+    color: #505050;
+  }
+
+  &__clock {
+    font-size: 1.5rem;
+    font-weight: 200;
+    color: #707070;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// ── Timeline Strip ────────────────────────────────────────────────────────────
+
+.orch-timeline {
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+
+  &__track {
+    display: flex;
+    gap: 0.35rem;
+    padding: 0.5rem 0;
+    min-width: max-content;
+  }
+
+  &__pip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #181818;
+    background: #0c0c0c;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 3.5rem;
+    position: relative;
+
+    &:hover { border-color: #282828; background: #111; }
+    &--sleep { opacity: 0.35; }
+    &--past  { opacity: 0.45; }
+
+    &--current {
+      border-color: var(--phase-color, #ff9900);
+      background: color-mix(in srgb, var(--phase-color, #ff9900) 8%, #0c0c0c);
+      box-shadow: 0 0 0 1px var(--phase-color, #ff9900);
+    }
+
+    &--selected:not(&--current) {
+      border-color: #333;
+      background: #151515;
+    }
+
+    &--override::after {
+      content: '';
+      position: absolute;
+      top: 0.25rem;
+      right: 0.25rem;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #fb923c;
+    }
+
+    &-label {
+      font-size: 0.58rem;
+      color: #505050;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    &-now {
+      font-size: 0.5rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--phase-color, #ff9900);
+      text-transform: uppercase;
+    }
+  }
+}
+
+// ── NOW Panel ─────────────────────────────────────────────────────────────────
+
+.orch-now {
+  background: color-mix(in srgb, var(--phase-bg, #1a1a1a) 80%, #0a0a0a);
+  border: 1px solid color-mix(in srgb, var(--phase-accent, #ff9900) 20%, #181818);
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__header-left  { display: flex; flex-direction: column; gap: 0.3rem; }
+  &__header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+
+  &__hour {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--phase-accent, #ff9900);
+    opacity: 0.8;
+  }
+
+  &__intent {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  &__override-badge {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fb923c;
+    background: rgba(251, 146, 60, 0.1);
+    border: 1px solid rgba(251, 146, 60, 0.2);
+    border-radius: 0.25rem;
+    padding: 0.15rem 0.4rem;
+    display: inline-block;
+  }
+
+  &__confidence { display: flex; align-items: center; gap: 0.5rem; }
+
+  &__confidence-label {
+    font-size: 0.62rem;
+    color: #383838;
+    white-space: nowrap;
+  }
+
+  &__confidence-bar {
+    width: 64px;
+    height: 3px;
+    background: #1a1a1a;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  &__confidence-fill {
+    height: 100%;
+    background: var(--phase-accent, #ff9900);
+    border-radius: 2px;
+    transition: width 0.6s ease;
+    opacity: 0.7;
+  }
+
+  &__confidence-val {
+    font-size: 0.62rem;
+    color: #404040;
+    font-variant-numeric: tabular-nums;
+    min-width: 2rem;
+  }
+}
+
+// ── Override Button ───────────────────────────────────────────────────────────
+
+.orch-override-btn {
+  background: transparent;
+  border: 1px solid #252525;
+  border-radius: 0.375rem;
+  color: #555;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  &:hover { border-color: var(--phase-accent, #ff9900); color: var(--phase-accent, #ff9900); }
+
+  &--remove {
+    color: #4a2020;
+    border-color: #2a1a1a;
+    &:hover { border-color: #ff6b6b; color: #ff6b6b; }
+  }
+}
+
+// ── 3 Panels ──────────────────────────────────────────────────────────────────
+
+.orch-panels {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.orch-panel {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+
+  &--left  { border-right: 1px solid rgba(255, 255, 255, 0.04); }
+  &--right { border-left:  1px solid rgba(255, 255, 255, 0.04); }
+
+  @media (max-width: 768px) {
+    &--left, &--right { border: none; border-top: 1px solid rgba(255, 255, 255, 0.04); }
+  }
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #3a3a3a;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    &--left   { background: #4a90d9; }
+    &--middle { background: var(--phase-accent, #ff9900); }
+    &--right  { background: #a78bfa; }
+  }
+
+  &__insight  { font-size: 0.82rem; color: #707070; line-height: 1.65; margin: 0; }
+  &__activity { font-size: 1rem; font-weight: 700; color: #e0e0e0; margin: 0; line-height: 1.4; }
+  &__metrics  { display: flex; flex-direction: column; gap: 0.35rem; }
+  &__empty    { font-size: 0.75rem; color: #2a2a2a; margin: 0; font-style: italic; }
+}
+
+// ── Metrics ───────────────────────────────────────────────────────────────────
+
+.orch-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0.3rem;
+
+  &__label { color: #404040; }
+  &__value { color: #909090; font-weight: 700; }
+}
+
+// ── Guidance List ─────────────────────────────────────────────────────────────
+
+.orch-guidance {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__item {
+    font-size: 0.8rem;
+    color: #606060;
+    line-height: 1.55;
+    padding-left: 0.875rem;
+    position: relative;
+
+    &::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--phase-accent, #ff9900);
+      opacity: 0.6;
+      font-size: 0.65rem;
+      top: 0.1em;
+    }
+  }
+}
+
+// ── Tools ─────────────────────────────────────────────────────────────────────
+
+.orch-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.orch-tool {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.45rem 0.625rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #141414;
+  border-radius: 0.4rem;
+  transition: border-color 0.15s;
+
+  &:hover { border-color: #222; }
+  &__icon { font-size: 0.9rem; }
+  &__name { font-size: 0.75rem; color: #606060; }
+}
+
+// ── Devices ───────────────────────────────────────────────────────────────────
+
+.orch-devices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  &__label {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #2a2a2a;
+    margin-bottom: 0.2rem;
+  }
+}
+
+.orch-device {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  color: #454545;
+
+  &__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #a78bfa;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+}
+
+// ── Full Schedule List ────────────────────────────────────────────────────────
+
+.orch-schedule {
+  margin-top: 2rem;
+
+  &__title {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #2a2a2a;
+    margin: 0 0 0.75rem;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+}
+
+.orch-row {
+  display: grid;
+  grid-template-columns: 4.5rem 2px 1fr auto;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.625rem 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #0d0d0d;
+    .orch-row__edit { opacity: 1; }
+  }
+
+  &--current {
+    background: color-mix(in srgb, var(--row-accent, #ff9900) 6%, transparent);
+    .orch-row__hour { color: var(--row-accent, #ff9900); }
+    .orch-row__bar  { background: var(--row-accent, #ff9900); opacity: 1; }
+  }
+
+  &--selected:not(&--current) { background: #0d0d0d; }
+  &--past  { opacity: 0.45; }
+  &--sleep { opacity: 0.3; }
+
+  &__time {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    align-items: flex-end;
+  }
+
+  &__hour {
+    font-size: 0.7rem;
+    color: #3a3a3a;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__now {
+    font-size: 0.48rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--row-accent, #ff9900);
+    text-transform: uppercase;
+  }
+
+  &__bar {
+    height: 100%;
+    min-height: 28px;
+    width: 2px;
+    background: #141414;
+    border-radius: 1px;
+    opacity: 0.5;
+    transition: background 0.2s;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  &__intent {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #808080;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__activity {
+    font-size: 0.7rem;
+    color: #383838;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__tag {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #2e2e2e;
+    white-space: nowrap;
+    &--override { color: #fb923c; }
+  }
+
+  &__edit {
+    background: transparent;
+    border: none;
+    color: #2a2a2a;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0.15rem 0.3rem;
+    border-radius: 0.2rem;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+    line-height: 1;
+
+    &:hover { color: #707070; }
+  }
+}
+
+// ── Override Modal ────────────────────────────────────────────────────────────
+
+.orch-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  backdrop-filter: blur(4px);
+  animation: orch-fade 0.15s ease;
+}
+
+.orch-modal {
+  background: #0f0f0f;
+  border: 1px solid #222;
+  border-radius: 0.875rem;
+  width: 440px;
+  max-width: calc(100vw - 2rem);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  animation: orch-slide 0.18s ease;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #181818;
+  }
+
+  &__title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #606060;
+  }
+
+  &__close {
+    background: transparent;
+    border: none;
+    color: #404040;
+    font-size: 0.875rem;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    transition: color 0.15s;
+    &:hover { color: #e0e0e0; }
+  }
+
+  &__hint {
+    font-size: 0.75rem;
+    color: #383838;
+    padding: 0.875rem 1.25rem 0;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__input {
+    width: 100%;
+    background: #080808;
+    border: none;
+    border-top: 1px solid #141414;
+    color: #d0d0d0;
+    font-family: inherit;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    padding: 1rem 1.25rem;
+    outline: none;
+    resize: none;
+    box-sizing: border-box;
+    margin-top: 0.875rem;
+
+    &::placeholder { color: #2e2e2e; }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.875rem 1.25rem;
+    border-top: 1px solid #141414;
+    justify-content: flex-end;
+  }
+
+  &__btn {
+    padding: 0.45rem 1rem;
+    border-radius: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.18s;
+
+    &--cancel {
+      background: transparent;
+      color: #404040;
+      border-color: #1e1e1e;
+      &:hover { color: #e0e0e0; border-color: #333; }
+    }
+
+    &--save {
+      background: #ff9900;
+      color: #000;
+      border-color: #ff9900;
+      &:hover:not(:disabled) { background: #e68a00; }
+      &:disabled { opacity: 0.3; cursor: not-allowed; }
+    }
+
+    &--remove {
+      background: transparent;
+      color: #7a3030;
+      border-color: #2a1414;
+      &:hover { color: #ff6b6b; border-color: #ff6b6b; }
+    }
+  }
+}
+
+// ── Animations ────────────────────────────────────────────────────────────────
+
+@keyframes orch-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes orch-slide {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes orch-pulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(74, 144, 217, 0.12), 0 0 80px rgba(74, 144, 217, 0.04); }
+  50%       { box-shadow: 0 0 50px rgba(74, 144, 217, 0.25), 0 0 100px rgba(74, 144, 217, 0.08); }
+}
