@@ -1,96 +1,72 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterModule } from '@angular/router';
+import { RouterOutlet, RouterModule, ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { Navbar } from '../landing-layout/landing-navbar/landing-navbar';
 import { GlobalSearchComponent } from '../global-search/global-search';
-import { LocalNewsService, LocalNewsItem } from '../../services/local-news.service';
-import { DiscussionChatComponent } from '../discussion-chat/discussion-chat';
+import { filter, map, mergeMap } from 'rxjs';
+
+import { ContextSidebarComponent } from '../../pages/personal/context-sidebar/context-sidebar';
+import { AiToolsPage } from '../../pages/personal/ai-tools/ai-tools';
+import { LocalNewsPage } from '../../pages/personal/local-news/local-news';
 
 @Component({
     selector: 'app-personal-layout',
-    imports: [CommonModule, GlobalSearchComponent, RouterOutlet, RouterModule, Navbar, DiscussionChatComponent],
+    standalone: true,
+    imports: [
+      CommonModule, 
+      GlobalSearchComponent, 
+      RouterOutlet, 
+      RouterModule, 
+      Navbar,
+      ContextSidebarComponent,
+      AiToolsPage,
+      LocalNewsPage
+    ],
     templateUrl: './personal-layout.html',
     styleUrl: './personal-layout.scss'
 })
-export class PersonalLayout {
-    readonly localNews = inject(LocalNewsService);
+export class PersonalLayout implements OnInit {
+    private router = inject(Router);
+    private activatedRoute = inject(ActivatedRoute);
 
-    readonly subjectFilter = signal('');
-    readonly areaFilter = signal('');
-
-    readonly filteredPersonalized = computed(() =>
-        this.applyFilters(this.localNews.personalized)
-    );
-
-    readonly filteredNearby = computed(() =>
-        this.applyFilters(this.localNews.nearby)
-    );
-
-    readonly hasActiveFilter = computed(() =>
-        this.subjectFilter().trim() !== '' || this.areaFilter().trim() !== ''
-    );
-
-    readonly filtersOpen = signal(false);
-
-    toggleFilters(): void {
-        this.filtersOpen.update(v => !v);
-    }
-
-    private applyFilters(items: LocalNewsItem[]): LocalNewsItem[] {
-        const subj = this.subjectFilter().trim().toLowerCase();
-        const areaKm = parseFloat(this.areaFilter());
-
-        return items.filter(item => {
-            const matchesSubject = !subj ||
-                item.title.toLowerCase().includes(subj) ||
-                item.tag.toLowerCase().includes(subj);
-
-            const matchesArea = isNaN(areaKm) || item.distance <= areaKm;
-
-            return matchesSubject && matchesArea;
-        });
-    }
-
-    clearFilters(): void {
-        this.subjectFilter.set('');
-        this.areaFilter.set('');
-    }
-
+    readonly sidebarType = signal<'news' | 'contextual'>('news');
+    readonly leftSidebarOpen = signal(true);
+    readonly rightSidebarOpen = signal(true);
     readonly topNavItems = [
         { label: 'HOME', route: '/', exact: true },
-        // { label: 'HUB', route: '/personal/action-hub' },
         { label: 'CREATE', route: '/personal/create' },
+        { label: 'NEARBY', route: '/personal/local-news' },
+        { label: 'AI TOOLS', route: '/personal/ai-tools' },
         { label: 'ADVERTISE', route: '/personal/advertise' },
         { label: 'DEMAND', route: '/personal/demand' },
         { label: 'SUPPLY', route: '/personal/supply' },
         { label: 'EDIT', route: '/personal/edit' },
     ];
 
-    readonly leftSidebarOpen = signal(true);
-    readonly rightPanelOpen = signal(true);
-    readonly mobileLeftOpen = signal(false);
-    readonly mobileRightOpen = signal(false);
-
-    toggleLeftSidebar(): void {
-        this.leftSidebarOpen.update(v => !v);
+    ngOnInit(): void {
+      this.router.events.pipe(
+        filter(event => event instanceof NavigationEnd),
+        map(() => this.activatedRoute),
+        map(route => {
+          while (route.firstChild) route = route.firstChild;
+          return route;
+        }),
+        filter(route => route.outlet === 'primary'),
+        mergeMap(route => route.data)
+      ).subscribe(data => {
+        const type = data['leftSidebar'] || 'news';
+        this.sidebarType.set(type as 'news' | 'contextual');
+      });
+      
+      // Also check initial route
+      let route = this.activatedRoute;
+      while (route.firstChild) route = route.firstChild;
+      route.data.subscribe(data => {
+        const type = data['leftSidebar'] || 'news';
+        this.sidebarType.set(type as 'news' | 'contextual');
+      });
     }
 
-    toggleRightPanel(): void {
-        this.rightPanelOpen.update(v => !v);
-    }
-
-    toggleMobileLeft(): void {
-        this.mobileLeftOpen.update(v => !v);
-        if (this.mobileRightOpen()) this.mobileRightOpen.set(false);
-    }
-
-    toggleMobileRight(): void {
-        this.mobileRightOpen.update(v => !v);
-        if (this.mobileLeftOpen()) this.mobileLeftOpen.set(false);
-    }
-
-    closeMobileOverlays(): void {
-        this.mobileLeftOpen.set(false);
-        this.mobileRightOpen.set(false);
-    }
+    toggleLeftSidebar(): void { this.leftSidebarOpen.update(v => !v); }
+    toggleRightSidebar(): void { this.rightSidebarOpen.update(v => !v); }
 }

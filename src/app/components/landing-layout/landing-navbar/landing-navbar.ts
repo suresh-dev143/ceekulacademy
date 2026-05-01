@@ -2,6 +2,7 @@ import { Component, signal, input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ThemeService } from '../../../services/theme/theme';
+import { AuthService } from '../../../services/auth.service';
 
 export interface NavLink {
   label: string;
@@ -23,7 +24,9 @@ export class Navbar {
 
   protected readonly isMobileMenuOpen = signal(false);
   protected readonly isLandingActionsOpen = signal(false);
+  protected readonly showUserMenu = signal(false);
   protected readonly themeService = inject(ThemeService);
+  protected readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
   toggleMobileMenu(): void {
@@ -36,6 +39,15 @@ export class Navbar {
 
   toggleLandingActions(): void {
     this.isLandingActionsOpen.update(value => !value);
+  }
+
+  toggleUserMenu(): void {
+    this.showUserMenu.update(v => !v);
+  }
+
+  logout(): void {
+    this.showUserMenu.set(false);
+    this.authService.logout();
   }
 
   toggleTheme(): void {

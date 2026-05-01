@@ -11,32 +11,37 @@
       <h1 aria-label="CEEKUL CIVILISATION">CEEKUL CIVILISATION</h1>
     </div>
     } @else {
-    <!-- Digital Life Title + Personal Navigation (Desktop only) -->
+    <!-- Digital Life Title (nav links moved to global search menu drawer) -->
     <div class="navbar__personal">
       <a routerLink="/personal/digital-life" class="navbar__digital-title">Digital Life</a>
-      @if (navLinks().length > 0) {
-      <nav class="navbar__personal-nav" [class.navbar__personal-nav--open]="isMobileMenuOpen()">
-        @for (link of navLinks(); track link.route) {
-        <a [routerLink]="link.route" routerLinkActive="navbar__personal-nav-link--active"
-          [routerLinkActiveOptions]="{ exact: link.exact || link.route === '/' }"
-          class="navbar__personal-nav-link" (click)="closeMobileMenu()">
-          {{ link.label }}
-        </a>
-        }
-      </nav>
-      }
     </div>
     }
     <!-- App User Profile Section -->
     <div class="navbar__actions">
+      @if (authService.currentUserProfile()?.ceebrainId) {
+        <div class="navbar__user-menu">
+          <button class="navbar__ceebrain-id" [class.active]="showUserMenu()"
+            (click)="toggleUserMenu()" aria-label="User menu">
+            <span class="navbar__ceebrain-label">CB</span>
+            <span class="navbar__ceebrain-value">{{ authService.currentUserProfile()?.ceebrainId }}</span>
+          </button>
+          @if (showUserMenu()) {
+            <div class="navbar__backdrop" (click)="showUserMenu.set(false)"></div>
+            <div class="navbar__dropdown">
+              <button class="navbar__dropdown-item navbar__dropdown-item--logout" (click)="logout()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Logout
+              </button>
+            </div>
+          }
+        </div>
+      }
     </div>
-
-    <!-- Mobile Menu Toggle (Personal page only) -->
-    @if (!isLandingPage()) {
-    <button class="navbar__mobile-toggle" (click)="toggleMobileMenu()" aria-label="Toggle menu">
-      <span class="navbar__hamburger" [class.navbar__hamburger--open]="isMobileMenuOpen()"></span>
-    </button>
-    }
 
   </div>
 </nav>

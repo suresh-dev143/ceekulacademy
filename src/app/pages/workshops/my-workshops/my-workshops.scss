@@ -1,10 +1,26 @@
 .my-ws-container {
-    max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 0;
     animation: fadeIn 0.4s ease-out;
 }
+.view-header {
+    text-align: left;
+    margin-bottom: 1.5rem;
 
+    .breadcrumb {
+        font-size: 0.9rem;
+        color: #94a3b8;
+
+        a {
+            color: #2563eb;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
 .header-row {
     display: flex;
     justify-content: space-between;

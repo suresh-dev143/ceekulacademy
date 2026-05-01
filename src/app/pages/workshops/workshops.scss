@@ -9,7 +9,48 @@
 
 .view-header {
     text-align: center;
+    margin-bottom: 2rem;
 
+    .workshop-actions-top {
+        display: flex;
+        justify-content: right;
+        gap: 1.2rem;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+
+        .action-btn-top {
+            background: color-mix(in srgb, #fff, transparent 96%);
+            border: 1px solid color-mix(in srgb, #fff, transparent 92%);
+            color: var(--text-primary);
+            padding: 0.7rem 1.4rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            backdrop-filter: blur(8px);
+
+            i {
+                color: #FF6B00;
+                font-size: 1.1rem;
+            }
+
+            &:hover {
+                background: color-mix(in srgb, #FF6B00, transparent 92%);
+                border-color: color-mix(in srgb, #FF6B00, transparent 75%);
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px rgba(255, 107, 0, 0.15);
+                color: white;
+            }
+
+            &:active {
+                transform: translateY(-1px);
+            }
+        }
+    }
 }
 
 .page-title {

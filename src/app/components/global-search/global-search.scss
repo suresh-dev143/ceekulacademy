@@ -644,3 +644,75 @@
         padding: 0.65rem 1.25rem;
     }
 }
+
+// ═══════════════════════════════════ MENU BUTTON ══
+
+.gs-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: color-mix(in srgb, #fff, transparent 65%);
+    font-size: 0.72rem;
+    padding: 0.3rem 0.45rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.15s;
+    border-radius: 2px;
+
+    &:hover {
+        color: var(--text-primary);
+    }
+
+    &--open {
+        color: var(--accent-primary);
+    }
+}
+
+// ═══════════════════════════════════ NAV MENU DROPDOWN ══
+
+.gs-nav-panel {
+    background: #070707;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-top: none;
+    animation: gs-panel-in 0.15s ease;
+}
+
+.gs-nav-panel__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 0.4rem 0.6rem;
+}
+
+.gs-nav-panel__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.75rem;
+    color: rgba(255, 255, 255, 0.45);
+    text-decoration: none;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    border-radius: 2px;
+
+    i {
+        font-size: 0.62rem;
+        opacity: 0.7;
+    }
+
+    &:hover {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    &--active {
+        color: var(--accent-primary);
+        border-bottom-color: var(--accent-primary);
+    }
+}

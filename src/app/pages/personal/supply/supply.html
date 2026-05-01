@@ -1,0 +1,425 @@
+<div class="supply">
+
+  <!-- ══ SUCCESS VIEW ══════════════════════════════════════════════════════════ -->
+  @if (view() === 'success') {
+  <div class="supply-success">
+    <div class="supply-success__icon">✓</div>
+    <h2 class="supply-success__title">Offer Submitted</h2>
+    <p class="supply-success__sub">Your supply has been added to the Ceekul ecosystem.</p>
+    <div class="supply-success__actions">
+      <button class="supply-btn supply-btn--primary" (click)="reset()">Submit Another</button>
+    </div>
+  </div>
+  }
+
+  <!-- ══ FORM VIEW ═══════════════════════════════════════════════════════════ -->
+  @if (view() === 'form') {
+
+  <!-- Header -->
+  <header class="supply-header">
+    <p class="supply-header__eyebrow">Provider Contribution System</p>
+    <h1 class="supply-header__title">Offer / Supply to Ecosystem</h1>
+    <p class="supply-header__sub">Provide value to the community by offering your knowledge, services, or infrastructure.</p>
+  </header>
+
+  <!-- ── Category Selection ─────────────────────────────────────────────────── -->
+  <section class="supply-section">
+    <h2 class="supply-section__heading">Select Category <span class="supply-required">*</span></h2>
+    <div class="supply-categories">
+      @for (cat of categories; track cat.id) {
+      <button class="supply-cat"
+        [class.supply-cat--active]="category() === cat.id"
+        (click)="selectCategory(cat.id)">
+        <span class="supply-cat__icon">{{ cat.icon }}</span>
+        <span class="supply-cat__label">{{ cat.label }}</span>
+      </button>
+      }
+    </div>
+  </section>
+
+  <!-- ── Dynamic Form ─────────────────────────────────────────────────────── -->
+  @if (category()) {
+  <div class="supply-form">
+
+    <!-- ── Basic Information ─────────────────────────────────────── -->
+    <section class="supply-section">
+      <h2 class="supply-section__heading">Basic Information</h2>
+      <div class="supply-grid">
+
+        @if (isEducation() || isHealthcare() || isJustice()) {
+        <label class="supply-field">
+          <span class="supply-field__label">Area</span>
+          <select class="supply-input" [(ngModel)]="area">
+            <option value="">— Select Area —</option>
+            @for (a of areas; track a) { <option [value]="a">{{ a }}</option> }
+          </select>
+        </label>
+        }
+
+        <label class="supply-field supply-field--wide">
+          <span class="supply-field__label">Title <span class="supply-required">*</span></span>
+          <input class="supply-input" type="text" [(ngModel)]="title"
+            placeholder="e.g. Advanced Mathematics for Grade 10"
+            [class.supply-input--error]="errors()['title']" />
+          @if (errors()['title']) { <span class="supply-field__error">{{ errors()['title'] }}</span> }
+        </label>
+
+        <label class="supply-field">
+          <span class="supply-field__label">Ceebrain ID (Provider) <span class="supply-required">*</span></span>
+          <input class="supply-input" type="text" [(ngModel)]="ceebrainId"
+            placeholder="Your Ceebrain ID"
+            [class.supply-input--error]="errors()['ceebrainId']" />
+          @if (errors()['ceebrainId']) { <span class="supply-field__error">{{ errors()['ceebrainId'] }}</span> }
+        </label>
+
+        <!-- Education-specific -->
+        @if (isEducation()) {
+        <label class="supply-field supply-field--wide">
+          <span class="supply-field__label">Details of Teacher / Provider</span>
+          <textarea class="supply-input supply-input--textarea" rows="3" [(ngModel)]="providerDetails"
+            placeholder="Qualifications, experience, specialisations…"></textarea>
+        </label>
+        <label class="supply-field">
+          <span class="supply-field__label">Mode of Teaching</span>
+          <select class="supply-input" [(ngModel)]="mode">
+            <option value="">— Select Mode —</option>
+            <option value="online">Online</option>
+            <option value="offline">Offline</option>
+            <option value="hybrid">Hybrid</option>
+          </select>
+        </label>
+        }
+
+        <!-- Healthcare-specific -->
+        @if (isHealthcare()) {
+        <label class="supply-field">
+          <span class="supply-field__label">Type of Service</span>
+          <select class="supply-input" [(ngModel)]="serviceType">
+            <option value="">— Select Type —</option>
+            <option value="clinic">Clinic</option>
+            <option value="consultation">Consultation</option>
+            <option value="therapy">Therapy</option>
+            <option value="diagnostic">Diagnostic</option>
+          </select>
+        </label>
+        <label class="supply-field supply-field--wide">
+          <span class="supply-field__label">Specialist Details</span>
+          <textarea class="supply-input supply-input--textarea" rows="3" [(ngModel)]="specialistInfo"
+            placeholder="Specialisation, qualifications, experience…"></textarea>
+        </label>
+        }
+
+        <!-- Justice-specific -->
+        @if (isJustice()) {
+        <label class="supply-field">
+          <span class="supply-field__label">Legal Service Type</span>
+          <input class="supply-input" type="text" [(ngModel)]="serviceType"
+            placeholder="e.g. Civil, Criminal, Family" />
+        </label>
+        <label class="supply-field">
+          <span class="supply-field__label">Years of Experience</span>
+          <input class="supply-input" type="text" [(ngModel)]="experience"
+            placeholder="e.g. 10 years" />
+        </label>
+        <label class="supply-field">
+          <span class="supply-field__label">Case Categories</span>
+          <input class="supply-input" type="text" [(ngModel)]="caseCategories"
+            placeholder="e.g. Divorce, Property, Consumer" />
+        </label>
+        }
+
+        <!-- Infrastructure-specific -->
+        @if (isInfrastructure()) {
+        <label class="supply-field">
+          <span class="supply-field__label">Type of Infrastructure</span>
+          <select class="supply-input" [(ngModel)]="serviceType">
+            <option value="">— Select Type —</option>
+            <option value="classroom">Classroom</option>
+            <option value="lab">Lab</option>
+            <option value="hall">Hall</option>
+            <option value="equipment">Equipment</option>
+            <option value="field">Field / Ground</option>
+          </select>
+        </label>
+        <label class="supply-field">
+          <span class="supply-field__label">Capacity</span>
+          <input class="supply-input" type="text" [(ngModel)]="capacity"
+            placeholder="e.g. 60 seats" />
+        </label>
+        <label class="supply-field supply-field--wide">
+          <span class="supply-field__label">Location / Address</span>
+          <input class="supply-input" type="text" [(ngModel)]="address"
+            placeholder="Full address" />
+        </label>
+        }
+
+        <!-- Service / Product -->
+        @if (isServiceOrProduct()) {
+        <label class="supply-field supply-field--wide">
+          <span class="supply-field__label">Description</span>
+          <textarea class="supply-input supply-input--textarea" rows="3" [(ngModel)]="description"
+            placeholder="Describe the service / product…"></textarea>
+        </label>
+        <label class="supply-field">
+          <span class="supply-field__label">Use Cases</span>
+          <input class="supply-input" type="text" [(ngModel)]="useCases"
+            placeholder="Who is it for?" />
+        </label>
+        <label class="supply-field">
+          <span class="supply-field__label">Delivery Mode</span>
+          <input class="supply-input" type="text" [(ngModel)]="deliveryMode"
+            placeholder="e.g. Online, On-site, Courier" />
+        </label>
+        }
+
+      </div>
+    </section>
+
+    <!-- ── Schedule ──────────────────────────────────────────────── -->
+    @if (!isServiceOrProduct() && !isInfrastructure()) {
+    <section class="supply-section">
+      <div class="supply-section__row">
+        <h2 class="supply-section__heading">Schedule</h2>
+        <button class="supply-btn supply-btn--ghost supply-btn--sm" (click)="addScheduleRow()">+ Add Slot</button>
+      </div>
+
+      <div class="supply-schedule">
+        @for (row of scheduleRows(); track $index; let i = $index) {
+        <div class="supply-schedule__row">
+          <select class="supply-input" [value]="row.day"
+            (change)="updateScheduleRow(i, 'day', $any($event.target).value)">
+            <option value="">Day</option>
+            @for (d of days; track d) { <option [value]="d">{{ d }}</option> }
+          </select>
+          <input class="supply-input" type="time" [value]="row.time"
+            (input)="updateScheduleRow(i, 'time', $any($event.target).value)"
+            placeholder="Time" />
+          <input class="supply-input" type="text" [value]="row.location"
+            (input)="updateScheduleRow(i, 'location', $any($event.target).value)"
+            placeholder="Location / Platform" />
+          <button class="supply-schedule__remove" (click)="removeScheduleRow(i)" [disabled]="scheduleRows().length <= 1"
+            aria-label="Remove row">✕</button>
+        </div>
+        }
+      </div>
+
+      <div class="supply-grid supply-grid--2">
+        <label class="supply-field">
+          <span class="supply-field__label">Duration — From</span>
+          <input class="supply-input" type="date" [(ngModel)]="durationFrom" />
+        </label>
+        <label class="supply-field">
+          <span class="supply-field__label">Duration — To</span>
+          <input class="supply-input" type="date" [(ngModel)]="durationTo"
+            [class.supply-input--error]="errors()['duration']" />
+          @if (errors()['duration']) { <span class="supply-field__error">{{ errors()['duration'] }}</span> }
+        </label>
+      </div>
+    </section>
+    }
+
+    <!-- ── Financial ──────────────────────────────────────────────── -->
+    <section class="supply-section">
+      <h2 class="supply-section__heading">
+        @if (isServiceOrProduct()) { Pricing } @else { Financial Details }
+      </h2>
+      <div class="supply-grid">
+
+        @if (isServiceOrProduct()) {
+        <label class="supply-field">
+          <span class="supply-field__label">Pricing Model</span>
+          <input class="supply-input" type="text" [(ngModel)]="pricingModel"
+            placeholder="e.g. Per session, Monthly, One-time" />
+        </label>
+        }
+
+        <label class="supply-field">
+          <span class="supply-field__label">Fees / Price (₹)
+            @if (isInfrastructure()) { <em class="supply-field__hint">per hour/day</em> }
+          </span>
+          <input class="supply-input" type="number" [(ngModel)]="fees" min="0"
+            placeholder="0"
+            [class.supply-input--error]="errors()['fees']" />
+          @if (errors()['fees']) { <span class="supply-field__error">{{ errors()['fees'] }}</span> }
+        </label>
+
+        @if (!isServiceOrProduct()) {
+        <label class="supply-field">
+          <span class="supply-field__label">Concession (%)</span>
+          <input class="supply-input" type="number" [(ngModel)]="concession" min="0" max="100"
+            placeholder="0"
+            [class.supply-input--error]="errors()['concession']" />
+          @if (errors()['concession']) { <span class="supply-field__error">{{ errors()['concession'] }}</span> }
+        </label>
+
+        <label class="supply-field">
+          <span class="supply-field__label">Revenue Share for Executive (%)</span>
+          <input class="supply-input" type="number" [(ngModel)]="revenueShare" min="0" max="100"
+            placeholder="0"
+            [class.supply-input--error]="errors()['revenueShare']" />
+          @if (errors()['revenueShare']) { <span class="supply-field__error">{{ errors()['revenueShare'] }}</span> }
+        </label>
+
+        <label class="supply-field supply-field--wide">
+          <span class="supply-field__label">Special Category Concession</span>
+          <div class="supply-checks">
+            <label class="supply-check">
+              <input type="checkbox" [(ngModel)]="bplFemale" />
+              <span>BPL Female</span>
+            </label>
+            <label class="supply-check">
+              <input type="checkbox" [(ngModel)]="bplMale" />
+              <span>BPL Male</span>
+            </label>
+          </div>
+        </label>
+        }
+
+      </div>
+    </section>
+
+    <!-- ── Contact ────────────────────────────────────────────────── -->
+    <section class="supply-section">
+      <h2 class="supply-section__heading">Contact Information</h2>
+      <div class="supply-grid">
+        <label class="supply-field">
+          <span class="supply-field__label">Phone</span>
+          <input class="supply-input" type="tel" [(ngModel)]="phone" placeholder="+91 XXXXX XXXXX" />
+        </label>
+        <label class="supply-field">
+          <span class="supply-field__label">Email</span>
+          <input class="supply-input" type="email" [(ngModel)]="email" placeholder="provider@example.com" />
+        </label>
+        @if (!isInfrastructure()) {
+        <label class="supply-field supply-field--wide">
+          <span class="supply-field__label">Address</span>
+          <input class="supply-input" type="text" [(ngModel)]="address" placeholder="Full address" />
+        </label>
+        }
+      </div>
+    </section>
+
+    <!-- ── Resources ─────────────────────────────────────────────── -->
+    <section class="supply-section">
+      <div class="supply-section__row">
+        <h2 class="supply-section__heading">Resources</h2>
+        <button class="supply-btn supply-btn--ghost supply-btn--sm" (click)="openResourceForm()">+ Add Resource</button>
+      </div>
+
+      <!-- Resource form (inline) -->
+      @if (resourceFormOpen()) {
+      <div class="supply-resource-form">
+        <div class="supply-grid">
+          <label class="supply-field">
+            <span class="supply-field__label">Resource Type</span>
+            <input class="supply-input" type="text"
+              [value]="draftResource().resourceType"
+              (input)="updateDraftResource('resourceType', $any($event.target).value)"
+              placeholder="e.g. Video, PDF, Tool" />
+          </label>
+          <label class="supply-field">
+            <span class="supply-field__label">Resource Name <span class="supply-required">*</span></span>
+            <input class="supply-input" type="text"
+              [value]="draftResource().resourceName"
+              (input)="updateDraftResource('resourceName', $any($event.target).value)"
+              placeholder="Name of resource" />
+          </label>
+          <label class="supply-field supply-field--wide">
+            <span class="supply-field__label">Details</span>
+            <textarea class="supply-input supply-input--textarea" rows="2"
+              [value]="draftResource().details"
+              (input)="updateDraftResource('details', $any($event.target).value)"
+              placeholder="Description of resource…"></textarea>
+          </label>
+          <label class="supply-field">
+            <span class="supply-field__label">Possible Uses</span>
+            <input class="supply-input" type="text"
+              [value]="draftResource().possibleUses"
+              (input)="updateDraftResource('possibleUses', $any($event.target).value)"
+              placeholder="How can this be used?" />
+          </label>
+          <label class="supply-field">
+            <span class="supply-field__label">Enable Options</span>
+            <div class="supply-checks">
+              <label class="supply-check">
+                <input type="checkbox"
+                  [checked]="draftResource().discussionEnabled"
+                  (change)="updateDraftResource('discussionEnabled', $any($event.target).checked)" />
+                <span>Open Discussion</span>
+              </label>
+              <label class="supply-check">
+                <input type="checkbox"
+                  [checked]="draftResource().gradingEnabled"
+                  (change)="updateDraftResource('gradingEnabled', $any($event.target).checked)" />
+                <span>Grading</span>
+              </label>
+            </div>
+          </label>
+        </div>
+        <div class="supply-resource-form__actions">
+          <button class="supply-btn supply-btn--primary supply-btn--sm" (click)="saveResource()"
+            [disabled]="!draftResource().resourceName.trim()">
+            {{ editingIndex() !== null ? 'Update' : 'Add' }} Resource
+          </button>
+          <button class="supply-btn supply-btn--ghost supply-btn--sm" (click)="closeResourceForm()">Cancel</button>
+        </div>
+      </div>
+      }
+
+      <!-- Resource table -->
+      @if (savedResources().length > 0) {
+      <div class="supply-table-wrap">
+        <table class="supply-table">
+          <thead>
+            <tr>
+              <th>SN</th>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Possible Uses</th>
+              <th>Discussion</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (res of savedResources(); track $index; let i = $index) {
+            <tr>
+              <td class="supply-table__sn">{{ i + 1 }}</td>
+              <td>{{ res.resourceType || '—' }}</td>
+              <td class="supply-table__name">{{ res.resourceName }}</td>
+              <td>{{ res.possibleUses || '—' }}</td>
+              <td>
+                <span class="supply-pill" [class.supply-pill--on]="res.discussionEnabled">
+                  {{ res.discussionEnabled ? 'Yes' : 'No' }}
+                </span>
+              </td>
+              <td class="supply-table__actions">
+                <button class="supply-table-btn" (click)="openResourceForm(i)" title="Edit">✎</button>
+                <button class="supply-table-btn supply-table-btn--del" (click)="removeResource(i)" title="Delete">✕</button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+    </section>
+
+    <!-- ── Submit ─────────────────────────────────────────────────── -->
+    @if (submitError()) {
+    <div class="supply-error-banner">{{ submitError() }}</div>
+    }
+
+    <div class="supply-submit">
+      <button class="supply-btn supply-btn--primary supply-btn--lg"
+        [disabled]="!canSubmit()"
+        (click)="submit()">
+        @if (submitting()) { Submitting… } @else { Submit Offer →  }
+      </button>
+      <p class="supply-submit__hint">Fields marked <span class="supply-required">*</span> are mandatory</p>
+    </div>
+
+  </div>
+  }
+
+  }
+</div>

@@ -1,12 +1,12 @@
 import { Component, signal, computed, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Subject, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs/operators';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '../../services/auth.service';
-import { LayoutComponent } from '../../components/layout/layout';
 import { WorkshopCardComponent } from './workshop-card/workshop-card';
 import { WorkshopDetailComponent } from './workshop-detail/workshop-detail';
 import {
@@ -119,7 +119,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
     standalone: true,
     imports: [
         FormsModule,
-        LayoutComponent, WorkshopCardComponent, WorkshopDetailComponent,
+        RouterModule, WorkshopCardComponent, WorkshopDetailComponent,
     ],
     templateUrl: './workshops.html',
     styleUrl: './workshops.scss',

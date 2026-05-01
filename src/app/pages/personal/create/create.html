@@ -1,336 +1,264 @@
-<div class="canvas-editor">
-
-  <!-- ── SUCCESS STATE ─────────────────────────────────────────────────────── -->
-  @if (submitSuccess()) {
-  <div class="canvas-success">
-    <div class="canvas-success__icon">✓</div>
-    <h2 class="canvas-success__heading">
-      @if (validationResult()?.status === 'APPROVED') { Published! } @else { Submitted! }
-    </h2>
-    <p class="canvas-success__text">
-      @if (validationResult()?.status === 'APPROVED') {
-        Your page passed AI review and is now live.
-      } @else {
-        Your page is queued for human review. We'll notify you once it's live.
-      }
-    </p>
-
-    @if (validationResult(); as vr) {
-    <div class="canvas-validation">
-      <span class="canvas-validation__label">AI Content Analysis</span>
-      @if (vr.category_match_score > 0 || vr.safety_score > 0 || vr.quality_score > 0) {
-      <div class="canvas-validation__scores">
-        <div class="canvas-validation__row">
-          <span class="canvas-validation__name">Relevance</span>
-          <div class="canvas-validation__bar"><span class="canvas-validation__fill" [style.width.%]="vr.category_match_score" [style.background]="scoreColor(vr.category_match_score)"></span></div>
-          <span class="canvas-validation__val" [style.color]="scoreColor(vr.category_match_score)">{{ vr.category_match_score }}</span>
-        </div>
-        <div class="canvas-validation__row">
-          <span class="canvas-validation__name">Safety</span>
-          <div class="canvas-validation__bar"><span class="canvas-validation__fill" [style.width.%]="vr.safety_score" [style.background]="scoreColor(vr.safety_score)"></span></div>
-          <span class="canvas-validation__val" [style.color]="scoreColor(vr.safety_score)">{{ vr.safety_score }}</span>
-        </div>
-        <div class="canvas-validation__row">
-          <span class="canvas-validation__name">Quality</span>
-          <div class="canvas-validation__bar"><span class="canvas-validation__fill" [style.width.%]="vr.quality_score" [style.background]="scoreColor(vr.quality_score)"></span></div>
-          <span class="canvas-validation__val" [style.color]="scoreColor(vr.quality_score)">{{ vr.quality_score }}</span>
-        </div>
-      </div>
-      }
-      <p class="canvas-validation__reason">{{ vr.reason }}</p>
+<div class="ceekul-create-surface">
+  <!-- ── MAIN CONTENT VIEWPORT ────────────────────────────────────────────── -->
+  <main class="create-viewport">
+    <!-- action buttons -->
+    <div class="create-action-bar"> <button class="cab-btn" (click)="openLibrary()">Update</button>
+      <button class="cab-btn" (click)="activeModal.set('upload')">Upload</button>
     </div>
-    }
 
-    <button class="canvas-btn canvas-btn--primary" (click)="resetEditor()">Create Another Page</button>
-  </div>
+    <!-- Ideas & Opinions -->
+    
 
-  } @else {
 
-  <!-- ── TOP BAR ────────────────────────────────────────────────────────────── -->
-  <div class="canvas-topbar">
-    <div class="canvas-topbar__left">
-      <span class="canvas-topbar__brand">Canvas Editor</span>
-      @if (savedFlash()) { <span class="canvas-topbar__saved">Saved</span> }
-    </div>
-    <div class="canvas-topbar__actions">
-      <button class="canvas-btn canvas-btn--ghost" (click)="saveDraft()" [disabled]="saving()">
-        {{ saving() ? 'Saving…' : 'Save Draft' }}
-      </button>
-      <button class="canvas-btn canvas-btn--primary" (click)="onSubmit()" [disabled]="!canSubmit() || submitting()">
-        {{ submitting() ? 'Submitting…' : 'Submit' }}
-      </button>
-    </div>
-  </div>
-
-  <!-- ── HEADER: TITLE + CATEGORY ──────────────────────────────────────────── -->
-  <div class="canvas-header">
-    <input
-      class="canvas-title-input"
-      type="text"
-      [value]="title()"
-      (input)="title.set($any($event.target).value)"
-      placeholder="Title your page..."
-      maxlength="120"
-    />
-    <div class="canvas-header__meta">
-      <select
-        class="canvas-category-select"
-        [value]="category()"
-        (change)="category.set($any($event.target).value)"
-      >
-        <option value="">Select Category</option>
-        @for (key of categoryKeys; track key) {
-        <option [value]="key">{{ getCategoryLabel(key) }}</option>
-        }
-      </select>
-      <span class="canvas-header__char">{{ title().length }} / 120</span>
-    </div>
-  </div>
-
-  <!-- ── PITSSS WARNINGS ───────────────────────────────────────────────────── -->
-  @if (pitsssErrors().length > 0) {
-  <div class="canvas-pitsss">
-    <p class="canvas-pitsss__title">⚠️ Quality Checklist</p>
-    @for (err of pitsssErrors(); track err) {
-    <p class="canvas-pitsss__item">{{ err }}</p>
-    }
-    <div class="canvas-pitsss__actions">
-      <button class="canvas-btn canvas-btn--ghost canvas-btn--sm" (click)="pitsssErrors.set([])">I'll fix it</button>
-      <button class="canvas-btn canvas-btn--warn canvas-btn--sm" (click)="acknowledgePITSSS()">Submit anyway</button>
-    </div>
-  </div>
-  }
-
-  <!-- ── SUBMIT ERROR ──────────────────────────────────────────────────────── -->
-  @if (submitError()) {
-  <div class="canvas-error">{{ submitError() }}</div>
-  }
-
-  <!-- ── CANVAS BLOCKS ─────────────────────────────────────────────────────── -->
-  <div class="canvas-body">
-
-    @for (block of blocks(); track block.id; let i = $index) {
-    <div
-      class="canvas-block"
-      [class.canvas-block--dragging]="dragFromIndex() === i"
-      [class.canvas-block--dragover]="dragOverIndex() === i"
-      draggable="true"
-      (dragstart)="onDragStart(i, $event)"
-      (dragover)="onDragOver(i, $event)"
-      (drop)="onDrop(i, $event)"
-      (dragend)="onDragEnd()"
-    >
-      <!-- Block toolbar -->
-      <div class="canvas-block__toolbar">
-        <span class="canvas-block__handle" title="Drag to reorder">⠿</span>
-        <span class="canvas-block__type-badge">{{ block.type }}</span>
-        <div class="canvas-block__controls">
-          <button class="canvas-block__ctrl" (click)="moveBlock(i, -1)" [disabled]="i === 0" title="Move up">↑</button>
-          <button class="canvas-block__ctrl" (click)="moveBlock(i, 1)" [disabled]="i === blocks().length - 1" title="Move down">↓</button>
-          <button class="canvas-block__ctrl" (click)="duplicateBlock(block.id)" title="Duplicate">❐</button>
-          <button class="canvas-block__ctrl canvas-block__ctrl--delete" (click)="deleteBlock(block.id)" title="Delete">✕</button>
-        </div>
-      </div>
-
-      <!-- Block content -->
-      <div class="canvas-block__body">
-
-        <!-- TEXT BLOCK -->
-        @if (block.type === 'text') {
-        <textarea
-          class="canvas-text"
-          [value]="block.content['html']"
-          (input)="updateBlockContent(block.id, 'html', $any($event.target).value)"
-          placeholder="Start writing... Use 'Problem:' to describe the issue you are addressing."
-          rows="5"
-        ></textarea>
-        }
-
-        <!-- CODE BLOCK -->
-        @if (block.type === 'code') {
-        <div class="canvas-code">
-          <div class="canvas-code__header">
-            <select
-              class="canvas-code__lang"
-              [value]="block.content['language']"
-              (change)="updateBlockContent(block.id, 'language', $any($event.target).value)"
-            >
-              <option value="javascript">JavaScript</option>
-              <option value="typescript">TypeScript</option>
-              <option value="python">Python</option>
-              <option value="html">HTML</option>
-              <option value="css">CSS</option>
-              <option value="bash">Bash</option>
-              <option value="sql">SQL</option>
-              <option value="json">JSON</option>
-            </select>
-            <button
-              class="canvas-code__copy"
-              (click)="copyCode(block.id, block.content['code'])"
-            >
-              {{ copiedBlockId() === block.id ? 'Copied' : 'Copy' }}
+    <div class="create-canvas">
+      <div class="canvas-inner">
+        <div class="category-dropdown">
+          @if (categoryDropdownOpen()) {
+          <div class="category-backdrop" (click)="categoryDropdownOpen.set(false)"></div>
+          }
+          <button class="category-trigger" [class.has-value]="category().length > 0"
+            (click)="categoryDropdownOpen.update(v => !v)">
+            <span class="trigger-label">{{ categoryLabel() }}</span>
+            <span class="trigger-arrow" [class.open]="categoryDropdownOpen()">▾</span>
+          </button>
+          @if (categoryDropdownOpen()) {
+          <div class="category-dropdown-list">
+            @for (cat of CONTENT_CATEGORIES; track cat.id) {
+            <button class="dropdown-item" [class.selected]="category().includes(cat.id)"
+              (click)="selectCategory(cat.id)">
+              <span class="check">{{ category().includes(cat.id) ? '✓' : '' }}</span>
+              <span class="item-label">{{ cat.label }}</span>
             </button>
+            }
           </div>
-          <textarea
-            class="canvas-code__input"
-            [value]="block.content['code']"
-            (input)="updateBlockContent(block.id, 'code', $any($event.target).value)"
-            placeholder="// Paste or write your code here..."
-            spellcheck="false"
-            rows="8"
-          ></textarea>
-        </div>
-        }
-
-        <!-- IMAGE BLOCK -->
-        @if (block.type === 'image') {
-        <div class="canvas-media">
-          @if (block.content['url']) {
-          <div class="canvas-media__preview">
-            <img [src]="block.content['url']" [alt]="block.content['alt'] || 'Image'" class="canvas-media__img" />
-            <button class="canvas-media__clear" (click)="clearMedia(block.id)">Remove</button>
-          </div>
-          <input
-            class="canvas-caption"
-            type="text"
-            [value]="block.content['caption']"
-            (input)="updateBlockContent(block.id, 'caption', $any($event.target).value)"
-            placeholder="Image caption..."
-          />
-          <input
-            class="canvas-caption"
-            type="text"
-            [value]="block.content['alt']"
-            (input)="updateBlockContent(block.id, 'alt', $any($event.target).value)"
-            placeholder="Alt text for accessibility..."
-          />
-          } @else {
-          <label class="canvas-upload">
-            <input type="file" accept="image/*" class="canvas-upload__input" (change)="onFileChange(block.id, $event, 'url')" />
-            <span class="canvas-upload__icon">📸</span>
-            <span class="canvas-upload__label">Drop or select an image</span>
-            <span class="canvas-upload__hint">PNG, JPG, WEBP up to 50MB</span>
-          </label>
           }
         </div>
-        }
+        <div class="topbar-center">
+          <input class="title-ghost-input" [value]="title()"
+            (input)="title.set($any($event.target).value); onFieldChange()" placeholder="Title..." />
+        </div>
+        <div class="topbar-center">
+          <input class="subtitle-ghost-input" [value]="subtitle()"
+            (input)="subtitle.set($any($event.target).value); onFieldChange()" placeholder="Subtitle..." />
+        </div>
+        @for (block of blocks(); track block.id) {
+        <article class="content-block">
+          <div class="block-drag-handle">⠿</div>
 
-        <!-- VIDEO BLOCK -->
-        @if (block.type === 'video') {
-        <div class="canvas-media">
-          @if (block.content['url']) {
-          <div class="canvas-media__preview">
-            <video [src]="block.content['url']" controls class="canvas-media__video"></video>
-            <button class="canvas-media__clear" (click)="clearMedia(block.id)">Remove</button>
+          <div class="block-main">
+            @if (block.type === 'text') {
+            <div class="text-editor-wrap">
+              @if (!isAdapted()) {
+              <textarea class="atomic-textarea" [value]="getBlockHtml(block)"
+                (input)="block.content['html'] = $any($event.target).value; onFieldChange()"
+                placeholder="Start writing atomic segment..."></textarea>
+              } @else {
+              <div class="atomic-rendered"
+                [innerHTML]="(getBlockHtml(block) | ceekulRenderer: userUpdates().concat(aiUpdates()) : personalContext())">
+              </div>
+              }
+            </div>
+            }
+
+            @if (block.type === 'code') {
+            <div class="code-editor-wrap">
+              <div class="code-meta">{{ block.content['language'] || 'plain' }}</div>
+              <textarea class="atomic-code-area" [value]="getBlockCode(block)"
+                (input)="block.content['code'] = $any($event.target).value; onFieldChange()"
+                spellcheck="false"></textarea>
+            </div>
+            }
           </div>
-          <input
-            class="canvas-caption"
-            type="text"
-            [value]="block.content['caption']"
-            (input)="updateBlockContent(block.id, 'caption', $any($event.target).value)"
-            placeholder="Video description..."
-          />
-          } @else {
-          <label class="canvas-upload">
-            <input type="file" accept="video/*" class="canvas-upload__input" (change)="onFileChange(block.id, $event, 'url')" />
-            <span class="canvas-upload__icon">🎬</span>
-            <span class="canvas-upload__label">Drop or select a video</span>
-            <span class="canvas-upload__hint">MP4, WEBM, MOV up to 50MB</span>
-          </label>
-          }
-        </div>
+        </article>
         }
 
-        <!-- AUDIO BLOCK -->
-        @if (block.type === 'audio') {
-        <div class="canvas-media">
-          @if (block.content['url']) {
-          <div class="canvas-media__preview canvas-media__preview--audio">
-            <audio [src]="block.content['url']" controls class="canvas-media__audio"></audio>
-            <span class="canvas-media__filename">{{ block.content['fileName'] }}</span>
-            <button class="canvas-media__clear" (click)="clearMedia(block.id)">Remove</button>
+        <div class="canvas-actions-row">
+          <button class="add-segment-btn" (click)="activeModal.set('picker')">Add Atomic Type</button>
+        </div>
+        <!-- ── TOP-BAR ORCHESTRATOR ────────────────────────────────────────────── -->
+        <header class="create-topbar">
+          <div class="topbar-left">
+            <div class="sync-indicator" [class.saving]="syncStatus() === 'saving'">
+              <!-- <span class="dot"></span> -->
+              <!-- <span class="label">{{ syncStatus() === 'synced' ? 'Synced' : 'Saving...' }}</span> -->
+            </div>
+            @if (hybridId()) {
+            <div class="atomic-id">{{ hybridId() }}</div>
+            }
+            <!-- <button class="action-btn" (click)="openLibrary()" title="My Content Library">
+        <span>Library</span>
+      </button> -->
+            <!-- <button class="action-btn" (click)="createNew()" title="Start New Segment">
+        <span>New</span>
+      </button> -->
           </div>
-          <input
-            class="canvas-caption"
-            type="text"
-            [value]="block.content['caption']"
-            (input)="updateBlockContent(block.id, 'caption', $any($event.target).value)"
-            placeholder="Audio description..."
-          />
-          } @else {
-          <label class="canvas-upload">
-            <input type="file" accept="audio/*" class="canvas-upload__input" (change)="onFileChange(block.id, $event, 'url')" />
-            <span class="canvas-upload__icon">🎵</span>
-            <span class="canvas-upload__label">Drop or select an audio file</span>
-            <span class="canvas-upload__hint">MP3, WAV, OGG up to 50MB</span>
-          </label>
-          }
-        </div>
-        }
 
-        <!-- DIVIDER BLOCK -->
-        @if (block.type === 'divider') {
-        <div class="canvas-divider"><span class="canvas-divider__dot"></span></div>
-        }
 
-        <!-- COLUMNS BLOCK -->
-        @if (block.type === 'columns') {
-        <div class="canvas-columns">
-          <textarea
-            class="canvas-columns__col"
-            [value]="block.content['col1']"
-            (input)="updateBlockContent(block.id, 'col1', $any($event.target).value)"
-            placeholder="Column 1..."
-            rows="4"
-          ></textarea>
-          <textarea
-            class="canvas-columns__col"
-            [value]="block.content['col2']"
-            (input)="updateBlockContent(block.id, 'col2', $any($event.target).value)"
-            placeholder="Column 2..."
-            rows="4"
-          ></textarea>
-          <textarea
-            class="canvas-columns__col"
-            [value]="block.content['col3']"
-            (input)="updateBlockContent(block.id, 'col3', $any($event.target).value)"
-            placeholder="Column 3..."
-            rows="4"
-          ></textarea>
-        </div>
-        }
+          <div class="topbar-actions">
+            <button class="action-btn" (click)="save()" title="Force Save">
+              <span>Save</span>
+            </button>
+            <button class="action-btn" (click)="share()" title="Collaborators">
+              <span>Share</span>
+            </button>
+            <!-- <button class="action-btn" (click)="use()" title="Dispatch to Container">
+        <span>Use</span>
+      </button> -->
+            <button class="action-btn" (click)="send()" title="Global Dispatch">
+              <span>Send</span>
+            </button>
+            <!-- <button class="action-btn" (click)="publish()" title="Push to Network">
+        <span>Publish</span>
+      </button> -->
 
-      </div><!-- /canvas-block__body -->
-    </div><!-- /canvas-block -->
-    }
-
-    <!-- ── ADD BLOCK ──────────────────────────────────────────────────────── -->
-    <button class="canvas-add-block" (click)="showBlockPicker.set(true)">
-      <span class="canvas-add-block__plus">+</span> New Block
-    </button>
-
-  </div><!-- /canvas-body -->
-
-  <!-- ── BLOCK PICKER MODAL ─────────────────────────────────────────────────── -->
-  @if (showBlockPicker()) {
-  <div class="canvas-picker-overlay" (click)="showBlockPicker.set(false)">
-    <div class="canvas-picker" (click)="$event.stopPropagation()">
-      <div class="canvas-picker__header">
-        <span class="canvas-picker__title">Choose a block</span>
-        <button class="canvas-picker__close" (click)="showBlockPicker.set(false)">✕</button>
+            <div class="v-divider"></div>
+            <!-- <button class="action-btn adapt" [class.active]="isAdapted()" (click)="adapt()">
+        <span>Adapt</span>
+      </button> -->
+          </div>
+        </header>
       </div>
-      <div class="canvas-picker__grid">
+    </div>
+
+  </main>
+
+  <!-- ── MODAL OVERLAYS ────────────────────────────────────────────────────── -->
+  @if (activeModal()) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card" [class.upload-modal]="activeModal() === 'upload'" (click)="$event.stopPropagation()">
+
+      @if (activeModal() === 'picker') {
+      <h3 class="modal-title">Select Atomic Type</h3>
+      <div class="picker-grid">
         @for (bt of BLOCK_TYPES; track bt.type) {
-        <button class="canvas-picker__item" (click)="addBlock(bt.type)">
-          <span class="canvas-picker__icon">{{ bt.icon }}</span>
-          <span class="canvas-picker__label">{{ bt.label }}</span>
-          <span class="canvas-picker__desc">{{ bt.desc }}</span>
+        <button class="picker-btn" (click)="addBlock(bt.type)">
+          <span class="icon">{{ bt.icon }}</span>
+          <span class="label">{{ bt.label }}</span>
+          <span class="desc">{{ bt.desc }}</span>
         </button>
         }
       </div>
+      }
+
+      @if (activeModal() === 'adapt') {
+      <h3 class="modal-title">Adaptation Context</h3>
+      <div class="adapt-form">
+        <div class="field">
+          <label>Cognitive Profile</label>
+          <select class="ceekul-select" (change)="personalContext().cognition = $any($event.target).value">
+            <option value="standard">Standard</option>
+            <option value="high">Theoretical / Advanced</option>
+            <option value="visual">Visual / Supportive</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Simulated Age: {{ personalContext().age }}</label>
+          <input type="range" min="10" max="90" [value]="personalContext().age"
+            (input)="personalContext().age = $any($event.target).value" />
+        </div>
+        <button class="apply-btn" (click)="closeModal(); toggleAdaptation()">Preview Adaptation</button>
+      </div>
+      }
+
+      @if (activeModal() === 'use') {
+      <h3 class="modal-title">Dispatch to Container</h3>
+      <div class="dispatch-form">
+        <p>Select the target container for this atomic segment.</p>
+        <select class="ceekul-select">
+          <option>Search Course/Workshop...</option>
+          <option>Neural Networks (Course)</option>
+          <option>Bio-Hackathon (Workshop)</option>
+        </select>
+        <button class="apply-btn" (click)="closeModal()">Confirm Link</button>
+      </div>
+      }
+
+      @if (activeModal() === 'upload') {
+      <div class="upload-header">
+        <div>
+          <h3 class="modal-title" style="margin-bottom:4px">Upload Content</h3>
+          <p class="modal-subtitle">Add multimedia content to your page</p>
+        </div>
+        <button class="upload-close-btn" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="upload-tabs">
+        <button class="upload-tab-btn" [class.active]="uploadTab() === 'file'" (click)="uploadTab.set('file')">📁 Upload
+          File</button>
+        <button class="upload-tab-btn" [class.active]="uploadTab() === 'embed'" (click)="uploadTab.set('embed')">🔗
+          Embed URL</button>
+      </div>
+
+      @if (uploadTab() === 'file') {
+      <div class="dropzone" [class.dragover]="isDragOver()" (dragover)="onDragOver($event)"
+        (dragleave)="isDragOver.set(false)" (drop)="onDrop($event)" (click)="fileInput.click()">
+        <span class="dz-icon">☁</span>
+        <p class="dz-text">Drag &amp; drop files here</p>
+        <p class="dz-hint">or click to browse · Image, Video, Audio, PDF, Lottie</p>
+        <input #fileInput type="file" multiple hidden (change)="onFileSelect($event)"
+          accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mp3,.wav,.pdf,.docx,.json" />
+      </div>
+
+      @if (uploadFiles().length > 0) {
+      <div class="upload-file-list">
+        @for (uf of uploadFiles(); track uf.id) {
+        <div class="upload-file-item" [class.is-error]="uf.status === 'error'" [class.is-done]="uf.status === 'done'">
+          <div class="file-thumb">
+            @if (uf.mediaType === 'image' && uf.preview) {
+            <img [src]="uf.preview" alt="" />
+            } @else {
+            <span class="file-type-icon">{{ getFileIcon(uf.mediaType) }}</span>
+            }
+          </div>
+          <div class="file-info">
+            <div class="file-name">{{ uf.name }}</div>
+            <div class="file-meta">{{ formatFileSize(uf.size) }}</div>
+            @if (uf.error) { <div class="file-error-msg">{{ uf.error }}</div> }
+            @if (uf.status === 'uploading' || uf.status === 'done') {
+            <div class="file-progress-bar">
+              <div class="file-progress-fill" [style.width.%]="uf.progress"></div>
+            </div>
+            }
+          </div>
+          <div class="file-status-icon">
+            @if (uf.status === 'done') { <span class="s-done">✓</span> }
+            @if (uf.status === 'error') { <span class="s-error">✗</span> }
+          </div>
+          @if (uf.status !== 'uploading') {
+          <button class="remove-file-btn" (click)="removeUploadFile(uf.id); $event.stopPropagation()">✕</button>
+          }
+        </div>
+        }
+      </div>
+      }
+      }
+
+
+
+      @if (uploadTab() === 'embed') {
+      <div class="embed-section">
+        <label class="embed-label">Media URL</label>
+        <input class="embed-input" type="url" [value]="embedUrl()" (input)="embedUrl.set($any($event.target).value)"
+          placeholder="https://example.com/media.jpg" />
+        @if (embedUrl()) {
+        <div class="embed-preview-wrap">
+          <img [src]="embedUrl()" alt="Preview" class="embed-preview-img" />
+        </div>
+        }
+      </div>
+      }
+
+      <div class="upload-actions">
+        <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+        <button class="submit-upload-btn" [disabled]="uploadTab() === 'file' ? uploadFiles().length === 0 : !embedUrl()"
+          (click)="submitUpload()">
+          {{ uploadTab() === 'embed' ? 'Insert' : 'Upload' }}
+        </button>
+      </div>
+      }
+
     </div>
   </div>
   }
 
-  }<!-- /else success -->
 </div>

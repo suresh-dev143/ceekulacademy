@@ -3,7 +3,24 @@
   max-width: 1200px;
   margin: 0 auto;
   min-height: 80vh;
+  .view-header {
+    text-align: left;
+    margin-bottom: 1.5rem;
 
+    .breadcrumb {
+      font-size: 0.9rem;
+      color: #94a3b8;
+
+      a {
+        color: #2563eb;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
   .header-section {
     margin-bottom: 3rem;
 

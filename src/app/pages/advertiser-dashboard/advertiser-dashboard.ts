@@ -10,9 +10,8 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-advertiser-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, LayoutComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
   template: `
-    <app-layout>
       <div class="advertiser-dashboard">
 
         <!-- Notifications -->
@@ -289,7 +288,6 @@ import { AuthService } from '../../services/auth.service';
         }
 
       </div>
-    </app-layout>
   `,
   styles: [`
     .advertiser-dashboard { padding: 24px 0; max-width: 1200px; margin: 0 auto; }

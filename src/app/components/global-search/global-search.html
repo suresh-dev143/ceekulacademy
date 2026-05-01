@@ -3,10 +3,11 @@
 
     <!-- ── Search bar row ── -->
     <div class="gs-bar" [class.gs-bar--filters-active]="activeFilterCount() > 0">
-        <i class="fas fa-search gs-icon"></i>
-
-
-
+          <!-- ── menu button ── -->
+        <button class="gs-menu-btn" (click)="toggleMenu(); $event.stopPropagation()"
+            [class.gs-menu-btn--open]="menuOpen()" aria-label="Toggle navigation menu">
+            <i class="fas fa-bars"></i>
+        </button>
         <input class="gs-input" type="text" [value]="query()" (input)="onInput($any($event.target).value)"
             (keydown)="onKeydown($event)" (focus)="isOpen.set(true)" [placeholder]="placeholderText()"
             autocomplete="off" spellcheck="false" aria-label="Global search">
@@ -36,6 +37,24 @@
             }
         </button>
     </div>
+
+    <!-- ── Nav Menu Dropdown (slide-down, same pattern as filter panel) ── -->
+    @if (menuOpen()) {
+    <div class="gs-nav-panel">
+        <nav class="gs-nav-panel__links">
+            @for (item of navItems; track item.route) {
+            <a class="gs-nav-panel__link"
+                [routerLink]="item.route"
+                routerLinkActive="gs-nav-panel__link--active"
+                [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+                (click)="menuOpen.set(false)">
+               
+                <span>{{ item.label }}</span>
+            </a>
+            }
+        </nav>
+    </div>
+    }
 
     <!-- ── Filter Panel (slide-down) ── -->
     @if (filtersOpen()) {
@@ -210,7 +229,7 @@
 
     <div class="gs-mob-header">
         <div class="gs-mob-bar">
-            <i class="fas fa-search gs-icon"></i>
+            <i class="fas fa-search gs-icon">Menu</i>
 
             <input class="gs-input" type="text" [value]="query()" (input)="onInput($any($event.target).value)"
                 (keydown)="onKeydown($event)" placeholder="Search anything..." autocomplete="off" autofocus

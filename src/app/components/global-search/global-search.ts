@@ -1,6 +1,6 @@
 import { Component, signal, computed, inject, HostListener, DestroyRef, ElementRef, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -74,10 +74,19 @@ const ROLE_QUICK_FILTERS: Partial<Record<UserRole, { label: string; value: Filte
     ],
 };
 
+const NAV_ITEMS: { label: string; route: string;  exact?: boolean }[] = [
+    { label: 'Home',      route: '/',                      exact: true },
+    { label: 'Create',    route: '/personal/create',     },
+    { label: 'Advertise', route: '/personal/advertise',  },
+    { label: 'Demand',    route: '/personal/demand',     },
+    { label: 'Supply',    route: '/personal/supply',    },
+    { label: 'Edit',      route: '/personal/edit',       },
+];
+
 @Component({
     selector: 'app-global-search',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterModule],
     templateUrl: './global-search.html',
     styleUrl: './global-search.scss'
 })
@@ -117,6 +126,9 @@ export class GlobalSearchComponent {
     });
 
     filtersOpen = signal<boolean>(false);
+    menuOpen    = signal<boolean>(false);
+
+    readonly navItems = NAV_ITEMS;
 
     private searchSubject = new Subject<string>();
 
@@ -197,12 +209,17 @@ export class GlobalSearchComponent {
         });
     }
 
+    toggleMenu() {
+        this.menuOpen.update(v => !v);
+    }
+
     // ── Click outside → close ─────────────────────────────────────────────────
     @HostListener('document:click', ['$event'])
     onDocClick(event: Event) {
         if (!this.elRef.nativeElement.contains(event.target)) {
             this.isOpen.set(false);
             this.filtersOpen.set(false);
+            this.menuOpen.set(false);
         }
     }
 
@@ -236,6 +253,7 @@ export class GlobalSearchComponent {
             case 'Escape':
                 this.clearQuery();
                 this.filtersOpen.set(false);
+                this.menuOpen.set(false);
                 this.isMobileExpanded.set(false);
                 break;
         }

@@ -15,6 +15,7 @@ export interface UserProfile {
     name: string;
     email: string;
     role: UserRole | 'Director';
+    ceebrainId?: string;
     partnerType?: string;
     expertTypes?: string[];
     activityType?: string[];
@@ -40,9 +41,14 @@ export interface RegisterRequest {
     location?: GeoLocation;
 }
 
+export type LoginMethod = 'EMAIL_PASSWORD' | 'MOBILE_PASSWORD' | 'CEEBRAIN_ID';
+
 export interface LoginRequest {
-    email: string;
     password: string;
+    loginMethod: LoginMethod;
+    email?: string;
+    phone?: string;
+    ceebrainId?: string;
 }
 
 export interface CeebrainRegisterRequest {
@@ -54,8 +60,12 @@ export interface CeebrainRegisterRequest {
     bplCategory?: 'yes' | 'no';
     underprivilegedCategory?: 'yes' | 'no';
     password: string;
-    ceebrainId: string;
     agreeToFramework: boolean;
+}
+
+interface GenerateCeebrainIdResponse {
+    status: boolean;
+    ceebrainId: string;
 }
 
 export interface ChangePasswordRequest {
@@ -87,6 +97,7 @@ interface ApiUser {
     status: string;
     profileImage: string;
     lastLoginAt: string;
+    ceebrainId?: string;
 }
 
 /** Shape returned by POST /users/login */
@@ -204,6 +215,12 @@ export class AuthService {
             );
     }
 
+    generateCeebrainId(): Observable<string> {
+        return this.http
+            .get<GenerateCeebrainIdResponse>(`${this.base}/users/ceebrain-id`)
+            .pipe(map(res => res.ceebrainId));
+    }
+
     ceebrainRegister(payload: CeebrainRegisterRequest): Observable<AuthResponse> {
         return this.http
             .post<ApiAuthResponse>(`${this.base}/users/ceebrain-register`, payload)
@@ -217,6 +234,7 @@ export class AuthService {
                             name: user.name,
                             email: user.email,
                             role: 'Student' as UserRole,
+                            ceebrainId: user.ceebrainId,
                         } satisfies UserProfile,
                     };
                 }),
@@ -242,6 +260,7 @@ export class AuthService {
                             partnerType: user.partnerType,
                             expertTypes: user.expertTypes,
                             activityType: user.activityType,
+                            ceebrainId: user.ceebrainId,
                         } satisfies UserProfile,
                     };
                 }),

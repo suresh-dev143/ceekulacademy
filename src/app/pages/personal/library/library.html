@@ -1,0 +1,124 @@
+<div class="library-surface">
+
+  <!-- ── Header ── -->
+  <header class="library-header">
+    <div class="header-text">
+      <h1 class="page-title">My Library</h1>
+      <p class="page-sub">Manage your created content</p>
+    </div>
+
+    <div class="header-controls">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input
+          class="search-input"
+          type="text"
+          placeholder="Search by title, category, ID..."
+          [value]="searchQuery()"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </div>
+
+      <select class="filter-select" (change)="onStatusChange($any($event.target).value)">
+        @for (opt of STATUS_OPTIONS; track opt.value) {
+          <option [value]="opt.value" [selected]="opt.value === selectedStatus()">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+  </header>
+
+  <!-- ── Error Banner ── -->
+  @if (errorMsg()) {
+    <div class="error-banner">{{ errorMsg() }}</div>
+  }
+
+  <!-- ── Table Container ── -->
+  <div class="table-container">
+
+    @if (loading()) {
+      <div class="state-overlay">
+        <span class="spinner"></span>
+        <span>Loading your content...</span>
+      </div>
+    } @else if (items().length === 0) {
+      <div class="state-overlay empty">
+        <span class="empty-icon">📄</span>
+        <p class="empty-text">No content found. Start creating from the Create Page.</p>
+        <button class="cta-btn" (click)="goToCreate()">Go to Create</button>
+      </div>
+    } @else {
+      <table class="content-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Hybrid ID</th>
+            <th>Ver.</th>
+            <th>Last Updated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.baseId) {
+            <tr class="table-row">
+              <td class="col-title">{{ item.title || '(untitled)' }}</td>
+              <td>
+                <span class="badge badge-cat">{{ item.category }}</span>
+              </td>
+              <td>
+                <span [class]="'badge badge-status-' + getItemState(item)">
+                  {{ getItemState(item) }}
+                </span>
+              </td>
+              <td class="col-mono">{{ item.hybridId }}</td>
+              <td class="col-ver">v{{ item.version }}</td>
+              <td class="col-date">{{ item.updatedAt | date:'dd MMM yyyy' }}</td>
+              <td>
+                <div class="row-actions">
+                  <button class="row-btn btn-read" (click)="read(item)">Read</button>
+                  <button class="row-btn btn-edit" (click)="edit(item)">Edit</button>
+                  <button class="row-btn btn-delete" (click)="confirmDelete(item)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+
+  </div>
+
+  <!-- ── Pagination ── -->
+  @if (totalItems() > 0) {
+    <footer class="pagination">
+      <span class="page-info">{{ displayStart }}–{{ displayEnd }} of {{ totalItems() }}</span>
+      <div class="page-controls">
+        <button class="page-btn" (click)="prevPage()" [disabled]="currentPage() === 1">← Prev</button>
+        <span class="page-num">{{ currentPage() }} / {{ totalPages }}</span>
+        <button class="page-btn" (click)="nextPage()" [disabled]="currentPage() >= totalPages">Next →</button>
+      </div>
+    </footer>
+  }
+
+  <!-- ── Delete Confirmation Modal ── -->
+  @if (deleteTarget()) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Delete Content</h3>
+        <p class="modal-body">
+          Are you sure you want to delete
+          <strong>"{{ deleteTarget()?.title || '(untitled)' }}"</strong>?
+          This action cannot be undone.
+        </p>
+        <div class="modal-actions">
+          <button class="modal-btn btn-cancel" (click)="cancelDelete()" [disabled]="deleting()">Cancel</button>
+          <button class="modal-btn btn-confirm-del" (click)="executeDelete()" [disabled]="deleting()">
+            {{ deleting() ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

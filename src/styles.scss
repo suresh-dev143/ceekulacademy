@@ -151,9 +151,9 @@ h2 {
 /* Global Button Design - Sharp & Flat */
 button,
 .btn {
-    background: transparent;
-    border: 1px solid color-mix(in srgb, #fff, transparent 90%);
+    background: none;
     color: var(--text-primary);
+    border: none;
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;

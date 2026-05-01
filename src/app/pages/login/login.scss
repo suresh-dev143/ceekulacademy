@@ -1,9 +1,7 @@
 .login-page {
-    min-height: calc(100vh - 200px);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #000000;
 }
 
 .login-container {
@@ -53,6 +51,45 @@
     text-transform: uppercase;
     letter-spacing: 1.5px;
     font-weight: 700;
+}
+
+.method-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--row-border);
+}
+
+.method-tab {
+    flex: 1;
+    padding: 0.75rem;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px;
+
+    &:hover {
+        color: var(--text-primary);
+    }
+
+    &.active {
+        color: var(--accent-primary);
+        border-bottom-color: var(--accent-primary);
+    }
+}
+
+.error-message--block {
+    padding: 0.75rem;
+    background: color-mix(in srgb, #ff4d4d 10%, transparent);
+    border: 1px solid #ff4d4d;
+    border-radius: 4px;
 }
 
 .login-form {

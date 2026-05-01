@@ -1,22 +1,38 @@
-<app-layout>
+
 <div class="login-page">
     <div class="login-container">
         <div class="login-card">
             <h1 class="login-title">Welcome Back</h1>
             <p class="login-subtitle">Sign in to continue your learning journey</p>
 
+            <div class="method-tabs">
+                <button type="button" class="method-tab" [class.active]="loginMethod() === 'email'"
+                    (click)="setMethod('email')">Email</button>
+                <button type="button" class="method-tab" [class.active]="loginMethod() === 'phone'"
+                    (click)="setMethod('phone')">Phone</button>
+                <button type="button" class="method-tab" [class.active]="loginMethod() === 'ceebrain'"
+                    (click)="setMethod('ceebrain')">Ceebrain ID</button>
+            </div>
+
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
                 <div class="form-group">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input type="email" id="email" formControlName="email" class="form-input"
-                        [class.error]="email?.invalid && email?.touched" placeholder="Enter your email" />
-                    @if (email?.invalid && email?.touched) {
+                    <label for="identifier" class="form-label">{{ identifierLabel }}</label>
+                    <input [type]="identifierType" id="identifier" formControlName="identifier" class="form-input"
+                        [class.error]="identifier?.invalid && identifier?.touched"
+                        [placeholder]="identifierPlaceholder" />
+                    @if (identifier?.invalid && identifier?.touched) {
                     <div class="error-message">
-                        @if (email?.errors?.['required']) {
-                        <span>Email is required</span>
+                        @if (identifier?.errors?.['required']) {
+                        <span>{{ identifierLabel }} is required</span>
                         }
-                        @if (email?.errors?.['email']) {
+                        @if (identifier?.errors?.['email']) {
                         <span>Please enter a valid email address</span>
+                        }
+                        @if (identifier?.errors?.['pattern'] && loginMethod() === 'phone') {
+                        <span>Please enter a valid 10-digit phone number</span>
+                        }
+                        @if (identifier?.errors?.['pattern'] && loginMethod() === 'ceebrain') {
+                        <span>Please enter a valid 12-digit Ceebrain ID</span>
                         }
                     </div>
                     }
@@ -38,6 +54,10 @@
                     }
                 </div>
 
+                @if (errorMessage()) {
+                <div class="error-message error-message--block">{{ errorMessage() }}</div>
+                }
+
                 <div class="form-options">
                     <label class="checkbox-label">
                         <input type="checkbox" formControlName="rememberMe" class="checkbox" />
@@ -57,10 +77,10 @@
                 <div class="form-footer">
                     <p class="footer-text">
                         Don't have an account?
-                        <a routerLink="/register" class="footer-link">Sign up</a>
+                        <a routerLink="/personal/register" class="footer-link">Sign up</a>
                     </p>
                 </div>
             </form>
         </div>
     </div>
-</div></app-layout>
+</div>

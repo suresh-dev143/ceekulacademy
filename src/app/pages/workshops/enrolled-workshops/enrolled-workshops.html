@@ -1,6 +1,8 @@
-<app-layout [showRightSidebar]="true">
-  <div class="enrolled-workshops-container animate-fade-in">
 
+  <div class="enrolled-workshops-container animate-fade-in">
+    <div class="view-header">
+     <span class="breadcrumb"><a routerLink="/personal/workshops">Workshops</a> / Enrolled Workshops</span>
+    </div>
     @if (selectedWorkshop()) {
     <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="currentUser()?.role ?? ''"
       [currentUserId]="currentUser()?.id" (close)="closeWorkshopDetail()">
@@ -85,4 +87,3 @@
     }
     }
   </div>
-</app-layout>

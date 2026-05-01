@@ -1,0 +1,29 @@
+<div class="ai-tools-page">
+  <div class="ai-tools">
+    <div class="ai-tools__header">
+      <p>You may set your choice AI Tools from <a>Here</a></p>
+    </div>
+    <div class="ai-tools__grid">
+      @for (tool of tools; track tool.name) {
+        <div class="tool-card">
+          <div class="tool-card__info">
+            <span class="tool-card__name">{{ tool.name }}</span>
+            <p class="tool-card__desc">{{ tool.desc }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Chat Panel -->
+  <div class="chat-panel">
+    <div class="chat-panel__header">
+      <h3>Discussions</h3>
+      <span class="status-badge">
+        <span class="status-dot"></span>
+        Live
+      </span>
+    </div>
+    <app-discussion-chat></app-discussion-chat>
+  </div>
+</div>

@@ -1,17 +1,16 @@
 import { Component, signal, computed, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser, DatePipe} from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { WorkshopService, WorkshopListItem, CreatedWorkshopData } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { LayoutComponent } from '../../../components/layout/layout';
 import { CreateWorkshop } from '../create-workshop/create-workshop';
 import { WorkshopDetailComponent } from '../workshop-detail/workshop-detail';
 
 @Component({
     selector: 'app-my-workshops',
     standalone: true,
-    imports: [LayoutComponent, CreateWorkshop, WorkshopDetailComponent,
+    imports: [CreateWorkshop,RouterModule, WorkshopDetailComponent,
     DatePipe],
     templateUrl: './my-workshops.html',
     styleUrl: './my-workshops.scss'

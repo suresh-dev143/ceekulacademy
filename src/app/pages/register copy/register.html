@@ -1,38 +1,40 @@
-<div class="register">
+<div class="register" data-cb-id="register-page">
   <!-- Main Content -->
   <main class="register__main">
     <div class="register__container">
       <div class="register__header">
-        <h1 class="register__title">Pl fill the following data to get registered :</h1>
+        <h1 class="register__title">Please fill the following data to get registered :</h1>
       </div>
-      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="register__form">
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="register__form" data-cb-id="register-form">
         <!-- Mobile No -->
         <div class="register__field">
           <label class="register__label" for="mobileNo">Your mobile no</label>
           <input type="tel" id="mobileNo" formControlName="mobileNo" class="register__input"
-            placeholder="Enter 10-digit mobile number" />
+            placeholder="Enter 10-digit mobile number" data-cb-id="register-mobile-input" />
           @if (registrationForm.get('mobileNo')?.touched && registrationForm.get('mobileNo')?.errors?.['pattern']) {
-            <div class="register__error">Please enter a valid 10-digit mobile number</div>
+            <div class="register__error" data-cb-id="register-mobile-error">Please enter a valid 10-digit mobile number</div>
           }
         </div>
 
         <!-- Date of Birth -->
         <div class="register__field">
           <label class="register__label" for="dateOfBirth">Your date of birth</label>
-          <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="register__input" />
+          <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="register__input"
+            data-cb-id="register-dob-input" />
         </div>
 
         <!-- Place of Birth -->
         <div class="register__field">
           <label class="register__label" for="placeOfBirth">Your place of birth</label>
           <input type="text" id="placeOfBirth" formControlName="placeOfBirth" class="register__input"
-            placeholder="Enter place of birth" />
+            placeholder="Enter place of birth" data-cb-id="register-place-of-birth-input" />
         </div>
 
         <!-- Identity Dropdown -->
         <div class="register__field">
           <label class="register__label" for="identity">Your identity</label>
-          <select id="identity" formControlName="identity" class="register__input register__select">
+          <select id="identity" formControlName="identity" class="register__input register__select"
+            data-cb-id="register-identity-select">
             <option value="" disabled>Select Identity</option>
             <option value="homo_sapiens">Member of human species (homo sapiens)</option>
             <option value="others">Others</option>
@@ -42,7 +44,8 @@
         <!-- Gender Dropdown -->
         <div class="register__field">
           <label class="register__label" for="gender">Your gender</label>
-          <select id="gender" formControlName="gender" class="register__input register__select">
+          <select id="gender" formControlName="gender" class="register__input register__select"
+            data-cb-id="register-gender-select">
             <option value="" disabled>Select gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
@@ -53,7 +56,8 @@
         <!-- BPL Category -->
         <div class="register__field">
           <label class="register__label" for="bplCategory">Do you belong to below poverty line category?</label>
-          <select id="bplCategory" formControlName="bplCategory" class="register__input register__select">
+          <select id="bplCategory" formControlName="bplCategory" class="register__input register__select"
+            data-cb-id="register-bpl-select">
             <option value="" disabled>Select Yes/No</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
@@ -65,30 +69,35 @@
           <label class="register__label" for="underprivilegedCategory">Do you belong to the underprivileged
             category?</label>
           <select id="underprivilegedCategory" formControlName="underprivilegedCategory"
-            class="register__input register__select">
+            class="register__input register__select" data-cb-id="register-underprivileged-select">
             <option value="" disabled>Select Yes/No</option>
             <option value="yes">Yes</option>
             <option value="no">No</option>
           </select>
         </div>
 
-        <!-- Ceebrain ID Display -->
-        <div class="register__ceebrain-info">
-          Your Ceebrain ID is : <span class="register__accent">{{ ceebrainId() }}</span>
-        </div>
+      
 
         <!-- Password -->
         <div class="register__field">
           <label class="register__label" for="password">Password</label>
           <input type="password" id="password" formControlName="password" class="register__input"
-            placeholder="Minimum 8 characters, 1 uppercase, 1 number" />
+            placeholder="Minimum 8 characters, 1 uppercase, 1 number" data-cb-id="register-password-input" />
           @if (registrationForm.get('password')?.touched && registrationForm.get('password')?.errors?.['pattern']) {
-            <div class="register__error">Must include one uppercase letter and one number</div>
+            <div class="register__error" data-cb-id="register-password-error">Must include one uppercase letter and one number</div>
           }
         </div>
-
+  <!-- Confirm Password -->
+        <div class="register__field">
+          <label class="register__label" for="confirmPassword">Confirm password</label>
+          <input type="password" id="confirmPassword" formControlName="confirmPassword" class="register__input"
+            placeholder="Re-enter your password" data-cb-id="register-confirm-password-input" />
+          @if (registrationForm.get('confirmPassword')?.touched && registrationForm.hasError('passwordMismatch')) {
+            <div class="register__error" data-cb-id="register-confirm-password-error">Passwords do not match</div>
+          }
+        </div>
         <!-- Document Upload Section -->
-        <div class="register__upload-section">
+        <div class="register__upload-section" data-cb-id="register-document-upload-section">
           <p class="register__upload-text">
             Please upload the documents. You may get your data verified by any Manager (or Director) of Ceekul Academy
             whenever you wish.
@@ -100,10 +109,11 @@
 
         <!-- Self Regulatory Framework -->
         <div class="register__framework-section">
-          <a href="#" class="register__link">Pl read the self regulatory framework :</a>
+          <a href="#" class="register__link" data-cb-id="register-framework-link">Pl read the self regulatory framework :</a>
           <div class="register__framework-container">
             <label class="register__checkbox-label">
-              <input type="checkbox" formControlName="agreeToFramework" class="register__checkbox" />
+              <input type="checkbox" formControlName="agreeToFramework" class="register__checkbox"
+                data-cb-id="register-agree-checkbox" />
               I agree with the self regulatory framework.
             </label>
           </div>
@@ -111,21 +121,32 @@
 
         <!-- Error Message -->
         @if (errorMessage()) {
-          <div class="register__error register__error--block">{{ errorMessage() }}</div>
+          <div class="register__error register__error--block" data-cb-id="register-error-message">{{ errorMessage() }}</div>
         }
 
         <!-- Register Button -->
         <div class="register__actions">
-          <button type="submit" class="register__submit-btn" [disabled]="isLoading()">
+          <button type="submit" class="register__submit-btn" [disabled]="isLoading()"
+            data-cb-id="register-submit-btn">
             {{ isLoading() ? 'Registering...' : 'Register' }}
           </button>
         </div>
       </form>
+       <div class="form-footer">
+                    <p class="footer-text">
+                       Already have an account?
+                        <a routerLink="/personal/login" class="footer-link">Login</a>
+                    </p>
+                </div>
     </div>
+    
+               
   </main>
 
   <!-- Success Message -->
   @if (showSuccess()) {
-    <div class="register__snackbar">Registration Successful!</div>
+    <div class="register__snackbar" data-cb-id="register-success-snackbar">
+      Registration Successful! Your Ceebrain ID is <strong>{{ ceebrainId() }}</strong>
+    </div>
   }
 </div>

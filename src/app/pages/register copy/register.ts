@@ -1,15 +1,20 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { DocumentUpload } from './components/document-upload/document-upload';
-import { Navbar } from '../../components/landing-layout/landing-navbar/landing-navbar';
-import { Router } from '@angular/router';
+import { Router,RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+
+function passwordsMatch(group: AbstractControl): ValidationErrors | null {
+  const pw = group.get('password')?.value;
+  const confirm = group.get('confirmPassword')?.value;
+  return pw && confirm && pw !== confirm ? { passwordMismatch: true } : null;
+}
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
-    Navbar,
+    RouterLink,
     ReactiveFormsModule,
     DocumentUpload
   ],
@@ -29,8 +34,6 @@ export class Register implements OnInit {
   constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
-    this.ceebrainId.set(this.generateCeebrainId());
-
     this.registrationForm = this.fb.group({
       mobileNo: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       dateOfBirth: ['', Validators.required],
@@ -44,16 +47,12 @@ export class Register implements OnInit {
         Validators.minLength(8),
         Validators.pattern('^(?=.*[A-Z])(?=.*[0-9]).*$')
       ]],
+      confirmPassword: ['', Validators.required],
       agreeToFramework: [false, Validators.requiredTrue]
-    });
-  }
-
-  generateCeebrainId(): string {
-    return Math.floor(100000000000 + Math.random() * 900000000000).toString();
+    }, { validators: passwordsMatch });
   }
 
   onSubmit(): void {
-    this.router.navigate(['personal/neurons']);
     if (this.registrationForm.invalid) {
       this.registrationForm.markAllAsTouched();
       return;
@@ -73,13 +72,12 @@ export class Register implements OnInit {
       bplCategory: formValue.bplCategory || undefined,
       underprivilegedCategory: formValue.underprivilegedCategory || undefined,
       password: formValue.password,
-      ceebrainId: this.ceebrainId(),
       agreeToFramework: formValue.agreeToFramework,
     }).subscribe({
-      next: () => {
+      next: (res) => {
         this.isLoading.set(false);
+        this.ceebrainId.set(res.user.ceebrainId ?? '');
         this.showSuccess.set(true);
-        setTimeout(() => this.router.navigate(['/personal/create']), 1500);
       },
       error: (err) => {
         this.isLoading.set(false);

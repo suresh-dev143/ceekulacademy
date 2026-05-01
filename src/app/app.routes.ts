@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { LandingLayout } from './components/landing-layout/landing-layout';
 import { Landing } from './pages/landing/landing';
 import { PersonalLayout } from './components/personal-layout/personal-layout';
-import { Advertise } from './pages/personal/advertise/advertise';
 import { Create } from './pages/personal/create/create';
 import { Demand } from './pages/personal/demand/demand';
 import { Edit } from './pages/personal/edit/edit';
@@ -23,10 +22,8 @@ export const routes: Routes = [
   { path: 'dashboard/student', loadComponent: () => import('./pages/student-dashboard/student-dashboard').then(m => m.StudentDashboardComponent) },
   { path: 'dashboard/student/nearby', loadComponent: () => import('./pages/student-nearby/student-nearby').then(m => m.StudentNearbyComponent) },
   { path: 'dashboard/teacher', loadComponent: () => import('./pages/teacher-dashboard/teacher-dashboard').then(m => m.TeacherDashboardComponent) },
-  { path: 'about', loadComponent: () => import('./pages/about/about').then(m => m.AboutComponent) },
-  { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
-  // { path: 'register', loadComponent: () => import('./pages/register/register').then(m => m.RegisterComponent) },
-  { path: 'profile', loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent) },
+  { path: 'about', loadComponent: () => import('./pages/about/about').then(m => m.AboutComponent) } ,
+   { path: 'profile', loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent) },
   { path: 'contact', loadComponent: () => import('./pages/contact/contact').then(m => m.ContactPageComponent) },
   { path: 'district', loadComponent: () => import('./pages/district/district').then(m => m.DistrictComponent) },
   { path: 'issues', loadComponent: () => import('./pages/issues/issues').then(m => m.IssuesPageComponent) },
@@ -43,7 +40,7 @@ export const routes: Routes = [
   { path: 'research/new', loadComponent: () => import('./pages/research/research-new/research-new').then(m => m.ResearchNewComponent) },
   { path: 'research', loadComponent: () => import('./pages/research/research').then(m => m.ResearchPageComponent) },
   // ==================== AD PLATFORM ====================
-  { path: 'dashboard/advertiser', loadComponent: () => import('./pages/advertiser-dashboard/advertiser-dashboard').then(m => m.AdvertiserDashboardComponent) },
+  { path: 'dashboard/advertiser', redirectTo: '/personal/advertise', pathMatch: 'full' },
   { path: 'lectures/:lectureId/watch', loadComponent: () => import('./pages/lecture-watch/lecture-watch').then(m => m.LectureWatchComponent) },
   { path: 'lectures/:lectureId/edit', loadComponent: () => import('./pages/live-editor/live-editor').then(m => m.LiveEditorComponent) },
   { path: 'lectures/:lectureId/chat', loadComponent: () => import('./pages/lecture-chat/lecture-chat').then(m => m.LectureChatComponent) },
@@ -71,12 +68,11 @@ export const routes: Routes = [
     path: 'personal',
     component: PersonalLayout,
     children: [
-      {
-        path: 'register',
-        component: Register
-      },
-      { path: '', redirectTo: 'digital-life', pathMatch: 'full' },
-      { path: 'dashboard/teacher/workshops', redirectTo: 'workshops', pathMatch: 'full' },
+      { path: '', redirectTo: 'my-activities', pathMatch: 'full' },
+      { path: 'register', component: Register },
+      { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
+
+      { path: 'dashboard/teacher/workshops', redirectTo: 'dashboard/my-workshops', pathMatch: 'full' },
       { path: 'dashboard/my-workshops', loadComponent: () => import('./pages/workshops/my-workshops/my-workshops').then(m => m.MyWorkshopsComponent) },
       { path: 'dashboard/enrolled-workshops', loadComponent: () => import('./pages/workshops/enrolled-workshops/enrolled-workshops').then(m => m.EnrolledWorkshopsComponent) },
 
@@ -88,23 +84,26 @@ export const routes: Routes = [
       { path: 'programs/:programId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
       { path: 'programs/:programId/:sectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
       { path: 'programs/:programId/:sectionId/:subSectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
-      { path: 'digital-life', loadComponent: () => import('./pages/personal/digital-life/digital-life').then(m => m.DigitalLife) },
+      { path: 'my-activities', loadComponent: () => import('./pages/personal/my-activities/my-activites').then(m => m.MyActivities) },
       { path: 'potential', component: Potential },
       { path: 'projects', component: Projects },
       { path: 'neurons', component: Neurons },
       { path: 'kutumb', component: Kutumb },
       { path: 'future', component: Future },
-      { path: 'my-activities', loadComponent: () => import('./pages/personal/my-activities/my-activities').then(m => m.MyActivities) },
+      { path: 'digital-life', loadComponent: () => import('./pages/personal/digital-life/digital-life').then(m => m.DigitalLife) },
       // Action Hub — unified create / offer / advertise / explore
       // { path: 'action-hub', loadComponent: () => import('./pages/personal/action-hub/action-hub').then(m => m.ActionHub) },
       // Top navbar routes
-      { path: 'create', component: Create },
-      { path: 'create/:pageId', component: Create },
-      { path: 'advertise', component: Advertise },
+      { path: 'create', component: Create, data: { leftSidebar: 'contextual' } },
+      { path: 'create/:pageId', component: Create, data: { leftSidebar: 'contextual' } },
+      { path: 'advertise', loadComponent: () => import('./pages/advertiser-dashboard/advertiser-dashboard').then(m => m.AdvertiserDashboardComponent) },
       { path: 'demand', component: Demand },
       { path: 'supply', component: Supply },
       { path: 'edit', component: Edit },
       { path: 'contact', loadComponent: () => import('./pages/contact/contact').then(m => m.ContactPageComponent) },
+      { path: 'local-news', loadComponent: () => import('./pages/personal/local-news/local-news').then(m => m.LocalNewsPage) },
+      { path: 'ai-tools', loadComponent: () => import('./pages/personal/ai-tools/ai-tools').then(m => m.AiToolsPage) },
+      { path: 'library', loadComponent: () => import('./pages/personal/library/library').then(m => m.LibraryComponent), data: { leftSidebar: 'contextual' } },
     ]
   },
 

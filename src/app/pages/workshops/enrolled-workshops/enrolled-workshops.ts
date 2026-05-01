@@ -3,14 +3,13 @@ import { isPlatformBrowser, TitleCasePipe} from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { WorkshopService, EnrollmentRecord, WorkshopListItem, EnrolledWorkshopSchedule } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
-import { LayoutComponent } from '../../../components/layout/layout';
 import { ToastService } from '../../../core/services/toast.service';
 import { WorkshopDetailComponent } from '../workshop-detail/workshop-detail';
 
 @Component({
     selector: 'app-enrolled-workshops',
     standalone: true,
-    imports: [RouterModule, LayoutComponent, WorkshopDetailComponent,
+    imports: [RouterModule, WorkshopDetailComponent,
     TitleCasePipe],
     templateUrl: './enrolled-workshops.html',
     styleUrl: './enrolled-workshops.scss'

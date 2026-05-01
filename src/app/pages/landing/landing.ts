@@ -132,5 +132,5 @@ export class Landing implements OnInit {
   }
 
   onRegister(): void { this.router.navigate(['/personal/register']); }
-  onContact(): void  { this.router.navigate(['/personal/contact']); }
+  onContact(): void  { this.router.navigate(['/contact']); }
 }
