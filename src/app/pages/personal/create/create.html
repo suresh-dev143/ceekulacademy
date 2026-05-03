@@ -1,49 +1,324 @@
 <div class="ceekul-create-surface">
-  <!-- ── MAIN CONTENT VIEWPORT ────────────────────────────────────────────── -->
   <main class="create-viewport">
-    <!-- action buttons -->
-    <div class="create-action-bar"> <button class="cab-btn" (click)="openLibrary()">Update</button>
+
+    <!-- action bar -->
+    <div class="create-action-bar">
+      <!-- <span class="cab-title" (click)="openLibrary()">Library</span> -->
+      <div class="cab-spacer"></div>
+      <button class="cab-btn" (click)="openIdeas()">Ideas</button>
+      <button class="cab-btn" (click)="goToLibrary()">Update</button>
       <button class="cab-btn" (click)="activeModal.set('upload')">Upload</button>
     </div>
 
-    <!-- Ideas & Opinions -->
-    
-
-
-    <div class="create-canvas">
+    <div class="create-canvas" [style.--accent]="categoryAccentColor()">
       <div class="canvas-inner">
-        <div class="category-dropdown">
-          @if (categoryDropdownOpen()) {
-          <div class="category-backdrop" (click)="categoryDropdownOpen.set(false)"></div>
-          }
-          <button class="category-trigger" [class.has-value]="category().length > 0"
-            (click)="categoryDropdownOpen.update(v => !v)">
-            <span class="trigger-label">{{ categoryLabel() }}</span>
-            <span class="trigger-arrow" [class.open]="categoryDropdownOpen()">▾</span>
-          </button>
-          @if (categoryDropdownOpen()) {
-          <div class="category-dropdown-list">
+
+        <!-- ── TITLE / SUBTITLE / CATEGORY / DOMAIN ── -->
+        <div class="topbar-center topbar-meta-row">
+          <select class="category-ghost-select" [value]="category()"
+            (change)="category.set($any($event.target).value); onIdentityChange()">
+            <option value="" disabled selected hidden>Category...</option>
             @for (cat of CONTENT_CATEGORIES; track cat.id) {
-            <button class="dropdown-item" [class.selected]="category().includes(cat.id)"
-              (click)="selectCategory(cat.id)">
-              <span class="check">{{ category().includes(cat.id) ? '✓' : '' }}</span>
-              <span class="item-label">{{ cat.label }}</span>
-            </button>
+            <option [value]="cat.label"> {{ cat.label }}</option>
             }
-          </div>
-          }
+          </select>
+          <select class="category-ghost-select" [value]="domain()"
+            (change)="domain.set($any($event.target).value); onFieldChange()">
+            @for (d of DOMAINS; track d.id) {
+            <option [value]="d.id">{{ d.label }}</option>
+            }
+          </select>
         </div>
         <div class="topbar-center">
           <input class="title-ghost-input" [value]="title()"
-            (input)="title.set($any($event.target).value); onFieldChange()" placeholder="Title..." />
+            (input)="title.set($any($event.target).value)"
+            (blur)="onIdentityChange()" placeholder="Title..." />
         </div>
         <div class="topbar-center">
           <input class="subtitle-ghost-input" [value]="subtitle()"
-            (input)="subtitle.set($any($event.target).value); onFieldChange()" placeholder="Subtitle..." />
+            (input)="subtitle.set($any($event.target).value)"
+            (blur)="onIdentityChange()" placeholder="Subtitle..." />
         </div>
-        @for (block of blocks(); track block.id) {
+
+        <!-- ── DYNAMIC STRUCTURE LAYER ── -->
+        @let cid = categoryId();
+
+        @if (cid === 'workshop') {
+        <div class="structure-layer">
+          <div class="sl-header">
+            <span class="sl-label">Workshop Structure</span>
+            <span class="sl-hint">3 sessions · Theory → Practice → Q&A</span>
+          </div>
+          @for (session of workshopSessions(); track session.id; let idx = $index) {
+          <div class="structure-card">
+            <div class="sc-index">{{ idx + 1 }}</div>
+            <div class="sc-body">
+              <input class="sc-title-input" [value]="session.title"
+                (input)="patchSession(session.id, 'title', $any($event.target).value)"
+                [placeholder]="idx === 0 ? 'Session 1 — Theory title...' : idx === 1 ? 'Session 2 — Practice title...' : 'Session 3 — Q&A title...'" />
+              <textarea class="sc-desc-input" [value]="session.description"
+                (input)="patchSession(session.id, 'description', $any($event.target).value)"
+                placeholder="Session description, objectives, key points..."></textarea>
+            </div>
+          </div>
+          }
+        </div>
+        }
+
+        @if (cid === 'course') {
+        <div class="structure-layer">
+          <div class="sl-header">
+            <span class="sl-label">Course Lectures</span>
+            <button class="sl-add-btn" (click)="addLecture()">+ Add Lecture</button>
+          </div>
+          @for (lecture of courseLectures(); track lecture.id; let idx = $index) {
+          <div class="structure-card">
+            <div class="sc-index">{{ idx + 1 }}</div>
+            <div class="sc-body">
+              <input class="sc-title-input" [value]="lecture.title"
+                (input)="patchLecture(lecture.id, 'title', $any($event.target).value)"
+                placeholder="Lecture title..." />
+              <textarea class="sc-desc-input" [value]="lecture.objectives"
+                (input)="patchLecture(lecture.id, 'objectives', $any($event.target).value)"
+                placeholder="Learning objectives..."></textarea>
+            </div>
+            <button class="sc-remove-btn" (click)="removeLecture(lecture.id)">✕</button>
+          </div>
+          }
+          @if (courseLectures().length === 0) {
+          <p class="sl-empty">Add your first lecture to start building the course.</p>
+          }
+        </div>
+        }
+
+        @if (cid === 'research') {
+        <div class="structure-layer">
+          <div class="sl-header">
+            <span class="sl-label">Research Structure</span>
+          </div>
+          <div class="sl-fields">
+            <div class="sl-field">
+              <label class="sl-field-label">Core Idea</label>
+              <textarea class="sl-field-area" [value]="researchIdea()"
+                (input)="researchIdea.set($any($event.target).value); onFieldChange()"
+                placeholder="The central hypothesis or question..."></textarea>
+            </div>
+            <div class="sl-field">
+              <label class="sl-field-label">Background</label>
+              <textarea class="sl-field-area" [value]="researchBackground()"
+                (input)="researchBackground.set($any($event.target).value); onFieldChange()"
+                placeholder="Prior work, context, and relevance..."></textarea>
+            </div>
+            <div class="sl-field">
+              <label class="sl-field-label">Methodology</label>
+              <textarea class="sl-field-area" [value]="researchMethodology()"
+                (input)="researchMethodology.set($any($event.target).value); onFieldChange()"
+                placeholder="Approach, tools, and process..."></textarea>
+            </div>
+            <div class="sl-field">
+              <label class="sl-field-label">Outcome</label>
+              <textarea class="sl-field-area" [value]="researchOutcome()"
+                (input)="researchOutcome.set($any($event.target).value); onFieldChange()"
+                placeholder="Expected or actual results..."></textarea>
+            </div>
+            <div class="sl-field">
+              <label class="sl-field-label">Collaborators</label>
+              <div class="sl-chip-input-row">
+                <input class="sl-chip-input" [value]="researchCollabDraft()"
+                  (input)="researchCollabDraft.set($any($event.target).value)"
+                  (keydown.enter)="addResearchCollab()"
+                  placeholder="CeeBrain ID or name..." />
+                <button class="sl-chip-add-btn" (click)="addResearchCollab()">Add</button>
+              </div>
+              @if (researchCollabs().length > 0) {
+              <div class="sl-chips">
+                @for (c of researchCollabs(); track c) {
+                <span class="sl-chip">{{ c }}<button (click)="removeResearchCollab(c)">✕</button></span>
+                }
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+        }
+
+        @if (cid === 'project') {
+        <div class="structure-layer">
+          <div class="sl-header">
+            <span class="sl-label">Project Structure</span>
+          </div>
+          <div class="sl-fields">
+            <div class="sl-field">
+              <label class="sl-field-label">Objective</label>
+              <textarea class="sl-field-area" [value]="projectObjective()"
+                (input)="projectObjective.set($any($event.target).value); onFieldChange()"
+                placeholder="What this project aims to achieve..."></textarea>
+            </div>
+            <div class="sl-field">
+              <label class="sl-field-label">Milestones</label>
+              <div class="sl-milestone-row">
+                <input class="sl-chip-input" style="flex:1" placeholder="Milestone title..."
+                  [value]="milestoneDraft().title"
+                  (input)="milestoneDraft.update(d => ({ ...d, title: $any($event.target).value }))" />
+                <input class="sl-chip-input" style="width:130px" type="date"
+                  [value]="milestoneDraft().due"
+                  (input)="milestoneDraft.update(d => ({ ...d, due: $any($event.target).value }))" />
+                <button class="sl-chip-add-btn" (click)="addMilestone()">Add</button>
+              </div>
+              @if (projectMilestones().length > 0) {
+              <div class="sl-milestone-list">
+                @for (m of projectMilestones(); track m.id) {
+                <div class="sl-milestone-item">
+                  <span class="milestone-title">{{ m.title }}</span>
+                  @if (m.due) { <span class="milestone-due">{{ m.due }}</span> }
+                  <button class="sl-remove-inline" (click)="removeMilestone(m.id)">✕</button>
+                </div>
+                }
+              </div>
+              }
+            </div>
+            <div class="sl-field">
+              <label class="sl-field-label">Resources</label>
+              <div class="sl-chip-input-row">
+                <input class="sl-chip-input" [value]="resourceDraft()"
+                  (input)="resourceDraft.set($any($event.target).value)"
+                  (keydown.enter)="addResource()"
+                  placeholder="Tool, link, or material..." />
+                <button class="sl-chip-add-btn" (click)="addResource()">Add</button>
+              </div>
+              @if (projectResources().length > 0) {
+              <div class="sl-chips">
+                @for (r of projectResources(); track r) {
+                <span class="sl-chip">{{ r }}<button (click)="removeResource(r)">✕</button></span>
+                }
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+        }
+
+        @if (cid === 'webinar') {
+        <div class="structure-layer">
+          <div class="sl-header">
+            <span class="sl-label">Webinar Structure</span>
+          </div>
+          <div class="sl-fields">
+            <div class="sl-field sl-field--row">
+              <label class="sl-field-label">Date & Time</label>
+              <input class="sl-inline-input" type="datetime-local" [value]="webinarDateTime()"
+                (input)="webinarDateTime.set($any($event.target).value); onFieldChange()" />
+            </div>
+            <div class="sl-field sl-field--row">
+              <label class="sl-field-label">Registration URL</label>
+              <input class="sl-inline-input" type="url" [value]="webinarRegUrl()"
+                (input)="webinarRegUrl.set($any($event.target).value); onFieldChange()"
+                placeholder="https://..." />
+            </div>
+            <div class="sl-field">
+              <label class="sl-field-label">Speakers</label>
+              <div class="sl-chip-input-row">
+                <input class="sl-chip-input" [value]="speakerDraft()"
+                  (input)="speakerDraft.set($any($event.target).value)"
+                  (keydown.enter)="addSpeaker()"
+                  placeholder="Speaker name or CeeBrain ID..." />
+                <button class="sl-chip-add-btn" (click)="addSpeaker()">Add</button>
+              </div>
+              @if (webinarSpeakers().length > 0) {
+              <div class="sl-chips">
+                @for (s of webinarSpeakers(); track s) {
+                <span class="sl-chip">{{ s }}<button (click)="removeSpeaker(s)">✕</button></span>
+                }
+              </div>
+              }
+            </div>
+            <div class="sl-field">
+              <label class="sl-field-label">Topics</label>
+              <div class="sl-chip-input-row">
+                <input class="sl-chip-input" [value]="topicDraft()"
+                  (input)="topicDraft.set($any($event.target).value)"
+                  (keydown.enter)="addTopic()"
+                  placeholder="Topic or agenda item..." />
+                <button class="sl-chip-add-btn" (click)="addTopic()">Add</button>
+              </div>
+              @if (webinarTopics().length > 0) {
+              <div class="sl-chips">
+                @for (t of webinarTopics(); track t) {
+                <span class="sl-chip">{{ t }}<button (click)="removeTopic(t)">✕</button></span>
+                }
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+        }
+
+        @if (cid === 'entertainment') {
+        <div class="structure-layer">
+          <div class="sl-header">
+            <span class="sl-label">Advertisement Structure</span>
+          </div>
+          <div class="sl-fields">
+            <div class="sl-field sl-field--row">
+              <label class="sl-field-label">Audience</label>
+              <input class="sl-inline-input" [value]="adAudience()"
+                (input)="adAudience.set($any($event.target).value); onFieldChange()"
+                placeholder="Target audience..." />
+            </div>
+            <div class="sl-field sl-field--row">
+              <label class="sl-field-label">Media URL</label>
+              <input class="sl-inline-input" type="url" [value]="adMediaUrl()"
+                (input)="adMediaUrl.set($any($event.target).value); onFieldChange()"
+                placeholder="https://..." />
+            </div>
+            <div class="sl-field sl-field--row">
+              <label class="sl-field-label">Redirect URL</label>
+              <input class="sl-inline-input" type="url" [value]="adRedirectUrl()"
+                (input)="adRedirectUrl.set($any($event.target).value); onFieldChange()"
+                placeholder="https://..." />
+            </div>
+            <div class="sl-field sl-field--row">
+              <label class="sl-field-label">Budget</label>
+              <input class="sl-inline-input" [value]="adBudget()"
+                (input)="adBudget.set($any($event.target).value); onFieldChange()"
+                placeholder="e.g. $500 / month" />
+            </div>
+            <div class="sl-field sl-field--row">
+              <label class="sl-field-label">Duration</label>
+              <input class="sl-inline-input" [value]="adDuration()"
+                (input)="adDuration.set($any($event.target).value); onFieldChange()"
+                placeholder="e.g. 30 days" />
+            </div>
+            <div class="sl-field">
+              <label class="sl-field-label">Tags</label>
+              <div class="sl-chip-input-row">
+                <input class="sl-chip-input" [value]="adTagDraft()"
+                  (input)="adTagDraft.set($any($event.target).value)"
+                  (keydown.enter)="addAdTag()"
+                  placeholder="Tag..." />
+                <button class="sl-chip-add-btn" (click)="addAdTag()">Add</button>
+              </div>
+              @if (adTags().length > 0) {
+              <div class="sl-chips">
+                @for (t of adTags(); track t) {
+                <span class="sl-chip">{{ t }}<button (click)="removeAdTag(t)">✕</button></span>
+                }
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- ── BLOCKS ── -->
+        @for (block of blocks(); track block.id; let idx = $index) {
         <article class="content-block">
-          <div class="block-drag-handle">⠿</div>
+          <div class="block-controls">
+            <button class="block-ctrl-btn" (click)="moveBlock(block.id, 'up')" [disabled]="idx === 0" title="Move Up">↑</button>
+            <div class="block-drag-handle">⠿</div>
+            <button class="block-ctrl-btn" (click)="moveBlock(block.id, 'down')" [disabled]="idx === blocks().length - 1" title="Move Down">↓</button>
+            <button class="block-ctrl-btn delete" (click)="removeBlock(block.id)" title="Remove">✕</button>
+          </div>
 
           <div class="block-main">
             @if (block.type === 'text') {
@@ -68,71 +343,354 @@
                 spellcheck="false"></textarea>
             </div>
             }
+
+            @if (block.type === 'image') {
+            <div class="image-block-wrap">
+              @if (block.content['src']) {
+              <img class="block-image" [src]="$any(block.content['src'])" [alt]="$any(block.content['alt']) || ''" />
+              } @else {
+              <div class="media-placeholder" (click)="activeModal.set('upload')">
+                <span class="placeholder-icon">📸</span>
+                <span class="placeholder-text">Click to add image</span>
+              </div>
+              }
+              <input class="caption-input" [value]="$any(block.content['caption']) || ''"
+                (input)="block.content['caption'] = $any($event.target).value; onFieldChange()"
+                placeholder="Caption..." />
+            </div>
+            }
+
+            @if (block.type === 'video') {
+            <div class="video-block-wrap">
+              @if (block.content['src']) {
+              <video class="block-video" [attr.src]="block.content['src']" controls></video>
+              } @else {
+              <div class="media-placeholder" (click)="activeModal.set('upload')">
+                <span class="placeholder-icon">🎬</span>
+                <span class="placeholder-text">Click to add video</span>
+              </div>
+              }
+              <input class="caption-input" [value]="$any(block.content['caption']) || ''"
+                (input)="block.content['caption'] = $any($event.target).value; onFieldChange()"
+                placeholder="Caption..." />
+            </div>
+            }
+
+            @if (block.type === 'audio') {
+            <div class="audio-block-wrap">
+              <input class="caption-input" [value]="$any(block.content['title']) || ''"
+                (input)="block.content['title'] = $any($event.target).value; onFieldChange()"
+                placeholder="Track title..." />
+              @if (block.content['src']) {
+              <audio class="block-audio" [attr.src]="block.content['src']" controls></audio>
+              } @else {
+              <div class="media-placeholder" (click)="activeModal.set('upload')">
+                <span class="placeholder-icon">🎵</span>
+                <span class="placeholder-text">Click to add audio</span>
+              </div>
+              }
+            </div>
+            }
+
+            @if (block.type === 'divider') {
+            <div class="divider-block-wrap">
+              <hr class="block-divider" [ngClass]="'divider-' + ($any(block.content['style']) || 'line')" />
+            </div>
+            }
+
+            @if (block.type === 'columns') {
+            <div class="columns-block-wrap">
+              <div class="columns-grid">
+                <textarea class="column-textarea" [value]="$any(block.content['left']) || ''"
+                  (input)="block.content['left'] = $any($event.target).value; onFieldChange()"
+                  placeholder="Left column..."></textarea>
+                <textarea class="column-textarea" [value]="$any(block.content['right']) || ''"
+                  (input)="block.content['right'] = $any($event.target).value; onFieldChange()"
+                  placeholder="Right column..."></textarea>
+              </div>
+            </div>
+            }
           </div>
         </article>
         }
 
         <div class="canvas-actions-row">
-          <button class="add-segment-btn" (click)="activeModal.set('picker')">Add Atomic Type</button>
+          <button class="add-segment-btn" (click)="activeModal.set('picker')">+ Add Atomic Block</button>
         </div>
-        <!-- ── TOP-BAR ORCHESTRATOR ────────────────────────────────────────────── -->
+
+        <!-- ── TOPBAR ── -->
         <header class="create-topbar">
           <div class="topbar-left">
-            <div class="sync-indicator" [class.saving]="syncStatus() === 'saving'">
-              <!-- <span class="dot"></span> -->
-              <!-- <span class="label">{{ syncStatus() === 'synced' ? 'Synced' : 'Saving...' }}</span> -->
-            </div>
+            <div class="sync-indicator" [class.saving]="syncStatus() === 'saving'"></div>
             @if (hybridId()) {
             <div class="atomic-id">{{ hybridId() }}</div>
             }
-            <!-- <button class="action-btn" (click)="openLibrary()" title="My Content Library">
-        <span>Library</span>
-      </button> -->
-            <!-- <button class="action-btn" (click)="createNew()" title="Start New Segment">
-        <span>New</span>
-      </button> -->
           </div>
-
-
           <div class="topbar-actions">
-            <button class="action-btn" (click)="save()" title="Force Save">
-              <span>Save</span>
-            </button>
-            <button class="action-btn" (click)="share()" title="Collaborators">
-              <span>Share</span>
-            </button>
-            <!-- <button class="action-btn" (click)="use()" title="Dispatch to Container">
-        <span>Use</span>
-      </button> -->
-            <button class="action-btn" (click)="send()" title="Global Dispatch">
-              <span>Send</span>
-            </button>
-            <!-- <button class="action-btn" (click)="publish()" title="Push to Network">
-        <span>Publish</span>
-      </button> -->
-
+            @if (contentState() !== 'draft') {
+            <span class="state-badge" [ngClass]="'state-' + contentState()">{{ contentState() }}</span>
+            }
+            <button class="action-btn" (click)="save()" title="Force Save"><span>Save</span></button>
+            <button class="action-btn" (click)="openUseAs()" title="Transform into Workshop, Course, Research or Ad"><span>Use As</span></button>
+            <button class="action-btn" (click)="share()" title="Share"><span>Share</span></button>
+            <button class="action-btn" (click)="send()" title="Publish"><span>Send</span></button>
             <div class="v-divider"></div>
-            <!-- <button class="action-btn adapt" [class.active]="isAdapted()" (click)="adapt()">
-        <span>Adapt</span>
-      </button> -->
           </div>
         </header>
+
       </div>
     </div>
-
   </main>
 
-  <!-- ── MODAL OVERLAYS ────────────────────────────────────────────────────── -->
+  <!-- ── MODALS ── -->
   @if (activeModal()) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-card" [class.upload-modal]="activeModal() === 'upload'" (click)="$event.stopPropagation()">
+
+      @if (activeModal() === 'eval-loading') {
+      <div class="eval-loading">
+        <div class="eval-spinner"></div>
+        <p class="eval-loading-text">Evaluating content…</p>
+        <p class="eval-loading-sub">Safety · Relevance · Routing</p>
+      </div>
+      }
+
+      @if (activeModal() === 'eval-result') {
+      @let r = evalResult()!;
+      <div class="eval-result">
+        <div class="eval-header">
+          <span class="eval-badge" [class.badge-review]="r.status === 'review'"
+            [class.badge-restrict]="r.status === 'restrict'">
+            {{ r.status === 'review' ? '⚠ Review Required' : '✕ Blocked' }}
+          </span>
+          <span class="eval-classification">{{ r.classification | titlecase }}</span>
+        </div>
+        <div class="eval-relevance">
+          <span class="eval-meta-label">Relevance</span>
+          <div class="relevance-track">
+            <div class="relevance-fill" [style.width.%]="r.relevance * 100"
+              [class.low]="r.relevance < 0.4" [class.mid]="r.relevance >= 0.4 && r.relevance < 0.7"></div>
+          </div>
+          <span class="relevance-pct">{{ (r.relevance * 100).toFixed(0) }}%</span>
+        </div>
+        <div class="eval-category">
+          <span class="eval-meta-label">Suggested category</span>
+          <span class="eval-category-value">{{ r.category }}</span>
+        </div>
+        @if (r.issues.length > 0) {
+        <ul class="eval-issues">
+          @for (issue of r.issues; track issue) {
+          <li class="eval-issue-item">{{ issue }}</li>
+          }
+        </ul>
+        }
+        <p class="eval-reason">{{ r.routing.reason }}</p>
+        <div class="eval-actions">
+          @if (r.status === 'review') {
+          <button class="eval-btn eval-btn--proceed" (click)="proceedAfterWarning()">Proceed Anyway</button>
+          }
+          <button class="eval-btn eval-btn--cancel" (click)="closeModal()">
+            {{ r.status === 'review' ? 'Cancel' : 'Close' }}
+          </button>
+        </div>
+      </div>
+      }
+
+      @if (activeModal() === 'share') {
+      <h3 class="modal-title">Share Content</h3>
+      <p class="modal-subtitle">Content cleared. Add collaborators by CeeBrain ID.</p>
+      <div class="collaborator-form">
+        <label class="collab-label">Collaborators</label>
+        <div class="collab-input-row">
+          <input class="collab-input" placeholder="CB100000000001"
+            [value]="collaboratorInput()"
+            (input)="collaboratorInput.set($any($event.target).value)"
+            (keydown.enter)="addCollaborator()" />
+          <button class="collab-add-btn" (click)="addCollaborator()">Add</button>
+        </div>
+        @if (collaboratorIds().length > 0) {
+        <div class="collab-chips">
+          @for (cid of collaboratorIds(); track cid) {
+          <div class="collab-chip">
+            {{ cid }}
+            <button class="chip-remove" (click)="removeCollaborator(cid)">✕</button>
+          </div>
+          }
+        </div>
+        }
+      </div>
+      <div class="eval-actions" style="margin-top:1.5rem">
+        <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Cancel</button>
+        <button class="eval-btn eval-btn--proceed" (click)="shareContent()">Share</button>
+      </div>
+      }
+
+      @if (activeModal() === 'send') {
+      <h3 class="modal-title">Publish to Network</h3>
+      <p class="modal-subtitle">Content cleared for global dispatch. This will make it publicly available.</p>
+      <div class="state-info">
+        <span class="state-badge" [ngClass]="'state-' + contentState()" style="text-transform:capitalize">{{ contentState() }}</span>
+        <span class="state-arrow">→</span>
+        <span class="state-badge state-published">Published</span>
+      </div>
+      <div class="eval-actions" style="margin-top:1.5rem">
+        <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Cancel</button>
+        <button class="eval-btn eval-btn--proceed" (click)="publishContent()">Publish</button>
+      </div>
+      }
+
+      @if (activeModal() === 'ideas') {
+      <h3 class="modal-title">Ideas</h3>
+      <p class="modal-subtitle">Latest research from Ceekul Web for "{{ title() || 'your topic' }}"</p>
+      @if (ideasLoading()) {
+      <div class="eval-loading" style="padding:2rem 0">
+        <div class="eval-spinner"></div>
+        <p class="eval-loading-text">Fetching from Ceekul Web…</p>
+        <p class="eval-loading-sub">Scanning research · Matching topic · Ranking relevance</p>
+      </div>
+      } @else if (ideasText()) {
+      <div class="ideas-content">{{ ideasText() }}</div>
+      } @else {
+      <p class="ideas-empty">Add a title to your content to load relevant research ideas.</p>
+      }
+      <div class="eval-actions" style="margin-top:1.5rem">
+        <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Close</button>
+        @if (title() && !ideasLoading()) {
+        <button class="eval-btn eval-btn--proceed" (click)="fetchIdeas()">Refresh</button>
+        }
+      </div>
+      }
+
+      @if (activeModal() === 'update') {
+      <h3 class="modal-title">Update Content</h3>
+      <div class="update-tabs">
+        <button class="update-tab-btn" [class.active]="updateTab() === 'creator'"
+          (click)="updateTab.set('creator')">Creator</button>
+        <button class="update-tab-btn" [class.active]="updateTab() === 'ai'"
+          (click)="updateTab.set('ai')">AI Research</button>
+      </div>
+
+      @if (updateTab() === 'creator') {
+      <div class="update-section">
+        <p class="update-hint">Find an exact phrase in your content and write your revised version. Your edit appears with an <span class="hint-user">indigo underline</span>.</p>
+        <label class="update-label">Phrase to find</label>
+        <input class="update-input" [value]="updateSegmentId()"
+          (input)="updateSegmentId.set($any($event.target).value)"
+          placeholder="Exact phrase from your content…" />
+        <label class="update-label">Your update</label>
+        <textarea class="update-textarea" [value]="updateContent()"
+          (input)="updateContent.set($any($event.target).value)"
+          placeholder="Replacement text…"></textarea>
+        <div class="eval-actions" style="margin-top:1rem">
+          <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Cancel</button>
+          <button class="eval-btn eval-btn--proceed"
+            [disabled]="!updateSegmentId() || !updateContent()"
+            (click)="applyCreatorUpdate()">Apply</button>
+        </div>
+      </div>
+      }
+
+      @if (updateTab() === 'ai') {
+      <div class="update-section">
+        <p class="update-hint">AI scans the Ceekul Web and annotates your content with research-backed updates, shown in <span class="hint-ai">amber highlight</span>.</p>
+        @if (aiUpdateLoading()) {
+        <div class="eval-loading" style="padding:1.5rem 0">
+          <div class="eval-spinner"></div>
+          <p class="eval-loading-text">Scanning Ceekul Web…</p>
+          <p class="eval-loading-sub">Researching · Comparing · Annotating</p>
+        </div>
+        } @else if (aiUpdateResult()) {
+        <div class="ai-update-result">{{ aiUpdateResult() }}</div>
+        }
+        <div class="eval-actions" style="margin-top:1rem">
+          <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Close</button>
+          <button class="eval-btn eval-btn--proceed"
+            [disabled]="aiUpdateLoading() || !title()"
+            (click)="fetchAiUpdate()">
+            {{ aiUpdateResult() ? 'Refresh' : 'Fetch from Web' }}
+          </button>
+        </div>
+      </div>
+      }
+      }
+
+      @if (activeModal() === 'use-as') {
+      <h3 class="modal-title">Use As</h3>
+      <p class="modal-subtitle">Transform your block content into a domain structure.</p>
+
+      @if (transformSaving()) {
+      <div class="eval-loading" style="padding:2rem 0">
+        <div class="eval-spinner"></div>
+        <p class="eval-loading-text">Saving content…</p>
+        <p class="eval-loading-sub">Generating your CID before transforming</p>
+      </div>
+      }
+
+      @if (!transformResult() && !transformLoading() && !transformError() && !transformSaving()) {
+      <div class="picker-grid">
+        <button class="picker-btn" (click)="runTransform('workshop')">
+          <span class="label">Workshop</span>
+          <span class="desc">3-session structure from headings</span>
+        </button>
+        <button class="picker-btn" (click)="runTransform('course')">
+          <span class="label">Course</span>
+          <span class="desc">Lectures derived from headings</span>
+        </button>
+        <button class="picker-btn" (click)="runTransform('research')">
+          <span class="label">Research</span>
+          <span class="desc">Problem, hypothesis, keywords</span>
+        </button>
+        <button class="picker-btn" (click)="runTransform('advertisement')">
+          <span class="label">Advertisement</span>
+          <span class="desc">Title + first media block</span>
+        </button>
+      </div>
+      }
+
+      @if (transformLoading()) {
+      <div class="eval-loading" style="padding:2rem 0">
+        <div class="eval-spinner"></div>
+        <p class="eval-loading-text">Transforming content…</p>
+        <p class="eval-loading-sub">Segmenting · Structuring · Caching</p>
+      </div>
+      }
+
+      @if (transformError()) {
+      <div class="eval-issues">
+        <p class="eval-issue-item">{{ transformError() }}</p>
+      </div>
+      <div class="eval-actions">
+        <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Close</button>
+      </div>
+      }
+
+      @if (transformResult()) {
+        @let tr = transformResult()!;
+        @if (tr.status === 'needs_review') {
+        <div class="eval-issues">
+          <p class="eval-issue-item">{{ tr.message }}</p>
+        </div>
+        }
+        @if (tr.status === 'ok') {
+        <div class="eval-issues" style="border-color:#10b981">
+          <p class="eval-issue-item" style="color:#10b981">
+            Applied as <strong>{{ tr.targetType }}</strong> — {{ tr.fromCache ? 'from cache' : 'freshly transformed' }}.
+            Structure pre-filled in the {{ tr.targetType }} section below.
+          </p>
+        </div>
+        }
+        <div class="eval-actions">
+          <button class="eval-btn eval-btn--cancel" (click)="transformResult.set(null); transformError.set(null)">Back</button>
+          <button class="eval-btn eval-btn--proceed" (click)="closeModal()">Done</button>
+        </div>
+      }
+      }
 
       @if (activeModal() === 'picker') {
       <h3 class="modal-title">Select Atomic Type</h3>
       <div class="picker-grid">
         @for (bt of BLOCK_TYPES; track bt.type) {
         <button class="picker-btn" (click)="addBlock(bt.type)">
-          <span class="icon">{{ bt.icon }}</span>
           <span class="label">{{ bt.label }}</span>
           <span class="desc">{{ bt.desc }}</span>
         </button>
@@ -160,19 +718,6 @@
       </div>
       }
 
-      @if (activeModal() === 'use') {
-      <h3 class="modal-title">Dispatch to Container</h3>
-      <div class="dispatch-form">
-        <p>Select the target container for this atomic segment.</p>
-        <select class="ceekul-select">
-          <option>Search Course/Workshop...</option>
-          <option>Neural Networks (Course)</option>
-          <option>Bio-Hackathon (Workshop)</option>
-        </select>
-        <button class="apply-btn" (click)="closeModal()">Confirm Link</button>
-      </div>
-      }
-
       @if (activeModal() === 'upload') {
       <div class="upload-header">
         <div>
@@ -183,26 +728,26 @@
       </div>
 
       <div class="upload-tabs">
-        <button class="upload-tab-btn" [class.active]="uploadTab() === 'file'" (click)="uploadTab.set('file')">📁 Upload
-          File</button>
-        <button class="upload-tab-btn" [class.active]="uploadTab() === 'embed'" (click)="uploadTab.set('embed')">🔗
-          Embed URL</button>
+        <button class="upload-tab-btn" [class.active]="uploadTab() === 'file'"
+          (click)="uploadTab.set('file')">📁 Upload File</button>
+        <button class="upload-tab-btn" [class.active]="uploadTab() === 'embed'"
+          (click)="uploadTab.set('embed')">🔗 Embed URL</button>
       </div>
 
       @if (uploadTab() === 'file') {
       <div class="dropzone" [class.dragover]="isDragOver()" (dragover)="onDragOver($event)"
         (dragleave)="isDragOver.set(false)" (drop)="onDrop($event)" (click)="fileInput.click()">
-        <span class="dz-icon">☁</span>
+     
         <p class="dz-text">Drag &amp; drop files here</p>
         <p class="dz-hint">or click to browse · Image, Video, Audio, PDF, Lottie</p>
         <input #fileInput type="file" multiple hidden (change)="onFileSelect($event)"
           accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mp3,.wav,.pdf,.docx,.json" />
       </div>
-
       @if (uploadFiles().length > 0) {
       <div class="upload-file-list">
         @for (uf of uploadFiles(); track uf.id) {
-        <div class="upload-file-item" [class.is-error]="uf.status === 'error'" [class.is-done]="uf.status === 'done'">
+        <div class="upload-file-item" [class.is-error]="uf.status === 'error'"
+          [class.is-done]="uf.status === 'done'">
           <div class="file-thumb">
             @if (uf.mediaType === 'image' && uf.preview) {
             <img [src]="uf.preview" alt="" />
@@ -225,7 +770,8 @@
             @if (uf.status === 'error') { <span class="s-error">✗</span> }
           </div>
           @if (uf.status !== 'uploading') {
-          <button class="remove-file-btn" (click)="removeUploadFile(uf.id); $event.stopPropagation()">✕</button>
+          <button class="remove-file-btn"
+            (click)="removeUploadFile(uf.id); $event.stopPropagation()">✕</button>
           }
         </div>
         }
@@ -233,12 +779,11 @@
       }
       }
 
-
-
       @if (uploadTab() === 'embed') {
       <div class="embed-section">
         <label class="embed-label">Media URL</label>
-        <input class="embed-input" type="url" [value]="embedUrl()" (input)="embedUrl.set($any($event.target).value)"
+        <input class="embed-input" type="url" [value]="embedUrl()"
+          (input)="embedUrl.set($any($event.target).value)"
           placeholder="https://example.com/media.jpg" />
         @if (embedUrl()) {
         <div class="embed-preview-wrap">
@@ -250,7 +795,8 @@
 
       <div class="upload-actions">
         <button class="cancel-btn" (click)="closeModal()">Cancel</button>
-        <button class="submit-upload-btn" [disabled]="uploadTab() === 'file' ? uploadFiles().length === 0 : !embedUrl()"
+        <button class="submit-upload-btn"
+          [disabled]="uploadTab() === 'file' ? uploadFiles().length === 0 : !embedUrl()"
           (click)="submitUpload()">
           {{ uploadTab() === 'embed' ? 'Insert' : 'Upload' }}
         </button>

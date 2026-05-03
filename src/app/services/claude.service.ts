@@ -14,6 +14,15 @@ export interface AdCopy {
   relevanceReason: string;
 }
 
+export interface ContentEvaluation {
+  status: 'allow' | 'review' | 'restrict';
+  classification: 'safe' | 'sensitive' | 'adult' | 'abusive';
+  relevance: number;
+  category: string;
+  issues: string[];
+  routing: { allowed: boolean; reason: string };
+}
+
 export interface WorkshopGenResult {
   workshopTitle: string;
   shortDescription: string;
@@ -65,6 +74,16 @@ export class ClaudeService {
   }): Observable<{ status: boolean; data: AdCopy }> {
     return this.http.post<{ status: boolean; data: AdCopy }>(
       `${this.base}/ad-copy`, payload
+    );
+  }
+
+  evaluateContent(payload: {
+    title: string;
+    subtitle?: string;
+    snippet?: string;
+  }): Observable<{ status: boolean; data: ContentEvaluation }> {
+    return this.http.post<{ status: boolean; data: ContentEvaluation }>(
+      `${this.base}/evaluate-content`, payload
     );
   }
 

@@ -2,6 +2,7 @@ import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CreatorService, DraftSummary } from '../../../services/creator.service';
+import { TransformTargetType } from '../../../services/transform.service';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 
 type FilterStatus = 'all' | 'draft' | 'shared' | 'published';
@@ -30,6 +31,16 @@ export class LibraryComponent implements OnInit, OnDestroy {
   readonly deleteTarget = signal<DraftSummary | null>(null);
   readonly deleting = signal(false);
   readonly errorMsg = signal('');
+
+  // ── Use As ─────────────────────────────────────────────────────────────────
+  readonly useAsTarget = signal<DraftSummary | null>(null);
+
+  readonly USE_AS_OPTIONS: { type: TransformTargetType; label: string; desc: string }[] = [
+    { type: 'workshop',      label: 'Workshop',      desc: '3-session structure from headings' },
+    { type: 'course',        label: 'Course',        desc: 'Lectures derived from headings'    },
+    { type: 'research',      label: 'Research',      desc: 'Problem, hypothesis, keywords'     },
+    { type: 'advertisement', label: 'Advertisement', desc: 'Title + first media block'         },
+  ];
 
   readonly STATUS_OPTIONS: { value: FilterStatus; label: string }[] = [
     { value: 'all', label: 'All Status' },
@@ -109,6 +120,21 @@ export class LibraryComponent implements OnInit, OnDestroy {
 
   goToCreate(): void {
     this.router.navigate(['/personal/create']);
+  }
+
+  openUseAs(item: DraftSummary): void {
+    this.useAsTarget.set(item);
+  }
+
+  cancelUseAs(): void {
+    this.useAsTarget.set(null);
+  }
+
+  navigateUseAs(type: TransformTargetType): void {
+    const item = this.useAsTarget();
+    if (!item) return;
+    this.useAsTarget.set(null);
+    this.router.navigate(['/personal/create', item.baseId], { queryParams: { useAs: type } });
   }
 
   confirmDelete(item: DraftSummary): void {

@@ -440,6 +440,60 @@
   }
 }
 
+// ── Use As row button ──
+
+.btn-use-as:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--accent);
+  color: #a5b4fc;
+}
+
+// ── Use As modal grid ──
+
+.use-as-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.use-as-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s;
+  font-family: inherit;
+
+  &:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+
+  .use-as-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+  }
+
+  .use-as-desc {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+}
+
+// ── Use As modal wider card ──
+
+.modal-card.use-as-card {
+  max-width: 520px;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

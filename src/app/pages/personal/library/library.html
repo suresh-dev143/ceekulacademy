@@ -78,6 +78,7 @@
                 <div class="row-actions">
                   <button class="row-btn btn-read" (click)="read(item)">Read</button>
                   <button class="row-btn btn-edit" (click)="edit(item)">Edit</button>
+                  <button class="row-btn btn-use-as" (click)="openUseAs(item)">Use As</button>
                   <button class="row-btn btn-delete" (click)="confirmDelete(item)">Delete</button>
                 </div>
               </td>
@@ -99,6 +100,29 @@
         <button class="page-btn" (click)="nextPage()" [disabled]="currentPage() >= totalPages">Next →</button>
       </div>
     </footer>
+  }
+
+  <!-- ── Use As Modal ── -->
+  @if (useAsTarget()) {
+    <div class="modal-overlay" (click)="cancelUseAs()">
+      <div class="modal-card use-as-card" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Use As</h3>
+        <p class="modal-body">
+          Transform <strong>"{{ useAsTarget()?.title || '(untitled)' }}"</strong> into:
+        </p>
+        <div class="use-as-grid">
+          @for (opt of USE_AS_OPTIONS; track opt.type) {
+            <button class="use-as-btn" (click)="navigateUseAs(opt.type)">
+              <span class="use-as-label">{{ opt.label }}</span>
+              <span class="use-as-desc">{{ opt.desc }}</span>
+            </button>
+          }
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn btn-cancel" (click)="cancelUseAs()">Cancel</button>
+        </div>
+      </div>
+    </div>
   }
 
   <!-- ── Delete Confirmation Modal ── -->
