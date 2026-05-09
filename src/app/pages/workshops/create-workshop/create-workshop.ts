@@ -1,231 +1,245 @@
 import { Component, inject, output, signal, input, OnInit, computed } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import {
-    FormArray, FormBuilder, FormGroup,
-    ReactiveFormsModule, Validators
-} from '@angular/forms';
-import { WorkshopService, CreateWorkshopRequest, CreatedWorkshopData, WorkshopListItem } from '../../../services/workshop.service';
-import { ClaudeService, WorkshopGenResult } from '../../../services/claude.service';
+import { WorkshopService, CreateWorkshopRequest, CreatedWorkshopData, WorkshopListItem, AdConfig, AdBreakActivity, WorkshopApiSchedule, AddSchedulePayload } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { RazorpayService } from '../../../services/razorpay.service';
+import { CreatorService, DraftSummary } from '../../../services/creator.service';
+import { FacilityDiscoveryComponent } from '../../../components/workshops/facility-discovery/facility-discovery.component';
+
+// ── Timezone helpers ──────────────────────────────────────────────────────────
+
+const TZ_IANA: Record<string, string> = {
+    UTC: 'UTC',
+    IST: 'Asia/Kolkata',
+    EST: 'America/New_York',
+    CST: 'America/Chicago',
+    PST: 'America/Los_Angeles',
+    GMT: 'Europe/London',
+    CET: 'Europe/Paris',
+    JST: 'Asia/Tokyo',
+    AEST: 'Australia/Sydney',
+};
+
+interface TzNow { dateStr: string; hours: number; minutes: number }
+
+function nowInTz(tzKey: string): TzNow {
+    const zone = TZ_IANA[tzKey] ?? 'UTC';
+    const now = new Date();
+
+    const dp = new Intl.DateTimeFormat('en-US', {
+        timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(now);
+    const y = dp.find(p => p.type === 'year')!.value;
+    const m = dp.find(p => p.type === 'month')!.value;
+    const d = dp.find(p => p.type === 'day')!.value;
+
+    const tp = new Intl.DateTimeFormat('en-US', {
+        timeZone: zone, hour: '2-digit', minute: '2-digit', hour12: false
+    }).formatToParts(now);
+    const hours = parseInt(tp.find(p => p.type === 'hour')!.value, 10) % 24;
+    const minutes = parseInt(tp.find(p => p.type === 'minute')!.value, 10);
+
+    return { dateStr: `${y}-${m}-${d}`, hours, minutes };
+}
+
+// ── Validators ────────────────────────────────────────────────────────────────
+
+function pastDateValidator(getTz: () => string): ValidatorFn {
+    return (ctrl: AbstractControl): ValidationErrors | null => {
+        const val = ctrl.value as string;
+        if (!val) return null;
+        return val < nowInTz(getTz()).dateStr ? { pastDate: true } : null;
+    };
+}
+
+function sessionConstraintsValidator(getTz: () => string): ValidatorFn {
+    return (group: AbstractControl): ValidationErrors | null => {
+        const errs: ValidationErrors = {};
+        const date = (group.get('date')?.value as string) ?? '';
+        const start = (group.get('startTime')?.value as string) ?? '';
+        const end = (group.get('endTime')?.value as string) ?? '';
+
+        if (start && end && end <= start) errs['endBeforeStart'] = true;
+
+        if (start && end) {
+            const [sh, sm] = start.split(':').map(Number);
+            const [eh, em] = end.split(':').map(Number);
+            const diff = (eh * 60 + em) - (sh * 60 + sm);
+            if (diff <= 0) errs['invalidDuration'] = true;
+        }
+
+        if (date && start) {
+            const { dateStr, hours: nh, minutes: nm } = nowInTz(getTz());
+            if (date === dateStr) {
+                const [sh, sm] = start.split(':').map(Number);
+                if (sh * 60 + sm <= nh * 60 + nm) errs['pastTime'] = true;
+            }
+        }
+
+        return Object.keys(errs).length ? errs : null;
+    };
+}
+
+interface HourRef {
+    cid: string;
+    version: number;
+    title: string;
+    subtitle: string;
+}
 
 @Component({
     selector: 'app-create-workshop',
     standalone: true,
-    imports: [ReactiveFormsModule],
+    imports: [ReactiveFormsModule, CommonModule, FacilityDiscoveryComponent],
     templateUrl: './create-workshop.html',
     styleUrl: './create-workshop.scss',
 })
 export class CreateWorkshop implements OnInit {
 
-    private fb = inject(FormBuilder);
-    private ws = inject(WorkshopService);
-    private claude = inject(ClaudeService);
-    private auth = inject(AuthService);
-    private toast = inject(ToastService);
-    private razorpay = inject(RazorpayService);
+    private fb         = inject(FormBuilder);
+    private ws         = inject(WorkshopService);
+    private auth       = inject(AuthService);
+    private toast      = inject(ToastService);
+    private creatorSvc = inject(CreatorService);
 
     workshopForm!: FormGroup;
-    isSubmitting = signal(false);
+    isSubmitting    = signal(false);
     workshopCreated = output<CreatedWorkshopData>();
-    cancel = output<void>();
+    cancel          = output<void>();
 
-    // ── AI Generator ──────────────────────────────────────────────────────────
-    showAiPanel  = signal(false);
-    isGenerating = signal(false);
-    aiGenerated  = signal(false);
-    aiTopic      = signal('');
-    aiAudience   = signal<'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'>('BEGINNER');
-    aiLanguage   = signal('English');
-    aiMode       = signal<'ONLINE' | 'OFFLINE'>('ONLINE');
+    // ── Edit mode ─────────────────────────────────────────────────────────────
+    workshopToEdit = input<WorkshopListItem | null>(null);
+    isEditMode     = computed(() => !!this.workshopToEdit());
 
-    get totalCommission(): number {
-        return 0; // Handled at schedule creation step instead
-    }
+    // ── Content library ───────────────────────────────────────────────────────
+    private _allContent = signal<DraftSummary[]>([]);
+    contentLoading      = signal(false);
+    contentError        = signal('');
 
-    // ── Symbol Picker ─────────────────────────────────────────────────────────
-    readonly symbolCategories = [
-        { label: 'Greek',   symbols: ['α','β','γ','δ','ε','ζ','η','θ','κ','λ','μ','ν','ξ','π','ρ','σ','τ','υ','φ','χ','ψ','ω','Γ','Δ','Θ','Λ','Ξ','Π','Σ','Υ','Φ','Ψ','Ω'] },
-        { label: 'Math',    symbols: ['±','∓','×','÷','≠','≤','≥','≈','≡','∝','∞','√','∛','∑','∏','∫','∂','∇','∈','∉','⊂','⊃','∪','∩','∅','∀','∃','¬','∧','∨','⟨','⟩'] },
-        { label: 'Physics', symbols: ['ħ','ℏ','ℓ','Å','°','′','″','→','←','↑','↓','↔','⇒','⇔','⊕','⊗','⊙','∇²','~'] },
-        { label: 'Powers',  symbols: ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹','₀','₁','₂','₃','₄','₅','₆','₇','₈','₉'] },
+    // ── Schedules (Session Form) ─────────────────────────────────────────────
+    localSchedules = signal<Partial<WorkshopApiSchedule>[]>([]);
+    showAddForm    = signal(false);
+    addForm!: FormGroup;
+
+    readonly timezones = [
+        { key: 'UTC', label: 'UTC  — Coordinated Universal Time' },
+        { key: 'IST', label: 'IST  — Indian Standard Time (UTC+5:30)' },
+        { key: 'EST', label: 'EST  — Eastern Standard Time (UTC−5)' },
+        { key: 'CST', label: 'CST  — Central Standard Time (UTC−6)' },
+        { key: 'PST', label: 'PST  — Pacific Standard Time (UTC−8)' },
+        { key: 'GMT', label: 'GMT  — Greenwich Mean Time (UTC+0)' },
+        { key: 'CET', label: 'CET  — Central European Time (UTC+1)' },
+        { key: 'JST', label: 'JST  — Japan Standard Time (UTC+9)' },
+        { key: 'AEST', label: 'AEST — Australian Eastern Time (UTC+10)' },
     ];
 
-    showSymbols      = signal(false);
-    activeSymbolTab  = signal(0);
-    private lastFocusedEl: HTMLTextAreaElement | HTMLInputElement | null = null;
+    showDiscovery = signal(false);
 
-    onFieldFocus(el: HTMLTextAreaElement | HTMLInputElement) {
-        this.lastFocusedEl = el;
-    }
 
-    toggleSymbols() { this.showSymbols.update(v => !v); }
+    // ── Search ────────────────────────────────────────────────────────────────
+    searchTitle    = signal('');
+    searchSubtitle = signal('');
 
-    insertSymbol(sym: string) {
-        const el = this.lastFocusedEl;
-        if (!el) return;
-        const start = el.selectionStart ?? el.value.length;
-        const end   = el.selectionEnd   ?? el.value.length;
-        el.value = el.value.slice(0, start) + sym + el.value.slice(end);
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.focus();
-        el.setSelectionRange(start + sym.length, start + sym.length);
-    }
+    // ── Identity (from Create Page) ──────────────────────────────────────────
+    readonly title    = signal('');
+    readonly subtitle = signal('');
+    readonly category = signal<string>('');
 
-    // ── Edit Mode Support ──────────────────────────────────────────────────
-    workshopToEdit = input<WorkshopListItem | null>(null);
-    isEditMode = computed(() => !!this.workshopToEdit());
+    readonly CONTENT_CATEGORIES = [
+        { id: 'course', label: 'Course', icon: '📚' },
+        { id: 'research', label: 'Research', icon: '🔬' },
+        { id: 'project', label: 'Project', icon: '🏗️' },
+        { id: 'webinar', label: 'Webinar', icon: '🎙️' },
+        { id: 'workshop', label: 'Workshop', icon: '🛠️' },
+        { id: 'entertainment', label: 'Entertainment', icon: '🎭' },
+        { id: 'other', label: 'Other', icon: '📢' },
+    ];
 
-    constructor() {
-        this.workshopForm = this.fb.group({
-            workshopTitle: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
-            workshopDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
-            expertDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
-            threeHourPlan: this.fb.group({
-                hour1: this.fb.group({
-                    title: ['', Validators.required],
-                    description: ['', Validators.required],
-                    expertAllowed: [true],
-                    instructorAllowed: [false],
-                    videos: this.fb.array([]),
-                    images: this.fb.array([])
-                }),
-                hour2: this.fb.group({
-                    title: [{ value: 'Hands On', disabled: true }, Validators.required],
-                    description: ['', Validators.required],
-                    expertAllowed: [true],
-                    instructorAllowed: [false],
-                    videos: this.fb.array([]),
-                    images: this.fb.array([])
-                }),
-                hour3: this.fb.group({
-                    title: ['Project Discussion', Validators.required],
-                    description: ['', Validators.required],
-                    expertAllowed: [true],
-                    instructorAllowed: [false],
-                    videos: this.fb.array([]),
-                    images: this.fb.array([])
-                })
-            })
-        });
-    }
+    readonly CATEGORY_META: Record<string, { color: string }> = {
+        course: { color: '#6366f1' },
+        research: { color: '#10b981' },
+        project: { color: '#f59e0b' },
+        webinar: { color: '#3b82f6' },
+        workshop: { color: '#8b5cf6' },
+        entertainment: { color: '#ec4899' },
+        other: { color: '#6366f1' },
+    };
 
-    ngOnInit() {
-        const editData = this.workshopToEdit();
-        if (editData) {
-            this.workshopForm.patchValue({
-                workshopTitle: editData.workshopTitle,
-                workshopDescription: editData.workshopDescription,
-                expertDescription: editData.expertDescription,
-            });
+    readonly categoryAccentColor = computed(() => {
+        const cat = this.category().toLowerCase().trim();
+        const match = this.CONTENT_CATEGORIES.find(c => c.label.toLowerCase() === cat);
+        return match ? (this.CATEGORY_META[match.id]?.color ?? '#6366f1') : '#6366f1';
+    });
 
-            if (editData.threeHourPlan) {
-                this.workshopForm.patchValue({
-                    threeHourPlan: editData.threeHourPlan
-                });
-                // Populate media FormArrays from edit data
-                (['hour1', 'hour2', 'hour3'] as const).forEach(hour => {
-                    const hourData = editData.threeHourPlan![hour] as any;
-                    (hourData?.videos || []).forEach((url: string) =>
-                        this.getHourVideos(hour).push(this.fb.control(url)));
-                    (hourData?.images || []).forEach((url: string) =>
-                        this.getHourImages(hour).push(this.fb.control(url)));
-                });
-            }
+    onIdentityChange() {
+        if (this.title()) {
+            this.workshopForm.patchValue({ workshopTitle: this.title() }, { emitEvent: false });
         }
     }
 
-    // ── AI Generation ─────────────────────────────────────────────────────────
+    searchResults = computed(() => {
+        const all = this._allContent();
+        const t   = this.searchTitle().trim().toLowerCase();
+        const s   = this.searchSubtitle().trim().toLowerCase();
+        if (!t && !s) return [];
+        return all.filter(d => {
+            const tMatch = !t || d.title.toLowerCase().includes(t);
+            const sMatch = !s || (d.subtitle ?? '').toLowerCase().includes(s);
+            return tMatch && sMatch;
+        });
+    });
 
-    generateWithAI() {
-        const topic = this.aiTopic().trim();
-        if (!topic) { this.toast.error('Please enter a workshop topic.'); return; }
+    // ── Per-hour assignments ──────────────────────────────────────────────────
+    hour1Ref = signal<HourRef | null>(null);
+    hour2Ref = signal<HourRef | null>(null);
+    hour3Ref = signal<HourRef | null>(null);
 
-        this.isGenerating.set(true);
-        this.claude.generateWorkshop({
-            topic,
-            audience: this.aiAudience(),
-            language: this.aiLanguage(),
-            mode:     this.aiMode()
-        }).subscribe({
-            next: (res) => {
-                this.isGenerating.set(false);
-                this.applyGeneratedWorkshop(res.data);
-            },
-            error: () => {
-                this.isGenerating.set(false);
-                this.toast.error('AI generation failed. Please try again.');
-            }
+    anyHourAssigned = computed(() => !!(this.hour1Ref() || this.hour2Ref() || this.hour3Ref()));
+
+    // ── Ad configuration ──────────────────────────────────────────────────────
+    adOverrideBy      = signal<'creator' | 'instructor' | 'learner'>('learner');
+    adDomains         = signal<string[]>([]);
+    adCategories      = signal<string[]>([]);
+    adKeywords        = signal<string[]>([]);
+    adBreakActivities = signal<Set<AdBreakActivity>>(new Set());
+
+    readonly BREAK_ACTIVITY_OPTIONS: { key: AdBreakActivity; label: string; icon: string }[] = [
+        { key: 'stretch',    label: 'Quick Stretch',          icon: '🤸' },
+        { key: 'meditation', label: 'Breathing & Meditation', icon: '🧘' },
+        { key: 'notes',      label: 'Review & Take Notes',    icon: '📝' },
+        { key: 'quiz',       label: 'Self-Quiz',              icon: '🧠' },
+        { key: 'discussion', label: 'Open Discussion',        icon: '💬' },
+        { key: 'walk',       label: 'Short Walk',             icon: '🚶' },
+        { key: 'custom',     label: 'Custom Activity',        icon: '✨' },
+    ];
+
+    toggleBreakActivity(key: AdBreakActivity) {
+        this.adBreakActivities.update(set => {
+            const next = new Set(set);
+            next.has(key) ? next.delete(key) : next.add(key);
+            return next;
         });
     }
 
-    private applyGeneratedWorkshop(data: WorkshopGenResult) {
-        const fmt = (arr: string[], prefix = '') =>
-            arr?.length ? `${prefix}${arr.map((s, i) => `${i + 1}. ${s}`).join('\n')}` : '';
-
-        const hour1Desc = [
-            data.hour1.explanation || '',
-            data.hour1.keyConcepts?.length  ? `\n\nKey Concepts: ${data.hour1.keyConcepts.join(', ')}` : '',
-            data.hour1.examples?.length     ? `\n\nExamples:\n${fmt(data.hour1.examples)}` : ''
-        ].join('').trim().slice(0, 1000);
-
-        const hour2Desc = [
-            fmt(data.hour2.practicalExercises, 'Exercises:\n'),
-            data.hour2.stepByStepTasks?.length ? `\n\nStep-by-Step:\n${fmt(data.hour2.stepByStepTasks)}` : '',
-            data.hour2.realWorldUseCase        ? `\n\nReal-World Use Case: ${data.hour2.realWorldUseCase}` : ''
-        ].join('').trim().slice(0, 1000);
-
-        const hour3Desc = [
-            fmt(data.hour3.discussionQuestions, 'Discussion Questions:\n'),
-            data.hour3.caseStudies?.length ? `\n\nCase Studies:\n${fmt(data.hour3.caseStudies)}` : '',
-            data.hour3.qaPrompts?.length   ? `\n\nQ&A Prompts:\n${fmt(data.hour3.qaPrompts)}` : ''
-        ].join('').trim().slice(0, 1000);
-
-        this.workshopForm.patchValue({
-            workshopTitle:       (data.workshopTitle  || '').slice(0, 100),
-            workshopDescription: (data.longDescription || '').slice(0, 1000),
-        });
-
-        this.workshopForm.get('threeHourPlan.hour1.title')?.setValue((data.hour1.title || '').slice(0, 100));
-        this.workshopForm.get('threeHourPlan.hour1.description')?.setValue(hour1Desc);
-        this.workshopForm.get('threeHourPlan.hour2.description')?.setValue(hour2Desc);
-        this.workshopForm.get('threeHourPlan.hour3.title')?.setValue((data.hour3.title || 'Open Discussion').slice(0, 100));
-        this.workshopForm.get('threeHourPlan.hour3.description')?.setValue(hour3Desc);
-
-        this.aiGenerated.set(true);
-        this.showAiPanel.set(false);
-        this.toast.success('Workshop content generated and filled in!');
+    isBreakActivityEnabled(key: AdBreakActivity): boolean {
+        return this.adBreakActivities().has(key);
     }
 
-    // ── Media helpers ─────────────────────────────────────────────────────────
-
-    getHourVideos(hour: 'hour1' | 'hour2' | 'hour3'): FormArray {
-        return this.workshopForm.get(`threeHourPlan.${hour}.videos`) as FormArray;
+    private _chipInput(list: ReturnType<typeof signal<string[]>>, raw: string) {
+        const val = raw.trim();
+        if (val && !list().includes(val)) list.update(a => [...a, val]);
     }
 
-    getHourImages(hour: 'hour1' | 'hour2' | 'hour3'): FormArray {
-        return this.workshopForm.get(`threeHourPlan.${hour}.images`) as FormArray;
+    addDomain(val: string)    { this._chipInput(this.adDomains, val); }
+    addCategory(val: string)  { this._chipInput(this.adCategories, val); }
+    addKeyword(val: string)   { this._chipInput(this.adKeywords, val); }
+
+    removeChip(list: ReturnType<typeof signal<string[]>>, item: string) {
+        list.update(a => a.filter(x => x !== item));
     }
 
-    addHourVideo(hour: 'hour1' | 'hour2' | 'hour3') {
-        this.getHourVideos(hour).push(this.fb.control(''));
-    }
-
-    removeHourVideo(hour: 'hour1' | 'hour2' | 'hour3', index: number) {
-        this.getHourVideos(hour).removeAt(index);
-    }
-
-    addHourImage(hour: 'hour1' | 'hour2' | 'hour3') {
-        this.getHourImages(hour).push(this.fb.control(''));
-    }
-
-    removeHourImage(hour: 'hour1' | 'hour2' | 'hour3', index: number) {
-        this.getHourImages(hour).removeAt(index);
-    }
-
-    // ── Error helpers (called from template) ─────────────────────────────────
-
+    // ── Error helpers ─────────────────────────────────────────────────────────
     fieldError(path: string): boolean {
         const c = this.workshopForm.get(path);
         return !!(c?.invalid && c.touched);
@@ -236,65 +250,285 @@ export class CreateWorkshop implements OnInit {
         return !!(c?.hasError(key) && c.touched);
     }
 
-    // ── Submit ────────────────────────────────────────────────────────────────
+    hourLabel(n: 1 | 2 | 3): string {
+        return ['Theory', 'Hands On', 'Project Discussion'][n - 1];
+    }
+
+    isAssignedTo(draft: DraftSummary, n: 1 | 2 | 3): boolean {
+        const ref = n === 1 ? this.hour1Ref() : n === 2 ? this.hour2Ref() : this.hour3Ref();
+        return ref?.cid === draft.baseId;
+    }
+
+    ngOnInit() {
+        this.workshopForm = this.fb.group({
+            workshopTitle:       ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+            workshopDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
+            expertDescription:   ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
+        });
+
+        this.buildAddForm();
+        this._loadContent();
+
+
+        const editData = this.workshopToEdit();
+        if (!editData) return;
+
+        this.workshopForm.patchValue({
+            workshopTitle:       editData.workshopTitle,
+            workshopDescription: editData.workshopDescription,
+            expertDescription:   editData.expertDescription,
+        });
+
+        // Sync signals
+        this.title.set(editData.workshopTitle);
+        this.category.set('Workshop'); // Default for workshops
+
+
+        const cr = editData.contentRef as any;
+        if (cr?.hour1?.cid) this.hour1Ref.set({ cid: cr.hour1.cid, version: cr.hour1.version ?? 0, title: editData.threeHourPlan?.hour1?.title ?? '', subtitle: '' });
+        if (cr?.hour2?.cid) this.hour2Ref.set({ cid: cr.hour2.cid, version: cr.hour2.version ?? 0, title: editData.threeHourPlan?.hour2?.title ?? '', subtitle: '' });
+        if (cr?.hour3?.cid) this.hour3Ref.set({ cid: cr.hour3.cid, version: cr.hour3.version ?? 0, title: editData.threeHourPlan?.hour3?.title ?? '', subtitle: '' });
+
+        const ac = editData.adConfig as AdConfig | undefined;
+        if (ac) {
+            if (ac.overrideBy)              this.adOverrideBy.set(ac.overrideBy);
+            if (ac.filters?.domains)        this.adDomains.set([...ac.filters.domains]);
+            if (ac.filters?.categories)     this.adCategories.set([...ac.filters.categories]);
+            if (ac.filters?.keywords)       this.adKeywords.set([...ac.filters.keywords]);
+            if (ac.breakActivities?.length) this.adBreakActivities.set(new Set(ac.breakActivities));
+        }
+    }
+
+    private _loadContent() {
+        this.contentLoading.set(true);
+        this.contentError.set('');
+        this.creatorSvc.listDrafts().subscribe({
+            next:  res => { this._allContent.set(res.data); this.contentLoading.set(false); },
+            error: ()  => { this.contentError.set('Failed to load content library'); this.contentLoading.set(false); },
+        });
+    }
+
+    setHour(n: 1 | 2 | 3, draft: DraftSummary) {
+        const ref: HourRef = { cid: draft.baseId, version: draft.version, title: draft.title, subtitle: draft.subtitle ?? '' };
+        if (n === 1) this.hour1Ref.set(ref);
+        else if (n === 2) this.hour2Ref.set(ref);
+        else this.hour3Ref.set(ref);
+    }
+
+    clearHour(n: 1 | 2 | 3) {
+        if (n === 1) this.hour1Ref.set(null);
+        else if (n === 2) this.hour2Ref.set(null);
+        else this.hour3Ref.set(null);
+    }
+
+    // ── Session Management ────────────────────────────────────────────────────
+
+    private buildAddForm(): void {
+        const getFormTz = () => this.addForm?.get('timezone')?.value ?? 'IST';
+
+        this.addForm = this.fb.group({
+            date: ['', [Validators.required, pastDateValidator(getFormTz)]],
+            startTime: ['', Validators.required],
+            endTime: ['', Validators.required],
+            timezone: ['IST', Validators.required],
+            sessionOrder: ['', Validators.required],
+            fee: [0, [Validators.required, Validators.min(0)]],
+            mode: ['online', Validators.required],
+            streamMode: ['interactive_class'],
+            location: [''],
+            resources: [''],
+            facilityId: [''],
+            facilityType: [''],
+            partnerId: [''],
+            partnerName: [''],
+            facilityDetails: [null],
+        }, {
+            validators: [sessionConstraintsValidator(getFormTz)]
+        });
+
+        this.addForm.get('mode')!.valueChanges.subscribe(m => this.syncLocationValidator(m ?? 'online'));
+    }
+
+    private syncLocationValidator(mode: string): void {
+        const loc = this.addForm.get('location')!;
+        const facId = this.addForm.get('facilityId')!;
+        const streamMode = this.addForm.get('streamMode')!;
+
+        if (mode === 'offline') {
+            loc.setValidators(Validators.required);
+            facId.setValidators(Validators.required);
+            streamMode.setValue(null);
+        } else {
+            loc.clearValidators();
+            facId.clearValidators();
+            loc.setValue('');
+            facId.setValue('');
+            if (!streamMode.value) streamMode.setValue('interactive_class');
+        }
+        loc.updateValueAndValidity();
+        facId.updateValueAndValidity();
+    }
+
+    openAddForm(sessionOrder?: number): void {
+        this.showAddForm.set(true);
+        this.addForm.reset({
+            mode: 'online',
+            fee: 0,
+            timezone: 'IST',
+            sessionOrder: sessionOrder || ''
+        });
+        if (sessionOrder) this.addForm.get('sessionOrder')?.disable();
+        else this.addForm.get('sessionOrder')?.enable();
+    }
+
+    cancelAddForm(): void {
+        this.showAddForm.set(false);
+    }
+
+    addScheduleToLocal(): void {
+        this.addForm.markAllAsTouched();
+        if (this.addForm.invalid) return;
+
+        const val = this.addForm.getRawValue();
+        const schedule: Partial<WorkshopApiSchedule> = {
+            ...val,
+            activity: this.hourLabel(Number(val.sessionOrder) as 1 | 2 | 3),
+            description: this.hourLabel(Number(val.sessionOrder) as 1 | 2 | 3)
+        };
+
+        this.localSchedules.update(list => [...list, schedule]);
+        this.cancelAddForm();
+        this.toast.success('Schedule added to plan');
+    }
+
+    removeSchedule(idx: number): void {
+        this.localSchedules.update(list => list.filter((_, i) => i !== idx));
+    }
+
+    schedulesByOrder(order: number) {
+        return this.localSchedules().filter(s => Number(s.sessionOrder) === order);
+    }
+
+    formatDate(iso: string): string {
+        try {
+            return new Date(iso).toLocaleDateString('en-IN', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+        } catch { return iso; }
+    }
+
+    sessionDuration(s: Partial<WorkshopApiSchedule>): string {
+        if (!s.startTime || !s.endTime) return '';
+        const [sh, sm] = s.startTime.split(':').map(Number);
+        const [eh, em] = s.endTime.split(':').map(Number);
+        const diff = (eh * 60 + em) - (sh * 60 + sm);
+        if (diff <= 0) return '';
+        const hrs = Math.floor(diff / 60);
+        const mins = diff % 60;
+        return hrs && mins ? `${hrs}h ${mins}m` : hrs ? `${hrs}h` : `${mins}m`;
+    }
+
+    // ── Facility Discovery ────────────────────────────────────────────────────
+
+    openDiscovery() { this.showDiscovery.set(true); }
+    closeDiscovery() { this.showDiscovery.set(false); }
+
+    onFacilitySelected(selection: any) {
+        this.addForm.patchValue({
+            facilityId: selection.facilityId,
+            facilityType: selection.facilityType,
+            partnerId: selection.partnerId,
+            partnerName: selection.partnerName,
+            location: `${selection.facilityName}, ${selection.partnerName}`,
+            facilityDetails: selection,
+            startTime: selection.selectedSlots?.[0]?.split('-')[0] || this.addForm.get('startTime')?.value,
+            endTime: selection.selectedSlots?.[selection.selectedSlots.length - 1]?.split('-')[1]?.replace('24:00','23:59') || this.addForm.get('endTime')?.value
+        });
+        this.closeDiscovery();
+    }
+
+    removeFacility() {
+        this.addForm.patchValue({ facilityId: '', location: '', facilityDetails: null });
+    }
+
+    get isOfflineMode(): boolean { return this.addForm?.get('mode')?.value === 'offline'; }
+    get isOnlineMode(): boolean  { return this.addForm?.get('mode')?.value === 'online'; }
+    get todayStr(): string { return nowInTz(this.addForm?.get('timezone')?.value || 'IST').dateStr; }
+    get isAddingForToday(): boolean {
+        const d = this.addForm?.get('date')?.value;
+        return !!d && d === this.todayStr;
+    }
 
     onSubmit() {
         this.workshopForm.markAllAsTouched();
         if (this.workshopForm.invalid || this.isSubmitting()) return;
-        console.log(this.workshopForm.value);
-        const userId = this.auth.currentUserProfile()?.id;
-        if (!userId && !this.isEditMode()) {
+        if (!this.anyHourAssigned()) {
+            this.toast.error('Please assign content to at least one hour before saving.');
+            return;
+        }
+        if (!this.auth.currentUserProfile()?.id && !this.isEditMode()) {
             this.toast.error('You must be logged in to create a workshop.');
             return;
         }
-
-        const v = this.workshopForm.getRawValue();
-        const editData = this.workshopToEdit();
-
-        if (this.isEditMode() && editData) {
-            this.proceedWithSave(v, editData);
-        } else {
-            // New workshop
-            this.proceedWithSave(v);
-        }
+        this._save();
     }
 
-    private proceedWithSave(v: any, editData?: WorkshopListItem) {
+    private _buildPayload() {
+        const v  = this.workshopForm.getRawValue();
+        const h1 = this.hour1Ref();
+        const h2 = this.hour2Ref();
+        const h3 = this.hour3Ref();
+
+        const domains    = this.adDomains();
+        const categories = this.adCategories();
+        const keywords   = this.adKeywords();
+
+        const breakActivities = [...this.adBreakActivities()] as AdBreakActivity[];
+
+        const adConfig: AdConfig = {
+            contentDurationMinutes: 50,
+            adBreakMinutes:         10,
+            overrideBy:             this.adOverrideBy(),
+            filters: {
+                ...(domains.length    && { domains }),
+                ...(categories.length && { categories }),
+                ...(keywords.length   && { keywords }),
+            },
+            ...(breakActivities.length && { breakActivities }),
+        };
+
+        return {
+            workshopTitle:       v.workshopTitle.trim(),
+            workshopDescription: v.workshopDescription.trim(),
+            expertDescription:   v.expertDescription.trim(),
+            schedules:           this.localSchedules() as any,
+            contentRef: {
+                hour1: h1 ? { cid: h1.cid, version: h1.version } : null,
+                hour2: h2 ? { cid: h2.cid, version: h2.version } : null,
+                hour3: h3 ? { cid: h3.cid, version: h3.version } : null,
+            },
+            threeHourPlan: {
+                hour1: { title: h1?.title ?? this.hourLabel(1), description: h1?.subtitle ?? '', expertAllowed: true,  instructorAllowed: false },
+                hour2: { title: h2?.title ?? this.hourLabel(2), description: h2?.subtitle ?? '', expertAllowed: true,  instructorAllowed: false },
+                hour3: { title: h3?.title ?? this.hourLabel(3), description: h3?.subtitle ?? '', expertAllowed: true,  instructorAllowed: true  },
+            },
+            adConfig,
+        };
+    }
+
+    private _save() {
         this.isSubmitting.set(true);
+        const payload  = this._buildPayload();
+        const editData = this.workshopToEdit();
 
         if (editData) {
-            // Update Basic Info
-            const updatePayload = {
-                workshopTitle: v.workshopTitle.trim(),
-                workshopDescription: v.workshopDescription.trim(),
-                expertDescription: v.expertDescription.trim(),
-                threeHourPlan: v.threeHourPlan,
-                schedules: []
-            };
-
-            this.ws.updateWorkshop(editData._id, updatePayload).subscribe({
-                next: (res: any) => {
-                    this.isSubmitting.set(false);
-                    this.toast.success('Workshop updated successfully!');
-                    this.workshopCreated.emit(res.data as unknown as CreatedWorkshopData);
-                },
+            this.ws.updateWorkshop(editData._id, payload).subscribe({
+                next: (res: any) => { this.isSubmitting.set(false); this.toast.success('Workshop updated!'); this.workshopCreated.emit(res.data); },
                 error: () => this.isSubmitting.set(false),
             });
         } else {
-            // Create New
-            const payload: CreateWorkshopRequest = {
-                workshopTitle: v.workshopTitle.trim(),
-                workshopDescription: v.workshopDescription.trim(),
-                expertDescription: v.expertDescription.trim(),
-                threeHourPlan: v.threeHourPlan,
-                schedules: []
-            };
-
-            this.ws.create(payload).subscribe({
-                next: (res: any) => {
-                    this.isSubmitting.set(false);
-                    this.workshopCreated.emit(res.data);
-                },
+            this.ws.create(payload as CreateWorkshopRequest).subscribe({
+                next: (res: any) => { this.isSubmitting.set(false); this.workshopCreated.emit(res.data); },
                 error: () => this.isSubmitting.set(false),
             });
         }

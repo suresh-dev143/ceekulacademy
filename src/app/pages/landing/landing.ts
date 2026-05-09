@@ -1,9 +1,10 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router ,RouterLink} from '@angular/router';
 import { GlobalSearchComponent } from '../../components/global-search/global-search';
 import { StoryService, StoryItem, STORY_CATEGORY_LABELS } from '../../services/story.service';
 import { DiscussionChatComponent } from '../../components/discussion-chat/discussion-chat';
+import { AuthService } from '../../services/auth.service';
 
 interface Pillar {
   title: string;
@@ -24,13 +25,17 @@ interface ContentSection {
 
 @Component({
   selector: 'app-landing',
-  imports: [CommonModule, GlobalSearchComponent, DiscussionChatComponent],
+  imports: [CommonModule, RouterLink,GlobalSearchComponent, DiscussionChatComponent],
   templateUrl: './landing.html',
   styleUrl: './landing.scss'
 })
 export class Landing implements OnInit {
   private readonly router = inject(Router);
   readonly storyService = inject(StoryService);
+  private readonly authService = inject(AuthService);
+
+  readonly isLoggedIn = this.authService.isLoggedIn;
+  readonly currentUser = this.authService.currentUserProfile;
 
   readonly stories       = this.storyService.stories;
   readonly selectedStory = this.storyService.selectedStory;
@@ -131,6 +136,6 @@ export class Landing implements OnInit {
     return this.storyService.getContentParagraphs(content);
   }
 
-  onRegister(): void { this.router.navigate(['/personal/register']); }
+  onRegister(): void { this.router.navigate(['/register']); }
   onContact(): void  { this.router.navigate(['/contact']); }
 }

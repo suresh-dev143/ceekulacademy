@@ -1,4 +1,8 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed, effect, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 export interface MiddleBox {
   activity: string;
@@ -15,6 +19,14 @@ export interface RightBox {
   devices: string[];
 }
 
+export interface CustomContent {
+  title: string;
+  subtitles: string[];
+  body: string;
+  source: 'ceekul' | 'upload';
+  contentId?: string;
+}
+
 export interface HourBlock {
   hour: number;
   hour_block: string;
@@ -26,9 +38,34 @@ export interface HourBlock {
   user_override: boolean;
   custom_activity: string;
   confidence_score: number;
+  content_cid: string;
+  ad_pack_cid: string;
+  ad_replaced: boolean;
+  criteria_of_content: string;
+  custom_content: CustomContent | null;
 }
 
-const BASE_SCHEDULE: Omit<HourBlock, 'user_override' | 'custom_activity'>[] = [
+interface ScheduleOverrideEntry {
+  user_override?: string;
+  custom_content?: CustomContent;
+}
+
+interface BackendScheduleResponse {
+  status: boolean;
+  schedule_overrides: Record<string, ScheduleOverrideEntry>;
+  ceebrainId: string | null;
+}
+
+function makeCid(seed: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) | 0;
+  }
+  return 'CID-' + (h >>> 0).toString(36).toUpperCase().padStart(8, '0');
+}
+
+const BASE_SCHEDULE: Omit<HourBlock, 'user_override' | 'custom_activity' | 'content_cid' | 'ad_pack_cid' | 'ad_replaced' | 'criteria_of_content' | 'custom_content'>[] = [
   {
     hour: 5,
     hour_block: "5:00-6:00",
@@ -550,7 +587,14 @@ const BASE_SCHEDULE: Omit<HourBlock, 'user_override' | 'custom_activity'>[] = [
 
 @Injectable({ providedIn: 'root' })
 export class LifeOrchestratorService {
+  private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly apiBase = `${environment.apiUrl}/api/my-activities`;
+
   private readonly STORAGE_KEY = 'life_orchestrator_overrides';
+  private readonly AD_STORAGE_KEY = 'life_orchestrator_ad_state';
+  private readonly CONTENT_STORAGE_KEY = 'life_orchestrator_custom_content';
 
   private readonly _schedule   = signal<HourBlock[]>([]);
   private readonly _currentHour = signal(new Date().getHours());
@@ -578,17 +622,87 @@ export class LifeOrchestratorService {
 
   constructor() {
     this._buildSchedule();
-    this._startClock();
+    if (this.isBrowser) this._startClock();
+    // Watch auth state: sync schedule from backend when user logs in/out
+    effect(() => {
+      if (this.auth.isLoggedIn()) {
+        if (this.isBrowser) this._loadFromBackend();
+      } else {
+        if (this.isBrowser) {
+          localStorage.removeItem(this.STORAGE_KEY);
+          localStorage.removeItem(this.CONTENT_STORAGE_KEY);
+        }
+        this._buildSchedule();
+      }
+    }, { allowSignalWrites: true });
+  }
+
+  /**
+   * Called immediately after registration to create the CB ID → schedule mapping
+   * in the database. Idempotent — safe to call multiple times.
+   */
+  initUserSchedule(ceebrainId: string): void {
+    if (!this.auth.isLoggedIn()) return;
+    this.http.post(this.apiBase, { schedule_overrides: {}, ceebrainId }).subscribe();
+  }
+
+  private _loadFromBackend(): void {
+    this.http.get<BackendScheduleResponse>(this.apiBase).subscribe({
+      next: (res) => {
+        if (!res.status) return;
+        const overrides: Record<number, string> = {};
+        const contentMap: Record<number, CustomContent> = {};
+        for (const [key, val] of Object.entries(res.schedule_overrides ?? {})) {
+          const hour = parseInt(key, 10);
+          if (val.user_override)  overrides[hour]   = val.user_override;
+          if (val.custom_content) contentMap[hour]  = val.custom_content;
+        }
+        if (this.isBrowser) {
+          localStorage.setItem(this.STORAGE_KEY,         JSON.stringify(overrides));
+          localStorage.setItem(this.CONTENT_STORAGE_KEY, JSON.stringify(contentMap));
+        }
+        this._buildSchedule();
+      },
+      error: () => { /* network unavailable — keep existing localStorage */ }
+    });
+  }
+
+  private _saveToBackend(): void {
+    if (!this.auth.isLoggedIn()) return;
+    const overrides   = this._loadOverrides();
+    const contentMap  = this._loadCustomContent();
+    const schedule_overrides: Record<string, ScheduleOverrideEntry> = {};
+    const allHours = new Set([
+      ...Object.keys(overrides).map(Number),
+      ...Object.keys(contentMap).map(Number),
+    ]);
+    for (const h of allHours) {
+      const entry: ScheduleOverrideEntry = {};
+      if (overrides[h])   entry.user_override  = overrides[h];
+      if (contentMap[h])  entry.custom_content = contentMap[h];
+      schedule_overrides[String(h)] = entry;
+    }
+    const ceebrainId = this.auth.currentUserProfile()?.ceebrainId;
+    this.http.post(this.apiBase, { schedule_overrides, ceebrainId }).subscribe();
   }
 
   private _buildSchedule(): void {
-    const overrides = this._loadOverrides();
+    const overrides   = this._loadOverrides();
+    const adState     = this._loadAdState();
+    const contentMap  = this._loadCustomContent();
+    const today       = new Date().toDateString();
     const schedule: HourBlock[] = BASE_SCHEDULE.map(base => {
       const ov = overrides[base.hour];
+      const ad = adState[base.hour];
       return {
         ...base,
-        user_override:   !!ov,
-        custom_activity: ov ?? ''
+        user_override:        !!ov,
+        custom_activity:      ov ?? '',
+        content_cid:          makeCid(`CC-H${base.hour}-${today}`),
+        ad_pack_cid:          makeCid(`AP-H${base.hour}-${today}`),
+        ad_replaced:          ad?.replaced ?? false,
+        criteria_of_content:  ad?.criteria ?? '',
+        custom_content:       contentMap[base.hour] ?? null,
       };
     });
     this._schedule.set(schedule);
@@ -621,18 +735,69 @@ export class LifeOrchestratorService {
     } else {
       delete overrides[hour];
     }
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(overrides));
+    if (this.isBrowser) localStorage.setItem(this.STORAGE_KEY, JSON.stringify(overrides));
     this._buildSchedule();
+    this._saveToBackend();
   }
 
   removeOverride(hour: number): void {
     const overrides = this._loadOverrides();
     delete overrides[hour];
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(overrides));
+    if (this.isBrowser) localStorage.setItem(this.STORAGE_KEY, JSON.stringify(overrides));
+    this._buildSchedule();
+    this._saveToBackend();
+  }
+
+  setAdReplacement(hour: number, replaced: boolean): void {
+    const state = this._loadAdState();
+    state[hour] = { ...(state[hour] ?? {}), replaced };
+    if (this.isBrowser) localStorage.setItem(this.AD_STORAGE_KEY, JSON.stringify(state));
     this._buildSchedule();
   }
 
+  setCriteriaOfContent(hour: number, criteria: string): void {
+    const state = this._loadAdState();
+    state[hour] = { ...(state[hour] ?? {}), criteria };
+    if (this.isBrowser) localStorage.setItem(this.AD_STORAGE_KEY, JSON.stringify(state));
+    this._buildSchedule();
+  }
+
+  setCustomContent(hours: number[], content: CustomContent): void {
+    const store = this._loadCustomContent();
+    hours.forEach(h => (store[h] = content));
+    if (this.isBrowser) localStorage.setItem(this.CONTENT_STORAGE_KEY, JSON.stringify(store));
+    this._buildSchedule();
+    this._saveToBackend();
+  }
+
+  clearCustomContent(hour: number): void {
+    const store = this._loadCustomContent();
+    delete store[hour];
+    if (this.isBrowser) localStorage.setItem(this.CONTENT_STORAGE_KEY, JSON.stringify(store));
+    this._buildSchedule();
+    this._saveToBackend();
+  }
+
+  private _loadCustomContent(): Record<number, CustomContent> {
+    if (!this.isBrowser) return {};
+    try {
+      return JSON.parse(localStorage.getItem(this.CONTENT_STORAGE_KEY) ?? '{}');
+    } catch {
+      return {};
+    }
+  }
+
+  private _loadAdState(): Record<number, { replaced?: boolean; criteria?: string }> {
+    if (!this.isBrowser) return {};
+    try {
+      return JSON.parse(localStorage.getItem(this.AD_STORAGE_KEY) ?? '{}');
+    } catch {
+      return {};
+    }
+  }
+
   private _loadOverrides(): Record<number, string> {
+    if (!this.isBrowser) return {};
     try {
       return JSON.parse(localStorage.getItem(this.STORAGE_KEY) ?? '{}');
     } catch {

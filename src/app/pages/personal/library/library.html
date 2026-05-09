@@ -61,8 +61,16 @@
         </thead>
         <tbody>
           @for (item of items(); track item.baseId) {
-            <tr class="table-row">
-              <td class="col-title">{{ item.title || '(untitled)' }}</td>
+            <tr class="table-row"
+                [dqrgDraggable]="true"
+                [dqrgCid]="item.hybridId"
+                [dqrgTitle]="item.title || '(untitled)'"
+                [dqrgCategory]="item.category"
+                title="Drag to DQRG panel to analyse with AI">
+              <td class="col-title">
+                <span class="drag-handle" title="Drag to DQRG">⠿</span>
+                {{ item.title || '(untitled)' }}
+              </td>
               <td>
                 <span class="badge badge-cat">{{ item.category }}</span>
               </td>
@@ -87,7 +95,6 @@
         </tbody>
       </table>
     }
-
   </div>
 
   <!-- ── Pagination ── -->

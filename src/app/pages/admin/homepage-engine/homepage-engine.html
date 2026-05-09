@@ -1,0 +1,180 @@
+<div class="hpe">
+
+  <!-- ══ Header ═══════════════════════════════════════════════════════════════ -->
+  <div class="hpe-header">
+    <div>
+      <span class="hpe-header__label">MODULE — HOMEPAGE ENGINE</span>
+      <h2 class="hpe-header__title">Content + Ad Orchestration</h2>
+      <p class="hpe-header__sub">50-min content blocks · 10-min precomputed ad packs · CID-addressed</p>
+    </div>
+    <div class="hpe-header__actions">
+      @if (overrideSlots().length > 0) {
+      <span class="hpe-header__overrides">{{ overrideSlots().length }} manual override{{ overrideSlots().length !== 1 ? 's' : '' }}</span>
+      }
+      <button class="hpe-btn hpe-btn--ghost" (click)="showAiPanel.update(v => !v)">
+        {{ showAiPanel() ? 'Hide' : 'Show' }} AI Suggestions
+        @if (aiSuggestions().length) {
+        <span class="hpe-badge">{{ aiSuggestions().length }}</span>
+        }
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ AI Shadow Editor ══════════════════════════════════════════════════════ -->
+  @if (showAiPanel() && aiSuggestions().length) {
+  <div class="hpe-ai-panel">
+    <div class="hpe-ai-panel__header">
+      <span class="hpe-ai-panel__label">✦ AI Shadow Editor — Suggestions</span>
+      <span class="hpe-ai-panel__cost">Ultra-light · No ML inference · Heuristic-based</span>
+    </div>
+    @for (slot of aiSuggestions(); track slot.hour) {
+    <div class="hpe-ai-tip">
+      <span class="hpe-ai-tip__hour">{{ slot.hourLabel }}</span>
+      <span class="hpe-ai-tip__text">{{ slot.aiSuggestion }}</span>
+      <button class="hpe-ai-tip__apply" (click)="selectSlot(slot)">View Slot →</button>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- ══ Main Layout ═══════════════════════════════════════════════════════════ -->
+  <div class="hpe-body">
+
+    <!-- Timeline -->
+    <div class="hpe-timeline">
+      <div class="hpe-timeline__legend">
+        <span>HOUR</span>
+        <span>PHASE</span>
+        <span>CONTENT (50 MIN)</span>
+        <span>CONTENT CID</span>
+        <span>AD PACK (10 MIN)</span>
+        <span>AD PACK CID</span>
+        <span>ENG</span>
+        <span></span>
+      </div>
+
+      @for (slot of cuap.contentSlots(); track slot.hour) {
+      <div class="hpe-slot"
+           [class.hpe-slot--current]="slot.isCurrentHour"
+           [class.hpe-slot--override]="slot.hasOverride"
+           [class.hpe-slot--selected]="selectedSlot()?.hour === slot.hour"
+           [style.--phase-color]="cuap.phaseAccent(slot.phase)"
+           (click)="selectSlot(slot)">
+
+        <span class="hpe-slot__hour">{{ slot.hourLabel }}</span>
+
+        <span class="hpe-slot__phase" [style.color]="cuap.phaseAccent(slot.phase)">
+          {{ slot.phase }}
+        </span>
+
+        <div class="hpe-slot__content">
+          @if (slot.hasOverride) {
+          <span class="hpe-slot__override-tag">OVERRIDE</span>
+          }
+          <span class="hpe-slot__title">{{ slot.contentTitle }}</span>
+        </div>
+
+        <code class="hpe-slot__cid">{{ slot.contentCid }}</code>
+
+        <span class="hpe-slot__ad-title">{{ slot.adTitle }}</span>
+
+        <code class="hpe-slot__cid hpe-slot__cid--ad">{{ slot.adPackCid }}</code>
+
+        <div class="hpe-slot__eng hpe-slot__eng--{{ engagementClass(slot.engagementScore) }}">
+          {{ slot.engagementScore }}
+        </div>
+
+        <button class="hpe-slot__edit" (click)="$event.stopPropagation(); selectSlot(slot)">
+          ↗
+        </button>
+
+      </div>
+      }
+    </div>
+
+    <!-- Detail Panel -->
+    @if (selectedSlot(); as slot) {
+    <div class="hpe-detail">
+
+      <div class="hpe-detail__header" [style.border-left-color]="cuap.phaseAccent(slot.phase)">
+        <div>
+          <span class="hpe-detail__hour">{{ slot.hourLabel }}</span>
+          <h3 class="hpe-detail__title">{{ slot.contentTitle }}</h3>
+        </div>
+        @if (slot.isCurrentHour) {
+        <span class="hpe-detail__live">● LIVE</span>
+        }
+      </div>
+
+      <div class="hpe-detail__block">
+        <p class="hpe-detail__block-label">Content Block (50 min)</p>
+        <div class="hpe-detail__row">
+          <span class="hpe-detail__key">Phase</span>
+          <span class="hpe-detail__val" [style.color]="cuap.phaseAccent(slot.phase)">{{ slot.phase }}</span>
+        </div>
+        <div class="hpe-detail__row">
+          <span class="hpe-detail__key">CID</span>
+          <code class="hpe-detail__cid">{{ slot.contentCid }}</code>
+        </div>
+        <div class="hpe-detail__row">
+          <span class="hpe-detail__key">Engagement</span>
+          <span class="hpe-detail__val">{{ slot.engagementScore }} / 100</span>
+        </div>
+        @if (slot.hasOverride) {
+        <div class="hpe-detail__override-notice">
+          ⚠ This slot has a manual override active
+          <button class="hpe-detail__clear" (click)="clearOverride(slot)">Clear Override</button>
+        </div>
+        }
+      </div>
+
+      <div class="hpe-detail__block">
+        <p class="hpe-detail__block-label">Ad Pack (10 min)</p>
+        <div class="hpe-detail__row">
+          <span class="hpe-detail__key">Title</span>
+          <span class="hpe-detail__val">{{ slot.adTitle }}</span>
+        </div>
+        <div class="hpe-detail__row">
+          <span class="hpe-detail__key">Pack CID</span>
+          <code class="hpe-detail__cid">{{ slot.adPackCid }}</code>
+        </div>
+        <div class="hpe-detail__row">
+          <span class="hpe-detail__key">Strategy</span>
+          <span class="hpe-detail__val">Precomputed · O(1) delivery</span>
+        </div>
+      </div>
+
+      @if (slot.aiSuggestion) {
+      <div class="hpe-detail__suggestion">
+        <span class="hpe-detail__suggestion-label">✦ AI Shadow Editor</span>
+        <p>{{ slot.aiSuggestion }}</p>
+      </div>
+      }
+
+      <!-- Override Control -->
+      <div class="hpe-detail__actions">
+        @if (!overrideMode()) {
+        <button class="hpe-btn hpe-btn--primary" (click)="openOverride()">Override Content CID</button>
+        } @else {
+        <div class="hpe-override-form">
+          <input
+            class="hpe-override-input"
+            type="text"
+            placeholder="Enter CID (ck_…)"
+            [value]="overrideCidInput()"
+            (input)="overrideCidInput.set($any($event.target).value)"
+            (keydown.enter)="applyOverride()"
+            (keydown.escape)="overrideMode.set(false)"
+            autofocus />
+          <button class="hpe-btn hpe-btn--primary" (click)="applyOverride()" [disabled]="!overrideCidInput().trim()">Apply</button>
+          <button class="hpe-btn hpe-btn--ghost" (click)="overrideMode.set(false)">Cancel</button>
+        </div>
+        }
+      </div>
+
+    </div>
+    }
+
+  </div>
+
+</div>

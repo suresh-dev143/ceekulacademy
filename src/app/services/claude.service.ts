@@ -7,6 +7,19 @@ export interface CoTeacherReply {
   reply: string;
 }
 
+export type DqrgMode = 'DISCUSS' | 'QUESTION' | 'RESEARCH' | 'GRADE';
+
+export interface DqrgMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface DqrgReply {
+  reply: string;
+  mode: DqrgMode;
+  cid: string;
+}
+
 export interface AdCopy {
   headline: string;
   body: string;
@@ -95,6 +108,19 @@ export class ClaudeService {
   }): Observable<{ status: boolean; data: WorkshopGenResult }> {
     return this.http.post<{ status: boolean; data: WorkshopGenResult }>(
       `${this.base}/generate-workshop`, payload
+    );
+  }
+
+  dqrgChat(payload: {
+    cid: string;
+    cidVersion?: number;
+    dqrgMode: DqrgMode;
+    userMessage: string;
+    contentContext?: { title?: string; summary?: string; category?: string };
+    interactionHistory?: DqrgMessage[];
+  }): Observable<{ status: boolean; data: DqrgReply }> {
+    return this.http.post<{ status: boolean; data: DqrgReply }>(
+      `${this.base}/dqrg`, payload
     );
   }
 }

@@ -1,35 +1,62 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { LifeOrchestratorService, HourBlock } from '../../../services/life-orchestrator.service';
+import { AuthService } from '../../../services/auth.service';
+import { TodaysContent } from './todays-content/todays-content';
 
 @Component({
   selector: 'app-my-activites',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, TodaysContent],
   templateUrl: './my-activites.html',
-  styleUrl: './my-activites.scss'
+  styleUrl: './my-activites.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class MyActivities implements OnInit, OnDestroy {
-  readonly orc = inject(LifeOrchestratorService);
+  readonly orc  = inject(LifeOrchestratorService);
+  readonly auth = inject(AuthService);
 
-  readonly showOverrideModal = signal(false);
-  readonly overrideInput     = signal('');
-  readonly overrideTargetHour = signal<number | null>(null);
-  readonly currentTime       = signal('');
-  readonly currentDate       = signal('');
+  // Always return the full display ID including "CB" prefix, normalising both
+  // backend format (plain digits) and client-fallback format (CB-prefixed string).
+  readonly ceebrainId  = computed(() => {
+    const raw = this.auth.currentUserProfile()?.ceebrainId ?? '';
+    if (!raw) return '';
+    return raw.startsWith('CB') ? raw : `CB${raw}`;
+  });
+  readonly currentTime = signal('');
+  readonly currentDate = signal('');
+  readonly collapsed   = signal(false);
+
+  toggleHub(): void { this.collapsed.update(v => !v); }
+
+  // ── Day-map helpers ───────────────────────────────────────────────────────
+
+  isCurrentHour(h: number): boolean { return h === this.orc.currentHour(); }
+  isPastHour(h: number): boolean    { return h < this.orc.currentHour(); }
+
+  contentTitle(b: HourBlock): string {
+    if (b.custom_content) return b.custom_content.title;
+    if (b.user_override)  return b.custom_activity;
+    return b.intent;
+  }
+
+  contentSubtitle(b: HourBlock): string {
+    if (b.custom_content?.subtitles?.length) return b.custom_content.subtitles[0];
+    return b.middle_box.activity;
+  }
+
+  contentTypeLabel(b: HourBlock): string {
+    if (b.custom_content) return b.custom_content.source === 'ceekul' ? 'Curated' : 'My Work';
+    if (b.user_override)  return 'Override';
+    return 'Vision';
+  }
 
   private clockInterval?: ReturnType<typeof setInterval>;
 
-  readonly hours = Array.from({ length: 24 }, (_, i) => i);
-
-  readonly confidenceWidth = computed(() => {
-    const b = this.orc.selectedBlock();
-    return b ? Math.round(b.confidence_score * 100) : 0;
-  });
-
   ngOnInit(): void {
     this.tickClock();
-    this.clockInterval = setInterval(() => this.tickClock(), 10_000);
+    this.clockInterval = setInterval(() => this.tickClock(), 1_000);
   }
 
   ngOnDestroy(): void {
@@ -38,59 +65,7 @@ export class MyActivities implements OnInit, OnDestroy {
 
   private tickClock(): void {
     const now = new Date();
-    this.currentTime.set(now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }));
+    this.currentTime.set(now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }));
     this.currentDate.set(now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' }));
-  }
-
-  selectHour(hour: number): void {
-    this.orc.selectHour(hour);
-  }
-
-  openOverride(hour: number, currentActivity: string): void {
-    this.overrideTargetHour.set(hour);
-    this.overrideInput.set(currentActivity);
-    this.showOverrideModal.set(true);
-  }
-
-  saveOverride(): void {
-    const hour = this.overrideTargetHour();
-    if (hour === null) return;
-    this.orc.setOverride(hour, this.overrideInput());
-    this.closeOverride();
-  }
-
-  removeOverride(hour: number): void {
-    this.orc.removeOverride(hour);
-    this.closeOverride();
-  }
-
-  closeOverride(): void {
-    this.showOverrideModal.set(false);
-    this.overrideInput.set('');
-    this.overrideTargetHour.set(null);
-  }
-
-  blockFor(hour: number): HourBlock | undefined {
-    return this.orc.schedule().find(b => b.hour === hour);
-  }
-
-  isCurrentHour(hour: number): boolean {
-    return hour === this.orc.currentHour();
-  }
-
-  isSelected(hour: number): boolean {
-    return hour === (this.orc.selectedHour() ?? this.orc.currentHour());
-  }
-
-  isPast(hour: number): boolean {
-    return hour < this.orc.currentHour();
-  }
-
-  isSleep(block: HourBlock): boolean {
-    return block.phase === 'sleep';
-  }
-
-  trackHour(_: number, hour: number): number {
-    return hour;
   }
 }

@@ -4,13 +4,14 @@ import { Router } from '@angular/router';
 import { CreatorService, DraftSummary } from '../../../services/creator.service';
 import { TransformTargetType } from '../../../services/transform.service';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
+import { DqrgDraggableDirective } from '../../../components/dqrg/dqrg-draggable.directive';
 
 type FilterStatus = 'all' | 'draft' | 'shared' | 'published';
 
 @Component({
   selector: 'app-library',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,DqrgDraggableDirective ],
   templateUrl: './library.html',
   styleUrl: './library.scss',
 })
@@ -92,7 +93,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
       );
     }
     if (this.selectedStatus() !== 'all') {
-      data = data.filter((d: any) => d.state === this.selectedStatus());
+      data = data.filter(d => d.state === this.selectedStatus());
     }
     this.totalItems.set(data.length);
     const start = (this.currentPage() - 1) * this.pageSize;
@@ -111,7 +112,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
   }
 
   read(item: DraftSummary): void {
-    this.router.navigate(['/content', item.hybridId]);
+    this.router.navigate(['/personal/create', item.baseId]);
   }
 
   edit(item: DraftSummary): void {
@@ -175,7 +176,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
   }
 
   getItemState(item: DraftSummary): string {
-    return (item as any).state || 'draft';
+    return item.state || 'draft';
   }
 
   prevPage(): void {

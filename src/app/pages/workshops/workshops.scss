@@ -1,3 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap');
+
+:host {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --accent: #6366f1;
+    --accent-soft: rgba(99, 102, 241, 0.1);
+    --text: #c9d1d9;
+    --text-muted: #8b949e;
+    --border: rgba(48, 54, 61, 0.8);
+    --glass: blur(16px);
+}
+
 .form-header {
     text-align: right;
 }
@@ -19,35 +32,21 @@
         flex-wrap: wrap;
 
         .action-btn-top {
-            background: color-mix(in srgb, #fff, transparent 96%);
-            border: 1px solid color-mix(in srgb, #fff, transparent 92%);
-            color: var(--text-primary);
-            padding: 0.7rem 1.4rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            backdrop-filter: blur(8px);
-
-            i {
-                color: #FF6B00;
-                font-size: 1.1rem;
-            }
+            border-radius: 6px;
+            transition: all 0.2s;
 
             &:hover {
-                background: color-mix(in srgb, #FF6B00, transparent 92%);
-                border-color: color-mix(in srgb, #FF6B00, transparent 75%);
-                transform: translateY(-3px);
-                box-shadow: 0 6px 20px rgba(255, 107, 0, 0.15);
-                color: white;
-            }
-
-            &:active {
-                transform: translateY(-1px);
+                background: var(--accent-soft);
+                border-color: var(--accent);
+                color: var(--accent);
             }
         }
     }
@@ -1299,5 +1298,21 @@ textarea {
 @media (max-width: 600px) {
     .quality-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+.edit-overlay {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

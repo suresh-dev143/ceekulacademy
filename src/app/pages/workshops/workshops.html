@@ -1,113 +1,120 @@
-
-    <div class="workshops-container animate-fade-in">
-        <!-- ══ Page header ══════════════════════════════════════════════════════ -->
-        <div class="view-header">
-            <div class="workshop-actions-top">
-                <button class="action-btn-top" routerLink="/personal/dashboard/enrolled-workshops">
-                   Enrolled Workshop
-                </button>
-                <button class="action-btn-top" routerLink="/personal/dashboard/my-workshops">
-                    My Workshop
-                </button>
-            </div>
-            <h1 class="page-title">Workshops</h1>
-            <p class="section-subtitle">Explore and enroll in practical learning sessions hosted by experts.</p>
-        </div>
-
-        @if (showWorkshopDetail() && selectedWorkshop()) {
-        <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="currentUser()?.role ?? ''"
-            [currentUserId]="currentUser()?.id" (close)="closeWorkshopDetail()" (sessionAdded)="onSessionAdded()">
-        </app-workshop-detail>
-
-        } @else {
-
-        <!-- ══ Filter bar ════════════════════════════════════════════════════════ -->
-        <div class="ws-filter-bar">
-            <!-- Result count -->
-            <div class="ws-result-meta" style="margin-left: 0;">
-                @if (!isLoading()) {
-                <span class="ws-result-count">
-                    {{ filteredWorkshops().length }}
-                    workshop{{ filteredWorkshops().length !== 1 ? 's' : '' }}
-                </span>
-                }
-                @if (activeFilterCount() > 0) {
-                <button class="clear-all-btn" style="pointer-events: none;">
-                    <i class="fas fa-filter"></i> {{ activeFilterCount() }} active filter{{ activeFilterCount() !== 1 ?
-                    's' : '' }}
-                </button>
-                }
-            </div>
-        </div>
-
-        <!-- ══ Loading — skeleton cards ═════════════════════════════════════════ -->
-        @if (isLoading()) {
-        <div class="course-grid">
-            @for (i of skeletonItems; track i) {
-            <div class="ws-skeleton-card">
-                <div class="ws-sk ws-sk--badge"></div>
-                <div class="ws-sk ws-sk--title"></div>
-                <div class="ws-sk ws-sk--line"></div>
-                <div class="ws-sk ws-sk--line ws-sk--short"></div>
-                <div class="ws-sk ws-sk--meta"></div>
-                <div class="ws-sk ws-sk--bar"></div>
-                <div class="ws-sk ws-sk--footer"></div>
-            </div>
-            }
-        </div>
-
-        <!-- ══ Workshop cards ════════════════════════════════════════════════════ -->
-        } @else if (paginatedWorkshops().length > 0) {
-        <div class="course-grid">
-            @for (w of paginatedWorkshops(); track w._id) {
-            <app-workshop-card [workshop]="w" [userRole]="currentUser()?.role ?? ''" [currentUserId]="currentUser()?.id"
-                (view)="onViewWorkshop($event)" (manage)="onManageWorkshop($event)" (book)="onBookWorkshop($event)"
-                (audit)="onAuditWorkshop($event)" />
-            }
-        </div>
-
-        <!-- ══ Pagination ════════════════════════════════════════════════════════ -->
-        @if (totalPages() > 1) {
-        <nav class="ws-pagination" aria-label="Workshop pages">
-            <button class="ws-page-btn ws-page-nav" [disabled]="currentPage() === 1"
-                (click)="goToPage(currentPage() - 1)" aria-label="Previous page">
-                <i class="fas fa-chevron-left"></i>
+<div class="workshops-container animate-fade-in">
+    <!-- ══ Page header ══════════════════════════════════════════════════════ -->
+    <div class="view-header">
+        <div class="workshop-actions-top">
+            <button class="action-btn-top" routerLink="/personal/create">
+                Create
             </button>
 
-            @for (item of paginationItems(); track $index) {
-            @if (item === null) {
-            <span class="ws-page-ellipsis">…</span>
-            } @else {
-            <button class="ws-page-btn" [class.active]="item === currentPage()" (click)="goToPage(item)"
-                [attr.aria-current]="item === currentPage() ? 'page' : null">
-                {{ item }}
+            <button class="action-btn-top" (click)="openCreate()">
+                Schedule
+            </button> <button class="action-btn-top" routerLink="/personal/dashboard/enrolled-workshops">
+                Enroll
             </button>
-            }
-            }
-
-            <button class="ws-page-btn ws-page-nav" [disabled]="currentPage() === totalPages()"
-                (click)="goToPage(currentPage() + 1)" aria-label="Next page">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </nav>
-        }
-
-        <!-- ══ Empty state ═══════════════════════════════════════════════════════ -->
-        } @else {
-        <div class="empty-search">
-            <i class="fas fa-chalkboard-teacher" style="font-size:2.5rem; margin-bottom:1rem; opacity:0.3;"></i>
-            @if (activeFilterCount() > 0) {
-            <p><strong>No workshops match your filters.</strong></p>
-            <p>Try clearing filters from the global search bar.</p>
-            } @else {
-            <p><strong>No workshops found.</strong></p>
-            @if (canCreateWorkshop) {
-            <p>Check back soon — workshops will appear here once available.</p>
-            }
-            }
         </div>
-        }
-
-        }
-
+        <!-- <h1 class="page-title">Workshops</h1>
+        <p class="section-subtitle">Explore and enroll in practical learning sessions hosted by experts.</p> -->
     </div>
+
+    @if (showWorkshopDetail() && selectedWorkshop()) {
+    <app-workshop-detail [workshop]="selectedWorkshop()!" [userRole]="currentUser()?.role ?? ''"
+        [currentUserId]="currentUser()?.id" (close)="closeWorkshopDetail()" (sessionAdded)="onSessionAdded()">
+    </app-workshop-detail>
+
+    } @else if (isCreating()) {
+    <div class="edit-overlay">
+        <app-create-workshop (workshopCreated)="onWorkshopCreated($event)" (cancel)="closeCreate()">
+        </app-create-workshop>
+    </div>
+    } @else {
+
+    <!-- ══ Filter bar ════════════════════════════════════════════════════════ -->
+    <div class="ws-filter-bar">
+        <!-- Result count -->
+        <div class="ws-result-meta" style="margin-left: 0;">
+            @if (!isLoading()) {
+            <span class="ws-result-count">
+                {{ filteredWorkshops().length }}
+                workshop{{ filteredWorkshops().length !== 1 ? 's' : '' }}
+            </span>
+            }
+            @if (activeFilterCount() > 0) {
+            <button class="clear-all-btn" style="pointer-events: none;">
+                <i class="fas fa-filter"></i> {{ activeFilterCount() }} active filter{{ activeFilterCount() !== 1 ?
+                's' : '' }}
+            </button>
+            }
+        </div>
+    </div>
+
+    <!-- ══ Loading — skeleton cards ═════════════════════════════════════════ -->
+    @if (isLoading()) {
+    <div class="course-grid">
+        @for (i of skeletonItems; track i) {
+        <div class="ws-skeleton-card">
+            <div class="ws-sk ws-sk--badge"></div>
+            <div class="ws-sk ws-sk--title"></div>
+            <div class="ws-sk ws-sk--line"></div>
+            <div class="ws-sk ws-sk--line ws-sk--short"></div>
+            <div class="ws-sk ws-sk--meta"></div>
+            <div class="ws-sk ws-sk--bar"></div>
+            <div class="ws-sk ws-sk--footer"></div>
+        </div>
+        }
+    </div>
+
+    <!-- ══ Workshop cards ════════════════════════════════════════════════════ -->
+    } @else if (paginatedWorkshops().length > 0) {
+    <div class="course-grid">
+        @for (w of paginatedWorkshops(); track w._id) {
+        <app-workshop-card [workshop]="w" [userRole]="currentUser()?.role ?? ''" [currentUserId]="currentUser()?.id"
+            (view)="onViewWorkshop($event)" (manage)="onManageWorkshop($event)" (book)="onBookWorkshop($event)"
+            (audit)="onAuditWorkshop($event)" />
+        }
+    </div>
+
+    <!-- ══ Pagination ════════════════════════════════════════════════════════ -->
+    @if (totalPages() > 1) {
+    <nav class="ws-pagination" aria-label="Workshop pages">
+        <button class="ws-page-btn ws-page-nav" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)"
+            aria-label="Previous page">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        @for (item of paginationItems(); track $index) {
+        @if (item === null) {
+        <span class="ws-page-ellipsis">…</span>
+        } @else {
+        <button class="ws-page-btn" [class.active]="item === currentPage()" (click)="goToPage(item)"
+            [attr.aria-current]="item === currentPage() ? 'page' : null">
+            {{ item }}
+        </button>
+        }
+        }
+
+        <button class="ws-page-btn ws-page-nav" [disabled]="currentPage() === totalPages()"
+            (click)="goToPage(currentPage() + 1)" aria-label="Next page">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </nav>
+    }
+
+    <!-- ══ Empty state ═══════════════════════════════════════════════════════ -->
+    } @else {
+    <div class="empty-search">
+        <i class="fas fa-chalkboard-teacher" style="font-size:2.5rem; margin-bottom:1rem; opacity:0.3;"></i>
+        @if (activeFilterCount() > 0) {
+        <p><strong>No workshops match your filters.</strong></p>
+        <p>Try clearing filters from the global search bar.</p>
+        } @else {
+        <p><strong>No workshops found.</strong></p>
+        @if (canCreateWorkshop) {
+        <p>Check back soon — workshops will appear here once available.</p>
+        }
+        }
+    </div>
+    }
+
+    }
+
+</div>

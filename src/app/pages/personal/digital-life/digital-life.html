@@ -1,5 +1,9 @@
 <div class="activities-container">
+  <div class="activities-header">
+   <a routerLink="/personal/my-activities"><span>←</span></a> <h1>My Digital Life</h1>
+     </div>
   <div class="activities-links">
+
     @for (section of sections; track section.title) {
       <a [routerLink]="section.route" class="activity-link-card">
         <div class="activity-link-content">

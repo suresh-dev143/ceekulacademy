@@ -73,6 +73,7 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     transition: all 0.2s;
     flex-shrink: 0;
     margin-top: 0.25rem;
+    margin-bottom: 1rem;
 
     &:hover {
         border-color: color-mix(in srgb, $error-color, transparent 60%);
@@ -86,9 +87,9 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
 .cwf-section {
     background: $bg-card;
     border: 1px solid $border-dimmer;
-    border-radius: 16px;
+
     padding: 1.75rem 2rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .cwf-section-label {
@@ -153,6 +154,79 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     color: var(--text-secondary);
     letter-spacing: 0.2px;
 }
+
+// ── Ghost Inputs (from Create Page) ──────────────────────────────────────────
+
+.topbar-center {
+    display: flex;
+    justify-content: left;
+    margin-bottom: 1rem;
+
+    &.topbar-meta-row {
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+
+    .title-ghost-input {
+        background: transparent;
+        border: none;
+        color: white;
+
+        font-weight: 700;
+
+        width: 100%;
+
+        outline: none;
+        font-family: 'Outfit', sans-serif;
+
+        &::placeholder {
+            color: color-mix(in srgb, #fff, transparent 80%);
+            font-weight: 400;
+        }
+    }
+
+    .category-ghost-input {
+        background: transparent;
+        border: none;
+        color: var(--accent);
+        font-size: 0.75rem;
+        font-weight: 700;
+        width: 100%;
+
+        outline: none;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-family: 'Outfit', sans-serif;
+
+        &::placeholder {
+            color: color-mix(in srgb, #fff, transparent 70%);
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+            opacity: 0.5;
+        }
+    }
+
+    .subtitle-ghost-input {
+        background: transparent;
+        border: none;
+        color: color-mix(in srgb, #fff, transparent 50%);
+        font-weight: 400;
+        width: 100%;
+        outline: none;
+        font-family: 'Outfit', sans-serif;
+
+        &::placeholder {
+            color: color-mix(in srgb, #fff, transparent 85%);
+        }
+
+        &:focus {
+            color: white;
+        }
+    }
+}
+
 
 // ── Inputs ───────────────────────────────────────────────────────────────────
 
@@ -405,7 +479,7 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
         }
     }
 
-    input[type="checkbox"]:checked ~ .cwf-checkbox-mark {
+    input[type="checkbox"]:checked~.cwf-checkbox-mark {
         background: $accent;
         border-color: $accent;
         box-shadow: 0 0 10px color-mix(in srgb, $accent, transparent 70%);
@@ -478,8 +552,9 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     padding: 1.25rem 1.5rem;
     cursor: pointer;
     user-select: none;
-    list-style: none; /* remove default arrow in webkit/blink */
-    
+    list-style: none;
+    /* remove default arrow in webkit/blink */
+
     &::-webkit-details-marker {
         display: none;
     }
@@ -492,7 +567,7 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
 .cwf-accordion-icon {
     font-size: 1.5rem;
     margin-right: 1.25rem;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .cwf-accordion-title {
@@ -532,6 +607,7 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -751,8 +827,13 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
 
 .empty-facility-box {
     text-align: center;
-    p { color: $text-dim; font-size: 0.85rem; margin-bottom: 1rem; }
-    
+
+    p {
+        color: $text-dim;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
     .btn-search-nearby {
         background: rgba(16, 185, 129, 0.1);
         border: 1px solid rgba(16, 185, 129, 0.2);
@@ -766,7 +847,11 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
         align-items: center;
         gap: 0.5rem;
         transition: all 0.2s;
-        &:hover { background: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+
+        &:hover {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+        }
     }
 }
 
@@ -775,7 +860,7 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
     border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: 10px;
     padding: 1rem;
-    
+
     .facility-main {
         display: flex;
         align-items: center;
@@ -796,8 +881,20 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
 
     .facility-meta {
         flex: 1;
-        .facility-name { color: #fff; font-size: 0.95rem; font-weight: 600; margin-bottom: 2px; }
-        .facility-type { color: #6b7280; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .facility-name {
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .facility-type {
+            color: #6b7280;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
     }
 
     .btn-remove-facility {
@@ -812,7 +909,10 @@ $bg-input-focus: color-mix(in srgb, #fff, transparent 92%);
         align-items: center;
         justify-content: center;
         transition: all 0.2s;
-        &:hover { background: rgba(239, 68, 68, 0.2); }
+
+        &:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
     }
 }
 
@@ -864,7 +964,9 @@ $ai-hover: #c084fc;
     border-radius: 20px;
     letter-spacing: 0.3px;
 
-    i { font-size: 0.6rem; }
+    i {
+        font-size: 0.6rem;
+    }
 }
 
 .cwf-ai-panel {
@@ -963,7 +1065,9 @@ $ai-hover: #c084fc;
     align-items: center;
     gap: 0.35rem;
 
-    i { font-size: 0.68rem; }
+    i {
+        font-size: 0.68rem;
+    }
 }
 
 .cwf-ai-generate-btn {
@@ -1032,7 +1136,10 @@ $ai-hover: #c084fc;
     color: $text-dim;
     margin-bottom: 0.9rem;
 
-    i { color: $accent; font-size: 0.8rem; }
+    i {
+        color: $accent;
+        font-size: 0.8rem;
+    }
 
     span {
         font-weight: 400;
@@ -1090,7 +1197,9 @@ $ai-hover: #c084fc;
     transition: all 0.2s;
     margin-top: 0.15rem;
 
-    i { font-size: 0.68rem; }
+    i {
+        font-size: 0.68rem;
+    }
 
     &:hover {
         background: color-mix(in srgb, $accent, transparent 85%);
@@ -1159,7 +1268,10 @@ $ai-hover: #c084fc;
     transition: all 0.15s;
     letter-spacing: 0.3px;
 
-    &:hover { color: var(--text-primary); border-color: color-mix(in srgb, #fff, transparent 80%); }
+    &:hover {
+        color: var(--text-primary);
+        border-color: color-mix(in srgb, #fff, transparent 80%);
+    }
 
     &.active {
         background: color-mix(in srgb, $accent, transparent 88%);
@@ -1198,7 +1310,9 @@ $ai-hover: #c084fc;
         transform: scale(1.1);
     }
 
-    &:active { transform: scale(0.95); }
+    &:active {
+        transform: scale(0.95);
+    }
 }
 
 .cwf-sym-hint {
@@ -1207,7 +1321,11 @@ $ai-hover: #c084fc;
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    i { font-size: 0.68rem; color: $accent; }
+
+    i {
+        font-size: 0.68rem;
+        color: $accent;
+    }
 }
 
 // ── Responsive ───────────────────────────────────────────────────────────────
@@ -1286,7 +1404,13 @@ $ai-hover: #c084fc;
 
 .empty-facility-box {
     text-align: center;
-    p { color: #888; font-size: 0.9rem; margin-bottom: 12px; }
+
+    p {
+        color: #888;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+
     .btn-search-nearby {
         background: #111;
         color: #4CAF50;
@@ -1296,7 +1420,11 @@ $ai-hover: #c084fc;
         font-size: 0.85rem;
         cursor: pointer;
         transition: all 0.2s;
-        &:hover { background: #4CAF50; color: white; }
+
+        &:hover {
+            background: #4CAF50;
+            color: white;
+        }
     }
 }
 
@@ -1305,7 +1433,7 @@ $ai-hover: #c084fc;
     border: 1px solid #4CAF50;
     border-radius: 8px;
     padding: 0.75rem 1rem;
-    
+
     .facility-main {
         display: flex;
         align-items: center;
@@ -1325,8 +1453,18 @@ $ai-hover: #c084fc;
 
     .facility-meta {
         flex: 1;
-        .facility-name { color: #fff; font-size: 0.95rem; font-weight: 500; }
-        .facility-type { color: #888; font-size: 0.75rem; text-transform: uppercase; }
+
+        .facility-name {
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .facility-type {
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
     }
 
     .btn-remove-facility {
@@ -1334,6 +1472,1160 @@ $ai-hover: #c084fc;
         border: none;
         color: #666;
         cursor: pointer;
-        &:hover { color: #f44336; }
+
+        &:hover {
+            color: #f44336;
+        }
+    }
+}
+
+// ── Content Link Banner ───────────────────────────────────────────────────────
+
+.cwf-browse-content-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.85rem 1.25rem;
+    background: color-mix(in srgb, $accent, transparent 92%);
+    border: 1px dashed $accent;
+    border-radius: 8px;
+    color: $accent;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+
+    &:hover {
+        background: color-mix(in srgb, $accent, transparent 85%);
+    }
+
+    i {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+}
+
+.cwf-browse-content-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.cwf-browse-content-sub {
+    display: block;
+    font-size: 0.72rem;
+    opacity: 0.75;
+    margin-top: 0.1rem;
+}
+
+.cwf-link-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, $accent, transparent 92%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 70%);
+    border-radius: 8px;
+    font-size: 0.83rem;
+    color: $accent;
+}
+
+.cwf-link-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, #22c55e, transparent 90%);
+    border: 1px solid color-mix(in srgb, #22c55e, transparent 60%);
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.cwf-link-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+}
+
+.cwf-link-icon {
+    color: #22c55e;
+    font-size: 1rem;
+    margin-top: 0.1rem;
+}
+
+.cwf-link-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #22c55e;
+}
+
+.cwf-link-title {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.cwf-link-cid {
+    display: block;
+    font-size: 0.7rem;
+    color: $text-dim;
+    font-family: monospace;
+    margin-top: 0.1rem;
+}
+
+.cwf-link-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.cwf-link-action-btn {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.73rem;
+    font-weight: 600;
+    background: transparent;
+    border: 1px solid $border-dim;
+    border-radius: 4px;
+    color: $text-dim;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+
+    &:hover {
+        border-color: $accent;
+        color: $accent;
+    }
+
+    &--unlink:hover {
+        border-color: $error-color;
+        color: $error-color;
+    }
+}
+
+// ── Content Picker ────────────────────────────────────────────────────────────
+
+
+.cwf-cp-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.cwf-cp-card {
+    background: #1a1a1a;
+    border: 1px solid $border-dim;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.cwf-cp-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem 1rem;
+    border-bottom: 1px solid $border-dimmer;
+}
+
+.cwf-cp-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.cwf-cp-sub {
+    font-size: 0.78rem;
+    color: $text-dim;
+    margin-top: 0.2rem;
+
+    strong {
+        color: $accent;
+    }
+}
+
+.cwf-cp-close {
+    background: transparent;
+    border: none;
+    color: $text-dim;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+
+    &:hover {
+        color: #fff;
+    }
+}
+
+.cwf-cp-search {
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid $border-dimmer;
+}
+
+.cwf-cp-search-input {
+    width: 100%;
+    font-size: 0.85rem;
+}
+
+.cwf-cp-state {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    color: $text-dim;
+    font-size: 0.85rem;
+
+    &--error {
+        color: $error-color;
+    }
+}
+
+.cwf-cp-list {
+    overflow-y: auto;
+    padding: 0.5rem;
+    flex: 1;
+}
+
+.cwf-cp-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 1px solid $border-dimmer;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.4rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+
+    &:hover {
+        background: $bg-card;
+        border-color: $accent;
+    }
+}
+
+.cwf-cp-item-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.cwf-cp-item-meta {
+    font-size: 0.73rem;
+    color: $text-dim;
+    margin-top: 0.2rem;
+}
+
+// ── Section hint ──────────────────────────────────────────────────────────────
+
+.cwf-section-hint {
+    font-size: 0.82rem;
+    color: $text-dim;
+    line-height: 1.5;
+    margin: 0 0 1.25rem;
+    padding: 0.6rem 0.9rem;
+    border-left: 2px solid $border-dim;
+}
+
+// ── Needs-review banner ────────────────────────────────────────────────────────
+
+.cwf-needs-review {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, $warn-color, transparent 88%);
+    border: 1px solid color-mix(in srgb, $warn-color, transparent 60%);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: $warn-color;
+
+    i {
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+    }
+}
+
+// ── Session Preview ────────────────────────────────────────────────────────────
+
+.cwf-sessions-preview {
+    margin-top: 1.25rem;
+}
+
+.cwf-sessions-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+}
+
+.cwf-sessions-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: $text-dim;
+}
+
+.cwf-sessions-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid $border-dim;
+    border-radius: 3px;
+    color: $text-dim;
+}
+
+.cwf-sessions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cwf-session-card {
+    background: $bg-card;
+    border: 1px solid $border-dimmer;
+    border-radius: 10px;
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: $accent;
+        opacity: 0.6;
+    }
+}
+
+.cwf-session-hour {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: $accent;
+    margin-bottom: 0.4rem;
+}
+
+.cwf-session-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.cwf-session-desc {
+    font-size: 0.77rem;
+    color: $text-dim;
+    line-height: 1.55;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+// ── Attach Area (no content linked) ──────────────────────────────────────────
+
+.cwf-attach-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2.5rem 1rem;
+    border: 2px dashed $border-dim;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.cwf-attach-icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: color-mix(in srgb, $accent, transparent 90%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cwf-attach-icon {
+    font-size: 1.4rem;
+    color: $accent;
+}
+
+.cwf-attach-text {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.cwf-attach-sub {
+    font-size: 0.82rem;
+    color: $text-dim;
+    max-width: 320px;
+    line-height: 1.5;
+}
+
+.cwf-attach-primary-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.4rem;
+    background: $accent;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.25rem;
+    transition: background 0.15s;
+
+    &:hover {
+        background: $accent-hover;
+    }
+}
+
+.cwf-attach-warn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: $text-dim;
+
+    i {
+        color: $warn-color;
+    }
+}
+
+// ── Search & Assign ──────────────────────────────────────────────────────────
+
+.cwf-search-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    .cwf-search-input {
+        flex: 1;
+    }
+}
+
+.cwf-search-state {
+    padding: 1.25rem;
+    text-align: center;
+    color: $text-dim;
+    font-size: 0.85rem;
+    border: 1px dashed $border-dim;
+    border-radius: 8px;
+
+    &--error {
+        color: $error-color;
+        border-color: rgba($error-color, 0.3);
+    }
+
+    &--idle {
+        color: $text-dim;
+    }
+}
+
+.cwf-results-list {
+    border: 1px solid $border-dim;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.cwf-result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid $border-dimmer;
+    transition: background 0.15s;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background: $bg-card;
+    }
+}
+
+.cwf-result-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.cwf-result-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cwf-result-sub {
+    font-size: 0.78rem;
+    color: $text-dim;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cwf-result-tags {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.15rem;
+}
+
+.cwf-tag {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 20px;
+    background: $bg-input;
+    color: $text-mid;
+
+    &--state {
+        color: $accent;
+        background: rgba($accent, 0.12);
+    }
+}
+
+.cwf-result-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+}
+
+.cwf-hour-btn {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid $border-dim;
+    background: transparent;
+    color: $text-dim;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+
+    &:hover {
+        border-color: $accent;
+        color: $accent;
+    }
+
+    &.is-set {
+        background: rgba($accent, 0.15);
+        border-color: $accent;
+        color: $accent;
+        font-weight: 600;
+    }
+}
+
+// ── Hour slots ───────────────────────────────────────────────────────────────
+
+.cwf-hours-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.cwf-hour-slot {
+    border: 1px dashed $border-dim;
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-height: 100px;
+    transition: border-color 0.2s, background 0.2s;
+
+    &.is-filled {
+        border-style: solid;
+        border-color: $accent;
+        background: rgba($accent, 0.04);
+    }
+}
+
+.cwf-hour-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: $accent;
+    text-transform: uppercase;
+}
+
+.cwf-hour-label {
+    font-size: 0.72rem;
+    color: $text-dim;
+    margin-bottom: 0.25rem;
+}
+
+.cwf-hour-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.cwf-hour-content-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.3;
+}
+
+.cwf-hour-content-sub {
+    font-size: 0.75rem;
+    color: $text-dim;
+}
+
+.cwf-hour-ver {
+    font-size: 0.7rem;
+    color: $text-mid;
+    margin-top: 0.15rem;
+}
+
+.cwf-hour-empty {
+    font-size: 0.78rem;
+    color: $text-dim;
+    font-style: italic;
+    margin-top: auto;
+}
+
+.cwf-hour-clear {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+    font-size: 0.7rem;
+    color: $error-color;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.7;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+// ── Ad Configuration ─────────────────────────────────────────────────────────
+
+.cwf-ad-timing {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: color-mix(in srgb, $accent, transparent 90%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 75%);
+    border-radius: 10px;
+    padding: 0.9rem 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.cwf-ad-timing-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    background: color-mix(in srgb, #fff, transparent 95%);
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    min-width: 70px;
+
+    &--ad {
+        background: color-mix(in srgb, $accent, transparent 85%);
+    }
+}
+
+.cwf-ad-timing-num {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.cwf-ad-timing-lbl {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: $text-dim;
+}
+
+.cwf-ad-timing-sep {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $text-dim;
+}
+
+.cwf-ad-timing-note {
+    font-size: 0.75rem;
+    color: $text-dim;
+    margin-left: 0.25rem;
+}
+
+.cwf-override-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+}
+
+.cwf-override-btn {
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    border: 1px solid $border-dim;
+    background: $bg-input;
+    color: $text-dim;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &.is-active {
+        border-color: $accent;
+        background: color-mix(in srgb, $accent, transparent 85%);
+        color: #fff;
+        font-weight: 600;
+    }
+
+    &:hover:not(.is-active) {
+        border-color: color-mix(in srgb, $accent, transparent 50%);
+        color: #fff;
+    }
+}
+
+.cwf-override-hint {
+    margin-top: 0.4rem;
+    font-size: 0.75rem;
+    color: $text-dim;
+    font-style: italic;
+}
+
+.cwf-chips-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.6rem;
+    background: $bg-input;
+    border: 1px solid $border-dim;
+    border-radius: 8px;
+    min-height: 2.4rem;
+    margin-top: 0.4rem;
+
+    &:focus-within {
+        border-color: $accent;
+        background: $bg-input-focus;
+    }
+}
+
+.cwf-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: color-mix(in srgb, $accent, transparent 80%);
+    border: 1px solid color-mix(in srgb, $accent, transparent 60%);
+    border-radius: 20px;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.75rem;
+    color: #fff;
+}
+
+.cwf-chip-remove {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.6;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.cwf-chip-input {
+    flex: 1;
+    min-width: 120px;
+    background: none;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 0.82rem;
+
+    &::placeholder {
+        color: $text-mid;
+    }
+}
+
+.cwf-chips-hint {
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+    color: $text-mid;
+}
+
+.cwf-label-opt {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: $text-mid;
+    margin-left: 0.25rem;
+}
+
+// ── Break Activity Options ────────────────────────────────────────────────────
+
+.cwf-activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+}
+
+.cwf-activity-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid $border-dim;
+    background: $bg-input;
+    color: $text-dim;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    position: relative;
+
+    &.is-active {
+        border-color: $accent;
+        background: color-mix(in srgb, $accent, transparent 85%);
+        color: #fff;
+    }
+
+    &:hover:not(.is-active) {
+        border-color: color-mix(in srgb, $accent, transparent 55%);
+        color: #fff;
+    }
+}
+
+.cwf-activity-icon {
+    font-size: 1rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.cwf-activity-label {
+    flex: 1;
+    font-size: 0.78rem;
+    line-height: 1.2;
+}
+
+.cwf-activity-check {
+    font-size: 0.7rem;
+    color: $accent;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+// ── Workshop Schedules ────────────────────────────────────────────────────────
+.cwf-schedules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+
+    @media (max-width: 992px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cwf-schedule-column {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid $border-dimmer;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 200px;
+}
+
+.cwf-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid $border-dimmer;
+
+    .cwf-column-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+}
+
+.cwf-schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.cwf-schedule-card {
+    background: $bg-card;
+    border: 1px solid $border-dimmer;
+    border-radius: 10px;
+    padding: 0.75rem;
+    position: relative;
+    transition: transform 0.2s, border-color 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+        border-color: $accent;
+    }
+
+    .cwf-sc-time {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 2px;
+    }
+
+    .cwf-sc-date {
+        font-size: 0.8rem;
+        color: $text-dim;
+        margin-bottom: 8px;
+    }
+
+    .cwf-sc-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .cwf-sc-fee {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: $accent;
+        }
+    }
+
+    .cwf-sc-remove {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: transparent;
+        border: none;
+        color: $text-dim;
+        cursor: pointer;
+        font-size: 0.8rem;
+        opacity: 0;
+        transition: opacity 0.2s, color 0.2s;
+
+        &:hover {
+            color: $error-color;
+        }
+    }
+
+    &:hover .cwf-sc-remove {
+        opacity: 1;
+    }
+}
+
+// ── Add Schedule Box ──────────────────────────────────────────────────────────
+.cwf-add-schedule-box {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid color-mix(in srgb, $accent, transparent 70%);
+    background: rgba(255, 255, 255, 0.03);
+
+    .cwf-box-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            i {
+                color: $accent;
+            }
+        }
+    }
+}
+
+.cwf-add-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+
+    .cwf-field--full {
+        grid-column: span 2;
+    }
+
+    @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+
+        .cwf-field--full {
+            grid-column: span 1;
+        }
+    }
+}
+
+.cwf-toggle-group {
+    display: flex;
+    background: $bg-input;
+    border: 1px solid $border-dim;
+    border-radius: 8px;
+    padding: 3px;
+    overflow: hidden;
+
+    .cwf-toggle {
+        flex: 1;
+        cursor: pointer;
+        position: relative;
+        text-align: center;
+
+        input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        span {
+            display: block;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            color: $text-dim;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        input:checked+span {
+            background: $accent;
+            color: #000;
+            font-weight: 600;
+        }
+    }
+}
+
+.cwf-location-picker {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed $border-dim;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: $text-dim;
+
+    i {
+        font-size: 1.5rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    &:hover {
+        border-color: $accent;
+        color: #fff;
+        background: rgba(var(--accent-rgb), 0.05);
+    }
+}
+
+.cwf-selected-facility {
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .cwf-sf-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #fff;
+
+        i {
+            color: #10b981;
+            font-size: 1.2rem;
+        }
+    }
+
+    .cwf-sf-remove {
+        background: transparent;
+        border: none;
+        color: $text-dim;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: all 0.2s;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+    }
+}
+
+.cwf-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid $border-dimmer;
+}
+
+.cwf-empty-state--center {
+    text-align: center;
+    padding: 3rem 1rem;
+    border: 1px dashed $border-dimmer;
+    border-radius: 15px;
+    margin-top: 1rem;
+
+    i {
+        font-size: 2.5rem;
+        color: $border-dim;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        color: $text-dim;
+        margin-bottom: 1.5rem;
     }
 }

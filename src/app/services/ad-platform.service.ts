@@ -13,6 +13,7 @@ export interface Advertisement {
   clickThroughUrl?: string;
   duration: number;
   category: string;
+  contentCid?: string;
   ratePerSecondPerStudent: number;
   totalBudget: number;
   remainingBudget: number;
@@ -94,6 +95,26 @@ export interface Settlement {
   status: 'pending' | 'processing' | 'paid' | 'failed' | 'on_hold';
   paidAt?: string;
   totalImpressions: number;
+}
+
+export interface AdPlanSlot {
+  contentRef: string;
+  adId: string;
+  startTime: number;
+  endTime: number;
+  duration: number;
+  matchScore: number;
+  ratePerSec: number;
+  category: string;
+}
+
+export interface AdPlan {
+  sessionKey: string;
+  slots: AdPlanSlot[];
+  totalDuration: number;
+  computedAt: string;
+  expiresAt: string;
+  fromCache: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -227,5 +248,27 @@ export class AdPlatformService {
 
   linkBankAccount(data: { accountNumber: string; ifscCode: string; accountHolderName: string; upiId?: string }): Observable<any> {
     return this.http.post(`${this.api}/wallet/bank-account`, data);
+  }
+
+  // ==================== CID-BASED AD DELIVERY ====================
+
+  getAdPlan(sessionKey: string): Observable<{ status: boolean; data: AdPlan }> {
+    return this.http.get<any>(`${this.api}/ads/delivery/${encodeURIComponent(sessionKey)}`);
+  }
+
+  precomputePlan(body: { pageId: string; userId?: string; learnerProfile?: Record<string, unknown>; force?: boolean }): Observable<any> {
+    return this.http.post(`${this.api}/ads/precompute`, body);
+  }
+
+  upsertAdIndex(entry: { adId: string; contentRef: string; rate: number; duration: number; category?: string; themes?: string[]; ageGroup?: string }): Observable<any> {
+    return this.http.post(`${this.api}/ads/index/upsert`, entry);
+  }
+
+  removeAdFromIndex(adId: string): Observable<any> {
+    return this.http.post(`${this.api}/ads/index/remove`, { adId });
+  }
+
+  invalidateAdPlans(pageId: string): Observable<any> {
+    return this.http.delete(`${this.api}/ads/plan/${pageId}`);
   }
 }

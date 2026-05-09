@@ -4,16 +4,22 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AgoraService } from '../../../services/agora.service';
 import { AgoraChatService } from '../../../services/agora-chat.service';
+import { CeekulWsChatService } from '../../../services/ceekul-ws-chat.service';
+import { UCRSService } from '../../../services/ucrs.service';
 import { WorkshopService, WorkshopApiSchedule } from '../../../services/workshop.service';
 import { AuthService } from '../../../services/auth.service';
 import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.component';
+import { SessionService } from '../../../services/session.service';
+import { ToastService } from '../../../core/services/toast.service';
+import { ToastComponent } from '../../../components/toast/toast';
 
 @Component({
     selector: 'app-live-room',
     standalone: true,
-    imports: [FormsModule, AdOverlayComponent],
+    imports: [CommonModule, FormsModule, AdOverlayComponent, ToastComponent],
     templateUrl: './live-room.html',
     styles: [`
         :host {
@@ -44,18 +50,16 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
             padding: .25rem .75rem; border-radius: 999px;
             font-size: .75rem; font-weight: 700; letter-spacing: .05em;
         }
-        .mode-badge.broadcast { background: #dc2626; }
+        .mode-badge.broadcast  { background: #dc2626; }
         .mode-badge.interactive { background: #2563eb; }
+        .mode-badge.embed      { background: #7c3aed; }
         .room-title {
             flex: 1; font-size: .9rem; font-weight: 500;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .participant-count {
-            font-size: .8rem; color: #64748b;
-            white-space: nowrap;
-        }
+        .participant-count { font-size: .8rem; color: #64748b; white-space: nowrap; }
 
-        /* ── Video grid ── */
+        /* ── Video / embed grid ── */
         .video-area {
             flex: 1; overflow: hidden; padding: .75rem;
             display: grid; gap: .5rem;
@@ -65,6 +69,7 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
         .video-area.quad       { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
         .video-area.multi      { grid-template-columns: repeat(3, 1fr); }
         .video-area.broadcast  { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+        .video-area.embed-mode { grid-template-columns: 1fr; grid-template-rows: 1fr; }
 
         .video-tile {
             position: relative;
@@ -73,9 +78,7 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
             overflow: hidden;
             min-height: 120px;
         }
-        .video-el {
-            width: 100%; height: 100%;
-        }
+        .video-el { width: 100%; height: 100%; }
         .name-tag {
             position: absolute; bottom: .5rem; left: .75rem;
             font-size: .75rem; background: rgba(0,0,0,.6);
@@ -89,10 +92,23 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
         .avatar-placeholder {
             width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
-            background: #1e2d45;
-            font-size: 2rem; color: #94a3b8;
+            background: #1e2d45; font-size: 2rem; color: #94a3b8;
         }
         .local-tile { border: 2px solid #3b82f6; }
+
+        /* Embed iframe */
+        .embed-frame {
+            width: 100%; height: 100%;
+            border: none; border-radius: 10px;
+            background: #000;
+        }
+        .embed-placeholder {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 1rem; color: #64748b; font-size: .95rem;
+        }
+        .embed-placeholder span { font-size: 2.5rem; }
 
         /* Waiting message */
         .waiting-msg {
@@ -113,11 +129,11 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
             display: flex; flex-direction: column; align-items: center; gap: .2rem;
             background: #2d2d44; border: none; border-radius: 12px;
             color: #fff; cursor: pointer; padding: .6rem 1.2rem;
-            font-size: .7rem; transition: background .15s;
+            font-size: .7rem; transition: background .15s; position: relative;
         }
         .ctrl-btn .icon { font-size: 1.3rem; }
         .ctrl-btn:hover { background: #3d3d60; }
-        .ctrl-btn.off { background: #dc2626; }
+        .ctrl-btn.off  { background: #dc2626; }
         .ctrl-btn.off:hover { background: #b91c1c; }
         .leave-btn {
             background: #ef4444; border: none; border-radius: 12px;
@@ -143,24 +159,20 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         .overlay p { color: #94a3b8; font-size: .9rem; }
-
         .error-card {
             background: #1e1e2e; border-radius: 14px;
             padding: 2rem; text-align: center; max-width: 380px;
         }
         .error-card h2 { color: #f87171; margin-bottom: .5rem; }
-        .error-card p { color: #94a3b8; font-size: .9rem; }
+        .error-card p  { color: #94a3b8; font-size: .9rem; }
         .error-card button {
             margin-top: 1.25rem; padding: .6rem 1.75rem;
             background: #3b82f6; color: #fff;
-            border: none; border-radius: 8px; cursor: pointer;
-            font-size: .9rem;
+            border: none; border-radius: 8px; cursor: pointer; font-size: .9rem;
         }
 
         /* ── Chat panel ── */
-        .room-body {
-            flex: 1; display: flex; overflow: hidden;
-        }
+        .room-body { flex: 1; display: flex; overflow: hidden; }
         .video-area {
             flex: 1; overflow: hidden; padding: .75rem;
             display: grid; gap: .5rem;
@@ -174,20 +186,16 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
             transition: width .25s ease;
         }
         .chat-panel.hidden { width: 0; min-width: 0; overflow: hidden; }
-
         .chat-header {
             padding: .6rem 1rem;
             border-bottom: 1px solid rgba(255,255,255,.08);
-            font-size: .8rem; font-weight: 600; color: #94a3b8;
-            flex-shrink: 0;
+            font-size: .8rem; font-weight: 600; color: #94a3b8; flex-shrink: 0;
         }
         .chat-messages {
             flex: 1; overflow-y: auto; padding: .75rem;
             display: flex; flex-direction: column; gap: .6rem;
         }
-        .chat-msg {
-            display: flex; gap: .5rem; align-items: flex-start;
-        }
+        .chat-msg { display: flex; gap: .5rem; align-items: flex-start; }
         .chat-msg.own { flex-direction: row-reverse; }
         .chat-avatar {
             width: 28px; height: 28px; border-radius: 50%;
@@ -204,9 +212,7 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
             background: transparent; color: #64748b;
             font-style: italic; font-size: .75rem;
         }
-        .chat-sender {
-            font-size: .7rem; color: #64748b; margin-bottom: .15rem;
-        }
+        .chat-sender { font-size: .7rem; color: #64748b; margin-bottom: .15rem; }
         .chat-input-row {
             display: flex; gap: .4rem; padding: .6rem;
             border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0;
@@ -225,7 +231,6 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
         .chat-send-btn:hover { background: #2563eb; }
         .chat-send-btn:disabled { background: #374151; cursor: default; }
 
-        /* Chat toggle button */
         .ctrl-btn .badge {
             position: absolute; top: -4px; right: -4px;
             background: #ef4444; color: #fff;
@@ -234,37 +239,76 @@ import { AdOverlayComponent } from '../../../components/ad-overlay/ad-overlay.co
             display: flex; align-items: center; justify-content: center;
             padding: 0 3px;
         }
-        .ctrl-btn { position: relative; }
     `]
 })
 export class LiveRoomComponent implements OnInit, OnDestroy {
-    readonly agora = inject(AgoraService);
-    readonly chat = inject(AgoraChatService);
-    private readonly workshopSvc = inject(WorkshopService);
-    private readonly auth = inject(AuthService);
-    private readonly route = inject(ActivatedRoute);
-    private readonly router = inject(Router);
+    readonly agora      = inject(AgoraService);
+    readonly agoraChat  = inject(AgoraChatService);
+    readonly wsChat     = inject(CeekulWsChatService);
+    readonly ucrs       = inject(UCRSService);
+    private readonly sanitizer    = inject(DomSanitizer);
+    private readonly workshopSvc  = inject(WorkshopService);
+    private readonly auth         = inject(AuthService);
+    private readonly route        = inject(ActivatedRoute);
+    private readonly router       = inject(Router);
+    private readonly sessionSvc   = inject(SessionService);
+    private readonly toast        = inject(ToastService);
 
-    @ViewChild('chatMessages') private chatMessagesEl?: ElementRef<HTMLElement>;
-    @ViewChild('adOverlay') private adOverlay?: AdOverlayComponent;
+    @ViewChild('chatMsgEl') private chatMessagesEl?: ElementRef<HTMLElement>;
+    @ViewChild('adOverlay')    private adOverlay?: AdOverlayComponent;
 
-    workshopId = '';
-    scheduleId = '';
+    workshopId  = '';
+    scheduleId  = '';
+    chatInput   = '';
 
-    readonly loading = signal(true);
-    readonly errorMsg = signal('');
+    // ── Session lifecycle ──────────────────────────────────────────────────────
+    private sessionCid    = signal<string | null>(null);
+    private sessionLogId  = signal<string | null>(null);
+    private sessionStart  = signal<string | null>(null);
+    private microInterval: ReturnType<typeof setInterval> | null = null;
+    private peakParticipants = 0;
+    private _sessionEnded    = false;
+    private lastUcrsCommitId: string | null = null;
+
+    readonly loading      = signal(true);
+    readonly errorMsg     = signal('');
     readonly workshopTitle = signal('');
-    readonly schedule = signal<WorkshopApiSchedule | null>(null);
-    readonly showChat = signal(false);
-    chatInput = '';
+    readonly schedule     = signal<WorkshopApiSchedule | null>(null);
+    readonly showChat     = signal(false);
+
+    // ── Embed mode ─────────────────────────────────────────────────────────────
+    readonly isEmbedMode   = computed(() => !!this.schedule()?.embedUrl);
+    readonly safeEmbedUrl  = computed<SafeResourceUrl | null>(() => {
+        const url = this.schedule()?.embedUrl;
+        return url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : null;
+    });
+
+    // ── Chat bridge: per-property computed signals (avoids union type issues in templates) ──
+    readonly chatMessages  = computed(() =>
+        this.isEmbedMode() ? this.wsChat.messages() : this.agoraChat.messages()
+    );
+    readonly chatConnected = computed(() =>
+        this.isEmbedMode() ? this.wsChat.isConnected() : this.agoraChat.isConnected()
+    );
+    readonly chatUnread    = computed(() =>
+        this.isEmbedMode() ? this.wsChat.unreadCount() : this.agoraChat.unreadCount()
+    );
+
+    chatAvatarColor(senderId: string): string {
+        return (this.isEmbedMode() ? this.wsChat : this.agoraChat).avatarColor(senderId);
+    }
+    chatAvatarInitial(name: string): string {
+        return (this.isEmbedMode() ? this.wsChat : this.agoraChat).avatarInitial(name);
+    }
 
     readonly participantCount = computed(() =>
         this.agora.remoteParticipants().length + (this.agora.isJoined() ? 1 : 0)
     );
 
     readonly gridClass = computed(() => {
+        if (this.isEmbedMode()) return 'embed-mode';
         const count = this.agora.remoteParticipants().length + (this.agora.isHost() ? 1 : 0);
-        const mode = this.schedule()?.streamMode;
+        const mode  = this.schedule()?.streamMode;
         if (mode === 'live_broadcast') return 'broadcast';
         if (count <= 1) return 'single';
         if (count === 2) return 'dual';
@@ -273,24 +317,20 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
     });
 
     constructor() {
-        // After Angular renders participant tiles, play their video tracks
         effect(() => {
             const participants = this.agora.remoteParticipants();
             Promise.resolve().then(() => {
                 for (const p of participants) {
                     if (p.videoTrack && p.hasVideo) {
                         const el = document.getElementById(`remote-video-${p.uid}`);
-                        if (el && el.childElementCount === 0) {
-                            p.videoTrack.play(el as HTMLElement);
-                        }
+                        if (el && el.childElementCount === 0) p.videoTrack.play(el as HTMLElement);
                     }
                 }
             });
         });
 
-        // Auto-scroll chat to bottom on new messages
         effect(() => {
-            this.chat.messages(); // track
+            this.chatMessages();
             Promise.resolve().then(() => {
                 if (this.chatMessagesEl?.nativeElement) {
                     this.chatMessagesEl.nativeElement.scrollTop =
@@ -311,45 +351,56 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
         }
 
         try {
-            // 1. Resolve workshop title + schedule details (needed for mode badge, etc.)
             const workshopRes = await this.workshopSvc
-                .getWorkshopById(this.workshopId)
-                .toPromise();
-            if (!workshopRes?.status) {
-                throw new Error(workshopRes?.message ?? 'Failed to load workshop.');
-            }
+                .getWorkshopById(this.workshopId).toPromise();
+            if (!workshopRes?.status) throw new Error(workshopRes?.message ?? 'Failed to load workshop.');
+
             this.workshopTitle.set(workshopRes.data.workshopTitle);
-            const sched = workshopRes.data.schedules.find(s => s._id === this.scheduleId);
+            const sched = workshopRes.data.schedules.find((s: any) => s._id === this.scheduleId);
             if (!sched) throw new Error('Schedule not found in this workshop.');
             this.schedule.set(sched);
 
-            // 2. Get Agora token — backend validates enrollment and assigns role
-            const tokenRes = await this.workshopSvc
-                .getAgoraToken(this.workshopId, this.scheduleId)
-                .toPromise();
-            if (!tokenRes?.status) {
-                throw new Error(tokenRes?.message ?? 'Could not get stream token.');
+            const user     = this.auth.currentUserProfile();
+            const userId   = user?.ceebrainId || user?.id || 'anon';
+            const userName = user?.name || user?.email || 'Participant';
+
+            if (this.isEmbedMode()) {
+                // ── Embed mode: no Agora, just WS chat + UCRS ─────────────────
+                this.wsChat.connect(this.scheduleId, userId, userName);
+                await this._startSessionCid();
+                this.ucrs.commit({
+                    type:        'stream.embed_connected',
+                    sessionId:   this.sessionCid() ?? this.scheduleId,
+                    speakerId:   userId,
+                    speakerName: userName,
+                    content:     `Embed stream connected: ${sched.embedUrl}`,
+                    metadata:    { embedUrl: sched.embedUrl },
+                });
+                this.loading.set(false);
+                this._scheduleAdOverlay(sched);
+                return;
             }
 
-            // 3. Join the channel
+            // ── Agora mode (existing behaviour) ───────────────────────────────
+            const tokenRes = await this.workshopSvc
+                .getAgoraToken(this.workshopId, this.scheduleId).toPromise();
+            if (!tokenRes?.status) throw new Error(tokenRes?.message ?? 'Could not get stream token.');
+
             await this.agora.join({
-                appId: tokenRes.data.appId,
+                appId:   tokenRes.data.appId,
                 channel: tokenRes.data.channelName,
-                token: tokenRes.data.token,
-                uid: tokenRes.data.uid,
-                mode: tokenRes.data.mode,
-                role: tokenRes.data.role,
+                token:   tokenRes.data.token,
+                uid:     tokenRes.data.uid,
+                mode:    tokenRes.data.mode,
+                role:    tokenRes.data.role,
             });
 
-            // 4. Render local video for hosts after DOM settles
             if (tokenRes.data.role === 'host') {
                 Promise.resolve().then(() => this.agora.playLocalVideo('local-video'));
+                await this._startSessionCid();
             }
 
-            // 5. Connect to live chat via RTM
-            const user = this.auth.currentUserProfile();
-            const userName = user?.name || user?.email || 'Participant';
-            await this.chat.connect(
+            await this.agoraChat.connect(
                 tokenRes.data.appId,
                 tokenRes.data.rtmToken,
                 tokenRes.data.rtmUid,
@@ -358,8 +409,6 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
             );
 
             this.loading.set(false);
-
-            // Schedule ad overlay for the last 10 minutes of this session
             this._scheduleAdOverlay(sched);
         } catch (err: any) {
             this.errorMsg.set(err?.message ?? 'Unable to join the live room.');
@@ -367,55 +416,129 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
         }
     }
 
-    /**
-     * Computes the remaining seconds in the schedule and arms the ad overlay
-     * to fire when 10 minutes remain. Uses a random session ID since workshops
-     * don't have a separate lecture session concept.
-     */
     private _scheduleAdOverlay(sched: WorkshopApiSchedule): void {
-        // Parse HH:mm end time relative to today
         const [endH, endM] = sched.endTime.split(':').map(Number);
-        const now = new Date();
-        const end = new Date(now);
+        const now  = new Date();
+        const end  = new Date(now);
         end.setHours(endH, endM, 0, 0);
-
-        // If the end time has already passed (e.g. late join), bail out
         const remainingSecs = Math.floor((end.getTime() - now.getTime()) / 1000);
         if (remainingSecs <= 0) return;
-
-        // Wait for the view to render the overlay element, then arm it
         Promise.resolve().then(() => {
             if (!this.adOverlay) return;
             const sessionId = `ws-${this.scheduleId}-${Date.now()}`;
-            this.adOverlay.startLiveModeWatch(
-                { contentId: this.workshopId, sessionId },
-                remainingSecs
-            );
+            this.adOverlay.startLiveModeWatch({ contentId: this.workshopId, sessionId }, remainingSecs);
         });
     }
 
-    async ngOnDestroy(): Promise<void> {
-        await this.chat.disconnect();
-        if (this.agora.isJoined()) {
-            await this.agora.leave();
+    // ── Session lifecycle ──────────────────────────────────────────────────────
+
+    private async _startSessionCid(): Promise<void> {
+        try {
+            const result = await this.sessionSvc.startSession(
+                this.workshopId, this.workshopTitle(), this.scheduleId
+            );
+            this.sessionCid.set(result.sessionCid);
+            this.sessionLogId.set(result.logicalId);
+            this.sessionStart.set(new Date().toISOString());
+            this.toast.info('Session recording started');
+            this.microInterval = setInterval(() => this._microCommit(), 30_000);
+        } catch {
+            this.toast.warning('Session CID could not be started — recording skipped');
         }
     }
 
-    async toggleMic(): Promise<void> { await this.agora.toggleMic(); }
+    private async _microCommit(): Promise<void> {
+        const cid       = this.sessionCid();
+        const logId     = this.sessionLogId();
+        const startedAt = this.sessionStart();
+        if (!cid || !startedAt) return;
+
+        const participants = this.participantCount();
+        if (participants > this.peakParticipants) this.peakParticipants = participants;
+        const elapsed = Math.round((Date.now() - new Date(startedAt).getTime()) / 1000);
+
+        try {
+            const result = await this.sessionSvc.microCommit({
+                sessionCid:       cid,
+                logicalId:        logId ?? '',
+                workshopId:       this.workshopId,
+                scheduleId:       this.scheduleId,
+                title:            this.workshopTitle(),
+                startedAt,
+                participantCount: participants,
+                chatCount:        this.chatMessages().length,
+                elapsedSecs:      elapsed,
+            });
+            this.sessionCid.set(result.cid);
+        } catch { /* silent */ }
+    }
+
+    private async _endSessionCid(): Promise<void> {
+        this._sessionEnded = true;
+        if (this.microInterval) { clearInterval(this.microInterval); this.microInterval = null; }
+        const cid       = this.sessionCid();
+        const startedAt = this.sessionStart();
+        if (!cid || !startedAt) return;
+
+        const totalSecs = Math.round((Date.now() - new Date(startedAt).getTime()) / 1000);
+        try {
+            await this.sessionSvc.endSession({
+                sessionCid:       cid,
+                workshopId:       this.workshopId,
+                scheduleId:       this.scheduleId,
+                title:            this.workshopTitle(),
+                startedAt,
+                totalSecs,
+                peakParticipants: this.peakParticipants,
+                totalMessages:    this.chatMessages().length,
+            });
+            this.toast.success('Session saved — AI summary is being generated');
+        } catch {
+            this.toast.warning('Session end could not be recorded');
+        }
+    }
+
+    async ngOnDestroy(): Promise<void> {
+        if (!this._sessionEnded) await this._endSessionCid();
+        if (this.isEmbedMode()) {
+            this.wsChat.disconnect();
+        } else {
+            await this.agoraChat.disconnect();
+            if (this.agora.isJoined()) await this.agora.leave();
+        }
+    }
+
+    // ── Controls ───────────────────────────────────────────────────────────────
+
+    async toggleMic():    Promise<void> { await this.agora.toggleMic(); }
     async toggleCamera(): Promise<void> { await this.agora.toggleCamera(); }
 
     toggleChat(): void {
         this.showChat.update(v => !v);
-        if (this.showChat()) {
-            this.chat.clearUnread();
-        }
+        if (this.showChat()) (this.isEmbedMode() ? this.wsChat : this.agoraChat).clearUnread();
     }
 
-    async sendChatMessage(): Promise<void> {
+    sendChatMessage(): void {
         const text = this.chatInput.trim();
         if (!text) return;
         this.chatInput = '';
-        await this.chat.send(text);
+
+        const user     = this.auth.currentUserProfile();
+        const userId   = user?.ceebrainId || user?.id || 'anon';
+        const userName = user?.name || user?.email || 'Participant';
+
+        (this.isEmbedMode() ? this.wsChat : this.agoraChat).send(text);
+
+        // UCRS commit for every chat message
+        const c = this.ucrs.commit({
+            type:        'chat.message',
+            sessionId:   this.sessionCid() ?? this.scheduleId,
+            speakerId:   userId,
+            speakerName: userName,
+            content:     text,
+            parentCommit: this.lastUcrsCommitId ?? undefined,
+        });
+        this.lastUcrsCommitId = c.commitId;
     }
 
     onChatKeydown(event: KeyboardEvent): void {
@@ -426,8 +549,13 @@ export class LiveRoomComponent implements OnInit, OnDestroy {
     }
 
     async leave(): Promise<void> {
-        await this.chat.disconnect();
-        await this.agora.leave();
+        await this._endSessionCid();
+        if (this.isEmbedMode()) {
+            this.wsChat.disconnect();
+        } else {
+            await this.agoraChat.disconnect();
+            await this.agora.leave();
+        }
         this.router.navigate(['/workshops', this.workshopId]);
     }
 

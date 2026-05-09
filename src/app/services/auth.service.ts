@@ -402,6 +402,16 @@ export class AuthService {
         return !!role && ['Student', 'Teacher', 'Researcher', 'Entrepreneur', 'Admin', 'Director'].includes(role);
     }
 
+    setCeebrainId(cbid: string): void {
+        const current = this._currentUser();
+        if (!current) return;
+        const updated = { ...current, ceebrainId: cbid };
+        this._currentUser.set(updated);
+        if (this.isBrowser) {
+            localStorage.setItem('auth_user', JSON.stringify(updated));
+        }
+    }
+
     // ── Dev helpers ───────────────────────────────────────────────────────────
 
     loginAsDirector(_directorId: string) { /* kept for dev simulation */ }

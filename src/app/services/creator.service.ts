@@ -15,6 +15,7 @@ export interface CreatorBlock {
 
 export interface DraftPayload {
   title: string;
+  subtitle?: string;
   contentType: ContentType;
   domain: string;
   category: string;
@@ -26,11 +27,13 @@ export interface DraftSummary {
   baseId: string;
   hybridId: string;
   title: string;
+  subtitle: string;
   contentType: ContentType;
   domain: string;
   category: string;
   version: number;
   wordCount: number;
+  state: ContentState;
   createdAt: string;
   updatedAt: string;
 }

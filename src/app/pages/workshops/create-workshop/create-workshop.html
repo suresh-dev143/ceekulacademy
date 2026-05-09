@@ -2,169 +2,49 @@
 
     <!-- ══ Header ══════════════════════════════════════════════════════════ -->
     <div class="cwf-header">
-        <div>
-            <div class="cwf-eyebrow">NEW WORKSHOP</div>
-            <h2 class="cwf-title">Create a Workshop</h2>
-        </div>
+        <!-- <div>
+            <div class="cwf-eyebrow">{{ isEditMode() ? 'EDIT WORKSHOP' : 'NEW WORKSHOP' }}</div>
+            <h2 class="cwf-title">{{ isEditMode() ? 'Update Workshop' : 'Create a Workshop' }}</h2>
+        </div> -->
         <button type="button" class="cwf-cancel-btn" (click)="onCancel()">
-            <i class="fas fa-times"></i> Cancel
+            <i class="fas fa-times"></i>
         </button>
-    </div>
-
-    <!-- ══ AI Generator ═══════════════════════════════════════════════════ -->
-    <div class="cwf-ai-bar">
-        <button type="button" class="cwf-ai-toggle" (click)="showAiPanel.set(!showAiPanel())">
-            <span class="cwf-ai-spark">✦</span>
-            Generate with AI
-            @if (aiGenerated()) { <span class="cwf-ai-done-badge"><i class="fas fa-check"></i> Filled</span> }
-            <i class="fas" [class.fa-chevron-down]="!showAiPanel()" [class.fa-chevron-up]="showAiPanel()"></i>
-        </button>
-
-        @if (showAiPanel()) {
-        <div class="cwf-ai-panel">
-            <div class="cwf-ai-panel-header">
-                <span class="cwf-ai-spark-lg">✦</span>
-                <div>
-                    <div class="cwf-ai-panel-title">AI Workshop Generator</div>
-                    <div class="cwf-ai-panel-sub">Describe your topic and audience — Claude will draft the complete 3-hour plan for you.</div>
-                </div>
-            </div>
-
-            <div class="cwf-ai-grid">
-                <!-- Topic -->
-                <div class="cwf-field cwf-ai-topic-field">
-                    <label class="cwf-label">Workshop Topic *</label>
-                    <input type="text" class="cwf-input" [value]="aiTopic()"
-                        (input)="aiTopic.set($any($event.target).value)"
-                        placeholder="e.g., Introduction to Machine Learning with Python">
-                </div>
-
-                <!-- Language -->
-                <div class="cwf-field">
-                    <label class="cwf-label">Language</label>
-                    <input type="text" class="cwf-input" [value]="aiLanguage()"
-                        (input)="aiLanguage.set($any($event.target).value)"
-                        placeholder="English">
-                </div>
-
-                <!-- Audience -->
-                <div class="cwf-field">
-                    <label class="cwf-label">Target Audience</label>
-                    <select class="cwf-input cwf-select" [value]="aiAudience()"
-                        (change)="aiAudience.set($any($event.target).value)">
-                        <option value="BEGINNER">Beginner</option>
-                        <option value="INTERMEDIATE">Intermediate</option>
-                        <option value="ADVANCED">Advanced</option>
-                    </select>
-                </div>
-
-                <!-- Mode -->
-                <div class="cwf-field">
-                    <label class="cwf-label">Workshop Mode</label>
-                    <div class="cwf-ai-mode-toggle">
-                        <button type="button" class="cwf-ai-mode-btn"
-                            [class.active]="aiMode() === 'ONLINE'"
-                            (click)="aiMode.set('ONLINE')">
-                            <i class="fas fa-wifi"></i> Online
-                        </button>
-                        <button type="button" class="cwf-ai-mode-btn"
-                            [class.active]="aiMode() === 'OFFLINE'"
-                            (click)="aiMode.set('OFFLINE')">
-                            <i class="fas fa-building"></i> Offline
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cwf-ai-actions">
-                <div class="cwf-ai-note">
-                    <i class="fas fa-info-circle"></i>
-                    Generated content fills the form — review and edit before saving.
-                </div>
-                <button type="button" class="cwf-ai-generate-btn"
-                    [disabled]="isGenerating() || !aiTopic().trim()"
-                    (click)="generateWithAI()">
-                    @if (isGenerating()) {
-                        <i class="fas fa-spinner fa-spin"></i> Generating…
-                    } @else {
-                        <span class="cwf-ai-spark">✦</span> Generate Workshop
-                    }
-                </button>
-            </div>
-        </div>
-        }
-    </div>
-
-    <!-- ══ Symbol Picker ═══════════════════════════════════════════════════ -->
-    <div class="cwf-sym-bar">
-        <button type="button" class="cwf-sym-toggle" (click)="toggleSymbols()">
-            <span class="cwf-sym-sigma">Σ</span>
-            Math &amp; Physics Symbols
-            <i class="fas" [class.fa-chevron-down]="!showSymbols()" [class.fa-chevron-up]="showSymbols()"></i>
-        </button>
-        @if (showSymbols()) {
-        <div class="cwf-sym-panel">
-            <div class="cwf-sym-tabs">
-                @for (cat of symbolCategories; track $index) {
-                <button type="button" class="cwf-sym-tab" [class.active]="activeSymbolTab() === $index"
-                    (click)="activeSymbolTab.set($index)">{{ cat.label }}</button>
-                }
-            </div>
-            <div class="cwf-sym-grid">
-                @for (sym of symbolCategories[activeSymbolTab()].symbols; track $index) {
-                <button type="button" class="cwf-sym-btn" (click)="insertSymbol(sym)" [title]="sym">{{ sym }}</button>
-                }
-            </div>
-            <div class="cwf-sym-hint">
-                <i class="fas fa-info-circle"></i> Focus any text field, then click a symbol to insert it at the cursor
-            </div>
-        </div>
-        }
     </div>
 
     <form [formGroup]="workshopForm" (ngSubmit)="onSubmit()" novalidate>
 
-        <!-- ══ 1. WORKSHOP DETAILS ═══════════════════════════════════════════ -->
-        <section class="cwf-section">
-            <div class="cwf-section-label"><span class="cwf-dot"></span> WORKSHOP DETAILS</div>
+        <!-- ══ 1. CREATE DETAILS ═══════════════════════════════════════════ -->
+        <section class="cwf-section" [style.--accent]="categoryAccentColor()">
+            <div class="cwf-section-label"><span class="cwf-dot"></span>Create Details</div>
 
-            <!-- Title -->
-            <div class="cwf-field">
-                <label class="cwf-label">Workshop Title *</label>
-                <div class="cwf-input-wrap">
-                    <input type="text" class="cwf-input" formControlName="workshopTitle"
-                        [class.is-error]="fieldError('workshopTitle')"
-                        placeholder="e.g., Advanced AI Development Bootcamp" maxlength="100"
-                        (focus)="onFieldFocus($any($event.target))">
-                    <span class="cwf-char">
-                        {{ workshopForm.get('workshopTitle')?.value?.length ?? 0 }}/100
-                    </span>
-                </div>
-                @if (fieldHasError('workshopTitle', 'required')) {
-                <div class="cwf-error">Title is required.</div>
-                } @else if (fieldHasError('workshopTitle', 'minlength')) {
-                <div class="cwf-error">Title must be at least 5 characters.</div>
-                }
+            <!-- ── CATEGORY / DOMAIN / TITLE / SUBTITLE ── -->
+            <div class="topbar-center topbar-meta-row">
+                <input class="category-ghost-input" [value]="category()"
+                    (input)="category.set($any($event.target).value); onIdentityChange()" placeholder="Category..." />
             </div>
+            <div class="topbar-center">
+                <input class="title-ghost-input" [value]="title()"
+                    (input)="title.set($any($event.target).value); onIdentityChange()" placeholder="Title..." />
+            </div>
+            <div class="topbar-center">
+                <input class="subtitle-ghost-input" [value]="subtitle()"
+                    (input)="subtitle.set($any($event.target).value)" placeholder="Subtitle..." />
+            </div>
+
 
 
 
 
         </section>
-
-        <!-- ══ 2. WORKSHOP STRUCTURE (3-HOUR PLAN) ═══════════════════════════════════════════════ -->
         <section class="cwf-section">
-            <!-- Workshop Description -->
             <div class="cwf-field">
                 <label class="cwf-label">Workshop Description *</label>
                 <div class="cwf-input-wrap">
                     <textarea class="cwf-input cwf-textarea" formControlName="workshopDescription"
                         [class.is-error]="fieldError('workshopDescription')"
                         placeholder="Describe what participants will learn, prerequisites, and outcomes..." rows="4"
-                        maxlength="1000" (focus)="onFieldFocus($any($event.target))"></textarea>
-                    <span class="cwf-char">
-                        {{ workshopForm.get('workshopDescription')?.value?.length ?? 0 }}/1000
-                    </span>
+                        maxlength="1000"></textarea>
+                    <span class="cwf-char">{{ workshopForm.get('workshopDescription')?.value?.length ?? 0 }}/1000</span>
                 </div>
                 @if (fieldHasError('workshopDescription', 'required')) {
                 <div class="cwf-error">Description is required.</div>
@@ -172,275 +52,16 @@
                 <div class="cwf-error">Description must be at least 20 characters.</div>
                 }
             </div>
-
-            <div class="cwf-section-label"><span class="cwf-dot"></span> WORKSHOP STRUCTURE (3-HOUR PLAN)</div>
-            <div class="cwf-hint" style="margin-bottom: 1.25rem;">
-                <i class="fas fa-lightbulb"></i>
-                Design your workshop in a structured 3-hour format for better learning outcomes.
-            </div>
-
-            <div formGroupName="threeHourPlan">
-
-            <!-- Hour 1 -->
-            <details class="cwf-accordion" open>
-                <summary class="cwf-accordion-head">
-                    <span class="cwf-accordion-icon">🧠</span>
-                    <span class="cwf-accordion-title">Hour 1 <span>(Learn & Innovate)</span></span>
-                    <i class="fas fa-chevron-down cwf-acc-arrow"></i>
-                </summary>
-                <div class="cwf-accordion-body" formGroupName="hour1">
-                    <div class="cwf-field">
-                        <label class="cwf-label">Title *</label>
-                        <div class="cwf-input-wrap">
-                            <input type="text" class="cwf-input cwf-input--large" formControlName="title"
-                                placeholder="e.g., Introduction to AI Systems"
-                                [class.is-error]="workshopForm.get('threeHourPlan.hour1.title')?.invalid && workshopForm.get('threeHourPlan.hour1.title')?.touched"
-                                (focus)="onFieldFocus($any($event.target))">
-                        </div>
-                        @if (workshopForm.get('threeHourPlan.hour1.title')?.hasError('required') &&
-                        workshopForm.get('threeHourPlan.hour1.title')?.touched) {
-                        <div class="cwf-error">Please enter title for Hour 1</div>
-                        }
-                    </div>
-                    <div class="cwf-field" style="margin-top: 1rem;">
-                        <label class="cwf-label">Description *</label>
-                        <textarea class="cwf-input cwf-textarea cwf-textarea--large" formControlName="description"
-                            placeholder="What will be covered in Hour 1..." rows="4"
-                            [class.is-error]="workshopForm.get('threeHourPlan.hour1.description')?.invalid && workshopForm.get('threeHourPlan.hour1.description')?.touched"
-                            (focus)="onFieldFocus($any($event.target))"></textarea>
-                        @if (workshopForm.get('threeHourPlan.hour1.description')?.hasError('required') &&
-                        workshopForm.get('threeHourPlan.hour1.description')?.touched) {
-                        <div class="cwf-error">Description is required for Hour 1</div>
-                        }
-                    </div>
-                    <!-- Hour 1 Media -->
-                    <div class="cwf-media-section">
-                        <div class="cwf-media-label"><i class="fas fa-photo-video"></i> Media Resources <span>(Optional)</span></div>
-                        <div class="cwf-field">
-                            <label class="cwf-label"><i class="fas fa-video"></i> Videos</label>
-                            <div formArrayName="videos">
-                                @for (ctrl of getHourVideos('hour1').controls; track $index) {
-                                <div class="cwf-url-row">
-                                    <input type="url" class="cwf-input" [formControlName]="$index"
-                                        placeholder="e.g., https://youtube.com/watch?v=..."
-                                        (focus)="onFieldFocus($any($event.target))">
-                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourVideo('hour1', $index)" title="Remove video">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                                }
-                            </div>
-                            <button type="button" class="cwf-add-media-btn" (click)="addHourVideo('hour1')">
-                                <i class="fas fa-plus"></i> Add Video
-                            </button>
-                        </div>
-                        <div class="cwf-field" style="margin-top: 0.75rem;">
-                            <label class="cwf-label"><i class="fas fa-image"></i> Images</label>
-                            <div formArrayName="images">
-                                @for (ctrl of getHourImages('hour1').controls; track $index) {
-                                <div class="cwf-url-row">
-                                    <input type="url" class="cwf-input" [formControlName]="$index"
-                                        placeholder="e.g., https://example.com/diagram.png"
-                                        (focus)="onFieldFocus($any($event.target))">
-                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourImage('hour1', $index)" title="Remove image">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                                }
-                            </div>
-                            <button type="button" class="cwf-add-media-btn" (click)="addHourImage('hour1')">
-                                <i class="fas fa-plus"></i> Add Image
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </details>
-
-            <!-- Hour 2 -->
-            <details class="cwf-accordion">
-                <summary class="cwf-accordion-head">
-                    <span class="cwf-accordion-icon">⚙️</span>
-                    <span class="cwf-accordion-title">Hour 2 <span>(Hands-On)</span></span>
-                    <i class="fas fa-chevron-down cwf-acc-arrow"></i>
-                </summary>
-                <div class="cwf-accordion-body" formGroupName="hour2">
-                    <div class="cwf-field">
-                        <label class="cwf-label">Title</label>
-                        <div class="cwf-input-wrap">
-                            <input type="text" class="cwf-input cwf-input--locked cwf-input--large"
-                                formControlName="title">
-                        </div>
-                    </div>
-                    <div class="cwf-field" style="margin-top: 1rem;">
-                        <label class="cwf-label">Description *</label>
-                        <textarea class="cwf-input cwf-textarea cwf-textarea--large" formControlName="description"
-                            placeholder="Describe the hands-on activity..." rows="4"
-                            [class.is-error]="workshopForm.get('threeHourPlan.hour2.description')?.invalid && workshopForm.get('threeHourPlan.hour2.description')?.touched"
-                            (focus)="onFieldFocus($any($event.target))"></textarea>
-                        @if (workshopForm.get('threeHourPlan.hour2.description')?.hasError('required') &&
-                        workshopForm.get('threeHourPlan.hour2.description')?.touched) {
-                        <div class="cwf-error">Hands-On session description is required</div>
-                        }
-                    </div>
-                    <div class="cwf-field" style="margin-top: 1rem;">
-                        <label class="cwf-label">Who can conduct this session? *</label>
-                        <div class="cwf-checkbox-group">
-                            <label class="cwf-checkbox">
-                                <input type="checkbox" formControlName="expertAllowed">
-                                <span class="cwf-checkbox-mark"></span>
-                                <span>Myself (Expert)</span>
-                            </label>
-                            <label class="cwf-checkbox">
-                                <input type="checkbox" formControlName="instructorAllowed">
-                                <span class="cwf-checkbox-mark"></span>
-                                <span>Open to others (Instructors)</span>
-                            </label>
-                        </div>
-                    </div>
-                    <!-- Hour 2 Media -->
-                    <div class="cwf-media-section">
-                        <div class="cwf-media-label"><i class="fas fa-photo-video"></i> Media Resources <span>(Optional)</span></div>
-                        <div class="cwf-field">
-                            <label class="cwf-label"><i class="fas fa-video"></i> Videos</label>
-                            <div formArrayName="videos">
-                                @for (ctrl of getHourVideos('hour2').controls; track $index) {
-                                <div class="cwf-url-row">
-                                    <input type="url" class="cwf-input" [formControlName]="$index"
-                                        placeholder="e.g., https://youtube.com/watch?v=..."
-                                        (focus)="onFieldFocus($any($event.target))">
-                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourVideo('hour2', $index)" title="Remove video">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                                }
-                            </div>
-                            <button type="button" class="cwf-add-media-btn" (click)="addHourVideo('hour2')">
-                                <i class="fas fa-plus"></i> Add Video
-                            </button>
-                        </div>
-                        <div class="cwf-field" style="margin-top: 0.75rem;">
-                            <label class="cwf-label"><i class="fas fa-image"></i> Images</label>
-                            <div formArrayName="images">
-                                @for (ctrl of getHourImages('hour2').controls; track $index) {
-                                <div class="cwf-url-row">
-                                    <input type="url" class="cwf-input" [formControlName]="$index"
-                                        placeholder="e.g., https://example.com/diagram.png"
-                                        (focus)="onFieldFocus($any($event.target))">
-                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourImage('hour2', $index)" title="Remove image">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                                }
-                            </div>
-                            <button type="button" class="cwf-add-media-btn" (click)="addHourImage('hour2')">
-                                <i class="fas fa-plus"></i> Add Image
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </details>
-
-            <!-- Hour 3 -->
-            <details class="cwf-accordion">
-                <summary class="cwf-accordion-head">
-                    <span class="cwf-accordion-icon">🚀</span>
-                    <span class="cwf-accordion-title">Hour 3 <span>(Project)</span></span>
-                    <i class="fas fa-chevron-down cwf-acc-arrow"></i>
-                </summary>
-                <div class="cwf-accordion-body" formGroupName="hour3">
-                    <div class="cwf-field">
-                        <label class="cwf-label">Title *</label>
-                        <div class="cwf-input-wrap">
-                            <input type="text" class="cwf-input cwf-input--large" formControlName="title"
-                                placeholder="Project details or discussion topics..."
-                                [class.is-error]="workshopForm.get('threeHourPlan.hour3.title')?.invalid && workshopForm.get('threeHourPlan.hour3.title')?.touched"
-                                (focus)="onFieldFocus($any($event.target))">
-                        </div>
-                        @if (workshopForm.get('threeHourPlan.hour3.title')?.hasError('required') &&
-                        workshopForm.get('threeHourPlan.hour3.title')?.touched) {
-                        <div class="cwf-error">Please enter title for Hour 3</div>
-                        }
-                    </div>
-                    <div class="cwf-field" style="margin-top: 1rem;">
-                        <label class="cwf-label">Description *</label>
-                        <textarea class="cwf-input cwf-textarea cwf-textarea--large" formControlName="description"
-                            placeholder="Project details or discussion topics..." rows="4"
-                            [class.is-error]="workshopForm.get('threeHourPlan.hour3.description')?.invalid && workshopForm.get('threeHourPlan.hour3.description')?.touched"
-                            (focus)="onFieldFocus($any($event.target))"></textarea>
-                        @if (workshopForm.get('threeHourPlan.hour3.description')?.hasError('required') &&
-                        workshopForm.get('threeHourPlan.hour3.description')?.touched) {
-                        <div class="cwf-error">Please provide details for Hour 3</div>
-                        }
-                    </div>
-                    <div class="cwf-field" style="margin-top: 1rem;">
-                        <label class="cwf-label">Who can conduct this session? *</label>
-                        <div class="cwf-checkbox-group">
-                            <label class="cwf-checkbox">
-                                <input type="checkbox" formControlName="expertAllowed">
-                                <span class="cwf-checkbox-mark"></span>
-                                <span>Myself (Expert)</span>
-                            </label>
-                            <label class="cwf-checkbox">
-                                <input type="checkbox" formControlName="instructorAllowed">
-                                <span class="cwf-checkbox-mark"></span>
-                                <span>Open to others (Instructors)</span>
-                            </label>
-                        </div>
-                    </div>
-                    <!-- Hour 3 Media -->
-                    <div class="cwf-media-section">
-                        <div class="cwf-media-label"><i class="fas fa-photo-video"></i> Media Resources <span>(Optional)</span></div>
-                        <div class="cwf-field">
-                            <label class="cwf-label"><i class="fas fa-video"></i> Videos</label>
-                            <div formArrayName="videos">
-                                @for (ctrl of getHourVideos('hour3').controls; track $index) {
-                                <div class="cwf-url-row">
-                                    <input type="url" class="cwf-input" [formControlName]="$index"
-                                        placeholder="e.g., https://youtube.com/watch?v=..."
-                                        (focus)="onFieldFocus($any($event.target))">
-                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourVideo('hour3', $index)" title="Remove video">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                                }
-                            </div>
-                            <button type="button" class="cwf-add-media-btn" (click)="addHourVideo('hour3')">
-                                <i class="fas fa-plus"></i> Add Video
-                            </button>
-                        </div>
-                        <div class="cwf-field" style="margin-top: 0.75rem;">
-                            <label class="cwf-label"><i class="fas fa-image"></i> Images</label>
-                            <div formArrayName="images">
-                                @for (ctrl of getHourImages('hour3').controls; track $index) {
-                                <div class="cwf-url-row">
-                                    <input type="url" class="cwf-input" [formControlName]="$index"
-                                        placeholder="e.g., https://example.com/diagram.png"
-                                        (focus)="onFieldFocus($any($event.target))">
-                                    <button type="button" class="cwf-remove-url-btn" (click)="removeHourImage('hour3', $index)" title="Remove image">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                                }
-                            </div>
-                            <button type="button" class="cwf-add-media-btn" (click)="addHourImage('hour3')">
-                                <i class="fas fa-plus"></i> Add Image
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </details>
-            </div>
-            <!-- Expert Description -->
+        </section>
+        <section class="cwf-section">
             <div class="cwf-field">
-                <label class="cwf-label">Expert Details</label>
+                <label class="cwf-label">Expert Details *</label>
                 <div class="cwf-input-wrap">
                     <textarea class="cwf-input cwf-textarea" formControlName="expertDescription"
                         [class.is-error]="fieldError('expertDescription')"
                         placeholder="Describe your expertise, qualifications, and relevant experience..." rows="3"
-                        maxlength="500" (focus)="onFieldFocus($any($event.target))"></textarea>
-                    <span class="cwf-char">
-                        {{ workshopForm.get('expertDescription')?.value?.length ?? 0 }}/500
-                    </span>
+                        maxlength="500"></textarea>
+                    <span class="cwf-char">{{ workshopForm.get('expertDescription')?.value?.length ?? 0 }}/500</span>
                 </div>
                 @if (fieldHasError('expertDescription', 'required')) {
                 <div class="cwf-error">Expert description is required.</div>
@@ -452,176 +73,358 @@
 
 
 
-        <!-- ══ 3. CONTENT CREATION TOOLS ═══════════════════════════════════════ -->
-        <section class="cwf-section cwf-tools-section">
-            <details class="cwf-tools-details">
-                <summary class="cwf-tools-summary">
-                    <span class="cwf-tools-summary-left">
-                        <span class="cwf-tools-icon">🛠️</span>
-                        <span>
-                            <span class="cwf-tools-title">Free Content Creation Tools</span>
-                            <span class="cwf-tools-subtitle">Curated tools to build slides, videos, designs & more</span>
-                        </span>
-                    </span>
-                    <i class="fas fa-chevron-down cwf-acc-arrow"></i>
-                </summary>
 
-                <div class="cwf-tools-body">
+        <!-- ══ 3. WORKSHOP SCHEDULES ════════════════════════════════════════ -->
+        <section class="cwf-section">
+            <div class="cwf-section-label"><span class="cwf-dot"></span> WORKSHOP SCHEDULES</div>
 
-                    <!-- Presentations -->
-                    <div class="cwf-tools-category">
-                        <div class="cwf-tools-cat-label">
-                            <i class="fas fa-desktop"></i> Presentations &amp; Slides
-                        </div>
-                        <div class="cwf-tools-grid">
-                            <a class="cwf-tool-card" href="https://slides.google.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">📊</span>
-                                <span class="cwf-tool-name">Google Slides</span>
-                                <span class="cwf-tool-desc">Browser-based, real-time collaboration, completely free</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://canva.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">🎨</span>
-                                <span class="cwf-tool-name">Canva</span>
-                                <span class="cwf-tool-desc">Drag-and-drop templates — slides, banners, thumbnails</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free tier</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://gamma.app" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">✨</span>
-                                <span class="cwf-tool-name">Gamma</span>
-                                <span class="cwf-tool-desc">AI-generated slides from a text prompt in seconds</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--ai">AI</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Video & Screen Recording -->
-                    <div class="cwf-tools-category">
-                        <div class="cwf-tools-cat-label">
-                            <i class="fas fa-video"></i> Video &amp; Screen Recording
-                        </div>
-                        <div class="cwf-tools-grid">
-                            <a class="cwf-tool-card" href="https://loom.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">🎥</span>
-                                <span class="cwf-tool-name">Loom</span>
-                                <span class="cwf-tool-desc">Record screen + webcam, share instantly with a link</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free tier</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://obsproject.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">📡</span>
-                                <span class="cwf-tool-name">OBS Studio</span>
-                                <span class="cwf-tool-desc">Professional screen recording & live streaming, open source</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://screencastify.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">🖥️</span>
-                                <span class="cwf-tool-name">Screencastify</span>
-                                <span class="cwf-tool-desc">Chrome extension for quick screen capture and sharing</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free tier</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Design & Graphics -->
-                    <div class="cwf-tools-category">
-                        <div class="cwf-tools-cat-label">
-                            <i class="fas fa-paint-brush"></i> Design &amp; Graphics
-                        </div>
-                        <div class="cwf-tools-grid">
-                            <a class="cwf-tool-card" href="https://figma.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">🖌️</span>
-                                <span class="cwf-tool-name">Figma</span>
-                                <span class="cwf-tool-desc">UI/UX design & visual diagrams with free collaborative plan</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free tier</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://express.adobe.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">🅰️</span>
-                                <span class="cwf-tool-name">Adobe Express</span>
-                                <span class="cwf-tool-desc">Social graphics, flyers, and quick visual content</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free tier</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://excalidraw.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">✏️</span>
-                                <span class="cwf-tool-name">Excalidraw</span>
-                                <span class="cwf-tool-desc">Hand-drawn style whiteboards and diagrams, open source</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Code Demos -->
-                    <div class="cwf-tools-category">
-                        <div class="cwf-tools-cat-label">
-                            <i class="fas fa-code"></i> Code Demos &amp; Live Coding
-                        </div>
-                        <div class="cwf-tools-grid">
-                            <a class="cwf-tool-card" href="https://codepen.io" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">🖊️</span>
-                                <span class="cwf-tool-name">CodePen</span>
-                                <span class="cwf-tool-desc">Live HTML/CSS/JS demos with shareable links</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://codesandbox.io" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">📦</span>
-                                <span class="cwf-tool-name">CodeSandbox</span>
-                                <span class="cwf-tool-desc">Full-stack browser IDE — React, Node, Vue and more</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free tier</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://replit.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">🔁</span>
-                                <span class="cwf-tool-name">Replit</span>
-                                <span class="cwf-tool-desc">Multi-language online IDE great for teaching code live</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free tier</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- AI Writing & Content -->
-                    <div class="cwf-tools-category">
-                        <div class="cwf-tools-cat-label">
-                            <i class="fas fa-robot"></i> AI Writing &amp; Content
-                        </div>
-                        <div class="cwf-tools-grid">
-                            <a class="cwf-tool-card" href="https://chat.openai.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">🤖</span>
-                                <span class="cwf-tool-name">ChatGPT</span>
-                                <span class="cwf-tool-desc">Draft outlines, exercises, quizzes, and workshop content</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--ai">AI · Free tier</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://gemini.google.com" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">💎</span>
-                                <span class="cwf-tool-name">Google Gemini</span>
-                                <span class="cwf-tool-desc">Google's AI — great for research summaries and content ideas</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--ai">AI · Free</span>
-                            </a>
-                            <a class="cwf-tool-card" href="https://notion.so" target="_blank" rel="noopener">
-                                <span class="cwf-tool-emoji">📝</span>
-                                <span class="cwf-tool-name">Notion</span>
-                                <span class="cwf-tool-desc">Organise workshop notes, docs, and checklists with AI assist</span>
-                                <span class="cwf-tool-badge cwf-tool-badge--free">Free tier</span>
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-            </details>
-        </section>
-
-        <!-- ══ Submit row ══════════════════════════════════════════════════════ -->
-        <div class="cwf-submit-row">
-            @if (!isEditMode() && totalCommission > 0) {
-            <div class="cwf-charge-notice">
-                <span>Total Portal Charges (₹25 × Number of Sessions):</span>
-                <span class="cwf-charge-amount">₹{{ totalCommission }}</span>
+            @if (localSchedules().length === 0 && !showAddForm()) {
+            <div class="cwf-empty-state cwf-empty-state--center">
+                <i class="fas fa-calendar-alt"></i>
+                <p>No schedules added yet. Add at least one session to publish.</p>
+                <button type="button" class="cwf-btn cwf-btn--outline" (click)="openAddForm()">
+                    <i class="fas fa-plus"></i> Add Initial Schedule
+                </button>
             </div>
             }
-            <button type="button" class="cwf-btn-secondary" (click)="onCancel()">
-                Cancel
-            </button>
-            <button type="submit" class="cwf-btn-primary" [disabled]="workshopForm.invalid || isSubmitting()">
+
+            <div class="cwf-schedules-grid">
+                <!-- Hour 1 -->
+                <div class="cwf-schedule-column">
+                    <div class="cwf-column-header">
+                        <span class="cwf-column-title">🧠 Hour 1</span>
+                        <button type="button" class="cwf-btn-icon" (click)="openAddForm(1)" title="Add Hour 1 Schedule">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="cwf-schedule-list">
+                        @for (s of schedulesByOrder(1); track $index) {
+                        <div class="cwf-schedule-card">
+                            <div class="cwf-sc-time">{{ s.startTime }} - {{ s.endTime }}</div>
+                            <div class="cwf-sc-date">{{ formatDate(s.date!) }}</div>
+                            <div class="cwf-sc-meta">
+                                <span class="cwf-tag" [class.cwf-tag--online]="s.mode==='online'">
+                                    {{ s.mode === 'online' ? 'Online' : 'Offline' }}
+                                </span>
+                                <span class="cwf-sc-fee">₹{{ s.fee }}</span>
+                            </div>
+                            <button type="button" class="cwf-sc-remove" (click)="removeSchedule($index)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Hour 2 -->
+                <div class="cwf-schedule-column">
+                    <div class="cwf-column-header">
+                        <span class="cwf-column-title">⚙️ Hour 2</span>
+                        <button type="button" class="cwf-btn-icon" (click)="openAddForm(2)" title="Add Hour 2 Schedule">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="cwf-schedule-list">
+                        @for (s of schedulesByOrder(2); track $index) {
+                        <div class="cwf-schedule-card">
+                            <div class="cwf-sc-time">{{ s.startTime }} - {{ s.endTime }}</div>
+                            <div class="cwf-sc-date">{{ formatDate(s.date!) }}</div>
+                            <div class="cwf-sc-meta">
+                                <span class="cwf-tag" [class.cwf-tag--online]="s.mode==='online'">
+                                    {{ s.mode === 'online' ? 'Online' : 'Offline' }}
+                                </span>
+                                <span class="cwf-sc-fee">₹{{ s.fee }}</span>
+                            </div>
+                            <button type="button" class="cwf-sc-remove" (click)="removeSchedule($index)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Hour 3 -->
+                <div class="cwf-schedule-column">
+                    <div class="cwf-column-header">
+                        <span class="cwf-column-title">🚀 Hour 3</span>
+                        <button type="button" class="cwf-btn-icon" (click)="openAddForm(3)" title="Add Hour 3 Schedule">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="cwf-schedule-list">
+                        @for (s of schedulesByOrder(3); track $index) {
+                        <div class="cwf-schedule-card">
+                            <div class="cwf-sc-time">{{ s.startTime }} - {{ s.endTime }}</div>
+                            <div class="cwf-sc-date">{{ formatDate(s.date!) }}</div>
+                            <div class="cwf-sc-meta">
+                                <span class="cwf-tag" [class.cwf-tag--online]="s.mode==='online'">
+                                    {{ s.mode === 'online' ? 'Online' : 'Offline' }}
+                                </span>
+                                <span class="cwf-sc-fee">₹{{ s.fee }}</span>
+                            </div>
+                            <button type="button" class="cwf-sc-remove" (click)="removeSchedule($index)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ Add schedule form ═══════════════════════════════════════════════ -->
+            @if (showAddForm()) {
+            <div class="cwf-add-schedule-box glass-card animate-fade-in">
+                <div class="cwf-box-header">
+                    <h3><i class="fas fa-clock"></i> New Schedule</h3>
+                    <button type="button" class="cwf-btn-close" (click)="cancelAddForm()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form [formGroup]="addForm" class="cwf-add-form-grid">
+                    <div class="cwf-field">
+                        <label class="cwf-label">Date *</label>
+                        <input type="date" class="cwf-input" formControlName="date" [min]="todayStr">
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Timezone *</label>
+                        <select class="cwf-input" formControlName="timezone">
+                            @for (tz of timezones; track tz.key) {
+                            <option [value]="tz.key">{{ tz.label }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Start Time *</label>
+                        <input type="time" class="cwf-input" formControlName="startTime">
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">End Time *</label>
+                        <input type="time" class="cwf-input" formControlName="endTime">
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Mapping *</label>
+                        <select class="cwf-input" formControlName="sessionOrder">
+                            <option value="" disabled>Select Hour...</option>
+                            <option [value]="1">🧠 Hour 1: Learn & Innovate</option>
+                            <option [value]="2">⚙️ Hour 2: Hands-On</option>
+                            <option [value]="3">🚀 Hour 3: Project Discussion</option>
+                        </select>
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Fee (₹) *</label>
+                        <input type="number" class="cwf-input" formControlName="fee" min="0">
+                    </div>
+
+                    <div class="cwf-field">
+                        <label class="cwf-label">Mode *</label>
+                        <div class="cwf-toggle-group">
+                            <label class="cwf-toggle">
+                                <input type="radio" formControlName="mode" value="online">
+                                <span>Online</span>
+                            </label>
+                            <label class="cwf-toggle">
+                                <input type="radio" formControlName="mode" value="offline">
+                                <span>Offline</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    @if (isOnlineMode) {
+                    <div class="cwf-field cwf-field--full">
+                        <label class="cwf-label">Stream Mode</label>
+                        <div class="cwf-toggle-group">
+                            <label class="cwf-toggle">
+                                <input type="radio" formControlName="streamMode" value="interactive_class">
+                                <span>Interactive Class</span>
+                            </label>
+                            <label class="cwf-toggle">
+                                <input type="radio" formControlName="streamMode" value="live_broadcast">
+                                <span>Live Broadcast</span>
+                            </label>
+                        </div>
+                    </div>
+                    }
+
+                    @if (isOfflineMode) {
+                    <div class="cwf-field cwf-field--full">
+                        <label class="cwf-label">Venue / Facility *</label>
+                        @if (!addForm.get('facilityId')?.value) {
+                        <div class="cwf-location-picker" (click)="openDiscovery()">
+                            <i class="fas fa-search-location"></i>
+                            <span>Find Verified Partner Facility</span>
+                        </div>
+                        } @else {
+                        <div class="cwf-selected-facility">
+                            <div class="cwf-sf-info">
+                                <i class="fas fa-university"></i>
+                                <span>{{ addForm.get('location')?.value }}</span>
+                            </div>
+                            <button type="button" class="cwf-sf-remove" (click)="removeFacility()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                    }
+
+                    <div class="cwf-field cwf-field--full">
+                        <label class="cwf-label">Additional Resources (Links/Materials)</label>
+                        <input type="text" class="cwf-input" formControlName="resources"
+                            placeholder="Optional links...">
+                    </div>
+
+                    <div class="cwf-form-footer cwf-field--full">
+                        <button type="button" class="cwf-btn cwf-btn--text" (click)="cancelAddForm()">Cancel</button>
+                        <button type="button" class="cwf-btn cwf-btn--primary" [disabled]="addForm.invalid"
+                            (click)="addScheduleToLocal()">
+                            <i class="fas fa-plus"></i> Add Schedule
+                        </button>
+                    </div>
+                </form>
+            </div>
+            }
+        </section>
+
+        <!-- ══ Facility Discovery Overlay ══════════════════════════════════════════ -->
+        @if (showDiscovery()) {
+        <app-facility-discovery [sessionDate]="addForm.get('date')?.value || ''"
+            [sessionStartTime]="addForm.get('startTime')?.value || ''"
+            [sessionEndTime]="addForm.get('endTime')?.value || ''" [isOffline]="true" [requiredSlots]="1"
+            [requiredCapacity]="0" (facilitySelected)="onFacilitySelected($event)" (close)="closeDiscovery()">
+        </app-facility-discovery>
+        }
+
+        <!-- ══ 3. AD CONFIGURATION ══════════════════════════════════════════ -->
+        <section class="cwf-section">
+            <div class="cwf-section-label"><span class="cwf-dot"></span> AD CONFIGURATION</div>
+            <p class="cwf-section-hint">
+                Each hour runs <strong>50 min of content</strong> followed by ads from the shared pool.
+                Set filters to control which ads appear. Choose who can override your filter at runtime.
+            </p>
+
+            <!-- Timing display -->
+            <div class="cwf-ad-timing">
+                <div class="cwf-ad-timing-block cwf-ad-timing-block--content">
+                    <span class="cwf-ad-timing-num">50 min</span>
+                    <span class="cwf-ad-timing-lbl">Content</span>
+                </div>
+                <span class="cwf-ad-timing-sep">+</span>
+                <div class="cwf-ad-timing-block cwf-ad-timing-block--ad">
+                    <span class="cwf-ad-timing-num">10 min</span>
+                    <span class="cwf-ad-timing-lbl">Ads</span>
+                </div>
+                <span class="cwf-ad-timing-note">per hour × 3 hours</span>
+            </div>
+
+            <!-- Override control -->
+            <div class="cwf-field">
+                <label class="cwf-label">Who can override ad filters?</label>
+                <div class="cwf-override-row">
+                    @for (opt of [['creator','Creator (locked)'],['instructor','Instructor'],['learner','Learner']] ;
+                    track opt[0]) {
+                    <button type="button" class="cwf-override-btn" [class.is-active]="adOverrideBy() === opt[0]"
+                        (click)="adOverrideBy.set($any(opt[0]))">
+                        {{ opt[1] }}
+                    </button>
+                    }
+                </div>
+                <div class="cwf-override-hint">
+                    @if (adOverrideBy() === 'creator') {
+                    Filters are fixed — instructors and learners cannot change them.
+                    } @else if (adOverrideBy() === 'instructor') {
+                    Instructors may override your filter for their sessions.
+                    } @else {
+                    Learners can personalise ads within the instructor's filter.
+                    }
+                </div>
+            </div>
+
+            <!-- Domain filter chips -->
+            <div class="cwf-field">
+                <label class="cwf-label">Domain filters <span class="cwf-label-opt">(optional)</span></label>
+                <div class="cwf-chips-wrap">
+                    @for (d of adDomains(); track d) {
+                    <span class="cwf-chip">{{ d }}<button type="button" class="cwf-chip-remove"
+                            (click)="removeChip(adDomains, d)">×</button></span>
+                    }
+                    <input class="cwf-chip-input" type="text" placeholder="e.g. technology" #domainInput
+                        (keydown.enter)="addDomain(domainInput.value); domainInput.value = ''; $event.preventDefault()"
+                        (keydown.tab)="addDomain(domainInput.value); domainInput.value = ''">
+                </div>
+                <div class="cwf-chips-hint">Press Enter or Tab to add a domain.</div>
+            </div>
+
+            <!-- Category filter chips -->
+            <div class="cwf-field">
+                <label class="cwf-label">Category filters <span class="cwf-label-opt">(optional)</span></label>
+                <div class="cwf-chips-wrap">
+                    @for (c of adCategories(); track c) {
+                    <span class="cwf-chip">{{ c }}<button type="button" class="cwf-chip-remove"
+                            (click)="removeChip(adCategories, c)">×</button></span>
+                    }
+                    <input class="cwf-chip-input" type="text" placeholder="e.g. education" #catInput
+                        (keydown.enter)="addCategory(catInput.value); catInput.value = ''; $event.preventDefault()"
+                        (keydown.tab)="addCategory(catInput.value); catInput.value = ''">
+                </div>
+                <div class="cwf-chips-hint">Press Enter or Tab to add a category.</div>
+            </div>
+
+            <!-- Keyword filter chips -->
+            <div class="cwf-field">
+                <label class="cwf-label">Keyword filters <span class="cwf-label-opt">(optional)</span></label>
+                <div class="cwf-chips-wrap">
+                    @for (k of adKeywords(); track k) {
+                    <span class="cwf-chip">{{ k }}<button type="button" class="cwf-chip-remove"
+                            (click)="removeChip(adKeywords, k)">×</button></span>
+                    }
+                    <input class="cwf-chip-input" type="text" placeholder="e.g. AI, machine learning" #kwInput
+                        (keydown.enter)="addKeyword(kwInput.value); kwInput.value = ''; $event.preventDefault()"
+                        (keydown.tab)="addKeyword(kwInput.value); kwInput.value = ''">
+                </div>
+                <div class="cwf-chips-hint">Press Enter or Tab to add a keyword.</div>
+            </div>
+
+            <!-- Break activity alternatives -->
+            <div class="cwf-field">
+                <label class="cwf-label">Learner break activities <span class="cwf-label-opt">(optional)</span></label>
+                <p class="cwf-section-hint" style="margin-top: 0.2rem">
+                    Learners may replace the 10-min ad break with any activity you enable below.
+                    Leave all off to offer the full platform default list.
+                </p>
+                <div class="cwf-activity-grid">
+                    @for (opt of BREAK_ACTIVITY_OPTIONS; track opt.key) {
+                    <button type="button" class="cwf-activity-btn" [class.is-active]="isBreakActivityEnabled(opt.key)"
+                        (click)="toggleBreakActivity(opt.key)">
+                        <span class="cwf-activity-icon">{{ opt.icon }}</span>
+                        <span class="cwf-activity-label">{{ opt.label }}</span>
+                        @if (isBreakActivityEnabled(opt.key)) {
+                        <span class="cwf-activity-check">✓</span>
+                        }
+                    </button>
+                    }
+                </div>
+                @if (adBreakActivities().size === 0) {
+                <div class="cwf-chips-hint">All platform activities will be available to learners.</div>
+                } @else {
+                <div class="cwf-chips-hint">{{ adBreakActivities().size }} activit{{ adBreakActivities().size === 1 ?
+                    'y' : 'ies' }} enabled for this workshop.</div>
+                }
+            </div>
+        </section>
+
+        <!-- ══ Submit ════════════════════════════════════════════════════════ -->
+        <div class="cwf-submit-row">
+            <button type="button" class="cwf-btn-secondary" (click)="onCancel()">Cancel</button>
+            <button type="submit" class="cwf-btn-primary"
+                [disabled]="workshopForm.invalid || isSubmitting() || !anyHourAssigned()">
                 @if (isSubmitting()) {
-                <i class="fas fa-spinner fa-spin"></i> {{ isEditMode() ? 'Updating Workshop...' : 'Creating Workshop...'
-                }}
+                <i class="fas fa-spinner fa-spin"></i> {{ isEditMode() ? 'Updating…' : 'Creating…' }}
                 } @else {
                 <i class="fas fa-check-circle"></i> {{ isEditMode() ? 'Update Workshop' : 'Create Workshop' }}
                 }

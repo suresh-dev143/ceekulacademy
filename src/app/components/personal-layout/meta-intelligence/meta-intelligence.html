@@ -1,0 +1,75 @@
+<div class="meta-intel">
+
+  @if (block(); as b) {
+
+  <!-- ── Dynamic Title ──────────────────────────────────────────────────────── -->
+  <div class="meta-intel__head" [style.--phase-accent]="orc.phaseAccent(b.phase)">
+    <span class="meta-intel__live-dot"></span>
+    <h2 class="meta-intel__dyn-title">{{ dynamicTitle() }}</h2>
+    <p class="meta-intel__intent">{{ b.intent }}</p>
+    <div class="meta-intel__meta-row">
+      <span class="meta-intel__hour-tag">{{ b.hour_block }}</span>
+      <span class="meta-intel__phase-tag" [style.color]="orc.phaseAccent(b.phase)">{{ b.phase }}</span>
+    </div>
+  </div>
+
+  <!-- ── Why This Hour ─────────────────────────────────────────────────────── -->
+  <div class="meta-intel__section">
+    <p class="meta-intel__section-label">Why This Hour</p>
+    <p class="meta-intel__insight">{{ b.left_box.insight }}</p>
+  </div>
+
+  <!-- ── Bio Signals ───────────────────────────────────────────────────────── -->
+  @if (metrics().length > 0) {
+  <div class="meta-intel__section">
+    <p class="meta-intel__section-label">Bio Signals</p>
+    <div class="meta-intel__metrics">
+      @for (m of metrics(); track m.key) {
+      <div class="meta-intel__metric">
+        <span class="meta-intel__metric-key">{{ m.key }}</span>
+        <span class="meta-intel__metric-val">{{ m.value }}</span>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- ── Content Identity ──────────────────────────────────────────────────── -->
+  <div class="meta-intel__section">
+    <p class="meta-intel__section-label">Content Identity</p>
+    <div class="meta-intel__cid-row">
+      <span class="meta-intel__cid-tag">CID</span>
+      <code class="meta-intel__cid-val">{{ b.content_cid }}</code>
+    </div>
+    <div class="meta-intel__cid-row">
+      <span class="meta-intel__cid-tag meta-intel__cid-tag--ad"
+            [class.meta-intel__cid-tag--replaced]="b.ad_replaced">
+        {{ b.ad_replaced ? 'Ad Replaced' : 'Ad CID' }}
+      </span>
+      <code class="meta-intel__cid-val" [class.meta-intel__cid-val--replaced]="b.ad_replaced">
+        {{ b.ad_replaced ? b.content_cid : b.ad_pack_cid }}
+      </code>
+    </div>
+    @if (b.ad_replaced) {
+      <p class="meta-intel__replaced-note">Ad block replaced with user content</p>
+    }
+  </div>
+
+  <!-- ── Criteria of Content ───────────────────────────────────────────────── -->
+  @if (b.criteria_of_content) {
+  <div class="meta-intel__section">
+    <p class="meta-intel__section-label">Criteria of Content</p>
+    <p class="meta-intel__criteria">{{ b.criteria_of_content }}</p>
+  </div>
+  }
+
+  } @else {
+
+  <div class="meta-intel__empty">
+    <div class="meta-intel__empty-orb"></div>
+    <p>No active content block.</p>
+  </div>
+
+  }
+
+</div>

@@ -57,6 +57,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: 0 1rem;
 
   &__header {
     padding: 1.8rem 0.875rem 1.04rem;
@@ -658,7 +659,7 @@
     border-bottom: 1px solid #2a2a2a;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 
     h3 {
       margin: 0;
@@ -679,7 +680,7 @@
 
   &__messages {
     margin-top: 3rem;
-    display:none;
+    display: none;
     flex: 0 1 auto;
     padding: 1.5rem;
     overflow-y: auto;
@@ -745,6 +746,14 @@
     border-color: #4a9eff;
     color: #4a9eff;
   }
+}
+
+.ceebrain-id-badge {
+  color: #4a9eff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.75rem;
 }
 
 .status-dot {
@@ -983,7 +992,7 @@
     font-size: 2.25rem;
     font-weight: 700;
     letter-spacing: 0.12em;
-    color: var(--accent-primary);
+    color: #ff9900;
     margin: 0;
   }
 
@@ -1006,6 +1015,8 @@
 }
 
 .cv-grid {
+  border-left: 6px solid #0e0e0e;
+  border-right: 6px solid #0e0e0e;
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   gap: 0.5rem;
@@ -1014,9 +1025,8 @@
 
 .cv-card {
   background: #0e0e0e;
-  border: 1px solid #202020;
-  border-left: 3px solid #202020;
-  border-radius: 0.625rem;
+  // border: 1px solid #202020;
+  // border-left: 3px solid #202020;
   padding: 1.5rem;
   transition:
     border-left-color 0.25s ease,

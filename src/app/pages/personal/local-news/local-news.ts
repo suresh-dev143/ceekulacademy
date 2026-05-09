@@ -1,16 +1,21 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { LocalNewsService, LocalNewsItem } from '../../../services/local-news.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-local-news',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './local-news.html',
   styleUrl: './local-news.scss'
 })
 export class LocalNewsPage {
   readonly localNews = inject(LocalNewsService);
+  readonly auth      = inject(AuthService);
+
+  readonly ceebrainId = computed(() => this.auth.currentUserProfile()?.ceebrainId ?? '');
 
   readonly subjectFilter = signal('');
   readonly areaFilter = signal('');

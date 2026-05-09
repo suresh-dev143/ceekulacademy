@@ -1,0 +1,77 @@
+.hl-page {
+  padding: 1rem 0rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.hl-header {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #141414;
+  margin-bottom: 1rem;
+
+  &__label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #303030;
+  }
+}
+
+.hl-grid {
+      border-left: 6px solid #0e0e0e;
+    border-right: 6px solid #0e0e0e;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.hl-card {
+  background: #0e0e0e;
+  padding: 1.5rem;
+ 
+ 
+  transition: border-left-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+
+  &:hover {
+    border-color: #2e2e2e;
+    border-left-color: #b8922c;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  }
+
+  &__number {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: #282828;
+    margin-bottom: 0.875rem;
+    transition: color 0.25s ease;
+  }
+
+  &:hover &__number {
+    color: #b8922c;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #c0c0c0;
+    margin: 0 0 0.5rem;
+  }
+
+  &__descriptor {
+    font-size: 0.9rem;
+    color: #626262;
+    line-height: 1.75;
+    margin: 0;
+  }
+}

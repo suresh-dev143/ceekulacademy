@@ -9,6 +9,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth.service';
 import { WorkshopCardComponent } from './workshop-card/workshop-card';
 import { WorkshopDetailComponent } from './workshop-detail/workshop-detail';
+import { CreateWorkshop } from './create-workshop/create-workshop';
 import {
     WorkshopService,
     WorkshopListItem,
@@ -119,7 +120,7 @@ const DEFAULT_WORKSHOPS: WorkshopListItem[] = [
     standalone: true,
     imports: [
         FormsModule,
-        RouterModule, WorkshopCardComponent, WorkshopDetailComponent,
+        RouterModule, WorkshopCardComponent, WorkshopDetailComponent, CreateWorkshop,
     ],
     templateUrl: './workshops.html',
     styleUrl: './workshops.scss',
@@ -138,6 +139,8 @@ export class PublicWorkshopsPageComponent {
     // ── Data ──────────────────────────────────────────────────────────────
     workshops = signal<WorkshopListItem[]>([]);
     isLoading = signal<boolean>(true);
+
+    isCreating = signal<boolean>(false);
 
     // ── Pagination ────────────────────────────────────────────────────────────
 
@@ -271,7 +274,19 @@ export class PublicWorkshopsPageComponent {
     // ── Workshop actions ──────────────────────────────────────────────────────
 
 
+    openCreate() {
+        this.isCreating.set(true);
+    }
 
+    closeCreate() {
+        this.isCreating.set(false);
+    }
+
+    onWorkshopCreated(_data: CreatedWorkshopData) {
+        this.closeCreate();
+        this.toast.success('Workshop created successfully!');
+        this.loadWorkshops();
+    }
     onViewWorkshop(w: WorkshopListItem): void {
         this.selectedWorkshop.set(w);
         this.showWorkshopDetail.set(true);

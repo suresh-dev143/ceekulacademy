@@ -31,7 +31,10 @@
         </div>
 
         <div class="form-group">
-            <label for="description">Description</label>
+            <label for="description" class="label-with-action">
+                Description
+                <button type="button" class="cp-browse-btn" (click)="openContentPicker()"><i class="fas fa-folder-open"></i> Browse My Content</button>
+            </label>
             <textarea id="description" formControlName="description" rows="4"
                 placeholder="Briefly describe what students will learn..."></textarea>
         </div>
@@ -73,3 +76,39 @@
         </div>
     </form>
 </div>
+
+@if (contentPickerOpen()) {
+<div class="cp-overlay" (click)="closeContentPicker()">
+    <div class="cp-card" (click)="$event.stopPropagation()">
+        <div class="cp-header">
+            <div>
+                <div class="cp-title">Browse My Content</div>
+                <div class="cp-sub">Select a draft to populate the course description</div>
+            </div>
+            <button type="button" class="cp-close" (click)="closeContentPicker()">✕</button>
+        </div>
+        <div class="cp-search">
+            <input type="text" class="cp-search-input"
+                placeholder="Search by title, domain, category..."
+                [value]="contentPickerQuery()"
+                (input)="contentPickerQuery.set($any($event.target).value)">
+        </div>
+        @if (contentPickerLoading()) {
+            <div class="cp-state"><i class="fas fa-spinner fa-spin"></i> Loading your content...</div>
+        } @else if (contentPickerError()) {
+            <div class="cp-state cp-state--error">{{ contentPickerError() }}</div>
+        } @else if (filteredPickerDrafts().length === 0) {
+            <div class="cp-state">No matching content found. Create content on the Create Page first.</div>
+        } @else {
+            <div class="cp-list">
+                @for (draft of filteredPickerDrafts(); track draft.baseId) {
+                    <button type="button" class="cp-item" (click)="applyDraftContent(draft)">
+                        <div class="cp-item-title">{{ draft.title }}</div>
+                        <div class="cp-item-meta">{{ draft.domain }} · {{ draft.category }} · {{ draft.wordCount }} words</div>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</div>
+}

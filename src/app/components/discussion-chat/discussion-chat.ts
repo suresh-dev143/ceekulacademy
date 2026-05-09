@@ -8,19 +8,26 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { DiscussionService, DiscussionRoom, DiscussionMessage, CreateRoomPayload } from '../../services/discussion.service';
 import { AuthService } from '../../services/auth.service';
+import { DqrgComponent } from '../dqrg/dqrg';
 
 @Component({
   selector: 'app-discussion-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, DqrgComponent],
   templateUrl: './discussion-chat.html',
   styleUrl: './discussion-chat.scss'
 })
 export class DiscussionChatComponent implements OnInit, OnDestroy {
 
-  @Input() contextId?:   string;
-  @Input() contextType?: string;
+  @Input() contextId?:       string;
+  @Input() contextType?:     string;
+  @Input() contentTitle?:    string;
+  @Input() contentSummary?:  string;
+  @Input() contentCategory?: string;
   @Input() placeholder = 'Join a discussion...';
+
+  // Panel toggle: 'discuss' = discussion rooms, 'dqrg' = AI intelligence
+  readonly panel = signal<'discuss' | 'dqrg'>('discuss');
 
   @ViewChild('messageList') private messageList!: ElementRef<HTMLDivElement>;
 

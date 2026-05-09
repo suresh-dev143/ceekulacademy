@@ -1,0 +1,187 @@
+<!-- ══ CURRENT HOUR — MINIMAL DISPLAY ═══════════════════════════════════════ -->
+@if (orc.currentBlock(); as block) {
+
+<div class="now-view">
+
+  <!-- Content Card — title only by default, expands on click -->
+  <div class="now-card"
+       [class.now-card--expanded]="showDetail()"
+       [class.now-card--vision]="contentTypeCss(block) === 'vision'"
+       [class.now-card--curations]="contentTypeCss(block) === 'curations'"
+       [class.now-card--works]="contentTypeCss(block) === 'works'"
+       [style.--phase-accent]="orc.phaseAccent(block.phase)">
+
+    <div class="now-card__top">
+      <span class="now-card__type">{{ contentTypeLabel(block) }}</span>
+      <span class="now-card__hour">{{ block.hour_block }}</span>
+    </div>
+
+    <h2 class="now-card__title" (click)="toggleDetail()">{{ contentTitle(block) }}</h2>
+    <p class="now-card__subtitle" (click)="toggleDetail()">{{ contentSubtitle(block) }}</p>
+
+    <div class="now-card__bottom">
+      <span class="now-card__phase" [style.color]="orc.phaseAccent(block.phase)">{{ block.phase }}</span>
+      <button class="now-card__toggle" (click)="toggleDetail()">
+        {{ showDetail() ? '↑ close' : '↓ details' }}
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── Expanded Detail ──────────────────────────────────────────────────── -->
+  @if (showDetail()) {
+  <div class="now-detail">
+
+    @if (block.custom_content?.body) {
+    <p class="now-detail__body">{{ block.custom_content!.body }}</p>
+    }
+
+    <div class="orch-panels">
+
+      <div class="orch-panel orch-panel--left">
+        <div class="orch-panel__label">
+          <span class="orch-panel__dot orch-panel__dot--left"></span>
+          Contextual Intelligence
+        </div>
+        <p class="orch-panel__insight">{{ block.left_box.insight }}</p>
+        @if (block.left_box.data | keyvalue; as items) {
+        @if (items.length > 0) {
+        <div class="orch-panel__metrics">
+          @for (m of items; track m.key) {
+          <div class="orch-metric">
+            <span class="orch-metric__label">{{ m.key }}</span>
+            <span class="orch-metric__value">{{ m.value }}</span>
+          </div>
+          }
+        </div>
+        }
+        }
+      </div>
+
+      <div class="orch-panel orch-panel--middle">
+        <div class="orch-panel__label">
+          <span class="orch-panel__dot orch-panel__dot--middle"></span>
+          Primary Experience
+        </div>
+        <p class="orch-panel__activity">
+          {{ block.user_override ? block.custom_activity : block.middle_box.activity }}
+        </p>
+        @if (!block.user_override && block.middle_box.guidance) {
+        <ul class="orch-guidance">
+          @for (g of block.middle_box.guidance.split('\n'); track g) {
+          <li class="orch-guidance__item">{{ g }}</li>
+          }
+        </ul>
+        }
+      </div>
+
+      <div class="orch-panel orch-panel--right">
+        <div class="orch-panel__label">
+          <span class="orch-panel__dot orch-panel__dot--right"></span>
+          Tools & Environment
+        </div>
+        @if (block.right_box.tools.length > 0) {
+        <div class="orch-tools">
+          @for (tool of block.right_box.tools; track tool) {
+          <div class="orch-tool"><span class="orch-tool__name">{{ tool }}</span></div>
+          }
+        </div>
+        }
+        @if (block.right_box.devices.length > 0) {
+        <div class="orch-devices">
+          <p class="orch-devices__label">Device Automation</p>
+          @for (d of block.right_box.devices; track d) {
+          <div class="orch-device"><span class="orch-device__dot"></span>{{ d }}</div>
+          }
+        </div>
+        }
+        @if (!block.right_box.tools.length && !block.right_box.devices.length) {
+        <p class="orch-panel__empty">Nothing active for this block.</p>
+        }
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="now-detail__actions">
+      @if (block.custom_content) {
+        <button class="orch-override-btn orch-override-btn--remove"
+          (click)="clearCustomContent(block.hour)">Restore Vision Flow</button>
+      } @else {
+        <button class="orch-override-btn"
+          (click)="openOverride(block.hour, block.user_override ? block.custom_activity : block.middle_box.activity)">
+          {{ block.user_override ? 'Edit Override' : 'Override This Hour' }}
+        </button>
+        @if (block.user_override) {
+        <button class="orch-override-btn orch-override-btn--remove"
+          (click)="removeOverride(block.hour)">Remove Override</button>
+        }
+      }
+    </div>
+
+  </div>
+  }
+
+</div>
+
+} @else {
+<div class="now-empty">
+  <span class="now-empty__glyph">◌</span>
+  <p class="now-empty__text">No content assigned for the current hour.</p>
+</div>
+}
+
+<!-- ══ OVERRIDE MODAL ═════════════════════════════════════════════════════ -->
+@if (showOverrideModal()) {
+@let targetHour = overrideTargetHour();
+<div class="orch-modal-overlay" (click)="closeOverride()">
+  <div class="orch-modal" (click)="$event.stopPropagation()">
+
+    <div class="orch-modal__header">
+      <span class="orch-modal__title">{{ targetHour !== null ? orc.formatHour(targetHour) : '' }}</span>
+      <button class="orch-modal__close" (click)="closeOverride()">✕</button>
+    </div>
+
+    <div class="orch-modal__tabs">
+      <button class="orch-modal__tab" [class.orch-modal__tab--active]="modalTab() === 'activity'"
+        (click)="modalTab.set('activity')">Activity</button>
+      <button class="orch-modal__tab" [class.orch-modal__tab--active]="modalTab() === 'criteria'"
+        (click)="modalTab.set('criteria')">Criteria of Content</button>
+    </div>
+
+    @if (modalTab() === 'activity') {
+      <p class="orch-modal__hint">Your choice always takes priority over the AI schedule.</p>
+      <textarea class="orch-modal__input" rows="3" autofocus
+        [value]="overrideInput()"
+        (input)="overrideInput.set($any($event.target).value)"
+        placeholder="What will you do during this hour?"></textarea>
+      <div class="orch-modal__actions">
+        <button class="orch-modal__btn orch-modal__btn--cancel" (click)="closeOverride()">Cancel</button>
+        @if (targetHour !== null && blockFor(targetHour)?.user_override) {
+          <button class="orch-modal__btn orch-modal__btn--remove" (click)="removeOverride(targetHour!)">Remove</button>
+        }
+        <button class="orch-modal__btn orch-modal__btn--save" (click)="saveOverride()"
+          [disabled]="!overrideInput().trim()">Save</button>
+      </div>
+    }
+
+    @if (modalTab() === 'criteria') {
+      <p class="orch-modal__hint">Define what this hour should deliver.</p>
+      <textarea class="orch-modal__input" rows="3"
+        [value]="criteriaInput()"
+        (input)="criteriaInput.set($any($event.target).value)"
+        placeholder="e.g. Deep focus on AI research. No social media. Long-form reading only."></textarea>
+      <label class="orch-modal__toggle">
+        <input type="checkbox" [checked]="adReplaced()"
+          (change)="adReplaced.set($any($event.target).checked)" />
+        <span>Replace ad block (last 10 min) with my content</span>
+      </label>
+      <div class="orch-modal__actions">
+        <button class="orch-modal__btn orch-modal__btn--cancel" (click)="closeOverride()">Cancel</button>
+        <button class="orch-modal__btn orch-modal__btn--save" (click)="saveCriteria()">Save Criteria</button>
+      </div>
+    }
+
+  </div>
+</div>
+}

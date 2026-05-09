@@ -1,0 +1,136 @@
+<!-- ══ SET MY CONTENT — HOUR TABLE ══════════════════════════════════════════ -->
+<div class="smc-wrap">
+
+  <div class="smc-table-scroll">
+    <table class="smc-tbl">
+      <thead>
+        <tr>
+          <th class="smc-tbl__th smc-tbl__th--time">Time</th>
+          <th class="smc-tbl__th smc-tbl__th--vision">Vision Flow</th>
+          <th class="smc-tbl__th smc-tbl__th--curated">Curated Content</th>
+          <th class="smc-tbl__th smc-tbl__th--work">My Work</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (hour of DAY_HOURS; track hour) {
+        @let block = blockFor(hour);
+        @if (block && !isSleep(block)) {
+
+        <tr class="smc-tbl__row"
+            [class.smc-tbl__row--current]="isCurrentHour(hour)"
+            [class.smc-tbl__row--past]="isPast(hour)"
+            [class.smc-tbl__row--editing]="editHour() === hour"
+            [style.--row-accent]="orc.phaseAccent(block.phase)">
+
+          <!-- Time -->
+          <td class="smc-tbl__td smc-tbl__td--time">
+            <span class="smc-tbl__hour">{{ orc.formatHour(hour) }}</span>
+            @if (isCurrentHour(hour)) {
+              <span class="smc-tbl__now">now</span>
+            }
+          </td>
+
+          <!-- Vision Flow — read-only -->
+          <td class="smc-tbl__td smc-tbl__td--vision">
+            <span class="smc-tbl__intent"
+                  [class.smc-tbl__intent--replaced]="!!block.custom_content">
+              {{ block.intent }}
+            </span>
+          </td>
+
+          <!-- Curated Content — clickable -->
+          <td class="smc-tbl__td smc-tbl__td--edit"
+              [class.smc-tbl__td--active]="editHour() === hour && editMode() === 'curated'"
+              (click)="toggleEdit(hour, 'curated')">
+            @if (block.custom_content?.source === 'ceekul') {
+              <span class="smc-tbl__set-title">{{ block.custom_content!.title }}</span>
+              <button class="smc-tbl__clear"
+                      (click)="$event.stopPropagation(); clearContent(hour)"
+                      title="Remove">✕</button>
+            } @else {
+              <span class="smc-tbl__add">+ Add</span>
+            }
+          </td>
+
+          <!-- My Work — clickable -->
+          <td class="smc-tbl__td smc-tbl__td--edit"
+              [class.smc-tbl__td--active]="editHour() === hour && editMode() === 'work'"
+              (click)="toggleEdit(hour, 'work')">
+            @if (block.custom_content?.source === 'upload') {
+              <span class="smc-tbl__set-title">{{ block.custom_content!.title }}</span>
+              <button class="smc-tbl__clear"
+                      (click)="$event.stopPropagation(); clearContent(hour)"
+                      title="Remove">✕</button>
+            } @else {
+              <span class="smc-tbl__add">+ Add</span>
+            }
+          </td>
+
+        </tr>
+
+        }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ EDIT PANEL — appears below table when a cell is clicked ══════════ -->
+  @if (editHour() !== null) {
+  <div class="smc-edit">
+
+    <div class="smc-edit__header">
+      <span class="smc-edit__label">
+        {{ orc.formatHour(editHour()!) }}
+        <span class="smc-edit__mode">{{ editMode() === 'curated' ? '· Curated Content' : '· My Work' }}</span>
+      </span>
+      <button class="smc-edit__close" (click)="closeEdit()">✕</button>
+    </div>
+
+    <!-- Curated Content picker -->
+    @if (editMode() === 'curated') {
+    <div class="smc-edit__body">
+      <input class="smc-edit__search" type="text" placeholder="Search Ceekul content…"
+             [value]="ceekulSearch()"
+             (input)="ceekulSearch.set($any($event.target).value)" />
+      <div class="smc-edit__list">
+        @for (item of filteredCeekulItems(); track item.id) {
+        <div class="smc-edit__item"
+             [class.smc-edit__item--selected]="selectedCeekulItem()?.id === item.id"
+             (click)="selectCeekulItem(item)">
+          <span class="smc-edit__item-title">{{ item.title }}</span>
+          <span class="smc-edit__item-sub">{{ item.subtitles[0] }}</span>
+        </div>
+        }
+      </div>
+    </div>
+    <div class="smc-edit__footer">
+      <button class="smc-edit__btn smc-edit__btn--cancel" (click)="closeEdit()">Cancel</button>
+      <button class="smc-edit__btn smc-edit__btn--save"
+              [disabled]="!selectedCeekulItem()"
+              (click)="applyContent()">Apply</button>
+    </div>
+    }
+
+    <!-- My Work form -->
+    @if (editMode() === 'work') {
+    <div class="smc-edit__body">
+      <input class="smc-edit__input" type="text" placeholder="Title *"
+             [value]="workTitle()"
+             (input)="workTitle.set($any($event.target).value)" />
+      <textarea class="smc-edit__textarea" placeholder="Content body (optional)…"
+                rows="4"
+                [value]="workBody()"
+                (input)="workBody.set($any($event.target).value)"></textarea>
+    </div>
+    <div class="smc-edit__footer">
+      <button class="smc-edit__btn smc-edit__btn--cancel" (click)="closeEdit()">Cancel</button>
+      <button class="smc-edit__btn smc-edit__btn--save"
+              [disabled]="!workTitle().trim()"
+              (click)="applyContent()">Save</button>
+    </div>
+    }
+
+  </div>
+  }
+
+</div>

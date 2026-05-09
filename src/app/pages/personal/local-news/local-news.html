@@ -1,120 +1,115 @@
 <div class="local-news-page">
+
+  <!-- @if (ceebrainId()) {
+  <div class="lnp-cbid-bar">
+    <a class="lnp-cbid-bar__value" routerLink="/personal/digital-life">CB{{ ceebrainId() }}</a>
+  </div>
+  } -->
+
   <div class="lnp">
     <!-- Header + Filter Toggle -->
+
     <div class="lnp__header">
       <span class="lnp__radius-label">10 km zone</span>
-      <button class="lnp__filter-toggle" (click)="toggleFilters()"
-        [class.lnp__filter-toggle--open]="filtersOpen()" type="button" aria-label="Toggle filters">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
-          <line x1="4" y1="6" x2="20" y2="6"></line>
-          <line x1="8" y1="12" x2="16" y2="12"></line>
-          <line x1="11" y1="18" x2="13" y2="18"></line>
-        </svg>
+      <button class="lnp__filter-toggle" (click)="toggleFilters()" [class.lnp__filter-toggle--open]="filtersOpen()"
+        type="button" aria-label="Toggle filters">
         <span>Filters</span>
       </button>
     </div>
 
-    <!-- Info Card -->
-    <div class="lnp__info-card">
-      <p><strong>Fill the filters above</strong> to get customised AI news.</p>
-      <ul class="lnp__info-list">
-        <li>
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="16" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12.01" y2="8" />
-          </svg>
-          <strong>Topic only</strong> — global news on that subject.
-        </li>
-        <li>
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          <strong>Area only</strong> — 10 km × 10 km zone around you.
-        </li>
-      </ul>
-    </div>
-
-    <!-- Collapsible Filters -->
-    <div class="lnp__filters" [class.lnp__filters--open]="filtersOpen()">
-      <div class="lnp-filter">
-        <label class="lnp-filter__label">Subject</label>
-        <input class="lnp-filter__input" type="text"
-          placeholder="e.g. Health, AI, Energy" [value]="subjectFilter()"
-          (input)="subjectFilter.set($any($event.target).value)" />
+    <div class="news-main">
+      <!-- Info Card -->
+      <div class="lnp__info-card">
+        <p><strong>Fill the filters above</strong> to get customised AI news.</p>
+        <ul class="lnp__info-list">
+          <li>
+           
+            <strong>Topic only</strong> — global news on that subject.
+          </li>
+          <li>
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <strong>Area only</strong> — 10 km × 10 km zone around you.
+          </li>
+        </ul>
       </div>
-      <div class="lnp-filter">
-        <label class="lnp-filter__label">Area</label>
-        <div class="lnp-filter__area-wrap">
-          <input class="lnp-filter__input lnp-filter__input--area" type="text"
-            placeholder="Max distance" [value]="areaFilter()"
-            (input)="areaFilter.set($any($event.target).value)" />
-          <span class="lnp-filter__unit">km</span>
+
+      <!-- Collapsible Filters -->
+      <div class="lnp__filters" [class.lnp__filters--open]="filtersOpen()">
+        <div class="lnp-filter">
+          <label class="lnp-filter__label">Subject</label>
+          <input class="lnp-filter__input" type="text" placeholder="e.g. Health, AI, Energy" [value]="subjectFilter()"
+            (input)="subjectFilter.set($any($event.target).value)" />
         </div>
-      </div>
-      @if (hasActiveFilter()) {
+        <div class="lnp-filter">
+          <label class="lnp-filter__label">Area</label>
+          <div class="lnp-filter__area-wrap">
+            <input class="lnp-filter__input lnp-filter__input--area" type="text" placeholder="Max distance"
+              [value]="areaFilter()" (input)="areaFilter.set($any($event.target).value)" />
+            <span class="lnp-filter__unit">km</span>
+          </div>
+        </div>
+        @if (hasActiveFilter()) {
         <button class="lnp-filter__clear" (click)="clearFilters()">Clear</button>
-      }
-    </div>
+        }
+      </div>
 
-    <!-- Scrollable content -->
-    <div class="lnp__content">
-      @if (hasActiveFilter()) {
+      <!-- Scrollable content -->
+      <div class="lnp__content">
+        @if (hasActiveFilter()) {
         <div class="lnp__zone">
           <span class="lnp__zone-label">For You</span>
           @for (item of filteredPersonalized(); track item._id) {
-            <div class="lnp-card lnp-card--personalized">
-              <span class="lnp-card__tag">{{ item.tag }}</span>
-              <p class="lnp-card__title">{{ item.title }}</p>
-              <div class="lnp-card__context">
-                <span>{{ item.distance }} km away</span>
-                <span>·</span>
-                <span>{{ item.timeContext }}</span>
-              </div>
-              <div class="lnp-card__actions">
-                @for (action of item.actions; track action.label) {
-                  <button class="lnp-btn lnp-btn--{{ action.variant }}">{{ action.label }}</button>
-                }
-              </div>
+          <div class="lnp-card lnp-card--personalized">
+            <span class="lnp-card__tag">{{ item.tag }}</span>
+            <p class="lnp-card__title">{{ item.title }}</p>
+            <div class="lnp-card__context">
+              <span>{{ item.distance }} km away</span>
+              <span>·</span>
+              <span>{{ item.timeContext }}</span>
             </div>
+            <div class="lnp-card__actions">
+              @for (action of item.actions; track action.label) {
+              <button class="lnp-btn lnp-btn--{{ action.variant }}">{{ action.label }}</button>
+              }
+            </div>
+          </div>
           } @empty {
-            <p class="lnp__no-results">No matches</p>
+          <p class="lnp__no-results">No matches</p>
           }
         </div>
 
         <div class="lnp__zone lnp__zone--nearby">
           <span class="lnp__zone-label">Live Nearby</span>
           @for (item of filteredNearby(); track item._id) {
-            <div class="lnp-card" [class.lnp-card--live]="item.isLive">
-              <span class="lnp-card__tag">{{ item.tag }}</span>
-              <p class="lnp-card__title">{{ item.title }}</p>
-              <div class="lnp-card__context">
-                <span>{{ item.distance }} km</span>
-                <span>·</span>
-                <span>{{ item.timeContext }}</span>
-              </div>
+          <div class="lnp-card" [class.lnp-card--live]="item.isLive">
+            <span class="lnp-card__tag">{{ item.tag }}</span>
+            <p class="lnp-card__title">{{ item.title }}</p>
+            <div class="lnp-card__context">
+              <span>{{ item.distance }} km</span>
+              <span>·</span>
+              <span>{{ item.timeContext }}</span>
             </div>
+          </div>
           }
         </div>
-      } @else {
+        } @else {
         <div class="lnp__placeholder">
           <p>Search by subject or area to see local news.</p>
         </div>
-      }
-    </div>
-
-    <!-- Ticker -->
-    <div class="lnp__ticker">
-      <div class="lnp__ticker-track">
-        @for (msg of localNews.tickerMessages; track $index) {
-          <span class="lnp__ticker-msg">{{ msg }}</span>
         }
+      </div>
+
+      <!-- Ticker -->
+      <div class="lnp__ticker">
+        <div class="lnp__ticker-track">
+          @for (msg of localNews.tickerMessages; track $index) {
+          <span class="lnp__ticker-msg">{{ msg }}</span>
+          }
+        </div>
       </div>
     </div>
   </div>

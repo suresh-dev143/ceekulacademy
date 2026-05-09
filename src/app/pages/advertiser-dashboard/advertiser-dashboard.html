@@ -1,0 +1,617 @@
+<div class="studio">
+
+  <!-- ── Notifications ──────────────────────────────────────────────────── -->
+  @if (toast()) {
+    <div class="toast" [class]="'toast--' + toast()!.type" role="alert">
+      <span class="toast__icon">{{ toast()!.type === 'success' ? '✓' : '✕' }}</span>
+      <span>{{ toast()!.message }}</span>
+      <button class="toast__close" (click)="toast.set(null)">✕</button>
+    </div>
+  }
+
+  <!-- ── Studio Header ──────────────────────────────────────────────────── -->
+  <header class="studio__header">
+    <div class="studio__brand">
+      <span class="studio__brand-icon">◈</span>
+      <span class="studio__brand-name">Campaign Studio</span>
+    </div>
+
+    <nav class="studio__nav">
+      @for (tab of tabs; track tab.id) {
+        <button class="studio__nav-btn" [class.active]="activeTab() === tab.id"
+          (click)="setTab(tab.id)">
+          <span class="studio__nav-icon">{{ tab.icon }}</span>
+          {{ tab.label }}
+        </button>
+      }
+    </nav>
+
+    <div class="studio__wallet">
+      @if (wallet()) {
+        <div class="studio__balance">
+          <span class="studio__balance-value">₹{{ wallet()!.balance | number:'1.0-0' }}</span>
+          <span class="studio__balance-label">Wallet</span>
+        </div>
+        <button class="studio__topup-btn" (click)="openDepositModal()">+ Top Up</button>
+      }
+    </div>
+  </header>
+
+  <!-- ── Quick Stats Bar ────────────────────────────────────────────────── -->
+  @if (activeTab() === 'campaigns') {
+    <div class="studio__stats-bar">
+      <div class="qstat">
+        <span class="qstat__value">{{ activeCampaigns() }}</span>
+        <span class="qstat__label">Active</span>
+      </div>
+      <div class="qstat">
+        <span class="qstat__value">{{ totalImpressions() | number }}</span>
+        <span class="qstat__label">Impressions</span>
+      </div>
+      <div class="qstat">
+        <span class="qstat__value">₹{{ totalSpent() | number:'1.0-0' }}</span>
+        <span class="qstat__label">Total Spent</span>
+      </div>
+      <div class="qstat">
+        <span class="qstat__value">{{ avgCompletion() | number:'1.0-0' }}%</span>
+        <span class="qstat__label">Avg Completion</span>
+      </div>
+    </div>
+  }
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: CAMPAIGNS                                                       -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'campaigns') {
+    <div class="studio__content">
+      <div class="campaigns-toolbar">
+        <div class="campaigns-filters">
+          @for (s of statusFilters; track s.value) {
+            <button class="filter-chip" [class.active]="selectedStatus() === s.value"
+              (click)="filterByStatus(s.value)">
+              {{ s.label }}
+            </button>
+          }
+        </div>
+        <button class="btn-create" (click)="setTab('create')">
+          <span>+</span> New Campaign
+        </button>
+      </div>
+
+      @if (isLoading()) {
+        <div class="skeleton-grid">
+          @for (n of [1,2,3,4]; track n) {
+            <div class="skeleton-card"></div>
+          }
+        </div>
+      } @else if (ads().length === 0) {
+        <div class="empty-state">
+          <div class="empty-state__icon">◈</div>
+          <h3>No campaigns yet</h3>
+          <p>Create your first campaign to start reaching learners</p>
+          <button class="btn-create" (click)="setTab('create')">+ New Campaign</button>
+        </div>
+      } @else {
+        <div class="campaigns-grid">
+          @for (ad of ads(); track ad._id) {
+            <div class="campaign-card" [class]="'campaign-card--' + ad.status">
+
+              <!-- Status dot + CID -->
+              <div class="campaign-card__topbar">
+                <div class="status-dot-wrap">
+                  <span class="status-dot" [class]="'dot--' + ad.status"></span>
+                  <span class="status-label">{{ statusLabel(ad.status) }}</span>
+                </div>
+                @if (ad.contentCid) {
+                  <button class="cid-badge" (click)="copyCid(ad.contentCid)"
+                    [title]="'CID: ' + ad.contentCid">
+                    ◈ {{ ad.contentCid | slice:0:12 }}…
+                  </button>
+                }
+              </div>
+
+              <!-- Thumbnail -->
+              <div class="campaign-card__media">
+                @if (ad.adType === 'video') {
+                  <div class="media-badge media-badge--video">▶ Video · {{ ad.duration }}s</div>
+                } @else {
+                  <div class="media-badge media-badge--image">◻ Image · {{ ad.duration }}s</div>
+                }
+                <img [src]="ad.thumbnailUrl || 'assets/placeholder-ad.svg'"
+                  [alt]="ad.title" class="campaign-card__thumb">
+              </div>
+
+              <!-- Info -->
+              <div class="campaign-card__info">
+                <h3 class="campaign-card__title">{{ ad.title }}</h3>
+                <span class="category-tag">{{ ad.category }}</span>
+              </div>
+
+              <!-- Budget ring + stats -->
+              <div class="campaign-card__metrics">
+                <div class="budget-ring-wrap">
+                  <svg class="budget-ring" viewBox="0 0 48 48">
+                    <circle cx="24" cy="24" r="20" fill="none" stroke="#e5e7eb" stroke-width="4"/>
+                    <circle cx="24" cy="24" r="20" fill="none"
+                      [attr.stroke]="budgetRingColor(ad)"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                      [attr.stroke-dasharray]="budgetDash(ad)"
+                      stroke-dashoffset="31.4"
+                      transform="rotate(-90 24 24)"/>
+                  </svg>
+                  <span class="budget-ring-pct">{{ budgetPct(ad) }}%</span>
+                </div>
+                <div class="budget-stats">
+                  <div class="bstat">
+                    <span class="bstat__v">₹{{ ad.remainingBudget | number:'1.0-0' }}</span>
+                    <span class="bstat__l">Remaining</span>
+                  </div>
+                  <div class="bstat">
+                    <span class="bstat__v">{{ ad.totalImpressions | number }}</span>
+                    <span class="bstat__l">Impressions</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rate info -->
+              <div class="campaign-card__rate">
+                <span>₹{{ ad.ratePerSecondPerStudent }}/s per student</span>
+                <span class="dot-sep">·</span>
+                <span>Expires {{ ad.expiryDate | date:'mediumDate' }}</span>
+              </div>
+
+              <!-- Actions -->
+              <div class="campaign-card__actions">
+                <button class="action-btn" (click)="viewAnalytics(ad)">Analytics</button>
+                @if (ad.status === 'active') {
+                  <button class="action-btn action-btn--warn" (click)="toggleAdStatus(ad, 'paused')">Pause</button>
+                } @else if (ad.status === 'paused') {
+                  <button class="action-btn action-btn--ok" (click)="toggleAdStatus(ad, 'active')">Resume</button>
+                }
+                <button class="action-btn" (click)="topUpBudget(ad)">Top Up</button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: CREATE CAMPAIGN (4-step wizard)                                 -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'create') {
+    <div class="studio__content">
+      <div class="wizard">
+
+        <!-- Step progress -->
+        <div class="wizard__steps">
+          @for (step of wizardSteps; track step.n) {
+            <div class="wstep" [class.active]="wizardStep() === step.n"
+              [class.done]="wizardStep() > step.n">
+              <div class="wstep__dot">
+                @if (wizardStep() > step.n) { <span>✓</span> }
+                @else { <span>{{ step.n }}</span> }
+              </div>
+              <span class="wstep__label">{{ step.label }}</span>
+            </div>
+            @if (step.n < 4) { <div class="wstep__line" [class.done]="wizardStep() > step.n"></div> }
+          }
+        </div>
+
+        <!-- ── Step 1: Content ──────────────────────────────────────── -->
+        @if (wizardStep() === 1) {
+          <div class="wizard__panel">
+            <h2 class="wizard__title">Ad Content</h2>
+            <p class="wizard__subtitle">Upload your creative and commit it to the content store. A unique CID will be generated.</p>
+
+            <div class="field-grid">
+              <div class="field">
+                <label class="field__label">Campaign Title *</label>
+                <input class="field__input" type="text" [(ngModel)]="draft.title"
+                  placeholder="e.g. Learn Python in 30 Days" maxlength="200">
+              </div>
+              <div class="field">
+                <label class="field__label">Category *</label>
+                <select class="field__input" [(ngModel)]="draft.category">
+                  <option value="">Select Category</option>
+                  @for (cat of categories; track cat) {
+                    <option [value]="cat">{{ cat }}</option>
+                  }
+                </select>
+              </div>
+              <div class="field field--full">
+                <label class="field__label">Description</label>
+                <textarea class="field__input field__textarea" [(ngModel)]="draft.description"
+                  rows="2" placeholder="Brief description of your ad"></textarea>
+              </div>
+
+              <!-- Duration picker -->
+              <div class="field">
+                <label class="field__label">Duration *</label>
+                <div class="duration-picker">
+                  @for (d of durations; track d) {
+                    <button class="dur-btn" [class.active]="draft.duration === d"
+                      (click)="draft.duration = d">{{ d }}s</button>
+                  }
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">Click-Through URL</label>
+                <input class="field__input" type="url" [(ngModel)]="draft.clickThroughUrl"
+                  placeholder="https://yoursite.com">
+              </div>
+
+              <!-- Media upload + UCE commit -->
+              <div class="field field--full">
+                <label class="field__label">Ad Media *</label>
+                <div class="upload-zone" [class.has-file]="committedCid()" [class.uploading]="isCommitting()">
+                  @if (!committedCid() && !isCommitting()) {
+                    <label class="upload-zone__label" for="mediaInput">
+                      <span class="upload-zone__icon">↑</span>
+                      <span class="upload-zone__text">Drop image or video here, or click to browse</span>
+                      <small>JPG, PNG, WebP, MP4, WebM · Max 20 MB</small>
+                    </label>
+                    <input id="mediaInput" type="file" class="upload-zone__input"
+                      accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                      (change)="onMediaSelected($event)">
+                  } @else if (isCommitting()) {
+                    <div class="upload-zone__progress">
+                      <div class="spinner"></div>
+                      <span>{{ commitStage() }}</span>
+                    </div>
+                  } @else {
+                    <div class="upload-zone__committed">
+                      @if (draft.adType === 'video') {
+                        <video [src]="draft.mediaUrl" controls class="media-preview"></video>
+                      } @else {
+                        <img [src]="draft.mediaUrl" alt="Preview" class="media-preview">
+                      }
+                      <div class="cid-result">
+                        <span class="cid-result__label">Content ID (CID)</span>
+                        <code class="cid-result__value">{{ committedCid() }}</code>
+                        <button class="cid-result__copy" (click)="copyCid(committedCid()!)">Copy</button>
+                      </div>
+                      <button class="remove-btn" (click)="resetMedia()">✕ Remove</button>
+                    </div>
+                  }
+                </div>
+                @if (uploadError()) {
+                  <small class="field__error">{{ uploadError() }}</small>
+                }
+              </div>
+            </div>
+
+            <div class="wizard__footer">
+              <button class="btn-ghost" (click)="setTab('campaigns')">Cancel</button>
+              <button class="btn-next" [disabled]="!canStep1()" (click)="wizardStep.set(2)">
+                Next: Targeting →
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- ── Step 2: Targeting ────────────────────────────────────── -->
+        @if (wizardStep() === 2) {
+          <div class="wizard__panel">
+            <h2 class="wizard__title">Targeting Criteria</h2>
+            <p class="wizard__subtitle">Define who sees your ad. Mandatory criteria are hard filters; optional criteria improve match scoring.</p>
+
+            <div class="targeting-sections">
+              <!-- Mandatory -->
+              <div class="targeting-section">
+                <div class="targeting-section__head">
+                  <span class="targeting-section__badge mandatory">Mandatory</span>
+                  <span class="targeting-section__help">Ad excluded if any defined field mismatches</span>
+                </div>
+
+                <div class="field-grid">
+                  <div class="field field--full">
+                    <label class="field__label">Target Categories</label>
+                    <div class="tag-input">
+                      @for (cat of categories; track cat) {
+                        <label class="tag-toggle" [class.active]="draft.mandatoryCriteria.categories.includes(cat.toLowerCase())">
+                          <input type="checkbox"
+                            [checked]="draft.mandatoryCriteria.categories.includes(cat.toLowerCase())"
+                            (change)="toggleCategory(cat.toLowerCase())">
+                          {{ cat }}
+                        </label>
+                      }
+                    </div>
+                    <small class="field__hint">Leave empty = all categories</small>
+                  </div>
+
+                  <div class="field">
+                    <label class="field__label">Age Group</label>
+                    <select class="field__input" [(ngModel)]="draft.mandatoryCriteria.ageGroup">
+                      <option value="all">All Ages</option>
+                      <option value="children">Children</option>
+                      <option value="teen">Teen</option>
+                      <option value="adult">Adult</option>
+                    </select>
+                  </div>
+
+                  <div class="field">
+                    <label class="field__label">Min Rate (₹/s)</label>
+                    <input class="field__input" type="number" min="0" step="0.001"
+                      [(ngModel)]="draft.mandatoryCriteria.minRatePerSecond"
+                      placeholder="0 = no minimum">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Optional -->
+              <div class="targeting-section">
+                <div class="targeting-section__head">
+                  <span class="targeting-section__badge optional">Optional</span>
+                  <span class="targeting-section__help">Improves ranking score when defined</span>
+                </div>
+
+                <div class="field-grid">
+                  <div class="field">
+                    <label class="field__label">Engagement Target (0–100)</label>
+                    <div class="slider-wrap">
+                      <input type="range" min="0" max="100"
+                        [(ngModel)]="draft.optionalCriteria.engagementScoreTarget">
+                      <span class="slider-val">{{ draft.optionalCriteria.engagementScoreTarget }}</span>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label class="field__label">Preferred Language</label>
+                    <select class="field__input" [(ngModel)]="draft.optionalCriteria.preferredLanguage">
+                      <option value="">Any Language</option>
+                      <option value="en">English</option>
+                      <option value="hi">Hindi</option>
+                      <option value="ta">Tamil</option>
+                      <option value="te">Telugu</option>
+                      <option value="kn">Kannada</option>
+                    </select>
+                  </div>
+
+                  <div class="field field--full">
+                    <label class="field__label">Interest Tags (comma-separated)</label>
+                    <input class="field__input" type="text"
+                      [value]="draft.optionalCriteria.interestTags.join(', ')"
+                      (change)="setInterestTags($event)"
+                      placeholder="coding, machine learning, finance">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wizard__footer">
+              <button class="btn-ghost" (click)="wizardStep.set(1)">← Back</button>
+              <button class="btn-next" (click)="wizardStep.set(3)">Next: Budget →</button>
+            </div>
+          </div>
+        }
+
+        <!-- ── Step 3: Budget & Schedule ───────────────────────────── -->
+        @if (wizardStep() === 3) {
+          <div class="wizard__panel">
+            <h2 class="wizard__title">Budget & Schedule</h2>
+            <p class="wizard__subtitle">Set your bidding rate and campaign lifetime. Cost only accrues when your ad plays.</p>
+
+            <div class="field-grid">
+              <div class="field field--full">
+                <label class="field__label">Rate per Second per Student (₹)</label>
+                <div class="rate-slider">
+                  <input type="range" min="0.001" max="1" step="0.001"
+                    [(ngModel)]="draft.ratePerSecondPerStudent"
+                    (input)="updateCostPreview()">
+                  <span class="rate-value">₹{{ draft.ratePerSecondPerStudent | number:'1.3-3' }}</span>
+                </div>
+                <div class="cost-preview">
+                  <div class="cost-item">
+                    <span class="cost-item__label">Est. cost for 100 students (full ad)</span>
+                    <span class="cost-item__value">₹{{ estimatedCost() | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="cost-item">
+                    <span class="cost-item__label">Budget will last ~</span>
+                    <span class="cost-item__value">{{ budgetDuration() }} impressions</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label">Total Budget (₹) *</label>
+                <input class="field__input" type="number" [(ngModel)]="draft.totalBudget"
+                  min="100" (input)="updateCostPreview()">
+              </div>
+
+              <div class="field">
+                <label class="field__label">Campaign Expiry *</label>
+                <input class="field__input" type="date" [(ngModel)]="draft.expiryDate" [min]="today">
+              </div>
+            </div>
+
+            <div class="wizard__footer">
+              <button class="btn-ghost" (click)="wizardStep.set(2)">← Back</button>
+              <button class="btn-next" (click)="wizardStep.set(4)">Next: Review →</button>
+            </div>
+          </div>
+        }
+
+        <!-- ── Step 4: Review & Submit ──────────────────────────────── -->
+        @if (wizardStep() === 4) {
+          <div class="wizard__panel">
+            <h2 class="wizard__title">Review Campaign</h2>
+            <p class="wizard__subtitle">Confirm your campaign details before submission.</p>
+
+            <div class="review-grid">
+              <div class="review-card">
+                <h4>Content</h4>
+                <div class="review-row"><span>Title</span><strong>{{ draft.title }}</strong></div>
+                <div class="review-row"><span>Category</span><strong>{{ draft.category }}</strong></div>
+                <div class="review-row"><span>Duration</span><strong>{{ draft.duration }}s</strong></div>
+                <div class="review-row"><span>Type</span><strong>{{ draft.adType | titlecase }}</strong></div>
+                @if (committedCid()) {
+                  <div class="review-row">
+                    <span>CID</span>
+                    <code class="review-cid">{{ committedCid() }}</code>
+                  </div>
+                }
+              </div>
+
+              <div class="review-card">
+                <h4>Targeting</h4>
+                <div class="review-row">
+                  <span>Categories</span>
+                  <strong>{{ draft.mandatoryCriteria.categories.join(', ') || 'All' }}</strong>
+                </div>
+                <div class="review-row"><span>Age Group</span><strong>{{ draft.mandatoryCriteria.ageGroup }}</strong></div>
+                <div class="review-row">
+                  <span>Language</span>
+                  <strong>{{ draft.optionalCriteria.preferredLanguage || 'Any' }}</strong>
+                </div>
+              </div>
+
+              <div class="review-card">
+                <h4>Budget</h4>
+                <div class="review-row"><span>Rate/s/student</span><strong>₹{{ draft.ratePerSecondPerStudent | number:'1.3-3' }}</strong></div>
+                <div class="review-row"><span>Total Budget</span><strong>₹{{ draft.totalBudget | number:'1.0-0' }}</strong></div>
+                <div class="review-row"><span>Expires</span><strong>{{ draft.expiryDate | date:'mediumDate' }}</strong></div>
+                <div class="review-row">
+                  <span>Est. 100-student reach</span>
+                  <strong>₹{{ estimatedCost() | number:'1.2-2' }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="wizard__footer">
+              <button class="btn-ghost" (click)="wizardStep.set(3)">← Back</button>
+              <button class="btn-submit" [disabled]="isSubmitting()" (click)="submitCampaign()">
+                @if (isSubmitting()) { <span class="spinner-sm"></span> Submitting... }
+                @else { Submit for Review }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: ANALYTICS                                                       -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'analytics') {
+    <div class="studio__content">
+      @if (!selectedAd()) {
+        <div class="analytics-picker">
+          <h3>Select a campaign to view analytics</h3>
+          <div class="campaigns-grid campaigns-grid--sm">
+            @for (ad of ads(); track ad._id) {
+              <button class="campaign-pick-btn" (click)="viewAnalytics(ad)">
+                <span class="cpick-title">{{ ad.title }}</span>
+                <span class="cpick-status" [class]="'dot--' + ad.status">●</span>
+              </button>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="analytics-panel">
+          <div class="analytics-header">
+            <button class="back-btn" (click)="selectedAd.set(null)">← Campaigns</button>
+            <h2>{{ selectedAd()!.title }}</h2>
+            @if (selectedAd()!.contentCid) {
+              <code class="cid-badge-sm">◈ {{ selectedAd()!.contentCid | slice:0:16 }}…</code>
+            }
+          </div>
+
+          @if (isLoadingAnalytics()) {
+            <div class="analytics-skeleton">
+              @for (n of [1,2,3,4,5]; track n) { <div class="kpi-skeleton"></div> }
+            </div>
+          } @else if (analytics()) {
+            <div class="kpi-row">
+              <div class="kpi-card">
+                <span class="kpi-card__value">{{ analytics()!.totalImpressions | number }}</span>
+                <span class="kpi-card__label">Impressions</span>
+              </div>
+              <div class="kpi-card">
+                <span class="kpi-card__value">{{ analytics()!.uniqueStudents | number }}</span>
+                <span class="kpi-card__label">Unique Students</span>
+              </div>
+              <div class="kpi-card">
+                <span class="kpi-card__value">{{ analytics()!.avgCompletionRate | number:'1.1-1' }}%</span>
+                <span class="kpi-card__label">Completion Rate</span>
+              </div>
+              <div class="kpi-card">
+                <span class="kpi-card__value">₹{{ analytics()!.totalSpent | number:'1.2-2' }}</span>
+                <span class="kpi-card__label">Total Spent</span>
+              </div>
+              <div class="kpi-card kpi-card--warn">
+                <span class="kpi-card__value">{{ analytics()!.fraud.fraudulent }}</span>
+                <span class="kpi-card__label">Fraud Blocked</span>
+              </div>
+            </div>
+
+            <!-- Daily spend chart -->
+            <div class="chart-card">
+              <h4 class="chart-card__title">Daily Spend — Last 30 Days</h4>
+              <div class="bar-chart">
+                @for (day of analytics()!.dailyBreakdown; track day._id) {
+                  <div class="bar-wrap" [title]="day._id + ': ₹' + day.spend">
+                    <div class="bar" [style.height.%]="getBarHeight(day.spend)"></div>
+                    <span class="bar-label">{{ day._id | slice:8:10 }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  <!-- TAB: SCHEDULE PREVIEW                                                -->
+  <!-- ════════════════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'schedule') {
+    <div class="studio__content">
+      <div class="schedule-panel">
+        <div class="schedule-panel__head">
+          <h3>Precomputed Delivery Plans</h3>
+          <p>Your active campaigns appear in these sessions' precomputed 600-second ad slots. Plans are computed before runtime — delivery is O(1).</p>
+        </div>
+
+        <div class="schedule-empty">
+          <div class="schedule-empty__icon">◈</div>
+          <p>Delivery plans are computed automatically before each session.<br>
+          Active campaigns appear in matching sessions within minutes.</p>
+          <div class="schedule-flow">
+            <div class="flow-step">Content<br><small>UCE → CID</small></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Index<br><small>category/theme</small></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Pre-Schedule<br><small>greedy 600s</small></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">O(1) Delivery<br><small>50-min mark</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
+
+<!-- ── Deposit Modal ────────────────────────────────────────────────────── -->
+@if (showDepositModal()) {
+  <div class="modal-overlay" (click)="showDepositModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3 class="modal__title">Top Up Wallet</h3>
+      <p class="modal__sub">₹1 = 1 Credit (managed via Razorpay)</p>
+      <div class="field">
+        <label class="field__label">Amount (₹)</label>
+        <input class="field__input" type="number" [(ngModel)]="depositAmount" min="100" step="100">
+      </div>
+      <div class="modal__actions">
+        <button class="btn-ghost" (click)="showDepositModal.set(false)">Cancel</button>
+        <button class="btn-submit" (click)="processDeposit()">Pay ₹{{ depositAmount }}</button>
+      </div>
+    </div>
+  </div>
+}

@@ -5,12 +5,29 @@
     </div>
     <div class="ai-tools__grid">
       @for (tool of tools; track tool.name) {
-        <div class="tool-card">
+        <div class="tool-card" [class.tool-card--expanded]="expandedTool() === tool.name"
+             (click)="toggleTool(tool.name)">
           <div class="tool-card__info">
             <span class="tool-card__name">{{ tool.name }}</span>
             <p class="tool-card__desc">{{ tool.desc }}</p>
           </div>
+          <span class="tool-card__arrow" [class.tool-card__arrow--open]="expandedTool() === tool.name">›</span>
         </div>
+
+        @if (expandedTool() === tool.name && tool.name === 'Content Creation') {
+          <div class="tool-sublist">
+            @for (bt of blockTypes; track bt.type) {
+              <a class="subtool-btn"
+                 [routerLink]="['/personal/create']"
+                 [queryParams]="{ block: bt.type }"
+                 (click)="$event.stopPropagation()">
+                <span class="subtool-btn__icon">{{ bt.icon }}</span>
+                <span class="subtool-btn__label">{{ bt.label }}</span>
+                <span class="subtool-btn__desc">{{ bt.desc }}</span>
+              </a>
+            }
+          </div>
+        }
       }
     </div>
   </div>

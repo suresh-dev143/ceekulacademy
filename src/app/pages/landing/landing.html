@@ -11,13 +11,11 @@
 
         <!-- Category Filter Chips -->
         <div class="story-filters">
-          <button class="story-filter-chip"
-                  [class.story-filter-chip--active]="activeCategory() === ''"
-                  (click)="setCategory('')">All</button>
+          <button class="story-filter-chip" [class.story-filter-chip--active]="activeCategory() === ''"
+            (click)="setCategory('')">All</button>
           @for (key of categoryKeys; track key) {
-          <button class="story-filter-chip"
-                  [class.story-filter-chip--active]="activeCategory() === key"
-                  (click)="setCategory(key)">{{ categoryLabels[key] }}</button>
+          <button class="story-filter-chip" [class.story-filter-chip--active]="activeCategory() === key"
+            (click)="setCategory(key)">{{ categoryLabels[key] }}</button>
           }
         </div>
 
@@ -41,11 +39,8 @@
           </div>
           } @else {
           @for (item of stories(); track item._id) {
-          <div class="story-item"
-               [class.story-item--active]="selectedStory()?._id === item._id"
-               (click)="selectStoryItem(item._id)"
-               role="button"
-               [attr.aria-label]="item.title">
+          <div class="story-item" [class.story-item--active]="selectedStory()?._id === item._id"
+            (click)="selectStoryItem(item._id)" role="button" [attr.aria-label]="item.title">
 
             @if (item.media.length > 0 && item.media[0].type === 'image') {
             <div class="story-item__thumb">
@@ -123,8 +118,8 @@
             @if (m.type === 'image') {
             <img [src]="m.url" alt="Story photo" class="story-detail__media-item" loading="lazy" />
             } @else {
-            <video [src]="m.url" class="story-detail__media-item story-detail__media-item--video"
-                   controls preload="metadata"></video>
+            <video [src]="m.url" class="story-detail__media-item story-detail__media-item--video" controls
+              preload="metadata"></video>
             }
             }
           </div>
@@ -132,14 +127,13 @@
 
           <!-- Engagement Bar -->
           <div class="story-engagement">
-            <button class="story-like-btn"
-                    [class.story-like-btn--liked]="isLiked(story._id)"
-                    (click)="toggleLike(story._id, $event)"
-                    aria-label="Like this story">
+            <button class="story-like-btn" [class.story-like-btn--liked]="isLiked(story._id)"
+              (click)="toggleLike(story._id, $event)" aria-label="Like this story">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                   [attr.fill]="isLiked(story._id) ? 'currentColor' : 'none'"
-                   stroke="currentColor" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                [attr.fill]="isLiked(story._id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                </path>
               </svg>
               <span>{{ story.likes }} {{ story.likes === 1 ? 'Like' : 'Likes' }}</span>
             </button>
@@ -205,12 +199,16 @@
     <!-- Right Column: Chat -->
     <aside class="three-col__right" [class.mobile-active]="activeTab() === 'chat'">
       <div class="chat-container">
-        <div class="chat-container__header">
-          <button class="chat-header-btn" (click)="onRegister()" aria-label="Register">REGISTER</button>
-          <h3>Chat</h3>
-          <button class="chat-header-btn" (click)="onContact()" aria-label="Contact">Contact</button>
-        </div>
-
+        <!-- <div class="chat-container__header">
+          @if (isLoggedIn()) {
+          <button routerLink="/personal/my-activities"><span class="ceebrain-id-badge" aria-label="Ceebrain ID">CB{{
+              currentUser()?.ceebrainId }}</span>
+          </button>
+          } @else {
+          <button class="chat-header-btn" (click)="onRegister()" aria-label="Register">Register</button>
+          }
+        </div> -->
+<button class="chat-header-btn" (click)="onRegister()" aria-label="Register">Register</button>
         <!-- Formats Panel -->
         <div class="formats-panel">
           <span class="formats-panel__label">Formats</span>

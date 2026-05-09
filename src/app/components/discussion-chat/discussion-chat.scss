@@ -28,6 +28,44 @@
     &:hover { color: #e0e0e0; }
   }
 
+  // ── PANEL TOGGLE ──────────────────────────────────────────────────────────
+  &__panel-toggle {
+    display: flex;
+    border-bottom: 1px solid #1e1e1e;
+    flex-shrink: 0;
+  }
+
+  &__panel-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.55rem 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #505050;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+
+    svg { width: 13px; height: 13px; }
+    &:hover { color: #909090; }
+
+    &--active {
+      color: #4a9eff;
+      border-bottom-color: #4a9eff;
+    }
+
+    &:last-child.dc__panel-btn--active {
+      color: #a78bfa;
+      border-bottom-color: #a78bfa;
+    }
+  }
+
   // ── ROOMS VIEW ─────────────────────────────────────────────────────────────
   &__rooms {
     display: flex;

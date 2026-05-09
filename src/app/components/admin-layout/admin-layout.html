@@ -1,0 +1,118 @@
+<div class="cuap" [class.cuap--collapsed]="!sidebarOpen()">
+
+  <!-- ── Sidebar ────────────────────────────────────────────────────────── -->
+  <aside class="cuap-sidebar">
+
+    <div class="cuap-sidebar__brand">
+      <span class="cuap-sidebar__logo">C</span>
+      @if (sidebarOpen()) {
+      <span class="cuap-sidebar__name">CUAP</span>
+      }
+      <button class="cuap-sidebar__toggle" (click)="sidebarOpen.update(v => !v)" title="Toggle sidebar">
+        {{ sidebarOpen() ? '‹' : '›' }}
+      </button>
+    </div>
+
+    <nav class="cuap-nav">
+      @for (mod of modules; track mod.id) {
+      <a class="cuap-nav__item"
+         [routerLink]="mod.route"
+         routerLinkActive="cuap-nav__item--active"
+         [title]="mod.label">
+        <span class="cuap-nav__glyph">{{ mod.glyph }}</span>
+        @if (sidebarOpen()) {
+        <span class="cuap-nav__label">{{ mod.label }}</span>
+        @if (mod.badge && mod.badge() > 0) {
+        <span class="cuap-nav__badge">{{ mod.badge() }}</span>
+        }
+        }
+      </a>
+      }
+    </nav>
+
+    <div class="cuap-sidebar__footer">
+      @if (cuap.degradedCount() > 0) {
+      <span class="cuap-sidebar__alert">{{ cuap.degradedCount() }} degraded</span>
+      }
+      @if (sidebarOpen()) {
+      <span class="cuap-sidebar__uptime">{{ cuap.vitals().uptime }}% uptime</span>
+      }
+    </div>
+
+  </aside>
+
+  <!-- ── Main ───────────────────────────────────────────────────────────── -->
+  <div class="cuap-main">
+
+    <!-- Top bar -->
+    <header class="cuap-topbar">
+
+      <!-- CID Quick Resolver -->
+      <div class="cuap-cid-bar" [class.cuap-cid-bar--active]="resolveVisible()">
+        <span class="cuap-cid-bar__label">⟐</span>
+        <input
+          class="cuap-cid-bar__input"
+          type="text"
+          placeholder="Resolve CID or CBID…"
+          [value]="cidInput()"
+          (input)="cidInput.set($any($event.target).value)"
+          (keydown.enter)="quickResolve()"
+          (keydown.escape)="dismissResolve()" />
+        <button class="cuap-cid-bar__btn" (click)="quickResolve()">RESOLVE</button>
+      </div>
+
+      <!-- Service health dots -->
+      <div class="cuap-health-strip">
+        @for (svc of cuap.systemServices(); track svc.name) {
+        <div class="cuap-health-dot"
+             [class.cuap-health-dot--ok]="svc.status === 'operational'"
+             [class.cuap-health-dot--warn]="svc.status === 'degraded'"
+             [class.cuap-health-dot--down]="svc.status === 'down'"
+             [title]="svc.name + ' — ' + svc.latencyMs + 'ms'">
+        </div>
+        }
+      </div>
+
+      <!-- Critical alerts -->
+      @if (cuap.criticalCount() > 0) {
+      <div class="cuap-topbar__alert">
+        ⚠ {{ cuap.criticalCount() }} CRITICAL
+      </div>
+      }
+
+      <div class="cuap-topbar__identity">
+        <span class="cuap-topbar__role">SUPER ADMIN</span>
+      </div>
+
+    </header>
+
+    <!-- CID resolve result popover -->
+    @if (resolveVisible()) {
+    <div class="cuap-cid-result" (click)="$event.stopPropagation()">
+      @if (cuap.cidResolving()) {
+      <span class="cuap-cid-result__resolving">Resolving…</span>
+      } @else if (cuap.cidError()) {
+      <span class="cuap-cid-result__error">Not found — invalid CID format</span>
+      } @else if (cuap.cidResult(); as r) {
+      <div class="cuap-cid-result__grid">
+        <span class="cuap-cid-result__key">CID</span>        <code class="cuap-cid-result__val">{{ r.cid }}</code>
+        <span class="cuap-cid-result__key">Type</span>       <span class="cuap-cid-result__val">{{ r.type }}</span>
+        <span class="cuap-cid-result__key">Version</span>    <span class="cuap-cid-result__val">v{{ r.version }}</span>
+        <span class="cuap-cid-result__key">Status</span>     <span class="cuap-cid-result__val cuap-cid-result__val--{{ r.status }}">{{ r.status }}</span>
+        <span class="cuap-cid-result__key">Parent</span>     <code class="cuap-cid-result__val">{{ r.parentCid ?? '—' }}</code>
+        <span class="cuap-cid-result__key">References</span> <span class="cuap-cid-result__val">{{ r.references }}</span>
+        <span class="cuap-cid-result__key">Size</span>       <span class="cuap-cid-result__val">{{ r.sizeBytes }} B</span>
+        <span class="cuap-cid-result__key">Committed</span>  <span class="cuap-cid-result__val">{{ r.timestamp | date:'medium' }}</span>
+      </div>
+      }
+      <button class="cuap-cid-result__close" (click)="dismissResolve()">✕</button>
+    </div>
+    }
+
+    <!-- Page content -->
+    <main class="cuap-content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+</div>

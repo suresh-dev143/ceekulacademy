@@ -38,230 +38,82 @@
             }
         </div>
 
-        <!-- ══════════════════════════════ A: PERSONAL INFO ══ -->
+        <!-- ══════════════════════════════ A: PRIMARY PROFILE ══ -->
         @if (activeSection() === 'personal') {
-        <div class="mpr-section">
-            <div class="section-head">
-                <span class="sh-dot"></span> PERSONAL INFORMATION
-                <span class="sh-updated">Updated: {{ profile().personalInfo.lastUpdated }}</span>
-                @if (!editingPersonal()) {
-                <button class="edit-btn" (click)="startEditPersonal()">
-                    <i class="fas fa-pen"></i> Edit
-                </button>
-                }
+        <div class="profile-layer">
+            <div class="card-glass profile-header">
+                <div class="avatar-wrap">
+                    <div class="avatar-glow"></div>
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ceebrain" alt="Avatar" class="avatar-img" />
+                    <button class="avatar-edit"><i class="fas fa-camera"></i></button>
+                </div>
+                <div class="profile-identity">
+                    <h1 class="profile-name">{{ profile().personalInfo.fullName || 'Neural Entity' }}</h1>
+                    <div class="cb-id-badge">
+                        <span class="cb-id-label">CB ID</span>
+                        <span class="cb-id-value">USR-{{ profile().userId }}</span>
+                    </div>
+                    <p class="profile-status">
+                        <span class="status-dot"></span> Synced & Active
+                    </p>
+                </div>
             </div>
 
-            @if (otpSuccess()) {
-            <div class="otp-success-banner">
-                <i class="fas fa-check-circle"></i> Verification successful! Status updated.
-            </div>
-            }
-
-            <form [formGroup]="personalForm">
-                <div class="fields-grid">
-
-                    <!-- Full Name -->
-                    <div class="field-group">
-                        <label class="field-label">Full Name *</label>
-                        @if (editingPersonal()) {
-                        <input class="field-input" type="text" formControlName="fullName" placeholder="Enter full name">
-                        @if (personalForm.get('fullName')?.invalid && personalForm.get('fullName')?.touched) {
-                        <div class="field-error">Full name is required</div>
-                        }
-                        } @else {
-                        <div class="field-value">{{ profile().personalInfo.fullName }}</div>
-                        }
-                    </div>
-
-                    <!-- Email -->
-                    <div class="field-group">
-                        <label class="field-label">Email Address *</label>
-                        <div class="field-with-badge">
-                            <div class="field-value">{{ profile().personalInfo.email }}</div>
-                            @if (profile().personalInfo.emailVerified) {
-                            <span class="verify-badge verified"><i class="fas fa-check-circle"></i> Verified</span>
-                            } @else {
-                            <span class="verify-badge unverified"><i class="fas fa-exclamation-circle"></i> Unverified</span>
-                            }
-                        </div>
-                    </div>
-
-                    <!-- Mobile -->
-                    <div class="field-group">
-                        <label class="field-label">Mobile Number *</label>
-                        @if (editingPersonal()) {
-                        <input class="field-input" type="tel" formControlName="mobile" placeholder="+91 XXXXX XXXXX">
-                        @if (personalForm.get('mobile')?.invalid && personalForm.get('mobile')?.touched) {
-                        <div class="field-error">Valid mobile number required</div>
-                        }
-                        } @else {
-                        <div class="field-with-badge">
-                            <div class="field-value">{{ profile().personalInfo.mobile }}</div>
-                            @if (profile().personalInfo.mobileVerified) {
-                            <span class="verify-badge verified"><i class="fas fa-check-circle"></i> Verified</span>
-                            } @else {
-                            <span class="verify-badge unverified"><i class="fas fa-exclamation-circle"></i> Unverified</span>
-                            @if (otpFlow() === 'none') {
-                            <button class="reverify-btn" (click)="initiateOtp('mobile')">Re-verify</button>
-                            }
-                            }
-                        </div>
-                        }
-                    </div>
-
-                    <!-- DOB -->
-                    <div class="field-group">
-                        <label class="field-label">Date of Birth *</label>
-                        @if (editingPersonal()) {
-                        <input class="field-input" type="date" formControlName="dob">
-                        } @else {
-                        <div class="field-value">{{ profile().personalInfo.dob }}</div>
-                        }
-                    </div>
-
-                    <!-- Place of Birth -->
-                    <div class="field-group">
-                        <label class="field-label">Place of Birth</label>
-                        @if (editingPersonal()) {
-                        <input class="field-input" type="text" formControlName="placeOfBirth"
-                            placeholder="City, State">
-                        } @else {
-                        <div class="field-value">{{ profile().personalInfo.placeOfBirth || '—' }}</div>
-                        }
-                    </div>
-
-                    <!-- Gender -->
-                    <div class="field-group">
-                        <label class="field-label">Gender *</label>
-                        @if (editingPersonal()) {
-                        <select class="field-input" formControlName="gender">
-                            <option value="">— Select —</option>
-                            @for (g of genderOptions; track g) {
-                            <option [value]="g">{{ g }}</option>
-                            }
-                        </select>
-                        } @else {
-                        <div class="field-value">{{ profile().personalInfo.gender }}</div>
-                        }
-                    </div>
-
-                    <!-- Address (full width) -->
-                    <div class="field-group field-group--full">
-                        <label class="field-label">Address *</label>
-                        @if (editingPersonal()) {
-                        <div formGroupName="address" class="address-grid">
-                            <div class="addr-field field-group--full">
-                                <input class="field-input" type="text" formControlName="addressLine1"
-                                    placeholder="House No, Street, Area *">
-                                @if (personalForm.get('address.addressLine1')?.invalid && personalForm.get('address.addressLine1')?.touched) {
-                                <div class="field-error">Address Line 1 is required</div>
-                                }
-                            </div>
-                            <div class="addr-field field-group--full">
-                                <input class="field-input" type="text" formControlName="addressLine2"
-                                    placeholder="Apartment, Suite, Unit (Optional)">
-                            </div>
-                            <div class="addr-field">
-                                <input class="field-input" type="text" formControlName="landmark"
-                                    placeholder="Landmark (Optional)">
-                            </div>
-                            <div class="addr-field">
-                                <input class="field-input" type="text" formControlName="city"
-                                    placeholder="City *">
-                                @if (personalForm.get('address.city')?.invalid && personalForm.get('address.city')?.touched) {
-                                <div class="field-error">City is required</div>
-                                }
-                            </div>
-                            <div class="addr-field">
-                                <input class="field-input" type="text" formControlName="district"
-                                    placeholder="District *">
-                                @if (personalForm.get('address.district')?.invalid && personalForm.get('address.district')?.touched) {
-                                <div class="field-error">District is required</div>
-                                }
-                            </div>
-                            <div class="addr-field">
-                                <input class="field-input" type="text" formControlName="state"
-                                    placeholder="State *">
-                                @if (personalForm.get('address.state')?.invalid && personalForm.get('address.state')?.touched) {
-                                <div class="field-error">State is required</div>
-                                }
-                            </div>
-                            <div class="addr-field">
-                                <input class="field-input" type="text" formControlName="country"
-                                    placeholder="Country *">
-                                @if (personalForm.get('address.country')?.invalid && personalForm.get('address.country')?.touched) {
-                                <div class="field-error">Country is required</div>
-                                }
-                            </div>
-                            <div class="addr-field">
-                                <input class="field-input" type="text" formControlName="pincode"
-                                    placeholder="6-digit PIN code *" maxlength="6">
-                                @if (personalForm.get('address.pincode')?.invalid && personalForm.get('address.pincode')?.touched) {
-                                <div class="field-error">Valid 6-digit PIN required</div>
-                                }
-                            </div>
-                        </div>
-                        } @else {
-                        <div class="field-value">
-                            {{ profile().personalInfo.address.addressLine1 }},
-                            {{ profile().personalInfo.address.city }},
-                            {{ profile().personalInfo.address.district }},
-                            {{ profile().personalInfo.address.state }} —
-                            {{ profile().personalInfo.address.pincode }}
-                        </div>
-                        }
-                    </div>
-
-                </div>
-
-                @if (editingPersonal()) {
-                <div class="form-actions">
-                    <button type="button" class="fa-cancel" (click)="cancelEditPersonal()">Cancel</button>
-                    <button type="button" class="fa-save" (click)="savePersonal()"
-                        [disabled]="personalForm.invalid || isSavingPersonal()">
-                        @if (isSavingPersonal()) {
-                        <i class="fas fa-spinner fa-spin"></i> Saving...
-                        } @else {
-                        <i class="fas fa-save"></i> Save Changes
-                        }
-                    </button>
-                </div>
-                }
-            </form>
-
-            <!-- OTP Panel -->
-            @if (otpFlow() !== 'none') {
-            <div class="otp-panel">
-                <div class="otp-title">
-                    <i class="fas fa-mobile-alt"></i>
-                    Verify {{ otpFlow() === 'mobile' ? 'Mobile Number' : 'Email Address' }}
-                </div>
-                @if (!otpSent()) {
-                <p class="otp-desc">We will send a one-time password to your {{ otpFlow() === 'mobile' ? 'mobile number' : 'email address' }}.</p>
-                <div class="otp-actions">
-                    <button class="otp-send-btn" (click)="sendOtp()">
-                        <i class="fas fa-paper-plane"></i> Send OTP
-                    </button>
-                    <button class="otp-cancel-btn" (click)="cancelOtp()">Cancel</button>
-                </div>
-                } @else {
-                <p class="otp-desc">OTP sent. Enter the 6-digit code below.</p>
-                <form [formGroup]="otpForm" class="otp-form">
-                    <input class="otp-input" type="text" formControlName="otpCode" placeholder="0 0 0 0 0 0"
-                        maxlength="6">
-                    @if (otpError()) {
-                    <div class="field-error">{{ otpError() }}</div>
-                    }
-                    <div class="otp-actions">
-                        <button type="button" class="otp-send-btn" (click)="verifyOtp()">
-                            <i class="fas fa-check"></i> Verify OTP
+            <div class="card-glass profile-data">
+                <div class="section-title">
+                    <span>Core Attributes</span>
+                    @if (!editingPersonal()) {
+                        <button class="edit-btn" (click)="startEditPersonal()">
+                            <i class="fas fa-pen"></i>
                         </button>
-                        <button type="button" class="otp-cancel-btn" (click)="cancelOtp()">Cancel</button>
+                    }
+                </div>
+
+                <form [formGroup]="personalForm" class="data-grid">
+                    <div class="data-field">
+                        <label>Date of Birth</label>
+                        @if (editingPersonal()) {
+                            <input type="date" formControlName="dob" class="futuristic-input" />
+                        } @else {
+                            <div class="data-value">{{ profile().personalInfo.dob || '—' }}</div>
+                        }
+                    </div>
+
+                    <div formGroupName="address" class="data-field">
+                        <label>Location</label>
+                        @if (editingPersonal()) {
+                            <input type="text" formControlName="city" class="futuristic-input" placeholder="City" />
+                        } @else {
+                            <div class="data-value">{{ profile().personalInfo.address.city || '—' }}</div>
+                        }
+                    </div>
+
+                    <div class="data-field data-field--full">
+                        <label>Skills</label>
+                        <div class="data-value tags">
+                            <span class="tag">Cognitive Flow</span>
+                            <span class="tag">Digital Empathy</span>
+                            <span class="tag">Pattern Recognition</span>
+                        </div>
+                    </div>
+
+                    <div class="data-field data-field--full">
+                        <label>Interests</label>
+                        <div class="data-value tags">
+                            <span class="tag">Neuroscience</span>
+                            <span class="tag">Quantum Computing</span>
+                            <span class="tag">Self-Regulation</span>
+                        </div>
                     </div>
                 </form>
+
+                @if (editingPersonal()) {
+                    <div class="action-row">
+                        <button class="btn btn-ghost" (click)="cancelEditPersonal()">Cancel</button>
+                        <button class="btn btn-primary" (click)="savePersonal()">Save Changes</button>
+                    </div>
                 }
             </div>
-            }
         </div>
         }
 

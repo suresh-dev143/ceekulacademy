@@ -1,6 +1,7 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterModule, ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { RouterOutlet, RouterModule, RouterLink, ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { Navbar } from '../landing-layout/landing-navbar/landing-navbar';
 import { GlobalSearchComponent } from '../global-search/global-search';
 import { filter, map, mergeMap } from 'rxjs';
@@ -8,19 +9,22 @@ import { filter, map, mergeMap } from 'rxjs';
 import { ContextSidebarComponent } from '../../pages/personal/context-sidebar/context-sidebar';
 import { AiToolsPage } from '../../pages/personal/ai-tools/ai-tools';
 import { LocalNewsPage } from '../../pages/personal/local-news/local-news';
+import { MetaIntelligenceComponent } from './meta-intelligence/meta-intelligence';
 
 @Component({
     selector: 'app-personal-layout',
     standalone: true,
     imports: [
-      CommonModule, 
-      GlobalSearchComponent, 
-      RouterOutlet, 
-      RouterModule, 
+      CommonModule,
+      GlobalSearchComponent,
+      RouterOutlet,
+      RouterModule,
+      RouterLink,
       Navbar,
       ContextSidebarComponent,
       AiToolsPage,
-      LocalNewsPage
+      LocalNewsPage,
+      MetaIntelligenceComponent,
     ],
     templateUrl: './personal-layout.html',
     styleUrl: './personal-layout.scss'
@@ -28,8 +32,11 @@ import { LocalNewsPage } from '../../pages/personal/local-news/local-news';
 export class PersonalLayout implements OnInit {
     private router = inject(Router);
     private activatedRoute = inject(ActivatedRoute);
+    private auth = inject(AuthService);
 
-    readonly sidebarType = signal<'news' | 'contextual'>('news');
+    readonly ceebrainId = computed(() => this.auth.currentUserProfile()?.ceebrainId ?? '');
+
+    readonly sidebarType = signal<'news' | 'contextual' | 'meta'>('news');
     readonly leftSidebarOpen = signal(true);
     readonly rightSidebarOpen = signal(true);
     readonly topNavItems = [

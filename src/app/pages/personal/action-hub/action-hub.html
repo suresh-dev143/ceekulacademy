@@ -249,7 +249,7 @@
           }
 
           <div class="explore-card__body">
-            <span class="explore-card__tag">{{ categoryLabels[story.category] ?? story.category }}</span>
+            <span class="explore-card__tag">{{ categoryLabels[story.category] }}</span>
             <h3 class="explore-card__title">{{ story.title }}</h3>
             <p class="explore-card__excerpt">{{ story.description | slice:0:100 }}{{ story.description.length > 100 ? '...' : '' }}</p>
             <div class="explore-card__meta">
@@ -316,7 +316,7 @@
       }
 
       <div class="story-modal__body">
-        <span class="story-modal__tag">{{ categoryLabels[story.category] ?? story.category }}</span>
+        <span class="story-modal__tag">{{ categoryLabels[story.category] }}</span>
         <h2 class="story-modal__title">{{ story.title }}</h2>
 
         <div class="story-modal__meta">

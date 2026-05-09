@@ -1,0 +1,167 @@
+<div class="dqrg" [class.dqrg--reset]="resetAnim()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)">
+
+  <!-- ── DRAG OVERLAY ────────────────────────────────────────────────────── -->
+  @if (dragOver()) {
+  <div class="dqrg__drag-overlay">
+    <div class="dqrg__drag-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+      <span>Drop content to load into DQRG</span>
+      <small>or drop selected text to pre-fill the question</small>
+    </div>
+  </div>
+  }
+
+  <!-- ── HEADER ──────────────────────────────────────────────────────────── -->
+  <div class="dqrg__header">
+
+    <div class="dqrg__header-top">
+      <span class="dqrg__label">DQRG Intelligence</span>
+      @if (activeCid()) {
+        <button class="dqrg__cid" [class.dqrg__cid--dropped]="hasDroppedCtx()" [title]="'CID: ' + activeCid()">
+          ◈ {{ cidShort() }}
+        </button>
+      }
+      @if (hasDroppedCtx()) {
+        <button class="dqrg__drop-clear" (click)="clearDroppedCtx()" title="Remove dropped content, revert to bound CID">✕</button>
+      }
+      @if (thread().length > 0) {
+        <button class="dqrg__clear" (click)="clearThread()" title="Clear thread">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"></path>
+          </svg>
+        </button>
+      }
+    </div>
+
+    @if (activeTitle()) {
+      <p class="dqrg__content-title">
+        @if (hasDroppedCtx()) { <span class="dqrg__dropped-badge">dropped</span> }
+        {{ activeTitle() }}
+      </p>
+    }
+
+    <!-- ── MODE TABS ──────────────────────────────────────────────────────── -->
+    <div class="dqrg__modes">
+      @for (entry of modes; track entry[0]) {
+        <button
+          class="dqrg__mode-btn"
+          [class]="'dqrg__mode-btn--' + entry[1].color"
+          [class.dqrg__mode-btn--active]="mode() === entry[0]"
+          (click)="setMode(entry[0])"
+          [title]="entry[1].hint">
+          <span class="dqrg__mode-icon">{{ entry[1].icon }}</span>
+          <span class="dqrg__mode-label">{{ entry[1].label }}</span>
+        </button>
+      }
+    </div>
+
+  </div>
+
+  <!-- ── THREAD ──────────────────────────────────────────────────────────── -->
+  <div class="dqrg__thread" #threadEl>
+
+    @if (isEmpty() && !thinking()) {
+      <div class="dqrg__empty">
+        <div class="dqrg__empty-icon">{{ modeMeta().icon }}</div>
+        <p class="dqrg__empty-title">{{ modeMeta().label }} Mode</p>
+        <p class="dqrg__empty-hint">{{ modeMeta().hint }}</p>
+        @if (!activeCid()) {
+          <p class="dqrg__empty-warn">Open a piece of content to activate DQRG.</p>
+          <p class="dqrg__empty-drop-tip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            Or drag a content card here
+          </p>
+        }
+      </div>
+    }
+
+    @for (msg of thread(); track trackBy($index, msg)) {
+
+      @if (msg.role === 'user') {
+        <div class="dqrg__msg dqrg__msg--user">
+          <div class="dqrg__bubble dqrg__bubble--user">{{ msg.content }}</div>
+          <span class="dqrg__time">{{ formatTime(msg.timestamp) }}</span>
+        </div>
+      }
+
+      @if (msg.role === 'assistant') {
+        <div class="dqrg__msg dqrg__msg--ai">
+          <div class="dqrg__ai-header">
+            <span class="dqrg__ai-badge" [class]="'dqrg__ai-badge--' + msg.mode.toLowerCase()">
+              {{ msg.mode }}
+            </span>
+            <span class="dqrg__time">{{ formatTime(msg.timestamp) }}</span>
+          </div>
+          @if (msg.parsed) {
+            <div class="dqrg__bubble dqrg__bubble--ai dqrg__bubble--structured">
+              <p class="dqrg__insight">{{ msg.parsed.insight }}</p>
+              @if (msg.parsed.cidRef) {
+                <div class="dqrg__cid-ref">
+                  <span class="dqrg__cid-ref-icon">◈</span>
+                  {{ msg.parsed.cidRef }}
+                </div>
+              }
+              @if (msg.parsed.nextAction) {
+                <div class="dqrg__next-action">
+                  <span class="dqrg__next-action-arrow">→</span>
+                  {{ msg.parsed.nextAction }}
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="dqrg__bubble dqrg__bubble--ai">{{ msg.content }}</div>
+          }
+        </div>
+      }
+
+    }
+
+    @if (thinking()) {
+      <div class="dqrg__msg dqrg__msg--ai">
+        <div class="dqrg__ai-header">
+          <span class="dqrg__ai-badge" [class]="'dqrg__ai-badge--' + mode().toLowerCase()">
+            {{ mode() }}
+          </span>
+        </div>
+        <div class="dqrg__thinking">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- ── INPUT ───────────────────────────────────────────────────────────── -->
+  <div class="dqrg__input-wrap">
+    <div class="dqrg__mode-strip" [class]="'dqrg__mode-strip--' + mode().toLowerCase()"></div>
+    <div class="dqrg__input">
+      <textarea
+        [value]="input()"
+        (input)="input.set($any($event.target).value)"
+        (keydown)="onKeydown($event)"
+        [placeholder]="modeMeta().hint + '…'"
+        [disabled]="!activeCid() || thinking()"
+        rows="1"
+        aria-label="DQRG input">
+      </textarea>
+      <button
+        class="dqrg__send"
+        [class]="'dqrg__send--' + mode().toLowerCase()"
+        [disabled]="!canSend() || !activeCid()"
+        (click)="send()"
+        aria-label="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+</div>

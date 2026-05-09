@@ -57,12 +57,41 @@ export interface WorkshopSchedule {
     facilityDetails?: any;
 }
 
+export interface HourRef {
+    cid: string;
+    version: number;
+}
+
+export interface ContentRef {
+    hour1?: HourRef | null;
+    hour2?: HourRef | null;
+    hour3?: HourRef | null;
+}
+
+export interface AdConfigFilters {
+    domains?: string[];
+    categories?: string[];
+    keywords?: string[];
+}
+
+export type AdBreakActivity = 'stretch' | 'meditation' | 'notes' | 'quiz' | 'discussion' | 'walk' | 'custom';
+
+export interface AdConfig {
+    contentDurationMinutes?: number;
+    adBreakMinutes?: number;
+    filters?: AdConfigFilters;
+    overrideBy?: 'creator' | 'instructor' | 'learner';
+    breakActivities?: AdBreakActivity[];
+}
+
 export interface CreateWorkshopRequest {
     workshopTitle: string;
     workshopDescription: string;
     expertDescription: string;
     threeHourPlan?: WorkshopThreeHourPlan;
     schedules: WorkshopSchedule[];
+    contentRef?: ContentRef | null;
+    adConfig?: AdConfig;
 }
 
 export interface UpdateWorkshopRequest {
@@ -72,6 +101,8 @@ export interface UpdateWorkshopRequest {
     threeHourPlan?: WorkshopThreeHourPlan;
     schedules?: WorkshopApiSchedule[];
     status?: WorkshopStatus;
+    contentRef?: ContentRef | null;
+    adConfig?: AdConfig;
 }
 
 export interface UpdatedWorkshopResponse {
@@ -135,6 +166,7 @@ export interface WorkshopApiSchedule {
     partnerId?: string;
     partnerName?: string;
     facilityDetails?: any;
+    embedUrl?: string;    // Member-provided stream URL (YouTube, Jitsi, Zoom, etc.)
 }
 
 export interface WorkshopListItem {
@@ -147,6 +179,8 @@ export interface WorkshopListItem {
     threeHourPlan?: WorkshopThreeHourPlan;
     schedules: WorkshopApiSchedule[];
     totalRevenuePotential: number;
+    contentRef?: ContentRef | null;
+    adConfig?: AdConfig;
     userEnrollment?: {
         role: string;
         status: string;

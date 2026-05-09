@@ -1,239 +1,116 @@
 <div class="orch" [class.orch--sleep]="orc.isSleepMode()">
 
-  <!-- ══ SLEEP MODE ══════════════════════════════════════════════════════════ -->
   @if (orc.isSleepMode()) {
   <div class="orch-sleep">
     <div class="orch-sleep__orb"></div>
+    @if (ceebrainId()) {
+      <a class="ma-hub__cbid ma-hub__cbid--sleep-mode" routerLink="/personal/digital-life">{{ ceebrainId() }}</a>
+    }
     <p class="orch-sleep__label">Autonomous Regeneration Mode</p>
     <p class="orch-sleep__time">{{ currentTime() }}</p>
     <p class="orch-sleep__hint">No content. No stimulation. Rest.</p>
-    <div class="orch-sleep__devices">
-      @for (d of orc.currentBlock()?.right_box?.devices ?? []; track d) {
-      <span class="orch-sleep__device">{{ d }}</span>
-      }
-    </div>
   </div>
   } @else {
 
-  <!-- ══ HEADER ══════════════════════════════════════════════════════════════ -->
-  <div class="orch-header">
-    <div class="orch-header__left">
-      <span class="orch-header__label">Life Orchestrator</span>
-      <span class="orch-header__date">{{ currentDate() }}</span>
-    </div>
-    <div class="orch-header__clock">{{ currentTime() }}</div>
-  </div>
+  <!-- ══ PERSONAL HUB ════════════════════════════════════════════════════════ -->
+  <div class="ma-hub">
 
-  <!-- ══ 24H TIMELINE STRIP ══════════════════════════════════════════════════ -->
-  <div class="orch-timeline">
-    <div class="orch-timeline__track">
-      @for (hour of hours; track hour) {
-      @let block = blockFor(hour);
-      @if (block) {
-      <button
-        class="orch-timeline__pip"
-        [class.orch-timeline__pip--current]="isCurrentHour(hour)"
-        [class.orch-timeline__pip--selected]="isSelected(hour)"
-        [class.orch-timeline__pip--past]="isPast(hour)"
-        [class.orch-timeline__pip--sleep]="isSleep(block)"
-        [class.orch-timeline__pip--override]="block.user_override"
-        [style.--phase-color]="orc.phaseAccent(block.phase)"
-        (click)="selectHour(hour)"
-        [title]="orc.formatHour(hour) + ' — ' + block.intent"
-      >
-        <span class="orch-timeline__pip-label">{{ orc.formatHour(hour) }}</span>
-        @if (isCurrentHour(hour)) {
-        <span class="orch-timeline__pip-now">NOW</span>
+    <div class="ma-hub__body" [class.ma-hub__body--collapsed]="collapsed()">
+
+      <!-- Top-right: date + time -->
+      <div class="ma-hub__cell ma-hub__cell--meta">
+        <span class="ma-hub__date">{{ currentDate() }}</span>
+        <span class="ma-hub__clock">{{ currentTime() }}</span>
+      </div>
+
+      <!-- Center: CB ID -->
+      <!-- <div class="ma-hub__cell ma-hub__cell--core">
+        @if (ceebrainId()) {
+          <a class="ma-hub__cbid" routerLink="/personal/digital-life">{{ ceebrainId() }}</a>
+          <span class="ma-hub__cbid-label">Ceebrain Identity</span>
+        } @else {
+          <span class="ma-hub__cbid ma-hub__cbid--guest">Ceebrain Space</span>
+          <span class="ma-hub__cbid-label ma-hub__cbid-label--guest">Register to get your unique ID</span>
         }
-      </button>
+      </div> -->
+
+      <!-- Bottom row: nav links -->
+      <div class="ma-hub__cell ma-hub__cell--todays">
+        <span class="ma-hub__nav ma-hub__nav--current">Today's Content</span>
+      </div>
+
+      <div class="ma-hub__cell ma-hub__cell--set">
+        <a class="ma-hub__nav" routerLink="/personal/set-my-content">Set My Content</a>
+      </div>
+
+      <div class="ma-hub__cell ma-hub__cell--past">
+        <a class="ma-hub__nav" routerLink="/personal/past-content">Past Content</a>
+      </div>
+
+    </div><!-- /body -->
+
+    <!-- Always-visible strip with collapse arrow -->
+    <button class="ma-hub__strip" (click)="toggleHub()"
+            [attr.aria-label]="collapsed() ? 'Expand hub' : 'Collapse hub'">
+      @if (collapsed() && ceebrainId()) {
+        <span class="ma-hub__strip-id">{{ ceebrainId() }}</span>
       }
-      }
-    </div>
-  </div>
+      <span class="ma-hub__arrow" [class.ma-hub__arrow--flipped]="collapsed()">⌃</span>
+    </button>
 
-  <!-- ══ SELECTED BLOCK DETAIL ═══════════════════════════════════════════════ -->
-  @if (orc.selectedBlock(); as block) {
-  <div class="orch-now" [style.--phase-accent]="orc.phaseAccent(block.phase)" [style.--phase-bg]="orc.phaseColor(block.phase)">
+  </div><!-- /hub -->
 
-    <!-- Block Header -->
-    <div class="orch-now__header">
-      <div class="orch-now__header-left">
-        <span class="orch-now__hour">{{ block.hour_block }}</span>
-        <h2 class="orch-now__intent">
-          @if (block.user_override) { {{ block.custom_activity }} }
-          @else { {{ block.intent }} }
-        </h2>
-        @if (block.user_override) {
-        <span class="orch-now__override-badge">User Override</span>
-        }
-      </div>
-      <div class="orch-now__header-right">
-        <div class="orch-now__confidence">
-          <span class="orch-now__confidence-label">AI Confidence</span>
-          <div class="orch-now__confidence-bar">
-            <div class="orch-now__confidence-fill" [style.width.%]="confidenceWidth()"></div>
-          </div>
-          <span class="orch-now__confidence-val">{{ confidenceWidth() }}%</span>
-        </div>
-        <button class="orch-override-btn" (click)="openOverride(block.hour, block.user_override ? block.custom_activity : block.middle_box.activity)">
-          {{ block.user_override ? 'Edit Override' : 'Override' }}
-        </button>
-        @if (block.user_override) {
-        <button class="orch-override-btn orch-override-btn--remove" (click)="removeOverride(block.hour)">Remove</button>
-        }
-      </div>
+  <!-- ══ CONTENT OF THE HOUR ══════════════════════════════════════════════════ -->
+  <app-todays-content></app-todays-content>
+
+  <!-- ══ MY DAY MAP ════════════════════════════════════════════════════════════ -->
+  <div class="ma-daymap">
+    <div class="ma-daymap__header">
+      <span class="ma-daymap__title">My Day</span>
+      <span class="ma-daymap__hint">Click any hour to set your content</span>
+      <a class="ma-daymap__edit-all" routerLink="/personal/set-my-content">Edit All</a>
     </div>
 
-    <!-- 3-Panel Layout -->
-    <div class="orch-panels">
-
-      <!-- LEFT BOX: Contextual Intelligence -->
-      <div class="orch-panel orch-panel--left">
-        <div class="orch-panel__label">
-          <span class="orch-panel__dot orch-panel__dot--left"></span>
-          Contextual Intelligence
-        </div>
-        <p class="orch-panel__insight">{{ block.left_box.insight }}</p>
-        @if (block.left_box.data | keyvalue; as dataItems) {
-        @if (dataItems.length > 0) {
-        <div class="orch-panel__metrics">
-          @for (m of dataItems; track m.key) {
-          <div class="orch-metric">
-            <span class="orch-metric__label">{{ m.key }}</span>
-            <span class="orch-metric__value">{{ m.value }}</span>
-          </div>
-          }
-        </div>
-        }
-        }
-      </div>
-
-      <!-- MIDDLE BOX: Primary Experience -->
-      <div class="orch-panel orch-panel--middle">
-        <div class="orch-panel__label">
-          <span class="orch-panel__dot orch-panel__dot--middle"></span>
-          Primary Experience
-        </div>
-        <p class="orch-panel__activity">
-          @if (block.user_override) { {{ block.custom_activity }} }
-          @else { {{ block.middle_box.activity }} }
-        </p>
-        @if (!block.user_override && block.middle_box.guidance) {
-        <ul class="orch-guidance">
-          @for (g of block.middle_box.guidance.split('\n'); track g) {
-          <li class="orch-guidance__item">{{ g }}</li>
-          }
-        </ul>
-        }
-      </div>
-
-      <!-- RIGHT BOX: Tools & Devices -->
-      <div class="orch-panel orch-panel--right">
-        <div class="orch-panel__label">
-          <span class="orch-panel__dot orch-panel__dot--right"></span>
-          Tools & Environment
-        </div>
-        @if (block.right_box.tools.length > 0) {
-        <div class="orch-tools">
-          @for (tool of block.right_box.tools; track tool) {
-          <div class="orch-tool">
-            <span class="orch-tool__name">{{ tool }}</span>
-          </div>
-          }
-        </div>
-        }
-        @if (block.right_box.devices.length > 0) {
-        <div class="orch-devices">
-          <p class="orch-devices__label">Device Automation</p>
-          @for (d of block.right_box.devices; track d) {
-          <div class="orch-device">
-            <span class="orch-device__dot"></span>
-            {{ d }}
-          </div>
-          }
-        </div>
-        }
-        @if (block.right_box.tools.length === 0 && block.right_box.devices.length === 0) {
-        <p class="orch-panel__empty">Nothing active for this block.</p>
-        }
-      </div>
-
-    </div><!-- /orch-panels -->
-  </div><!-- /orch-now -->
-  }
-
-  <!-- ══ FULL SCHEDULE LIST ═════════════════════════════════════════════════ -->
-  <div class="orch-schedule">
-    <p class="orch-schedule__title">Today's Schedule</p>
     <div class="orch-schedule__list">
-      @for (hour of hours; track hour) {
-      @let block = blockFor(hour);
-      @if (block) {
-      <div
-        class="orch-row"
-        [class.orch-row--current]="isCurrentHour(hour)"
-        [class.orch-row--past]="isPast(hour)"
-        [class.orch-row--sleep]="isSleep(block)"
-        [class.orch-row--selected]="isSelected(hour)"
-        [style.--row-accent]="orc.phaseAccent(block.phase)"
-        (click)="selectHour(hour)"
-      >
-        <div class="orch-row__time">
-          <span class="orch-row__hour">{{ orc.formatHour(hour) }}</span>
-          @if (isCurrentHour(hour)) { <span class="orch-row__now">NOW</span> }
+      @for (block of orc.schedule(); track block.hour) {
+        <div class="orch-row"
+             [class.orch-row--current]="isCurrentHour(block.hour)"
+             [class.orch-row--past]="isPastHour(block.hour)"
+             [class.orch-row--sleep]="block.phase === 'sleep'"
+             [style.--row-accent]="orc.phaseAccent(block.phase)">
+
+          <div class="orch-row__time">
+            <span class="orch-row__hour">{{ block.hour_block }}</span>
+            @if (isCurrentHour(block.hour)) {
+              <span class="orch-row__now">Now</span>
+            }
+          </div>
+
+          <div class="orch-row__bar"></div>
+
+          <div class="orch-row__content">
+            <span class="orch-row__intent">{{ contentTitle(block) }}</span>
+            <span class="orch-row__activity">{{ contentSubtitle(block) }}</span>
+          </div>
+
+          <div class="orch-row__right">
+            <span class="orch-row__tag"
+                  [class.orch-row__tag--override]="block.user_override && !block.custom_content"
+                  [class.orch-row__tag--content]="!!block.custom_content">
+              {{ contentTypeLabel(block) }}
+            </span>
+            @if (block.phase !== 'sleep') {
+              <a class="orch-row__edit"
+                 [routerLink]="['/personal/set-my-content']"
+                 [queryParams]="{hour: block.hour}">✎</a>
+            }
+          </div>
+
         </div>
-        <div class="orch-row__bar"></div>
-        <div class="orch-row__content">
-          <span class="orch-row__intent">
-            @if (block.user_override) { {{ block.custom_activity }} }
-            @else { {{ block.intent }} }
-          </span>
-          @if (!isSleep(block)) {
-          <span class="orch-row__activity">{{ block.middle_box.activity }}</span>
-          }
-        </div>
-        <div class="orch-row__right">
-          @if (block.user_override) { <span class="orch-row__tag orch-row__tag--override">Override</span> }
-          @else { <span class="orch-row__tag" [style.color]="orc.phaseAccent(block.phase)">{{ block.phase }}</span> }
-          <button class="orch-row__edit" (click)="$event.stopPropagation(); openOverride(hour, block.user_override ? block.custom_activity : block.middle_box.activity)" title="Override this block">✎</button>
-        </div>
-      </div>
-      }
       }
     </div>
   </div>
 
-  }<!-- /not sleep mode -->
-
-  <!-- ══ OVERRIDE MODAL ═════════════════════════════════════════════════════ -->
-  @if (showOverrideModal()) {
-  @let targetHour = overrideTargetHour();
-  <div class="orch-modal-overlay" (click)="closeOverride()">
-    <div class="orch-modal" (click)="$event.stopPropagation()">
-      <div class="orch-modal__header">
-        <span class="orch-modal__title">
-          Override {{ targetHour !== null ? orc.formatHour(targetHour) : '' }}
-        </span>
-        <button class="orch-modal__close" (click)="closeOverride()">✕</button>
-      </div>
-      <p class="orch-modal__hint">Your choice always takes priority over the AI schedule.</p>
-      <textarea
-        class="orch-modal__input"
-        [value]="overrideInput()"
-        (input)="overrideInput.set($any($event.target).value)"
-        placeholder="What will you do during this hour?"
-        rows="3"
-        autofocus
-      ></textarea>
-      <div class="orch-modal__actions">
-        <button class="orch-modal__btn orch-modal__btn--cancel" (click)="closeOverride()">Cancel</button>
-        @if (targetHour !== null && blockFor(targetHour)?.user_override) {
-        <button class="orch-modal__btn orch-modal__btn--remove" (click)="removeOverride(targetHour!)">Remove Override</button>
-        }
-        <button class="orch-modal__btn orch-modal__btn--save" (click)="saveOverride()" [disabled]="!overrideInput().trim()">Save Override</button>
-      </div>
-    </div>
-  </div>
   }
 
 </div>

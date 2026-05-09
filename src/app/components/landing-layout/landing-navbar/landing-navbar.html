@@ -10,10 +10,14 @@
     <div class="navbar__brand-title">
       <h1 aria-label="CEEKUL CIVILISATION">CEEKUL CIVILISATION</h1>
     </div>
+    } @else if (isRegisterPage()) {
+    <div class="navbar__personal">
+      <span class="navbar__digital-title navbar__digital-title--mission">Ceekul Mission</span>
+    </div>
     } @else {
     <!-- Digital Life Title (nav links moved to global search menu drawer) -->
     <div class="navbar__personal">
-      <a routerLink="/personal/digital-life" class="navbar__digital-title">Digital Life</a>
+      <a routerLink="/personal/human-life" class="navbar__digital-title">Digital Life</a>
     </div>
     }
     <!-- App User Profile Section -->
@@ -22,8 +26,7 @@
         <div class="navbar__user-menu">
           <button class="navbar__ceebrain-id" [class.active]="showUserMenu()"
             (click)="toggleUserMenu()" aria-label="User menu">
-            <span class="navbar__ceebrain-label">CB</span>
-            <span class="navbar__ceebrain-value">{{ authService.currentUserProfile()?.ceebrainId }}</span>
+            <span class="navbar__ceebrain-value">CB{{ authService.currentUserProfile()?.ceebrainId }}</span>
           </button>
           @if (showUserMenu()) {
             <div class="navbar__backdrop" (click)="showUserMenu.set(false)"></div>

@@ -15,15 +15,23 @@
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
-            <div class="sidebar-inner" [ngSwitch]="sidebarType()">
-                <app-local-news *ngSwitchCase="'news'"></app-local-news>
-                <app-context-sidebar *ngSwitchCase="'contextual'"></app-context-sidebar>
+            <div class="sidebar-inner">
+                @switch (sidebarType()) {
+                    @case ('news') { <app-local-news></app-local-news> }
+                    @case ('contextual') { <app-context-sidebar></app-context-sidebar> }
+                    @case ('meta') { <app-meta-intelligence></app-meta-intelligence> }
+                }
             </div>
         </aside>
 
         <!-- ── Center Column ── -->
         <main class="layout__main" role="main">
             <app-global-search></app-global-search>
+            @if (ceebrainId()) {
+              <div class="layout__cbid-header">
+                <span class="layout__cbid-title">CB{{ ceebrainId() }}</span>
+              </div>
+            }
             <router-outlet></router-outlet>
         </main>
 

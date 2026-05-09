@@ -1,152 +1,652 @@
-<div class="register" data-cb-id="register-page">
-  <!-- Main Content -->
-  <main class="register__main">
-    <div class="register__container">
-      <div class="register__header">
-        <h1 class="register__title">Please fill the following data to get registered :</h1>
+<div class="reg-page">
+
+  <!-- Neural background canvas -->
+  <canvas class="reg-neural" #neuralCanvas></canvas>
+
+  <app-navbar [isLandingPage]="false"></app-navbar>
+
+  <div class="reg-layout">
+
+    <!-- ══ LEFT — Guidelines ══════════════════════════════════════════════════ -->
+    <aside class="reg-col reg-col--left">
+      <div class="reg-glass reg-guide">
+        <p class="reg-guide__label">Guidelines</p>
+        <div class="reg-guide__line"></div>
+        <ul class="reg-guide__list">
+          <li class="reg-guide__item">
+            <span class="reg-guide__dot"></span>
+            Secure digital identity
+          </li>
+          <li class="reg-guide__item">
+            <span class="reg-guide__dot"></span>
+            One account per individual
+          </li>
+          <li class="reg-guide__item">
+            <span class="reg-guide__dot"></span>
+            Biometric is always optional
+          </li>
+          <li class="reg-guide__item">
+            <span class="reg-guide__dot"></span>
+            Open to every human being
+          </li>
+          <li class="reg-guide__item">
+            <span class="reg-guide__dot"></span>
+            Fully self-regulated
+          </li>
+          <li class="reg-guide__item">
+            <span class="reg-guide__dot"></span>
+            No surveillance, no profit from data
+          </li>
+        </ul>
+        <p class="reg-guide__footer">
+          Creating your CeeBrain ID is a commitment to the self-regulatory framework.
+        </p>
       </div>
-      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="register__form" data-cb-id="register-form">
-        <!-- Mobile No -->
-        <div class="register__field">
-          <label class="register__label" for="mobileNo">Your mobile no</label>
-          <input type="tel" id="mobileNo" formControlName="mobileNo" class="register__input"
-            placeholder="Enter 10-digit mobile number" data-cb-id="register-mobile-input" />
-          @if (registrationForm.get('mobileNo')?.touched && registrationForm.get('mobileNo')?.errors?.['pattern']) {
-            <div class="register__error" data-cb-id="register-mobile-error">Please enter a valid 10-digit mobile number</div>
-          }
+    </aside>
+
+    <!-- ══ CENTER — Registration Core ═══════════════════════════════════════ -->
+    <main class="reg-col reg-col--center">
+
+      <!-- ── Concentric ring decoration ──────────────────────────────────────── -->
+      <div class="reg-rings" aria-hidden="true">
+        <div class="reg-glow"></div>
+        <div class="reg-sweep"></div>
+        <div class="reg-ring reg-ring--1">
+          <span class="reg-ring__tick reg-ring__tick--n"></span>
+          <span class="reg-ring__tick reg-ring__tick--e"></span>
+          <span class="reg-ring__tick reg-ring__tick--s"></span>
+          <span class="reg-ring__tick reg-ring__tick--w"></span>
+        </div>
+        <div class="reg-ring reg-ring--2">
+          <span class="reg-ring__tick reg-ring__tick--n"></span>
+          <span class="reg-ring__tick reg-ring__tick--s"></span>
+        </div>
+        <div class="reg-ring reg-ring--3"></div>
+        <div class="reg-ring reg-ring--4"></div>
+        <div class="reg-ring reg-ring--5"></div>
+      </div>
+
+      <!-- ══ CONCENTRIC SQUARES + COSMIC ENERGY SYSTEM ═══════════════════════ -->
+      <div class="reg-squares"
+           [class.reg-squares--active]="step() === 'creating' || step() === 'complete'"
+           aria-hidden="true">
+
+        <!-- ── SVG cosmic energy beams (8 directions → CB ID) ── -->
+        <svg class="reg-esv" viewBox="-660 -560 1320 1120"
+             xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="egl-tl" x1="-650" y1="-540" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#00F5FF" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#00F5FF" stop-opacity="0.55"/>
+            </linearGradient>
+            <linearGradient id="egl-tr" x1="650" y1="-540" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#6C5CE7" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#6C5CE7" stop-opacity="0.55"/>
+            </linearGradient>
+            <linearGradient id="egl-bl" x1="-650" y1="540" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#6C5CE7" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#6C5CE7" stop-opacity="0.55"/>
+            </linearGradient>
+            <linearGradient id="egl-br" x1="650" y1="540" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#00F5FF" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#00F5FF" stop-opacity="0.55"/>
+            </linearGradient>
+            <linearGradient id="egl-t" x1="0" y1="-560" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FFD700" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#FFD700" stop-opacity="0.35"/>
+            </linearGradient>
+            <linearGradient id="egl-b" x1="0" y1="560" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FF9500" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#FF9500" stop-opacity="0.30"/>
+            </linearGradient>
+            <linearGradient id="egl-l" x1="-660" y1="0" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#00F5FF" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#00F5FF" stop-opacity="0.25"/>
+            </linearGradient>
+            <linearGradient id="egl-r" x1="660" y1="0" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#6C5CE7" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#6C5CE7" stop-opacity="0.25"/>
+            </linearGradient>
+          </defs>
+          <!-- diagonal beams (4 corners → center) -->
+          <line x1="-650" y1="-540" x2="0" y2="0" stroke="url(#egl-tl)" stroke-width="1"   class="reg-eline reg-eline--d1" stroke-dasharray="10 22"/>
+          <line x1=" 650" y1="-540" x2="0" y2="0" stroke="url(#egl-tr)" stroke-width="1"   class="reg-eline reg-eline--d2" stroke-dasharray="10 22"/>
+          <line x1="-650" y1=" 540" x2="0" y2="0" stroke="url(#egl-bl)" stroke-width="1"   class="reg-eline reg-eline--d3" stroke-dasharray="10 22"/>
+          <line x1=" 650" y1=" 540" x2="0" y2="0" stroke="url(#egl-br)" stroke-width="1"   class="reg-eline reg-eline--d4" stroke-dasharray="10 22"/>
+          <!-- cardinal beams (4 midpoints → center) -->
+          <line x1="   0" y1="-560" x2="0" y2="0" stroke="url(#egl-t)"  stroke-width="0.8" class="reg-eline reg-eline--d5" stroke-dasharray="8 18"/>
+          <line x1="   0" y1=" 560" x2="0" y2="0" stroke="url(#egl-b)"  stroke-width="0.8" class="reg-eline reg-eline--d6" stroke-dasharray="8 18"/>
+          <line x1="-660" y1="   0" x2="0" y2="0" stroke="url(#egl-l)"  stroke-width="0.8" class="reg-eline reg-eline--d7" stroke-dasharray="8 18"/>
+          <line x1=" 660" y1="   0" x2="0" y2="0" stroke="url(#egl-r)"  stroke-width="0.8" class="reg-eline reg-eline--d8" stroke-dasharray="8 18"/>
+        </svg>
+
+        <!-- ── 6 concentric rotating squares ── -->
+        <div class="reg-sq reg-sq--1">
+          <span class="reg-sq__c reg-sq__c--tl"></span>
+          <span class="reg-sq__c reg-sq__c--tr"></span>
+          <span class="reg-sq__c reg-sq__c--bl"></span>
+          <span class="reg-sq__c reg-sq__c--br"></span>
+        </div>
+        <div class="reg-sq reg-sq--2">
+          <span class="reg-sq__c reg-sq__c--tl"></span>
+          <span class="reg-sq__c reg-sq__c--tr"></span>
+          <span class="reg-sq__c reg-sq__c--bl"></span>
+          <span class="reg-sq__c reg-sq__c--br"></span>
+        </div>
+        <div class="reg-sq reg-sq--3">
+          <span class="reg-sq__c reg-sq__c--tl"></span>
+          <span class="reg-sq__c reg-sq__c--tr"></span>
+          <span class="reg-sq__c reg-sq__c--bl"></span>
+          <span class="reg-sq__c reg-sq__c--br"></span>
+        </div>
+        <div class="reg-sq reg-sq--4">
+          <span class="reg-sq__c reg-sq__c--tl"></span>
+          <span class="reg-sq__c reg-sq__c--tr"></span>
+          <span class="reg-sq__c reg-sq__c--bl"></span>
+          <span class="reg-sq__c reg-sq__c--br"></span>
+        </div>
+        <div class="reg-sq reg-sq--5">
+          <span class="reg-sq__c reg-sq__c--tl"></span>
+          <span class="reg-sq__c reg-sq__c--tr"></span>
+          <span class="reg-sq__c reg-sq__c--bl"></span>
+          <span class="reg-sq__c reg-sq__c--br"></span>
+        </div>
+        <div class="reg-sq reg-sq--6">
+          <span class="reg-sq__c reg-sq__c--tl"></span>
+          <span class="reg-sq__c reg-sq__c--tr"></span>
+          <span class="reg-sq__c reg-sq__c--bl"></span>
+          <span class="reg-sq__c reg-sq__c--br"></span>
         </div>
 
-        <!-- Date of Birth -->
-        <div class="register__field">
-          <label class="register__label" for="dateOfBirth">Your date of birth</label>
-          <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="register__input"
-            data-cb-id="register-dob-input" />
-        </div>
+        <!-- ── 12 cosmic energy particles ── -->
+        <span class="reg-p reg-p--1"></span>
+        <span class="reg-p reg-p--2"></span>
+        <span class="reg-p reg-p--3"></span>
+        <span class="reg-p reg-p--4"></span>
+        <span class="reg-p reg-p--5"></span>
+        <span class="reg-p reg-p--6"></span>
+        <span class="reg-p reg-p--7"></span>
+        <span class="reg-p reg-p--8"></span>
+        <span class="reg-p reg-p--9"></span>
+        <span class="reg-p reg-p--10"></span>
+        <span class="reg-p reg-p--11"></span>
+        <span class="reg-p reg-p--12"></span>
 
-        <!-- Place of Birth -->
-        <div class="register__field">
-          <label class="register__label" for="placeOfBirth">Your place of birth</label>
-          <input type="text" id="placeOfBirth" formControlName="placeOfBirth" class="register__input"
-            placeholder="Enter place of birth" data-cb-id="register-place-of-birth-input" />
-        </div>
+      </div><!-- /.reg-squares -->
 
-        <!-- Identity Dropdown -->
-        <div class="register__field">
-          <label class="register__label" for="identity">Your identity</label>
-          <select id="identity" formControlName="identity" class="register__input register__select"
-            data-cb-id="register-identity-select">
-            <option value="" disabled>Select Identity</option>
-            <option value="homo_sapiens">Member of human species (homo sapiens)</option>
-            <option value="others">Others</option>
-          </select>
-        </div>
+      <!-- ── Content ─────────────────────────────────────────────────────────── -->
+      <div class="reg-center-content">
 
-        <!-- Gender Dropdown -->
-        <div class="register__field">
-          <label class="register__label" for="gender">Your gender</label>
-          <select id="gender" formControlName="gender" class="register__input register__select"
-            data-cb-id="register-gender-select">
-            <option value="" disabled>Select gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="transgender">Transgender</option>
-          </select>
-        </div>
-
-        <!-- BPL Category -->
-        <div class="register__field">
-          <label class="register__label" for="bplCategory">Do you belong to below poverty line category?</label>
-          <select id="bplCategory" formControlName="bplCategory" class="register__input register__select"
-            data-cb-id="register-bpl-select">
-            <option value="" disabled>Select Yes/No</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
-
-        <!-- Underprivileged Category -->
-        <div class="register__field">
-          <label class="register__label" for="underprivilegedCategory">Do you belong to the underprivileged
-            category?</label>
-          <select id="underprivilegedCategory" formControlName="underprivilegedCategory"
-            class="register__input register__select" data-cb-id="register-underprivileged-select">
-            <option value="" disabled>Select Yes/No</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
-
-      
-
-        <!-- Password -->
-        <div class="register__field">
-          <label class="register__label" for="password">Password</label>
-          <input type="password" id="password" formControlName="password" class="register__input"
-            placeholder="Minimum 8 characters, 1 uppercase, 1 number" data-cb-id="register-password-input" />
-          @if (registrationForm.get('password')?.touched && registrationForm.get('password')?.errors?.['pattern']) {
-            <div class="register__error" data-cb-id="register-password-error">Must include one uppercase letter and one number</div>
-          }
-        </div>
-  <!-- Confirm Password -->
-        <div class="register__field">
-          <label class="register__label" for="confirmPassword">Confirm password</label>
-          <input type="password" id="confirmPassword" formControlName="confirmPassword" class="register__input"
-            placeholder="Re-enter your password" data-cb-id="register-confirm-password-input" />
-          @if (registrationForm.get('confirmPassword')?.touched && registrationForm.hasError('passwordMismatch')) {
-            <div class="register__error" data-cb-id="register-confirm-password-error">Passwords do not match</div>
-          }
-        </div>
-        <!-- Document Upload Section -->
-        <div class="register__upload-section" data-cb-id="register-document-upload-section">
-          <p class="register__upload-text">
-            Please upload the documents. You may get your data verified by any Manager (or Director) of Ceekul Academy
-            whenever you wish.
-            If you don't have a mobile number or any ID Proof then pl get the video of your visual identity verified by
-            her/him.
-          </p>
-          <app-document-upload />
-        </div>
-
-        <!-- Self Regulatory Framework -->
-        <div class="register__framework-section">
-          <a href="#" class="register__link" data-cb-id="register-framework-link">Pl read the self regulatory framework :</a>
-          <div class="register__framework-container">
-            <label class="register__checkbox-label">
-              <input type="checkbox" formControlName="agreeToFramework" class="register__checkbox"
-                data-cb-id="register-agree-checkbox" />
-              I agree with the self regulatory framework.
-            </label>
-          </div>
-        </div>
-
-        <!-- Error Message -->
-        @if (errorMessage()) {
-          <div class="register__error register__error--block" data-cb-id="register-error-message">{{ errorMessage() }}</div>
+      <!-- Progress + Back -->
+      <div class="reg-progress-row">
+        @if (canGoBack()) {
+          <button class="reg-back" (click)="goBack()" title="Go back">
+            <span class="reg-back__arrow">‹</span> Back
+          </button>
         }
+        <div class="reg-progress">
+          <div class="reg-progress__fill" [style.width.%]="progressPercent()"></div>
+        </div>
+      </div>
 
-        <!-- Register Button -->
-        <div class="register__actions">
-          <button type="submit" class="register__submit-btn" [disabled]="isLoading()"
-            data-cb-id="register-submit-btn">
-            {{ isLoading() ? 'Registering...' : 'Register' }}
+      <!-- STEP: entry / otp-phone — Phone Input -->
+      @if (step() === 'entry' || step() === 'otp-phone') {
+        <div class="reg-card">
+          <div class="reg-orb-wrap">
+            <div class="reg-orb"></div>
+          </div>
+          <h1 class="reg-card__title">Create Your Identity</h1>
+          
+
+          <div class="reg-cbid-preview">
+            <span class="reg-cbid-preview__label">Your CEEBRAIN ID</span>
+            <span class="reg-cbid-preview__value">{{ previewId() }}</span>
+          </div>
+
+          <form [formGroup]="phoneForm" class="reg-form">
+
+            <div class="reg-field">
+              <label class="reg-label">Mobile Number</label>
+              <div class="reg-input-row">
+
+                <!-- Country code input -->
+                <input type="text" class="reg-input reg-input--cc"
+                  [value]="countryCode()"
+                  (input)="countryCode.set($any($event.target).value.replace(/\D/g, ''))"
+                  maxlength="4"
+                  placeholder="91"
+                  aria-label="Country code" />
+
+                <input type="tel" formControlName="phone" class="reg-input reg-input--phone"
+                  placeholder="Mobile number" autocomplete="tel"
+                  (keydown.enter)="sendOtp()" />
+
+                <button type="button" class="reg-btn reg-btn--otp"
+                  (click)="sendOtp()" [disabled]="otpLoading() || otpSent()">
+                  @if (otpLoading()) {
+                    <span class="reg-spinner"></span>
+                  } @else {
+                    {{ otpSent() ? '✓ Sent' : 'Send OTP' }}
+                  }
+                </button>
+              </div>
+              @if (phoneForm.get('phone')?.touched && phoneForm.get('phone')?.errors?.['required']) {
+                <p class="reg-err">Mobile number is required</p>
+              }
+              @if (phoneForm.get('phone')?.touched && phoneForm.get('phone')?.errors?.['pattern']) {
+                <p class="reg-err">Enter a valid mobile number</p>
+              }
+            </div>
+            <div class="reg-field reg-field--center">
+              <span>Or</span>
+            </div>
+            <div class="reg-field">
+              <button type="button" class="reg-btn reg-btn--ghost reg-btn--full"
+                (click)="openBiometric()">
+                <span class="reg-bio-icon">◎</span>
+                Biometric Scan 
+              </button>
+            </div>
+
+            <label class="reg-consent">
+              <input type="checkbox" formControlName="consent" />
+              <span class="reg-consent__box"></span>
+              <span class="reg-consent__text">
+                I understand and agree to the self-regulatory framework
+              </span>
+            </label>
+
+            @if (errorMessage()) {
+              <p class="reg-err reg-err--block">{{ errorMessage() }}</p>
+            }
+
+          </form>
+        </div>
+      }
+
+      <!-- STEP: otp-verify / otp-fallback — OTP Input -->
+      @if (step() === 'otp-verify' || step() === 'otp-fallback') {
+        <div class="reg-card">
+          <div class="reg-orb-wrap">
+            <div class="reg-orb reg-orb--cyan"></div>
+          </div>
+          <h1 class="reg-card__title">Verify Your Number</h1>
+          <p class="reg-card__sub">
+            OTP sent to&nbsp;<strong>+{{ countryCode() }} {{ phoneForm.get('phone')?.value }}</strong>
+          </p>
+
+          <form [formGroup]="phoneForm" class="reg-form">
+
+            <div class="reg-field">
+              <label class="reg-label">One-Time Password</label>
+              <input type="text" formControlName="otp" class="reg-input reg-input--otp"
+                placeholder="· · · · · ·" maxlength="6" autocomplete="one-time-code"
+                (keydown.enter)="verifyOtp()" />
+              <div class="reg-otp-meta">
+                @if (otpCountdown() > 0) {
+                  <span class="reg-otp-timer">Resend in {{ otpCountdown() }}s</span>
+                } @else {
+                  <button type="button" class="reg-link" (click)="resendOtp()">Resend OTP</button>
+                }
+                @if (step() === 'otp-fallback') {
+                  <button type="button" class="reg-link reg-link--voice"
+                    (click)="useVoiceCall()">Call me instead</button>
+                }
+              </div>
+            </div>
+
+            @if (errorMessage()) {
+              <p class="reg-err reg-err--block">{{ errorMessage() }}</p>
+            }
+
+            <button type="button" class="reg-btn reg-btn--primary reg-btn--full"
+              [disabled]="(phoneForm.get('otp')?.value?.length ?? 0) < 6 || isLoading()"
+              (click)="verifyOtp()">
+              @if (isLoading()) { Verifying… } @else { Verify OTP }
+            </button>
+
+          </form>
+        </div>
+      }
+
+      <!-- STEP: guidelines — Agree / Disagree -->
+      @if (step() === 'guidelines') {
+        <div class="reg-card">
+          <h1 class="reg-card__title">Almost There</h1>
+          <p class="reg-card__sub">Your identity is ready to be woven into the network.</p>
+          <div class="reg-info-box">
+            By agreeing, you join the CEEBRAIN self-regulatory framework — a commitment to
+            responsible, conscious digital participation. No surveillance. No exploitation.
+          </div>
+          <div class="reg-action-row">
+            <button class="reg-btn reg-btn--ghost" (click)="disagreeGuidelines()">I Disagree</button>
+            <button class="reg-btn reg-btn--primary" (click)="agreeGuidelines()" [disabled]="isLoading()">
+              @if (isLoading()) { Creating… } @else { Agree &amp; Create Identity }
+            </button>
+          </div>
+          @if (errorMessage()) {
+            <p class="reg-err reg-err--block" style="margin-top:1rem">{{ errorMessage() }}</p>
+          }
+        </div>
+      }
+
+      <!-- STEP: disagreement -->
+      @if (step() === 'disagreement') {
+        <div class="reg-card">
+          <h1 class="reg-card__title">Your Voice Matters</h1>
+          <p class="reg-card__sub">Share your concern — it reaches the right team directly.</p>
+          <textarea class="reg-textarea" rows="4"
+            placeholder="Your concern, suggestion, or question…"
+            (input)="updateDisagreement($event)"></textarea>
+          <button class="reg-btn reg-btn--primary reg-btn--full"
+            [disabled]="!disagreementText().trim()"
+            (click)="submitDisagreement()">Submit Feedback</button>
+        </div>
+      }
+
+      <!-- STEP: acknowledged -->
+      @if (step() === 'acknowledged') {
+        <div class="reg-card reg-card--center">
+          <div class="reg-ack-check">✓</div>
+          <h1 class="reg-card__title">Feedback Received</h1>
+          <p class="reg-card__sub">Thank you. You may still proceed to create your identity.</p>
+          <button class="reg-btn reg-btn--primary" (click)="continueAfterDisagreement()">
+            Continue
           </button>
         </div>
-      </form>
-       <div class="form-footer">
-                    <p class="footer-text">
-                       Already have an account?
-                        <a routerLink="/personal/login" class="footer-link">Login</a>
-                    </p>
-                </div>
-    </div>
-    
-               
-  </main>
+      }
 
-  <!-- Success Message -->
-  @if (showSuccess()) {
-    <div class="register__snackbar" data-cb-id="register-success-snackbar">
-      Registration Successful! Your Ceebrain ID is <strong>{{ ceebrainId() }}</strong>
-    </div>
-  }
-</div>
+      <!-- STEP: creating -->
+      @if (step() === 'creating') {
+        <div class="reg-card reg-card--center">
+          <div class="reg-creating">
+            <div class="reg-creating__ring"></div>
+            <div class="reg-creating__core"></div>
+          </div>
+          <p class="reg-creating__text">Weaving your identity into the digital fabric…</p>
+        </div>
+      }
+
+      <!-- STEP: complete -->
+      @if (step() === 'complete') {
+        <div class="reg-card reg-card--center">
+          <div class="reg-success">
+            <div class="reg-success__ring"></div>
+            <span class="reg-success__check">✓</span>
+          </div>
+          <h1 class="reg-card__title">Identity Created</h1>
+          <p class="reg-card__sub">Welcome to CEEBRAIN</p>
+          <div class="reg-cbid">
+            <span class="reg-cbid__label">Your CeeBrain ID</span>
+            <span class="reg-cbid__value">{{ ceebrainId() }}</span>
+          </div>
+          <button class="reg-btn reg-btn--primary reg-btn--full"
+                  (click)="enterMySpace()">
+            Enter My Space &rarr;
+          </button>
+          <p class="reg-redirect-note">
+            Entering your space in {{ redirectCountdown() }}…
+          </p>
+        </div>
+      }
+
+      </div><!-- /.reg-center-content -->
+
+    </main>
+
+    <!-- ══ RIGHT — Verification Tools ════════════════════════════════════════ -->
+    <aside class="reg-col reg-col--right">
+
+      <!-- ── BIOMETRIC COLLECTION PANEL ─────────────────────────────────────── -->
+      @if (biometricOpen()) {
+        <div class="reg-glass reg-bio-panel">
+
+          <div class="reg-bio-panel__header">
+            <div class="reg-bio-panel__header-left">
+              @if (biometricStage() !== 'list') {
+                <button class="reg-bio-panel__back" (click)="backToToolList()" title="Back">‹</button>
+              }
+              <span class="reg-bio-panel__title">
+                {{ biometricStage() === 'list' ? 'Choose a Biometric Tool' : biometricSelectedTool()!.name }}
+              </span>
+            </div>
+            <button class="reg-bio-panel__close" (click)="closeBiometric()" title="Close">✕</button>
+          </div>
+
+          <!-- ── STAGE: LIST ── all tools to pick from -->
+          @if (biometricStage() === 'list') {
+            <p class="reg-bio-list-hint">Select one tool to begin data collection</p>
+            <div class="reg-bio-list">
+              @for (tool of BIOMETRIC_TOOLS; track $index) {
+                <button class="reg-bio-list-item"
+                  [class.reg-bio-list-item--done]="biometricScanned().includes($index)"
+                  [style.--bio-color]="tool.color"
+                  (click)="selectBiometricTool($index)">
+                  <span class="reg-bio-list-item__bar"></span>
+                  <span class="reg-bio-list-item__icon">{{ tool.icon }}</span>
+                  <span class="reg-bio-list-item__body">
+                    <span class="reg-bio-list-item__name">{{ tool.name }}</span>
+                    <span class="reg-bio-list-item__desc">{{ tool.desc }}</span>
+                  </span>
+                  @if (biometricScanned().includes($index)) {
+                    <span class="reg-bio-list-item__check" [style.color]="tool.color">✓</span>
+                  } @else {
+                    <span class="reg-bio-list-item__arrow">›</span>
+                  }
+                </button>
+              }
+            </div>
+            @if (biometricScanned().length > 0) {
+              <p class="reg-bio-collected-count">
+                {{ biometricScanned().length }} / {{ BIOMETRIC_TOOLS.length }} collected
+              </p>
+            }
+          }
+
+          <!-- ── STAGE: SCAN ── active scanner for selected tool -->
+          @if (biometricStage() === 'scan') {
+            <div class="reg-bio-scanner" [style.--bio-color]="biometricSelectedTool()!.color">
+              <div class="reg-bio-scanner__ring" [class.reg-bio-scanner__ring--active]="biometricScanning()"></div>
+              @if (biometricScanning()) {
+                <div class="reg-bio-scanner__sweep"></div>
+              }
+              <span class="reg-bio-scanner__icon">{{ biometricSelectedTool()!.icon }}</span>
+            </div>
+
+            <p class="reg-bio-step-name" [style.color]="biometricSelectedTool()!.color">
+              {{ biometricSelectedTool()!.name }}
+            </p>
+            <p class="reg-bio-step-desc">{{ biometricSelectedTool()!.desc }}</p>
+
+            <!-- Captured flash — shown briefly after scan, then auto-returns to list -->
+            @if (biometricCaptured()) {
+              <div class="reg-bio-captured" [style.--bio-color]="biometricSelectedTool()!.color">
+                <span class="reg-bio-captured__check">✓</span>
+                <span class="reg-bio-captured__label">Captured</span>
+              </div>
+            }
+
+            <div class="reg-bio-actions">
+              @if (biometricScanning() || biometricCaptured()) {
+                <span class="reg-bio-scanning">
+                  @if (biometricScanning()) { <span class="reg-spinner"></span> Scanning… }
+                  @if (biometricCaptured()) { Returning to tools… }
+                </span>
+              } @else {
+                <button class="reg-btn reg-btn--primary" (click)="startBiometricScan()">
+                  Start Scan
+                </button>
+                <button class="reg-link" (click)="backToToolList()">Cancel</button>
+              }
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- ── NORMAL VERIFICATION TOOLS PANEL ────────────────────────────────── -->
+      @if (!biometricOpen()) {
+      <div class="reg-glass reg-vtool-panel">
+        <p class="reg-vtool-panel__title">ID Verification Tools</p>
+        <div class="reg-vtool-panel__line"></div>
+
+        <!-- ID Verification Protocol — all steps -->
+      
+
+        <div class="reg-vtool" style="--tool-color: #00F5FF">
+          <div class="reg-vtool__bar"></div>
+          <div>
+            <p class="reg-vtool__name">Auto-read OTP</p>
+            <p class="reg-vtool__desc">{{ autoReadSupported() ? 'Supported on this device' : 'Manual entry mode' }}</p>
+          </div>
+          <span class="reg-vtool__status">{{ (step() === 'otp-verify' || step() === 'otp-fallback') ? 'Active' : 'Standby' }}</span>
+        </div>
+
+        <div class="reg-vtool" style="--tool-color: #00BCD4">
+          <div class="reg-vtool__bar"></div>
+          <div>
+            <p class="reg-vtool__name">Voice Fallback</p>
+            <p class="reg-vtool__desc">Available after 3 failed OTP attempts</p>
+          </div>
+          <span class="reg-vtool__status">{{ step() === 'otp-fallback' ? 'Active' : 'Standby' }}</span>
+        </div>
+
+        <div class="reg-vtool" style="--tool-color: #00BCD4">
+          <div class="reg-vtool__bar"></div>
+          <div>
+            <p class="reg-vtool__name">Voice &amp; Breath Sample</p>
+            <p class="reg-vtool__desc">Voiceprint + respiratory baseline via acoustic scan</p>
+          </div>
+          <span class="reg-vtool__status">Standby</span>
+        </div>
+
+        <div class="reg-vtool" style="--tool-color: #FB923C">
+          <div class="reg-vtool__bar"></div>
+          <div>
+            <p class="reg-vtool__name">Live Face &amp; Vital Scan</p>
+            <p class="reg-vtool__desc">Liveness detection + facial mapping + resting vitals</p>
+          </div>
+          <span class="reg-vtool__status">Standby</span>
+        </div>
+
+        <div class="reg-vtool" style="--tool-color: #A78BFA">
+          <div class="reg-vtool__bar"></div>
+          <div>
+            <p class="reg-vtool__name">Eye Response &amp; Attention Check</p>
+            <p class="reg-vtool__desc">Pupillary reflex + gaze tracking + attention baseline</p>
+          </div>
+          <span class="reg-vtool__status">Standby</span>
+        </div>
+
+        <div class="reg-vtool" style="--tool-color: #22C55E">
+          <div class="reg-vtool__bar"></div>
+          <div>
+            <p class="reg-vtool__name">Movement &amp; Response Test</p>
+            <p class="reg-vtool__desc">Motor latency + gestural timing + micro-movement print</p>
+          </div>
+          <span class="reg-vtool__status">Standby</span>
+        </div>
+
+        <div class="reg-vtool" style="--tool-color: #EC4899">
+          <div class="reg-vtool__bar"></div>
+          <div>
+            <p class="reg-vtool__name">Touch Signature &amp; Pulse Scan</p>
+            <p class="reg-vtool__desc">Dermal pressure + skin conductance + optical pulse</p>
+          </div>
+          <span class="reg-vtool__status">Standby</span>
+        </div>
+
+        <div class="reg-vtool" style="--tool-color: #60A5FA">
+          <div class="reg-vtool__bar"></div>
+          <div>
+            <p class="reg-vtool__name">Device Posture &amp; Gait Check</p>
+            <p class="reg-vtool__desc">Accelerometer pattern + posture fingerprint</p>
+          </div>
+          <span class="reg-vtool__status">Standby</span>
+        </div>
+
+        <div class="reg-vtool" style="--tool-color: #F87171">
+          <div class="reg-vtool__bar"></div>
+          <div>
+            <p class="reg-vtool__name">Blood &amp; Oxygen Inputs</p>
+            <p class="reg-vtool__desc">SpO₂ saturation + haemodynamic baseline parameters</p>
+          </div>
+          <span class="reg-vtool__status">Standby</span>
+        </div>
+
+        <!-- OTP verification step — scan panel -->
+        @if (step() === 'otp-verify' || step() === 'otp-fallback') {
+          <div class="reg-vtool reg-vtool--active">
+            <span class="reg-vtool__dot reg-vtool__dot--pulse"></span>
+            <div>
+              <p class="reg-vtool__name">OTP Verification</p>
+              <p class="reg-vtool__desc">Active — awaiting your code</p>
+            </div>
+          </div>
+          <div class="reg-scan">
+            <div class="reg-scan__grid"></div>
+            <div class="reg-scan__line"></div>
+            <p class="reg-scan__label">Verifying identity signal</p>
+          </div>
+        }
+
+        <!-- Guidelines step -->
+        @if (step() === 'guidelines' || step() === 'disagreement' || step() === 'acknowledged') {
+          <div class="reg-vtool reg-vtool--done">
+            <span class="reg-vtool__dot reg-vtool__dot--green"></span>
+            <div>
+              <p class="reg-vtool__name">Phone Verified</p>
+              <p class="reg-vtool__desc">Mobile identity confirmed</p>
+            </div>
+          </div>
+          <div class="reg-vtool">
+            <span class="reg-vtool__dot"></span>
+            <div>
+              <p class="reg-vtool__name">Framework Review</p>
+              <p class="reg-vtool__desc">Acknowledgment pending</p>
+            </div>
+          </div>
+        }
+
+        <!-- Creating step -->
+        @if (step() === 'creating') {
+          <div class="reg-vtool reg-vtool--active">
+            <span class="reg-vtool__dot reg-vtool__dot--pulse"></span>
+            <div>
+              <p class="reg-vtool__name">Identity Weaving</p>
+              <p class="reg-vtool__desc">Generating your CeeBrain ID</p>
+            </div>
+          </div>
+          <div class="reg-scan">
+            <div class="reg-scan__grid"></div>
+            <div class="reg-scan__line"></div>
+            <p class="reg-scan__label">Identity allocation in progress</p>
+          </div>
+        }
+
+        <!-- Complete step -->
+        @if (step() === 'complete') {
+          <div class="reg-vtool reg-vtool--done">
+            <span class="reg-vtool__dot reg-vtool__dot--green"></span>
+            <div>
+              <p class="reg-vtool__name">Identity Confirmed</p>
+              <p class="reg-vtool__desc">All signals verified</p>
+            </div>
+          </div>
+          <div class="reg-vtool reg-vtool--done">
+            <span class="reg-vtool__dot reg-vtool__dot--green"></span>
+            <div>
+              <p class="reg-vtool__name">CeeBrain ID Issued</p>
+              <p class="reg-vtool__desc">Registered on the network</p>
+            </div>
+          </div>
+        }
+
+      </div>
+      } <!-- /.reg-vtool-panel -->
+
+    </aside>
+
+  </div><!-- /.reg-layout -->
+
+</div><!-- /.reg-page -->

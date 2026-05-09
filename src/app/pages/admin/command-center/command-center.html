@@ -1,0 +1,130 @@
+<div class="cc">
+
+  <!-- ══ Page Header ══════════════════════════════════════════════════════════ -->
+  <div class="cc-header">
+    <div class="cc-header__left">
+      <span class="cc-header__label">CEEKUL UNIFIED ADMIN PANEL</span>
+      <h1 class="cc-header__title">Command Center</h1>
+    </div>
+    <div class="cc-header__meta">
+      <span class="cc-header__load cc-header__load--{{ cuap.vitals().systemLoad }}">
+        {{ cuap.vitals().systemLoad | uppercase }} LOAD
+      </span>
+      <span class="cc-header__uptime">{{ cuap.vitals().uptime }}% UPTIME</span>
+    </div>
+  </div>
+
+  <!-- ══ Vitals Strip ══════════════════════════════════════════════════════════ -->
+  <div class="cc-vitals">
+
+    <div class="cc-vital">
+      <span class="cc-vital__label">Active Users</span>
+      <span class="cc-vital__value">{{ formatNumber(cuap.vitals().activeUsers) }}</span>
+      <span class="cc-vital__sub">right now</span>
+    </div>
+
+    <div class="cc-vital">
+      <span class="cc-vital__label">Content Units</span>
+      <span class="cc-vital__value">{{ formatNumber(cuap.vitals().contentUnitsTotal) }}</span>
+      <span class="cc-vital__sub">total indexed</span>
+    </div>
+
+    <div class="cc-vital">
+      <span class="cc-vital__label">Active Ads</span>
+      <span class="cc-vital__value cc-vital__value--purple">{{ formatNumber(cuap.vitals().adsActive) }}</span>
+      <span class="cc-vital__sub">in delivery</span>
+    </div>
+
+    <div class="cc-vital">
+      <span class="cc-vital__label">CID Commits</span>
+      <span class="cc-vital__value cc-vital__value--cyan">{{ formatNumber(cuap.vitals().cidCommitsToday) }}</span>
+      <span class="cc-vital__sub">today</span>
+    </div>
+
+    <div class="cc-vital">
+      <span class="cc-vital__label">Neuron Flow</span>
+      <span class="cc-vital__value cc-vital__value--green">{{ formatNumber(cuap.vitals().neuronFlowToday) }}</span>
+      <span class="cc-vital__sub">today</span>
+    </div>
+
+    <div class="cc-vital cc-vital--alert" [class.cc-vital--warn]="cuap.vitals().moderationQueueSize > 10">
+      <span class="cc-vital__label">Mod Queue</span>
+      <span class="cc-vital__value cc-vital__value--orange">{{ cuap.vitals().moderationQueueSize }}</span>
+      <span class="cc-vital__sub">pending review</span>
+    </div>
+
+  </div>
+
+  <!-- ══ Body Grid ════════════════════════════════════════════════════════════ -->
+  <div class="cc-body">
+
+    <!-- Activity Feed -->
+    <div class="cc-panel cc-panel--feed">
+      <div class="cc-panel__header">
+        <span class="cc-panel__title">Live Activity</span>
+        <span class="cc-panel__subtitle">CID commit ledger</span>
+      </div>
+      <div class="cc-feed">
+        @for (event of cuap.activityFeed(); track event.id) {
+        <div class="cc-feed__item cc-feed__item--{{ event.severity }}">
+          <div class="cc-feed__dot cc-feed__dot--{{ event.severity }}"></div>
+          <div class="cc-feed__body">
+            <span class="cc-feed__type">{{ event.type | uppercase }}</span>
+            @if (event.cid) {
+            <code class="cc-feed__cid">{{ event.cid }}</code>
+            }
+            <span class="cc-feed__summary">{{ event.summary }}</span>
+          </div>
+          <span class="cc-feed__time">{{ cuap.relative(event.timestamp) }}</span>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right column: services + launcher -->
+    <div class="cc-right">
+
+      <!-- System Health -->
+      <div class="cc-panel cc-panel--health">
+        <div class="cc-panel__header">
+          <span class="cc-panel__title">System Services</span>
+        </div>
+        <div class="cc-services">
+          @for (svc of cuap.systemServices(); track svc.name) {
+          <div class="cc-svc" [class.cc-svc--warn]="svc.status === 'degraded'" [class.cc-svc--down]="svc.status === 'down'">
+            <div class="cc-svc__left">
+              <div class="cc-svc__indicator cc-svc__indicator--{{ svc.status }}"></div>
+              <span class="cc-svc__name">{{ svc.name }}</span>
+            </div>
+            <div class="cc-svc__right">
+              <div class="cc-svc__bar">
+                <div class="cc-svc__fill" [style.width.%]="svc.health" [class.cc-svc__fill--warn]="svc.health < 95"></div>
+              </div>
+              <span class="cc-svc__latency">{{ svc.latencyMs }}ms</span>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Module Launcher -->
+      <div class="cc-panel cc-panel--launcher">
+        <div class="cc-panel__header">
+          <span class="cc-panel__title">Module Launcher</span>
+        </div>
+        <div class="cc-launcher">
+          @for (mod of modules; track mod.route) {
+          <a class="cc-launch-tile" [routerLink]="mod.route" [style.--accent]="mod.accent">
+            <span class="cc-launch-tile__glyph">{{ mod.glyph }}</span>
+            <span class="cc-launch-tile__label">{{ mod.label }}</span>
+            <span class="cc-launch-tile__sub">{{ mod.sub }}</span>
+          </a>
+          }
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

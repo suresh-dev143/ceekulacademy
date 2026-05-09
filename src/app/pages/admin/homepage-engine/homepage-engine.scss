@@ -1,0 +1,502 @@
+$cyan:   #00f5ff;
+$orange: #ff9900;
+$red:    #ff3366;
+$green:  #22c55e;
+$text:   #c8d8f0;
+$muted:  #3a4a6a;
+$border: rgba(0, 245, 255, 0.08);
+$surface:#080c15;
+
+.hpe {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-height: 100%;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.hpe-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $border;
+
+  &__label {
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    color: $muted;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0 0 0.2rem;
+  }
+
+  &__sub {
+    font-size: 0.65rem;
+    color: $muted;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  &__overrides {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: $orange;
+  }
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────────
+
+.hpe-btn {
+  padding: 0.4rem 0.875rem;
+  border-radius: 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &--primary {
+    background: rgba(0,245,255,0.1);
+    border-color: rgba(0,245,255,0.3);
+    color: $cyan;
+    &:hover:not(:disabled) { background: rgba(0,245,255,0.18); }
+    &:disabled { opacity: 0.35; cursor: not-allowed; }
+  }
+
+  &--ghost {
+    background: transparent;
+    border-color: $border;
+    color: $muted;
+    &:hover { color: $text; border-color: rgba(0,245,255,0.2); }
+  }
+}
+
+.hpe-badge {
+  background: $orange;
+  color: #000;
+  font-size: 0.55rem;
+  font-weight: 800;
+  border-radius: 100px;
+  padding: 0.05rem 0.3rem;
+  min-width: 14px;
+  text-align: center;
+}
+
+// ── AI Panel ──────────────────────────────────────────────────────────────────
+
+.hpe-ai-panel {
+  background: rgba(124,58,237,0.05);
+  border: 1px solid rgba(124,58,237,0.2);
+  border-radius: 8px;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 1rem;
+    border-bottom: 1px solid rgba(124,58,237,0.15);
+  }
+
+  &__label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #a78bfa;
+  }
+
+  &__cost {
+    font-size: 0.58rem;
+    color: $muted;
+  }
+}
+
+.hpe-ai-tip {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(124,58,237,0.08);
+
+  &:last-child { border-bottom: none; }
+
+  &__hour {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #a78bfa;
+    white-space: nowrap;
+    min-width: 64px;
+  }
+
+  &__text {
+    flex: 1;
+    font-size: 0.72rem;
+    color: $text;
+    line-height: 1.4;
+  }
+
+  &__apply {
+    background: transparent;
+    border: 1px solid rgba(124,58,237,0.3);
+    border-radius: 4px;
+    color: #a78bfa;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    &:hover { background: rgba(124,58,237,0.12); }
+  }
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+
+.hpe-body {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.25rem;
+  flex: 1;
+  align-items: start;
+
+  @media (max-width: 1100px) { grid-template-columns: 1fr; }
+}
+
+// ── Timeline ──────────────────────────────────────────────────────────────────
+
+.hpe-timeline {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  overflow: hidden;
+
+  &__legend {
+    display: grid;
+    grid-template-columns: 72px 80px 1fr 110px 1fr 110px 40px 32px;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid $border;
+    font-size: 0.52rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $muted;
+  }
+}
+
+.hpe-slot {
+  display: grid;
+  grid-template-columns: 72px 80px 1fr 110px 1fr 110px 40px 32px;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: background 0.12s, border-left-color 0.12s;
+
+  &:last-child { border-bottom: none; }
+
+  &:hover {
+    background: rgba(0,245,255,0.02);
+    border-left-color: rgba(0,245,255,0.2);
+  }
+
+  &--current {
+    background: rgba(0,245,255,0.04);
+    border-left-color: $cyan;
+  }
+
+  &--override {
+    background: rgba(255,153,0,0.03);
+    border-left-color: $orange;
+  }
+
+  &--selected {
+    background: rgba(0,245,255,0.06);
+    border-left-color: $cyan;
+  }
+
+  &__hour {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: $text;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__phase {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__content {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  &__override-tag {
+    font-size: 0.52rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: $orange;
+    background: rgba(255,153,0,0.1);
+    border: 1px solid rgba(255,153,0,0.2);
+    border-radius: 3px;
+    padding: 0.05rem 0.3rem;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: 0.72rem;
+    color: $text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__cid {
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    color: $cyan;
+    opacity: 0.6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &--ad { color: #a78bfa; }
+  }
+
+  &__ad-title {
+    font-size: 0.68rem;
+    color: $muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__eng {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 4px;
+    padding: 0.1rem 0.3rem;
+    font-variant-numeric: tabular-nums;
+
+    &--high { color: $green;  background: rgba(34,197,94,0.1);  }
+    &--mid  { color: $orange; background: rgba(255,153,0,0.1);  }
+    &--low  { color: $muted;  background: rgba(255,255,255,0.03);}
+  }
+
+  &__edit {
+    background: transparent;
+    border: 1px solid $border;
+    border-radius: 4px;
+    color: $muted;
+    font-size: 0.72rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    opacity: 0;
+
+    .hpe-slot:hover & { opacity: 1; }
+    &:hover { color: $cyan; border-color: rgba(0,245,255,0.3); }
+  }
+}
+
+// ── Detail Panel ──────────────────────────────────────────────────────────────
+
+.hpe-detail {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid $border;
+    border-left: 3px solid transparent;
+  }
+
+  &__hour {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: $muted;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0;
+  }
+
+  &__live {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: $green;
+    animation: cuap-pulse 2s ease infinite;
+  }
+
+  &__block {
+    padding: 0.875rem 1.1rem;
+    border-bottom: 1px solid $border;
+  }
+
+  &__block-label {
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $muted;
+    margin: 0 0 0.5rem;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.2rem 0;
+    gap: 0.5rem;
+  }
+
+  &__key {
+    font-size: 0.62rem;
+    color: $muted;
+  }
+
+  &__val {
+    font-size: 0.72rem;
+    color: $text;
+    text-align: right;
+  }
+
+  &__cid {
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    color: $cyan;
+    opacity: 0.8;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    text-align: right;
+  }
+
+  &__override-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255,153,0,0.07);
+    border: 1px solid rgba(255,153,0,0.2);
+    border-radius: 5px;
+    font-size: 0.62rem;
+    color: $orange;
+    gap: 0.5rem;
+  }
+
+  &__clear {
+    background: transparent;
+    border: 1px solid rgba(255,153,0,0.4);
+    border-radius: 4px;
+    color: $orange;
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    &:hover { background: rgba(255,153,0,0.12); }
+  }
+
+  &__suggestion {
+    padding: 0.875rem 1.1rem;
+    border-bottom: 1px solid $border;
+    background: rgba(124,58,237,0.04);
+
+    &-label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #a78bfa;
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+
+    p { font-size: 0.72rem; color: $text; margin: 0; line-height: 1.5; }
+  }
+
+  &__actions {
+    padding: 0.875rem 1.1rem;
+  }
+}
+
+.hpe-override-form {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.hpe-override-input {
+  flex: 1;
+  background: rgba(0,245,255,0.04);
+  border: 1px solid rgba(0,245,255,0.2);
+  border-radius: 5px;
+  color: $text;
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  padding: 0.35rem 0.625rem;
+  outline: none;
+  min-width: 0;
+
+  &::placeholder { color: $muted; }
+  &:focus { border-color: rgba(0,245,255,0.4); }
+}
+
+@keyframes cuap-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LandingLayout } from './components/landing-layout/landing-layout';
 import { Landing } from './pages/landing/landing';
 import { PersonalLayout } from './components/personal-layout/personal-layout';
+import { AdminLayout } from './components/admin-layout/admin-layout';
 import { Create } from './pages/personal/create/create';
 import { Demand } from './pages/personal/demand/demand';
 import { Edit } from './pages/personal/edit/edit';
@@ -57,6 +58,10 @@ export const routes: Routes = [
   // ==================== PAYMENT RETURN (Cramib redirect-back) ====================
   { path: 'payment/return', loadComponent: () => import('./pages/payment-return/payment-return').then(m => m.PaymentReturn) },
 
+  // Registration — standalone full-page layout (not wrapped in PersonalLayout)
+  { path: 'register', component: Register },
+   { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
+
   {
     path: '',
     component: LandingLayout,
@@ -69,8 +74,7 @@ export const routes: Routes = [
     component: PersonalLayout,
     children: [
       { path: '', redirectTo: 'my-activities', pathMatch: 'full' },
-      { path: 'register', component: Register },
-      { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
+     
 
       { path: 'dashboard/teacher/workshops', redirectTo: 'dashboard/my-workshops', pathMatch: 'full' },
       { path: 'dashboard/my-workshops', loadComponent: () => import('./pages/workshops/my-workshops/my-workshops').then(m => m.MyWorkshopsComponent) },
@@ -84,13 +88,20 @@ export const routes: Routes = [
       { path: 'programs/:programId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
       { path: 'programs/:programId/:sectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
       { path: 'programs/:programId/:sectionId/:subSectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
-      { path: 'my-activities', loadComponent: () => import('./pages/personal/my-activities/my-activites').then(m => m.MyActivities) },
+      {
+        path: 'my-activities',
+        loadComponent: () => import('./pages/personal/my-activities/my-activites').then(m => m.MyActivities),
+        data: { leftSidebar: 'meta' },
+      },
+      { path: 'set-my-content', loadComponent: () => import('./pages/personal/my-activities/set-my-content/set-my-content').then(m => m.SetMyContent),   data: { leftSidebar: 'meta' } },
+      { path: 'past-content',   loadComponent: () => import('./pages/personal/my-activities/past-content/past-content').then(m => m.PastContent),         data: { leftSidebar: 'meta' } },
       { path: 'potential', component: Potential },
       { path: 'projects', component: Projects },
       { path: 'neurons', component: Neurons },
       { path: 'kutumb', component: Kutumb },
       { path: 'future', component: Future },
       { path: 'digital-life', loadComponent: () => import('./pages/personal/digital-life/digital-life').then(m => m.DigitalLife) },
+      { path: 'human-life', loadComponent: () => import('./pages/personal/human-life/human-life').then(m => m.HumanLife) },
       // Action Hub — unified create / offer / advertise / explore
       // { path: 'action-hub', loadComponent: () => import('./pages/personal/action-hub/action-hub').then(m => m.ActionHub) },
       // Top navbar routes
@@ -104,6 +115,25 @@ export const routes: Routes = [
       { path: 'local-news', loadComponent: () => import('./pages/personal/local-news/local-news').then(m => m.LocalNewsPage) },
       { path: 'ai-tools', loadComponent: () => import('./pages/personal/ai-tools/ai-tools').then(m => m.AiToolsPage) },
       { path: 'library', loadComponent: () => import('./pages/personal/library/library').then(m => m.LibraryComponent), data: { leftSidebar: 'contextual' } },
+    ]
+  },
+
+  // ==================== CUAP — ADMIN PANEL ====================
+  {
+    path: 'admin',
+    component: AdminLayout,
+    children: [
+      { path: '', redirectTo: 'command', pathMatch: 'full' },
+      { path: 'command',  loadComponent: () => import('./pages/admin/command-center/command-center').then(m => m.CommandCenter) },
+      { path: 'homepage', loadComponent: () => import('./pages/admin/homepage-engine/homepage-engine').then(m => m.HomepageEngine) },
+      { path: 'content',  loadComponent: () => import('./pages/admin/content-mod/content-mod').then(m => m.ContentMod) },
+      { path: 'cid',      loadComponent: () => import('./pages/admin/cid-explorer/cid-explorer').then(m => m.CidExplorer) },
+      { path: 'ads',      loadComponent: () => import('./pages/admin/ad-manager/ad-manager').then(m => m.AdManager) },
+      { path: 'users',    loadComponent: () => import('./pages/admin/user-mgmt/user-mgmt').then(m => m.UserMgmt) },
+      { path: 'analytics',loadComponent: () => import('./pages/admin/analytics/analytics').then(m => m.Analytics) },
+      { path: 'infra',    loadComponent: () => import('./pages/admin/infra/infra').then(m => m.Infra) },
+      { path: 'identity', loadComponent: () => import('./pages/admin/identity/identity').then(m => m.Identity) },
+      { path: 'settings', loadComponent: () => import('./pages/admin/settings/settings').then(m => m.Settings) },
     ]
   },
 
