@@ -14,30 +14,31 @@ import { TodaysContent } from './todays-content/todays-content';
   encapsulation: ViewEncapsulation.None,
 })
 export class MyActivities implements OnInit, OnDestroy {
-  readonly orc  = inject(LifeOrchestratorService);
+  readonly orc = inject(LifeOrchestratorService);
   readonly auth = inject(AuthService);
 
   // Always return the full display ID including "CB" prefix, normalising both
   // backend format (plain digits) and client-fallback format (CB-prefixed string).
-  readonly ceebrainId  = computed(() => {
+  readonly ceebrainId = computed(() => {
     const raw = this.auth.currentUserProfile()?.ceebrainId ?? '';
+
     if (!raw) return '';
     return raw.startsWith('CB') ? raw : `CB${raw}`;
   });
   readonly currentTime = signal('');
   readonly currentDate = signal('');
-  readonly collapsed   = signal(false);
+  readonly collapsed = signal(false);
 
   toggleHub(): void { this.collapsed.update(v => !v); }
 
   // ── Day-map helpers ───────────────────────────────────────────────────────
 
   isCurrentHour(h: number): boolean { return h === this.orc.currentHour(); }
-  isPastHour(h: number): boolean    { return h < this.orc.currentHour(); }
+  isPastHour(h: number): boolean { return h < this.orc.currentHour(); }
 
   contentTitle(b: HourBlock): string {
     if (b.custom_content) return b.custom_content.title;
-    if (b.user_override)  return b.custom_activity;
+    if (b.user_override) return b.custom_activity;
     return b.intent;
   }
 
@@ -48,7 +49,7 @@ export class MyActivities implements OnInit, OnDestroy {
 
   contentTypeLabel(b: HourBlock): string {
     if (b.custom_content) return b.custom_content.source === 'ceekul' ? 'Curated' : 'My Work';
-    if (b.user_override)  return 'Override';
+    if (b.user_override) return 'Override';
     return 'Vision';
   }
 
@@ -57,6 +58,7 @@ export class MyActivities implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.tickClock();
     this.clockInterval = setInterval(() => this.tickClock(), 1_000);
+    console.log('ceebrainId', this.ceebrainId);
   }
 
   ngOnDestroy(): void {

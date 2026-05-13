@@ -1,0 +1,64 @@
+<div class="personal-hub">
+  <header class="personal-hub__header">
+    <h1 class="personal-hub__title">AI for Everyone</h1>
+    <p class="personal-hub__subtitle">Your personalized daily experience layer</p>
+  </header>
+
+  <!-- Section 1: Current Content Topics -->
+  <section class="personal-hub__section topics-section">
+    <div class="topics-grid">
+      @for (topic of topics(); track topic.id) {
+        <div 
+          class="topic-card" 
+          [class.active]="selectedTopicId() === topic.id"
+          (click)="selectTopic(topic.id)"
+        >
+          <div class="topic-card__glow"></div>
+          <div class="topic-card__content">
+            <span class="topic-card__title">{{ topic.title }}</span>
+          </div>
+          <div class="topic-card__border"></div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Section 2: Current Activities -->
+  <section class="personal-hub__section activities-section">
+    <div class="section-header">
+      <h2 class="section-title">
+        Current Hour Activities 
+        <span class="topic-indicator">— {{ selectedTopic()?.title }}</span>
+      </h2>
+    </div>
+
+    <div class="activities-list">
+      @if (selectedTopic(); as topic) {
+        @for (activity of topic.activities; track activity.text) {
+          <div class="activity-card">
+            <div class="activity-card__type">{{ activity.type }}</div>
+            <div class="activity-card__text">{{ activity.text }}</div>
+            <div class="activity-card__action">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="skeleton-shimmer">
+          <div class="skeleton-item"></div>
+          <div class="skeleton-item"></div>
+          <div class="skeleton-item"></div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Floating Particles Overlay (Simulated with CSS) -->
+  <div class="particles-container">
+    <div class="particle p1"></div>
+    <div class="particle p2"></div>
+    <div class="particle p3"></div>
+    <div class="particle p4"></div>
+    <div class="particle p5"></div>
+  </div>
+</div>

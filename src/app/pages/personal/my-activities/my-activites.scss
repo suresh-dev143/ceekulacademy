@@ -1,7 +1,7 @@
 // ── Life Orchestrator Dashboard ────────────────────────────────────────────────
 
 .orch {
-  
+
   color: #e0e0e0;
   min-height: 100vh;
   font-size: 0.875rem;
@@ -77,11 +77,11 @@
 
 .ma-hub {
   border: 1px solid #1a1a1a;
- 
+
   margin-bottom: 1.75rem;
   background: #060606;
   background-image: radial-gradient(ellipse at 50% 50%,
-    rgba(255, 153, 0, 0.04) 0%, transparent 65%);
+      rgba(255, 153, 0, 0.04) 0%, transparent 65%);
   overflow: hidden;
 }
 
@@ -115,14 +115,14 @@
   align-items: center;
   justify-content: center;
 
-  &--meta   {
+  &--meta {
     grid-area: meta;
     justify-content: flex-end;
     gap: 0.45rem;
     padding: 0.45rem 0.875rem 0.1rem;
   }
 
-  &--core   {
+  &--core {
     grid-area: core;
     padding: 0.5rem 1rem 0.6rem;
     border-bottom: 1px solid #141414;
@@ -130,9 +130,22 @@
     gap: 0;
   }
 
-  &--todays { grid-area: todays; padding: 0.65rem 0.5rem; border-right: 1px solid #141414; }
-  &--set    { grid-area: set;    padding: 0.65rem 0.5rem; border-right: 1px solid #141414; }
-  &--past   { grid-area: past;   padding: 0.65rem 0.5rem; }
+  &--todays {
+    grid-area: todays;
+    padding: 0.65rem 0.5rem;
+    border-right: 1px solid #141414;
+  }
+
+  &--set {
+    grid-area: set;
+    padding: 0.65rem 0.5rem;
+    border-right: 1px solid #141414;
+  }
+
+  &--past {
+    grid-area: past;
+    padding: 0.65rem 0.5rem;
+  }
 }
 
 // ── CB ID ─────────────────────────────────────────────────────────────────────
@@ -149,7 +162,9 @@
   line-height: 1;
   transition: text-shadow 0.22s;
 
-  &:hover { text-shadow: 0 0 24px rgba(255, 153, 0, 0.66); }
+  &:hover {
+    text-shadow: 0 0 24px rgba(255, 153, 0, 0.66);
+  }
 
   &--guest {
     font-size: 0.75rem;
@@ -177,7 +192,9 @@
   margin-top: 0.3rem;
   text-align: center;
 
-  &--guest { color: #242424; }
+  &--guest {
+    color: #242424;
+  }
 }
 
 .ma-hub__date {
@@ -206,8 +223,102 @@
   text-align: center;
   transition: color 0.18s;
 
-  &:hover      { color: #707070; }
-  &--current   { color: #484848; cursor: default; }
+  &:hover {
+    color: #707070;
+  }
+
+  &--current {
+    color: #484848;
+    cursor: default;
+  }
+}
+
+// ── AI for Everyone Hub ───────────────────────────────────────────────────────
+.ma-ai-hub {
+  margin-bottom: 2rem;
+  padding: 0.5rem;
+
+  &__card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  &__header {
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: #fff;
+    margin: 0;
+    text-transform: none;
+    background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.5));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  &__glow {
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255, 153, 0, 0.15) 0%, transparent 70%);
+    filter: blur(30px);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    color: #a0a0a0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover {
+      background: rgba(255, 153, 0, 0.08);
+      border-color: rgba(255, 153, 0, 0.3);
+      color: #ff9900;
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+      .ma-ai-hub__dot {
+        background: #ff9900;
+        box-shadow: 0 0 10px #ff9900;
+        transform: scale(1.2);
+      }
+    }
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
 }
 
 // ── Collapse strip ────────────────────────────────────────────────────────────
@@ -225,7 +336,9 @@
   cursor: pointer;
   transition: background 0.18s;
 
-  &:hover { background: rgba(255,255,255,0.018); }
+  &:hover {
+    background: rgba(255, 255, 255, 0.018);
+  }
 }
 
 .ma-hub__strip-id {
@@ -243,9 +356,13 @@
   display: inline-block;
   transition: transform 0.3s ease, color 0.18s;
 
-  &--flipped { transform: rotate(180deg); }
+  &--flipped {
+    transform: rotate(180deg);
+  }
 
-  .ma-hub__strip:hover & { color: #666; }
+  .ma-hub__strip:hover & {
+    color: #666;
+  }
 }
 
 // ── Day Map ───────────────────────────────────────────────────────────────────
@@ -285,7 +402,9 @@
     text-decoration: none;
     transition: color 0.18s;
 
-    &:hover { color: #ff9900; }
+    &:hover {
+      color: #ff9900;
+    }
   }
 }
 
@@ -299,10 +418,18 @@ a.orch-row__edit {
 // ── Mobile ────────────────────────────────────────────────────────────────────
 
 @media (max-width: 480px) {
-  .ma-hub__body { max-height: 9rem; }
+  .ma-hub__body {
+    max-height: 9rem;
+  }
 
-  .ma-hub__cbid { font-size: 1rem; }
-  .ma-hub__nav  { font-size: 0.5rem; letter-spacing: 0.08em; }
+  .ma-hub__cbid {
+    font-size: 1rem;
+  }
+
+  .ma-hub__nav {
+    font-size: 0.5rem;
+    letter-spacing: 0.08em;
+  }
 }
 
 // ── Set My Content Inline ─────────────────────────────────────────────────────
@@ -337,7 +464,9 @@ a.orch-row__edit {
     border-bottom-color: #4a9eff;
   }
 
-  &:hover:not(.smc-subtab--active) { color: #777; }
+  &:hover:not(.smc-subtab--active) {
+    color: #777;
+  }
 }
 
 .smc-vision__desc {
@@ -415,7 +544,9 @@ a.orch-row__edit {
   overflow-x: auto;
   scrollbar-width: none;
 
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   &__track {
     display: flex;
@@ -438,9 +569,18 @@ a.orch-row__edit {
     min-width: 3.5rem;
     position: relative;
 
-    &:hover { border-color: #282828; background: #111; }
-    &--sleep { opacity: 0.35; }
-    &--past  { opacity: 0.45; }
+    &:hover {
+      border-color: #282828;
+      background: #111;
+    }
+
+    &--sleep {
+      opacity: 0.35;
+    }
+
+    &--past {
+      opacity: 0.45;
+    }
 
     &--current {
       border-color: var(--phase-color, #ff9900);
@@ -522,7 +662,10 @@ a.orch-row__edit {
     color: #484848;
   }
 
-  &__sep { color: #282828; font-size: 0.7rem; }
+  &__sep {
+    color: #282828;
+    font-size: 0.7rem;
+  }
 
   &__override-badge {
     font-size: 0.55rem;
@@ -616,8 +759,18 @@ a.orch-row__edit {
     flex-wrap: wrap;
   }
 
-  &__header-left  { display: flex; flex-direction: column; gap: 0.3rem; }
-  &__header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+  &__header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  &__header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
 
   &__hour {
     font-size: 0.62rem;
@@ -649,7 +802,11 @@ a.orch-row__edit {
     display: inline-block;
   }
 
-  &__confidence { display: flex; align-items: center; gap: 0.5rem; }
+  &__confidence {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 
   &__confidence-label {
     font-size: 0.62rem;
@@ -697,12 +854,19 @@ a.orch-row__edit {
   transition: all 0.2s;
   white-space: nowrap;
 
-  &:hover { border-color: var(--phase-accent, #ff9900); color: var(--phase-accent, #ff9900); }
+  &:hover {
+    border-color: var(--phase-accent, #ff9900);
+    color: var(--phase-accent, #ff9900);
+  }
 
   &--remove {
     color: #4a2020;
     border-color: #2a1a1a;
-    &:hover { border-color: #ff6b6b; color: #ff6b6b; }
+
+    &:hover {
+      border-color: #ff6b6b;
+      color: #ff6b6b;
+    }
   }
 }
 
@@ -712,7 +876,9 @@ a.orch-row__edit {
   display: grid;
   grid-template-columns: 1fr 1.4fr 1fr;
 
-  @media (max-width: 768px) { grid-template-columns: 1fr; }
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .orch-panel {
@@ -721,11 +887,21 @@ a.orch-row__edit {
   flex-direction: column;
   gap: 0.875rem;
 
-  &--left  { border-right: 1px solid rgba(255, 255, 255, 0.04); }
-  &--right { border-left:  1px solid rgba(255, 255, 255, 0.04); }
+  &--left {
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  &--right {
+    border-left: 1px solid rgba(255, 255, 255, 0.04);
+  }
 
   @media (max-width: 768px) {
-    &--left, &--right { border: none; border-top: 1px solid rgba(255, 255, 255, 0.04); }
+
+    &--left,
+    &--right {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
   }
 
   &__label {
@@ -743,15 +919,47 @@ a.orch-row__edit {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    &--left   { background: #4a90d9; }
-    &--middle { background: var(--phase-accent, #ff9900); }
-    &--right  { background: #a78bfa; }
+
+    &--left {
+      background: #4a90d9;
+    }
+
+    &--middle {
+      background: var(--phase-accent, #ff9900);
+    }
+
+    &--right {
+      background: #a78bfa;
+    }
   }
 
-  &__insight  { font-size: 0.82rem; color: #707070; line-height: 1.65; margin: 0; }
-  &__activity { font-size: 1rem; font-weight: 700; color: #e0e0e0; margin: 0; line-height: 1.4; }
-  &__metrics  { display: flex; flex-direction: column; gap: 0.35rem; }
-  &__empty    { font-size: 0.75rem; color: #2a2a2a; margin: 0; font-style: italic; }
+  &__insight {
+    font-size: 0.82rem;
+    color: #707070;
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  &__activity {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #e0e0e0;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  &__metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  &__empty {
+    font-size: 0.75rem;
+    color: #2a2a2a;
+    margin: 0;
+    font-style: italic;
+  }
 }
 
 // ── Metrics ───────────────────────────────────────────────────────────────────
@@ -765,8 +973,14 @@ a.orch-row__edit {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 0.3rem;
 
-  &__label { color: #404040; }
-  &__value { color: #909090; font-weight: 700; }
+  &__label {
+    color: #404040;
+  }
+
+  &__value {
+    color: #909090;
+    font-weight: 700;
+  }
 }
 
 // ── Guidance List ─────────────────────────────────────────────────────────────
@@ -816,9 +1030,18 @@ a.orch-row__edit {
   border-radius: 0.4rem;
   transition: border-color 0.15s;
 
-  &:hover { border-color: #222; }
-  &__icon { font-size: 0.9rem; }
-  &__name { font-size: 0.75rem; color: #606060; }
+  &:hover {
+    border-color: #222;
+  }
+
+  &__icon {
+    font-size: 0.9rem;
+  }
+
+  &__name {
+    font-size: 0.75rem;
+    color: #606060;
+  }
 }
 
 // ── Devices ───────────────────────────────────────────────────────────────────
@@ -888,18 +1111,36 @@ a.orch-row__edit {
 
   &:hover {
     background: #0d0d0d;
-    .orch-row__edit { opacity: 1; }
+
+    .orch-row__edit {
+      opacity: 1;
+    }
   }
 
   &--current {
     background: color-mix(in srgb, var(--row-accent, #ff9900) 6%, transparent);
-    .orch-row__hour { color: var(--row-accent, #ff9900); }
-    .orch-row__bar  { background: var(--row-accent, #ff9900); opacity: 1; }
+
+    .orch-row__hour {
+      color: var(--row-accent, #ff9900);
+    }
+
+    .orch-row__bar {
+      background: var(--row-accent, #ff9900);
+      opacity: 1;
+    }
   }
 
-  &--selected:not(&--current) { background: #0d0d0d; }
-  &--past  { opacity: 0.45; }
-  &--sleep { opacity: 0.3; }
+  &--selected:not(&--current) {
+    background: #0d0d0d;
+  }
+
+  &--past {
+    opacity: 0.45;
+  }
+
+  &--sleep {
+    opacity: 0.3;
+  }
 
   &__time {
     display: flex;
@@ -970,7 +1211,10 @@ a.orch-row__edit {
     text-transform: uppercase;
     color: #2e2e2e;
     white-space: nowrap;
-    &--override { color: #fb923c; }
+
+    &--override {
+      color: #fb923c;
+    }
   }
 
   &__edit {
@@ -985,7 +1229,9 @@ a.orch-row__edit {
     transition: opacity 0.15s, color 0.15s;
     line-height: 1;
 
-    &:hover { color: #707070; }
+    &:hover {
+      color: #707070;
+    }
   }
 }
 
@@ -1038,7 +1284,10 @@ a.orch-row__edit {
     padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
     transition: color 0.15s;
-    &:hover { color: #e0e0e0; }
+
+    &:hover {
+      color: #e0e0e0;
+    }
   }
 
   &__hint {
@@ -1064,7 +1313,9 @@ a.orch-row__edit {
     box-sizing: border-box;
     margin-top: 0.875rem;
 
-    &::placeholder { color: #2e2e2e; }
+    &::placeholder {
+      color: #2e2e2e;
+    }
   }
 
   &__actions {
@@ -1090,22 +1341,37 @@ a.orch-row__edit {
       background: transparent;
       color: #404040;
       border-color: #1e1e1e;
-      &:hover { color: #e0e0e0; border-color: #333; }
+
+      &:hover {
+        color: #e0e0e0;
+        border-color: #333;
+      }
     }
 
     &--save {
       background: #ff9900;
       color: #000;
       border-color: #ff9900;
-      &:hover:not(:disabled) { background: #e68a00; }
-      &:disabled { opacity: 0.3; cursor: not-allowed; }
+
+      &:hover:not(:disabled) {
+        background: #e68a00;
+      }
+
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
     }
 
     &--remove {
       background: transparent;
       color: #7a3030;
       border-color: #2a1414;
-      &:hover { color: #ff6b6b; border-color: #ff6b6b; }
+
+      &:hover {
+        color: #ff6b6b;
+        border-color: #ff6b6b;
+      }
     }
   }
 
@@ -1128,7 +1394,9 @@ a.orch-row__edit {
     transition: color 0.15s, background 0.15s;
     border-bottom: 2px solid transparent;
 
-    &:hover { color: #808080; }
+    &:hover {
+      color: #808080;
+    }
 
     &--active {
       color: #ff9900;
@@ -1158,7 +1426,9 @@ a.orch-row__edit {
       transition: color 0.15s;
     }
 
-    &:hover span { color: #a0a0a0; }
+    &:hover span {
+      color: #a0a0a0;
+    }
   }
 
   &__cid-preview {
@@ -1192,18 +1462,37 @@ a.orch-row__edit {
 // ── Animations ────────────────────────────────────────────────────────────────
 
 @keyframes orch-fade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes orch-slide {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes orch-pulse {
-  0%, 100% { box-shadow: 0 0 30px rgba(74, 144, 217, 0.12), 0 0 80px rgba(74, 144, 217, 0.04); }
-  50%       { box-shadow: 0 0 50px rgba(74, 144, 217, 0.25), 0 0 100px rgba(74, 144, 217, 0.08); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(74, 144, 217, 0.12), 0 0 80px rgba(74, 144, 217, 0.04);
+  }
+
+  50% {
+    box-shadow: 0 0 50px rgba(74, 144, 217, 0.25), 0 0 100px rgba(74, 144, 217, 0.08);
+  }
 }
 
 // ── Set My Content Button ─────────────────────────────────────────────────────
@@ -1349,7 +1638,10 @@ a.orch-row__edit {
     padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
     transition: color 0.15s;
-    &:hover { color: #e0e0e0; }
+
+    &:hover {
+      color: #e0e0e0;
+    }
   }
 
   &__footer {
@@ -1388,8 +1680,14 @@ a.orch-row__edit {
     gap: 0.75rem;
     flex-shrink: 1;
 
-    &::-webkit-scrollbar { width: 4px; }
-    &::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #222;
+      border-radius: 2px;
+    }
   }
 
   &__label {
@@ -1421,7 +1719,10 @@ a.orch-row__edit {
   transition: all 0.15s;
   white-space: nowrap;
 
-  &:hover { border-color: #333; color: #808080; }
+  &:hover {
+    border-color: #333;
+    color: #808080;
+  }
 
   &--active {
     border-color: #ff9900;
@@ -1449,7 +1750,10 @@ a.orch-row__edit {
   transition: all 0.15s;
   white-space: nowrap;
 
-  &:hover { border-color: #333; color: #707070; }
+  &:hover {
+    border-color: #333;
+    color: #707070;
+  }
 
   &--selected {
     border-color: #ff9900;
@@ -1477,7 +1781,10 @@ a.orch-row__edit {
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover { border-color: #333; color: #808080; }
+  &:hover {
+    border-color: #333;
+    color: #808080;
+  }
 
   &--active {
     border-color: #ff9900;
@@ -1500,8 +1807,13 @@ a.orch-row__edit {
   transition: border-color 0.15s;
   flex-shrink: 0;
 
-  &::placeholder { color: #2e2e2e; }
-  &:focus { border-color: #333; }
+  &::placeholder {
+    color: #2e2e2e;
+  }
+
+  &:focus {
+    border-color: #333;
+  }
 }
 
 .smc-db-list {
@@ -1517,7 +1829,10 @@ a.orch-row__edit {
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 
-  &:hover { border-color: #252525; background: #0d0d0d; }
+  &:hover {
+    border-color: #252525;
+    background: #0d0d0d;
+  }
 
   &--selected {
     border-color: #ff9900;
@@ -1575,9 +1890,17 @@ a.orch-row__edit {
   box-sizing: border-box;
   transition: border-color 0.15s;
 
-  &::placeholder { color: #2e2e2e; }
-  &:focus { border-color: #333; }
-  &--sub { flex: 1; }
+  &::placeholder {
+    color: #2e2e2e;
+  }
+
+  &:focus {
+    border-color: #333;
+  }
+
+  &--sub {
+    flex: 1;
+  }
 }
 
 .smc-subtitles {
@@ -1601,7 +1924,10 @@ a.orch-row__edit {
   padding: 0.25rem;
   transition: color 0.15s;
   flex-shrink: 0;
-  &:hover { color: #ff6b6b; }
+
+  &:hover {
+    color: #ff6b6b;
+  }
 }
 
 .smc-add-subtitle {
@@ -1617,7 +1943,10 @@ a.orch-row__edit {
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover { border-color: #333; color: #707070; }
+  &:hover {
+    border-color: #333;
+    color: #707070;
+  }
 }
 
 .smc-textarea {
@@ -1635,8 +1964,13 @@ a.orch-row__edit {
   box-sizing: border-box;
   transition: border-color 0.15s;
 
-  &::placeholder { color: #2e2e2e; }
-  &:focus { border-color: #333; }
+  &::placeholder {
+    color: #2e2e2e;
+  }
+
+  &:focus {
+    border-color: #333;
+  }
 }
 
 .smc-btn {
@@ -1654,14 +1988,25 @@ a.orch-row__edit {
     background: transparent;
     color: #404040;
     border-color: #1e1e1e;
-    &:hover { color: #e0e0e0; border-color: #333; }
+
+    &:hover {
+      color: #e0e0e0;
+      border-color: #333;
+    }
   }
 
   &--apply {
     background: #ff9900;
     color: #000;
     border-color: #ff9900;
-    &:hover:not(:disabled) { background: #e68a00; }
-    &:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    &:hover:not(:disabled) {
+      background: #e68a00;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
   }
 }

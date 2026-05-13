@@ -87,9 +87,10 @@ export class LoginComponent {
 
         this.authService.login(payload).subscribe({
             next: (res) => {
+                console.log(res);
                 this.isSubmitting.set(false);
                 const role = res.user.role?.toLowerCase() ?? '';
-                this.router.navigate(['/personal', role]).catch(() => {
+                this.router.navigate(['/personal/my-activities', role]).catch(() => {
                     this.router.navigate(['/personal']);
                 });
             },

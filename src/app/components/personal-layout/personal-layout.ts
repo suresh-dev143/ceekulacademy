@@ -41,7 +41,9 @@ export class PersonalLayout implements OnInit {
     readonly rightSidebarOpen = signal(true);
     readonly topNavItems = [
         { label: 'HOME', route: '/', exact: true },
+        { label: 'PERSONAL', route: '/personal', exact: true },
         { label: 'CREATE', route: '/personal/create' },
+
         { label: 'NEARBY', route: '/personal/local-news' },
         { label: 'AI TOOLS', route: '/personal/ai-tools' },
         { label: 'ADVERTISE', route: '/personal/advertise' },

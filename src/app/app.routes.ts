@@ -73,7 +73,8 @@ export const routes: Routes = [
     path: 'personal',
     component: PersonalLayout,
     children: [
-      { path: '', redirectTo: 'my-activities', pathMatch: 'full' },
+      { path: '', loadComponent: () => import('./pages/personal/personal-hub/personal-hub').then(m => m.PersonalHubComponent) },
+
      
 
       { path: 'dashboard/teacher/workshops', redirectTo: 'dashboard/my-workshops', pathMatch: 'full' },

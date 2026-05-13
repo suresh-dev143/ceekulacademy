@@ -3,23 +3,22 @@
     <app-navbar [navLinks]="topNavItems" class="layout__navbar"></app-navbar>
 
     <!-- ── Main Body ── -->
-    <div class="layout__body"
-         [class.left-collapsed]="!leftSidebarOpen()"
-         [class.right-collapsed]="!rightSidebarOpen()">
+    <div class="layout__body" [class.left-collapsed]="!leftSidebarOpen()" [class.right-collapsed]="!rightSidebarOpen()">
 
         <!-- ── Left Sidebar (Dynamic) ── -->
         <aside class="layout__sidebar layout__sidebar--left" [class.collapsed]="!leftSidebarOpen()">
             <button class="sidebar-toggle left" (click)="toggleLeftSidebar()">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2.5" class="toggle-icon" [style.transform]="!leftSidebarOpen() ? 'rotate(180deg)' : ''">
+                    stroke-width="2.5" class="toggle-icon"
+                    [style.transform]="!leftSidebarOpen() ? 'rotate(180deg)' : ''">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
             <div class="sidebar-inner">
                 @switch (sidebarType()) {
-                    @case ('news') { <app-local-news></app-local-news> }
-                    @case ('contextual') { <app-context-sidebar></app-context-sidebar> }
-                    @case ('meta') { <app-meta-intelligence></app-meta-intelligence> }
+                @case ('news') { <app-local-news></app-local-news> }
+                @case ('contextual') { <app-context-sidebar></app-context-sidebar> }
+                @case ('meta') { <app-meta-intelligence></app-meta-intelligence> }
                 }
             </div>
         </aside>
@@ -28,9 +27,12 @@
         <main class="layout__main" role="main">
             <app-global-search></app-global-search>
             @if (ceebrainId()) {
-              <div class="layout__cbid-header">
-                <span class="layout__cbid-title">CB{{ ceebrainId() }}</span>
-              </div>
+
+            <div class="layout__cbid-header">
+                <span routerLink="/personal/digital-life" class="layout__cbid-title">CB{{
+                    ceebrainId() }}</span>
+
+            </div>
             }
             <router-outlet></router-outlet>
         </main>
@@ -39,7 +41,8 @@
         <aside class="layout__sidebar layout__sidebar--right" [class.collapsed]="!rightSidebarOpen()">
             <button class="sidebar-toggle right" (click)="toggleRightSidebar()">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2.5" class="toggle-icon" [style.transform]="!rightSidebarOpen() ? 'rotate(180deg)' : ''">
+                    stroke-width="2.5" class="toggle-icon"
+                    [style.transform]="!rightSidebarOpen() ? 'rotate(180deg)' : ''">
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
             </button>

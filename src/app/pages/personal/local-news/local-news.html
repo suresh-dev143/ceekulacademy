@@ -1,20 +1,38 @@
 <div class="local-news-page">
-
-  <!-- @if (ceebrainId()) {
-  <div class="lnp-cbid-bar">
-    <a class="lnp-cbid-bar__value" routerLink="/personal/digital-life">CB{{ ceebrainId() }}</a>
-  </div>
-  } -->
+  <nav class="lnp-nav">
+    <div class="lnp-dropdown">
+      <button class="lnp-dropdown__trigger">
+        Programs
+        <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg> -->
+      </button>
+      <div class="lnp-dropdown__content">
+        <a routerLink="/personal/programs/innovative">Innovative Courses</a>
+        <a routerLink="/personal/programs/research">Futuristic Research</a>
+        <a routerLink="/personal/programs/projects">Project Development</a>
+        <a class="lnp-dropdown__split">
+          <span routerLink="">Webinars</span>
+          &
+          <span routerLink="/personal/workshops">Workshops</span>
+        </a>
+        <a routerLink="/personal/programs/services">Community Services</a>
+        <a routerLink="/personal/programs/harmony">Cosmic Coherence</a>
+      </div>
+    </div>
+    <button class="lnp__filter-toggle" (click)="toggleFilters()" [class.lnp__filter-toggle--open]="filtersOpen()"
+      type="button" aria-label="Toggle filters">
+      <span><i class="fas fa-bars"></i></span>
+    </button>
+  </nav>
 
   <div class="lnp">
     <!-- Header + Filter Toggle -->
 
     <div class="lnp__header">
-      <span class="lnp__radius-label">10 km zone</span>
-      <button class="lnp__filter-toggle" (click)="toggleFilters()" [class.lnp__filter-toggle--open]="filtersOpen()"
-        type="button" aria-label="Toggle filters">
-        <span>Filters</span>
-      </button>
+      <!-- <span class="lnp__radius-label">10 km zone</span> -->
+
     </div>
 
     <div class="news-main">
@@ -23,7 +41,7 @@
         <p><strong>Fill the filters above</strong> to get customised AI news.</p>
         <ul class="lnp__info-list">
           <li>
-           
+
             <strong>Topic only</strong> — global news on that subject.
           </li>
           <li>

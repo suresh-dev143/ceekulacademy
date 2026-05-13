@@ -8,7 +8,8 @@
                 <h1 class="mpr-title">My Profile</h1>
                 <div class="mpr-uid">
                     User ID: <span class="uid-value">USR-{{ profile().userId }}</span>
-                    <span class="account-status-badge status-{{ profile().accountInfo.accountStatus === 'Active' ? 'active' : 'warn' }}">
+                    <span
+                        class="account-status-badge status-{{ profile().accountInfo.accountStatus === 'Active' ? 'active' : 'warn' }}">
                         {{ profile().accountInfo.accountStatus }}
                     </span>
                 </div>
@@ -17,8 +18,7 @@
                 <div class="comp-ring">
                     <svg viewBox="0 0 80 80" class="comp-svg">
                         <circle cx="40" cy="40" r="34" class="comp-track" />
-                        <circle cx="40" cy="40" r="34" class="comp-fill"
-                            [attr.stroke-dasharray]="213.6"
+                        <circle cx="40" cy="40" r="34" class="comp-fill" [attr.stroke-dasharray]="213.6"
                             [attr.stroke-dashoffset]="213.6 - (213.6 * completion() / 100)"
                             [attr.stroke]="getCompletionColor(completion())" />
                     </svg>
@@ -44,7 +44,8 @@
             <div class="card-glass profile-header">
                 <div class="avatar-wrap">
                     <div class="avatar-glow"></div>
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ceebrain" alt="Avatar" class="avatar-img" />
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ceebrain" alt="Avatar"
+                        class="avatar-img" />
                     <button class="avatar-edit"><i class="fas fa-camera"></i></button>
                 </div>
                 <div class="profile-identity">
@@ -63,9 +64,9 @@
                 <div class="section-title">
                     <span>Core Attributes</span>
                     @if (!editingPersonal()) {
-                        <button class="edit-btn" (click)="startEditPersonal()">
-                            <i class="fas fa-pen"></i>
-                        </button>
+                    <button class="edit-btn" (click)="startEditPersonal()">
+                        <i class="fas fa-pen"></i>
+                    </button>
                     }
                 </div>
 
@@ -73,18 +74,18 @@
                     <div class="data-field">
                         <label>Date of Birth</label>
                         @if (editingPersonal()) {
-                            <input type="date" formControlName="dob" class="futuristic-input" />
+                        <input type="date" formControlName="dob" class="futuristic-input" />
                         } @else {
-                            <div class="data-value">{{ profile().personalInfo.dob || '—' }}</div>
+                        <div class="data-value">{{ profile().personalInfo.dob || '—' }}</div>
                         }
                     </div>
 
                     <div formGroupName="address" class="data-field">
                         <label>Location</label>
                         @if (editingPersonal()) {
-                            <input type="text" formControlName="city" class="futuristic-input" placeholder="City" />
+                        <input type="text" formControlName="city" class="futuristic-input" placeholder="City" />
                         } @else {
-                            <div class="data-value">{{ profile().personalInfo.address.city || '—' }}</div>
+                        <div class="data-value">{{ profile().personalInfo.address.city || '—' }}</div>
                         }
                     </div>
 
@@ -108,10 +109,10 @@
                 </form>
 
                 @if (editingPersonal()) {
-                    <div class="action-row">
-                        <button class="btn btn-ghost" (click)="cancelEditPersonal()">Cancel</button>
-                        <button class="btn btn-primary" (click)="savePersonal()">Save Changes</button>
-                    </div>
+                <div class="action-row">
+                    <button class="btn btn-ghost" (click)="cancelEditPersonal()">Cancel</button>
+                    <button class="btn btn-primary" (click)="savePersonal()">Save Changes</button>
+                </div>
                 }
             </div>
         </div>
@@ -211,8 +212,7 @@
                 @if (editingIdentity()) {
                 <div class="form-actions">
                     <button type="button" class="fa-cancel" (click)="cancelEditIdentity()">Cancel</button>
-                    <button type="button" class="fa-save" (click)="saveIdentity()"
-                        [disabled]="identityForm.invalid">
+                    <button type="button" class="fa-save" (click)="saveIdentity()" [disabled]="identityForm.invalid">
                         <i class="fas fa-save"></i> Save
                     </button>
                 </div>
@@ -253,8 +253,7 @@
                         <div class="doc-name">{{ doc.fileName }}</div>
                         <div class="doc-meta">{{ doc.type }} · Uploaded {{ doc.uploadedAt }}</div>
                     </div>
-                    <span class="doc-status"
-                        [style.color]="getDocStatusColor(doc.status)"
+                    <span class="doc-status" [style.color]="getDocStatusColor(doc.status)"
                         [style.borderColor]="getDocStatusColor(doc.status)">
                         {{ doc.status }}
                     </span>
@@ -307,7 +306,8 @@
                         <i class="fas fa-shield-alt"></i> Two-Factor Authentication
                     </div>
                     <div class="sc-meta">
-                        {{ profile().accountInfo.twoFAEnabled ? 'Adds an extra layer of login security' : 'Disabled — recommended to enable' }}
+                        {{ profile().accountInfo.twoFAEnabled ? 'Adds an extra layer of login security' : 'Disabled —
+                        recommended to enable' }}
                     </div>
                     <div class="tfa-toggle" [class.on]="profile().accountInfo.twoFAEnabled" (click)="toggleTwoFA()">
                         <div class="tfa-knob"></div>
@@ -332,7 +332,8 @@
                     @for (session of profile().accountInfo.activeSessions; track session.sessionId) {
                     <div class="session-row" [class.session-current]="session.isCurrent">
                         <div class="sess-icon">
-                            <i class="fas {{ session.device.toLowerCase().includes('phone') || session.device.toLowerCase().includes('android') || session.device.toLowerCase().includes('iphone') ? 'fa-mobile-alt' : 'fa-laptop' }}"></i>
+                            <i
+                                class="fas {{ session.device.toLowerCase().includes('phone') || session.device.toLowerCase().includes('android') || session.device.toLowerCase().includes('iphone') ? 'fa-mobile-alt' : 'fa-laptop' }}"></i>
                         </div>
                         <div class="sess-info">
                             <div class="sess-device">{{ session.device }} · {{ session.browser }}</div>
@@ -364,7 +365,8 @@
                         Request Deactivation
                     </button>
                 </div>
-                <p class="danger-desc">Initiates the account deactivation process. Your data will be securely retained for 30 days, after which it will be permanently erased per our data governance policy.</p>
+                <p class="danger-desc">Initiates the account deactivation process. Your data will be securely retained
+                    for 30 days, after which it will be permanently erased per our data governance policy.</p>
                 @if (profile().accountInfo.accountStatus === 'Deactivation Requested') {
                 <div class="deactivation-pending">
                     <i class="fas fa-hourglass-half"></i> Deactivation request is under review.
@@ -477,7 +479,8 @@
             <div class="comp-bar-block">
                 <div class="comp-bar-header">
                     <span>Overall Completion</span>
-                    <span class="comp-bar-pct" [style.color]="getCompletionColor(completion())">{{ completion() }}%</span>
+                    <span class="comp-bar-pct" [style.color]="getCompletionColor(completion())">{{ completion()
+                        }}%</span>
                 </div>
                 <div class="comp-bar-track">
                     <div class="comp-bar-fill" [style.width.%]="completion()"
@@ -565,8 +568,7 @@
             </div>
             <div class="mf-group">
                 <label class="mf-label">New Password * (min 8 characters)</label>
-                <input type="password" class="mf-input" formControlName="newPassword"
-                    placeholder="Create new password">
+                <input type="password" class="mf-input" formControlName="newPassword" placeholder="Create new password">
                 @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
                 <div class="mf-error">Minimum 8 characters required</div>
                 }
@@ -587,8 +589,7 @@
             }
             <div class="modal-actions">
                 <button type="button" class="mfa-cancel" (click)="closePasswordModal()">Cancel</button>
-                <button type="submit" class="mfa-save"
-                    [disabled]="passwordForm.invalid || isChangingPassword()">
+                <button type="submit" class="mfa-save" [disabled]="passwordForm.invalid || isChangingPassword()">
                     @if (isChangingPassword()) {
                     <i class="fas fa-spinner fa-spin"></i> Updating...
                     } @else {

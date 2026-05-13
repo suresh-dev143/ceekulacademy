@@ -3,14 +3,48 @@
   @if (orc.isSleepMode()) {
   <div class="orch-sleep">
     <div class="orch-sleep__orb"></div>
-    @if (ceebrainId()) {
-      <a class="ma-hub__cbid ma-hub__cbid--sleep-mode" routerLink="/personal/digital-life">{{ ceebrainId() }}</a>
-    }
+
     <p class="orch-sleep__label">Autonomous Regeneration Mode</p>
     <p class="orch-sleep__time">{{ currentTime() }}</p>
     <p class="orch-sleep__hint">No content. No stimulation. Rest.</p>
   </div>
   } @else {
+
+  <!-- ══ AI FOR EVERYONE ══════════════════════════════════════════════════════ -->
+  <div class="ma-ai-hub">
+    <div class="ma-ai-hub__card">
+      <div class="ma-ai-hub__header">
+        <h2 class="ma-ai-hub__title">AI for Everyone</h2>
+        <div class="ma-ai-hub__glow"></div>
+      </div>
+      <div class="ma-ai-hub__grid">
+        <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/self-improvement">
+
+          Self Improvement
+        </a>
+        <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/creative">
+
+          Creative Expression
+        </a>
+        <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/innovation">
+
+          Innovation & Research
+        </a>
+        <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/family">
+
+          Family Transformation
+        </a>
+        <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/digital-system">
+
+          Evolving Digital System
+        </a>
+        <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/projects">
+
+          Identify Your Project
+        </a>
+      </div>
+    </div>
+  </div>
 
   <!-- ══ PERSONAL HUB ════════════════════════════════════════════════════════ -->
   <div class="ma-hub">
@@ -50,10 +84,9 @@
     </div><!-- /body -->
 
     <!-- Always-visible strip with collapse arrow -->
-    <button class="ma-hub__strip" (click)="toggleHub()"
-            [attr.aria-label]="collapsed() ? 'Expand hub' : 'Collapse hub'">
+    <button class="ma-hub__strip" (click)="toggleHub()" [attr.aria-label]="collapsed() ? 'Expand hub' : 'Collapse hub'">
       @if (collapsed() && ceebrainId()) {
-        <span class="ma-hub__strip-id">{{ ceebrainId() }}</span>
+      <span class="ma-hub__strip-id">{{ ceebrainId() }}</span>
       }
       <span class="ma-hub__arrow" [class.ma-hub__arrow--flipped]="collapsed()">⌃</span>
     </button>
@@ -73,40 +106,35 @@
 
     <div class="orch-schedule__list">
       @for (block of orc.schedule(); track block.hour) {
-        <div class="orch-row"
-             [class.orch-row--current]="isCurrentHour(block.hour)"
-             [class.orch-row--past]="isPastHour(block.hour)"
-             [class.orch-row--sleep]="block.phase === 'sleep'"
-             [style.--row-accent]="orc.phaseAccent(block.phase)">
+      <div class="orch-row" [class.orch-row--current]="isCurrentHour(block.hour)"
+        [class.orch-row--past]="isPastHour(block.hour)" [class.orch-row--sleep]="block.phase === 'sleep'"
+        [style.--row-accent]="orc.phaseAccent(block.phase)">
 
-          <div class="orch-row__time">
-            <span class="orch-row__hour">{{ block.hour_block }}</span>
-            @if (isCurrentHour(block.hour)) {
-              <span class="orch-row__now">Now</span>
-            }
-          </div>
-
-          <div class="orch-row__bar"></div>
-
-          <div class="orch-row__content">
-            <span class="orch-row__intent">{{ contentTitle(block) }}</span>
-            <span class="orch-row__activity">{{ contentSubtitle(block) }}</span>
-          </div>
-
-          <div class="orch-row__right">
-            <span class="orch-row__tag"
-                  [class.orch-row__tag--override]="block.user_override && !block.custom_content"
-                  [class.orch-row__tag--content]="!!block.custom_content">
-              {{ contentTypeLabel(block) }}
-            </span>
-            @if (block.phase !== 'sleep') {
-              <a class="orch-row__edit"
-                 [routerLink]="['/personal/set-my-content']"
-                 [queryParams]="{hour: block.hour}">✎</a>
-            }
-          </div>
-
+        <div class="orch-row__time">
+          <span class="orch-row__hour">{{ block.hour_block }}</span>
+          @if (isCurrentHour(block.hour)) {
+          <span class="orch-row__now">Now</span>
+          }
         </div>
+
+        <div class="orch-row__bar"></div>
+
+        <div class="orch-row__content">
+          <span class="orch-row__intent">{{ contentTitle(block) }}</span>
+          <span class="orch-row__activity">{{ contentSubtitle(block) }}</span>
+        </div>
+
+        <div class="orch-row__right">
+          <span class="orch-row__tag" [class.orch-row__tag--override]="block.user_override && !block.custom_content"
+            [class.orch-row__tag--content]="!!block.custom_content">
+            {{ contentTypeLabel(block) }}
+          </span>
+          @if (block.phase !== 'sleep') {
+          <a class="orch-row__edit" [routerLink]="['/personal/set-my-content']" [queryParams]="{hour: block.hour}">✎</a>
+          }
+        </div>
+
+      </div>
       }
     </div>
   </div>

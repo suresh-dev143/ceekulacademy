@@ -32,9 +32,9 @@ function passwordMatchValidator(form: AbstractControl) {
 export class MyProfileComponent {
 
     private profileService = inject(ProfileService);
-    private authService    = inject(AuthService);
-    private toast          = inject(ToastService);
-    private fb             = inject(FormBuilder);
+    private authService = inject(AuthService);
+    private toast = inject(ToastService);
+    private fb = inject(FormBuilder);
 
     // ── Data ──────────────────────────────────────────────────────────
     profile = this.profileService.profile;
@@ -45,27 +45,27 @@ export class MyProfileComponent {
     activeSection = signal<Section>('personal');
 
     // ── Edit modes ────────────────────────────────────────────────────
-    editingPersonal  = signal<boolean>(false);
-    editingIdentity  = signal<boolean>(false);
+    editingPersonal = signal<boolean>(false);
+    editingIdentity = signal<boolean>(false);
     isSavingPersonal = signal<boolean>(false);
 
     // ── OTP ───────────────────────────────────────────────────────────
-    otpFlow    = signal<'none' | 'mobile' | 'email'>('none');
-    otpSent    = signal<boolean>(false);
-    otpError   = signal<string>('');
+    otpFlow = signal<'none' | 'mobile' | 'email'>('none');
+    otpSent = signal<boolean>(false);
+    otpError = signal<string>('');
     otpSuccess = signal<boolean>(false);
 
     // ── Password modal ────────────────────────────────────────────────
-    showPasswordModal   = signal<boolean>(false);
-    passwordError       = signal<string>('');
-    passwordSuccess     = signal<boolean>(false);
-    isChangingPassword  = signal<boolean>(false);
+    showPasswordModal = signal<boolean>(false);
+    passwordError = signal<string>('');
+    passwordSuccess = signal<boolean>(false);
+    isChangingPassword = signal<boolean>(false);
 
     // ── Deactivation ──────────────────────────────────────────────────
     showDeactivateConfirm = signal<boolean>(false);
 
     // ── Document upload ───────────────────────────────────────────────
-    uploadingDoc  = signal<boolean>(false);
+    uploadingDoc = signal<boolean>(false);
     uploadDocType = signal<string>('ID Proof');
 
     // ── Computed role helpers ─────────────────────────────────────────
@@ -104,34 +104,34 @@ export class MyProfileComponent {
         const ii = this.profile().identityInfo;
 
         this.personalForm = this.fb.group({
-            fullName:     [pi.fullName,     [Validators.required, Validators.minLength(2)]],
-            mobile:       [pi.mobile,       [Validators.required, Validators.pattern(/^\+?\d[\d\s\-]{8,14}$/)]],
-            email:        [pi.email,        [Validators.required, Validators.email]],
-            dob:          [pi.dob,          Validators.required],
+            fullName: [pi.fullName, [Validators.required, Validators.minLength(2)]],
+            mobile: [pi.mobile, [Validators.required, Validators.pattern(/^\+?\d[\d\s\-]{8,14}$/)]],
+            email: [pi.email, [Validators.required, Validators.email]],
+            dob: [pi.dob, Validators.required],
             placeOfBirth: [pi.placeOfBirth],
-            gender:       [pi.gender,       Validators.required],
+            gender: [pi.gender, Validators.required],
             address: this.fb.group({
                 addressLine1: [pi.address.addressLine1, Validators.required],
                 addressLine2: [pi.address.addressLine2],
-                landmark:     [pi.address.landmark],
-                city:         [pi.address.city, Validators.required],
-                district:     [pi.address.district, Validators.required],
-                state:        [pi.address.state, Validators.required],
-                country:      [pi.address.country, Validators.required],
-                pincode:      [pi.address.pincode, [Validators.required, Validators.pattern(/^\d{6}$/)]],
+                landmark: [pi.address.landmark],
+                city: [pi.address.city, Validators.required],
+                district: [pi.address.district, Validators.required],
+                state: [pi.address.state, Validators.required],
+                country: [pi.address.country, Validators.required],
+                pincode: [pi.address.pincode, [Validators.required, Validators.pattern(/^\d{6}$/)]],
             })
         });
 
         this.identityForm = this.fb.group({
-            identityType:   [ii.identityType,   Validators.required],
+            identityType: [ii.identityType, Validators.required],
             identityNumber: [ii.identityNumber, Validators.required],
-            bpl:            [ii.bpl],
-            underprivileged:[ii.underprivileged]
+            bpl: [ii.bpl],
+            underprivileged: [ii.underprivileged]
         });
 
         this.passwordForm = this.fb.group({
-            oldPassword:     ['', Validators.required],
-            newPassword:     ['', [Validators.required, Validators.minLength(8)]],
+            oldPassword: ['', Validators.required],
+            newPassword: ['', [Validators.required, Validators.minLength(8)]],
             confirmPassword: ['', Validators.required]
         }, { validators: passwordMatchValidator });
 
@@ -174,10 +174,10 @@ export class MyProfileComponent {
         const dateOfBirth = v.dob ? (v.dob as string).split('-').reverse().join('-') : undefined;
 
         const payload: UpdateProfileRequest = {
-            name:        v.fullName,
+            name: v.fullName,
             dateOfBirth,
-            gender:      v.gender,
-            address:     v.address
+            gender: v.gender,
+            address: v.address
         };
 
         this.isSavingPersonal.set(true);
@@ -185,17 +185,17 @@ export class MyProfileComponent {
         this.authService.updateProfile(userId, payload).subscribe({
             next: () => {
                 this.profileService.updatePersonalInfo({
-                    fullName:     v.fullName,
-                    dob:          v.dob,
+                    fullName: v.fullName,
+                    dob: v.dob,
                     placeOfBirth: v.placeOfBirth,
-                    gender:       v.gender,
-                    address:      v.address,
+                    gender: v.gender,
+                    address: v.address,
                 });
                 this.profileService.addAuditEntry({
-                    field:    'Personal Info',
+                    field: 'Personal Info',
                     oldValue: '—',
                     newValue: 'Updated via API',
-                    status:   'Success',
+                    status: 'Success',
                 });
                 this.toast.success('Profile updated successfully.');
                 this.isSavingPersonal.set(false);
@@ -285,7 +285,7 @@ export class MyProfileComponent {
         const v = this.passwordForm.value;
         const payload: ChangePasswordRequest = {
             currentPassword: v.oldPassword,
-            newPassword:     v.newPassword,
+            newPassword: v.newPassword,
         };
 
         this.isChangingPassword.set(true);
@@ -330,8 +330,8 @@ export class MyProfileComponent {
 
     // ── Helpers ───────────────────────────────────────────────────────
     getVerificationColor(status: VerificationStatus): string {
-        if (status === 'Verified')  return '#22c55e';
-        if (status === 'Rejected')  return '#ef4444';
+        if (status === 'Verified') return '#22c55e';
+        if (status === 'Rejected') return '#ef4444';
         return '#f59e0b';
     }
 
@@ -346,10 +346,10 @@ export class MyProfileComponent {
     }
 
     readonly navItems: { key: Section; label: string; icon: string }[] = [
-        { key: 'personal',   label: 'Personal',   icon: 'fa-user' },
-        { key: 'identity',   label: 'Identity',   icon: 'fa-id-card' },
-        { key: 'security',   label: 'Security',   icon: 'fa-shield-alt' },
-        { key: 'role',       label: 'Role Details', icon: 'fa-graduation-cap' },
+        { key: 'personal', label: 'Personal', icon: 'fa-user' },
+        { key: 'identity', label: 'Identity', icon: 'fa-id-card' },
+        { key: 'security', label: 'Security', icon: 'fa-shield-alt' },
+        { key: 'role', label: 'Role Details', icon: 'fa-graduation-cap' },
         { key: 'completion', label: 'Completion', icon: 'fa-tasks' },
     ];
 }
