@@ -81,6 +81,7 @@ import { CommonModule } from '@angular/common';
         margin: 0 0 0.5rem;
         background: linear-gradient(135deg, #fff 0%, #667eea 100%);
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
       }
       .role-badges {

@@ -158,7 +158,7 @@ import { AdvisorService } from '../../services/advisor.service';
     
     .dashboard-header {
       display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;
-      .page-title { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-weight: 800; margin: 0; background: linear-gradient(135deg, #fff 0%, #667eea 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .page-title { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-weight: 800; margin: 0; background: linear-gradient(135deg, #fff 0%, #667eea 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
       .district-name { font-size: 0.9rem; font-weight: 600; color: color-mix(in srgb, #fff, transparent 50%); margin: 0.5rem 0 0; i { color: #667eea; margin-right: 0.5rem; } }
     }
 

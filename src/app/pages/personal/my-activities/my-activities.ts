@@ -1,5 +1,7 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 interface Activity {
   type: string;
@@ -13,13 +15,27 @@ interface Topic {
 }
 
 @Component({
-  selector: 'app-personal-hub',
+  selector: 'app-my-activities',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './personal-hub.html',
-  styleUrl: './personal-hub.scss'
+  imports: [CommonModule, RouterLink],
+  templateUrl: './my-activities.html',
+  styleUrl: './my-activities.scss'
 })
-export class PersonalHubComponent {
+export class MyActivities implements OnInit, OnDestroy {
+  private readonly auth = inject(AuthService);
+
+  readonly collapsed = signal(false);
+  readonly ceebrainId = computed(() => {
+    const raw = this.auth.currentUserProfile()?.ceebrainId ?? '';
+    if (!raw) return '';
+    return raw.startsWith('CB') ? raw : `CB${raw}`;
+  });
+
+  readonly currentDate = signal<string>('');
+  readonly currentTime = signal<string>('');
+
+  private timerId?: any;
+
   readonly topics = signal<Topic[]>([
     {
       id: 'self-improvement',
@@ -67,9 +83,36 @@ export class PersonalHubComponent {
 
   readonly selectedTopicId = signal<string>('self-improvement');
 
-  readonly selectedTopic = computed(() => 
+  readonly selectedTopic = computed(() =>
     this.topics().find(t => t.id === this.selectedTopicId())
   );
+
+  ngOnInit() {
+    this.updateDateTime();
+    this.timerId = setInterval(() => this.updateDateTime(), 1000);
+  }
+
+  ngOnDestroy() {
+    if (this.timerId) clearInterval(this.timerId);
+  }
+
+  private updateDateTime() {
+    const now = new Date();
+    this.currentDate.set(now.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      month: 'short', 
+      day: 'numeric' 
+    }));
+    this.currentTime.set(now.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    }));
+  }
+
+  toggleHub() {
+    this.collapsed.update(v => !v);
+  }
 
   selectTopic(id: string) {
     this.selectedTopicId.set(id);

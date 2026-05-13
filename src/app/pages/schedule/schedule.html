@@ -1,0 +1,664 @@
+<div class="ceekul-schedule-surface">
+
+  <!-- ── Top Bar ── -->
+  <header class="sched-topbar">
+    <div class="topbar-left">
+      <div class="sync-indicator" [class.saving]="submitting()">
+        <span class="dot"></span>
+        <span>{{ submitting() ? 'Scheduling...' : 'Schedule' }}</span>
+      </div>
+      <span class="atomic-label" [style.color]="accentColor()">
+        {{ selectedCat().label }}
+      </span>
+    </div>
+
+    <div class="topbar-tabs">
+      <button class="tab-btn" [class.active]="activeTab() === 'create'" (click)="setTab('create')">
+        + Create
+      </button>
+      <button class="tab-btn" [class.active]="activeTab() === 'mine'" (click)="setTab('mine')">
+        My Schedules
+        @if (mySchedules().length) {
+          <span class="tab-count">{{ mySchedules().length }}</span>
+        }
+      </button>
+    </div>
+
+    <div class="topbar-right">
+      <button class="action-btn" (click)="navigateToEnrol()">
+        Enrol &rarr;
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Create Tab ── -->
+  @if (activeTab() === 'create') {
+    <div class="sched-canvas">
+      <div class="canvas-inner">
+
+        <!-- ── Category Selector ── -->
+        <div class="section-block">
+          <div class="section-label">Category</div>
+          <div class="category-dropdown">
+            <button class="category-trigger"
+              [class.has-value]="true"
+              [style.border-color]="accentColor() + '55'"
+              (click)="toggleCatDropdown()">
+              <span class="cat-label">{{ selectedCat().label }}</span>
+              <span class="trigger-arrow" [class.open]="showCatDropdown()">⌄</span>
+            </button>
+            @if (showCatDropdown()) {
+              <div class="cat-backdrop" (click)="closeCatDropdown()"></div>
+              <div class="category-dropdown-list">
+                @for (cat of CATEGORIES; track cat.id) {
+                  <button class="dropdown-item" [class.selected]="cat.id === category()"
+                    (click)="selectCategory(cat.id)">
+                    <span class="check">{{ cat.id === category() ? '✓' : '' }}</span>
+                    <span class="item-label">{{ cat.label }}</span>
+                    <span class="cat-dot" [style.background]="cat.color"></span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- ── Content Search & Autofill ── -->
+        <div class="section-block">
+          <div class="section-label">Link Content <span class="label-hint">(search your drafts or published)</span></div>
+          <div class="search-wrap">
+            <div class="search-row">
+              <input class="ghost-input search-input"
+                [value]="contentSearchQ()"
+                (input)="onContentSearchInput($event)"
+                (blur)="closeResults()"
+                placeholder="Search by title to auto-fill fields..."
+                autocomplete="off" />
+              @if (selectedContentRef()) {
+                <button class="clear-ref-btn" (click)="clearContentSelection()" title="Clear link">✕</button>
+              }
+              @if (searchLoading()) {
+                <span class="search-spinner"></span>
+              }
+            </div>
+            @if (selectedContentRef()) {
+              <div class="ref-badge">
+                <span class="ref-icon">◈</span> Content linked · {{ selectedContentRef()!.baseId }}
+              </div>
+            }
+            @if (showResults() && contentResults().length) {
+              <div class="search-results">
+                @for (item of contentResults(); track item.baseId) {
+                  <button class="search-result-item" (click)="selectContent(item)">
+                    <div class="result-title">{{ item.title }}</div>
+                    <div class="result-meta">{{ item.subtitle }} · {{ item.contentTitle }}</div>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- ── Title Fields ── -->
+        <div class="section-block titles-block">
+          <div class="title-row">
+            <label class="field-label">Program Title <span class="required">*</span></label>
+            <input class="ghost-input title-input"
+              [value]="programTitle()"
+              (input)="programTitle.set($any($event.target).value)"
+              placeholder="Program Title..." />
+          </div>
+          <div class="title-row">
+            <label class="field-label">Section Title</label>
+            <input class="ghost-input subtitle-input"
+              [value]="sectionTitle()"
+              (input)="sectionTitle.set($any($event.target).value)"
+              placeholder="Section or Module Title..." />
+          </div>
+          <div class="title-row">
+            <label class="field-label">Content Title</label>
+            <input class="ghost-input content-title-input"
+              [value]="contentTitle()"
+              (input)="contentTitle.set($any($event.target).value)"
+              placeholder="Specific Content Title..." />
+          </div>
+        </div>
+
+        <!-- ── Expert ── -->
+        <div class="section-block">
+          <div class="section-label">Expert CB-ID <span class="label-hint">(optional)</span></div>
+          <input class="ghost-input mono-input"
+            [value]="instructorId()"
+            (input)="instructorId.set($any($event.target).value)"
+            placeholder="CB0000000000000..." />
+        </div>
+
+        <!-- ── Content Description ── -->
+        <div class="semantic-section" [class.expanded]="cdExpanded()">
+          <button class="sem-header" (click)="toggleCd()">
+            <div class="sem-header-left">
+              <span class="sem-icon" [style.color]="accentColor()">◈</span>
+              <span class="sem-title">Content Description</span>
+              <span class="sem-badge">UCRS Semantic</span>
+            </div>
+            <div class="sem-header-right">
+              @if (!cdExpanded()) {
+                <span class="sem-preview">{{ cdSummary() }}</span>
+              }
+              <span class="sem-arrow" [class.open]="cdExpanded()">⌄</span>
+            </div>
+          </button>
+
+          @if (cdExpanded()) {
+            <div class="sem-body">
+
+              <!-- Overview -->
+              <div class="sem-field">
+                <label class="sem-label">Session Overview</label>
+                <textarea class="sem-textarea" rows="3"
+                  [value]="cdOverview()"
+                  (input)="cdOverview.set($any($event.target).value)"
+                  placeholder="Brief overview of what this session covers and its significance..."></textarea>
+              </div>
+
+              <!-- Learning Outcomes -->
+              <div class="sem-field">
+                <label class="sem-label">Learning Outcomes <span class="sem-hint">what students can do after</span></label>
+                <div class="chip-input-row">
+                  <input class="chip-input"
+                    [value]="cdOutcomeInput()"
+                    (input)="cdOutcomeInput.set($any($event.target).value)"
+                    (keydown.enter)="addOutcome()"
+                    placeholder="Students will be able to..." />
+                  <button class="chip-add-btn" (click)="addOutcome()">+ Add</button>
+                </div>
+                @if (cdOutcomes().length) {
+                  <div class="chips-row">
+                    @for (o of cdOutcomes(); track $index) {
+                      <span class="chip outcome-chip">{{ o }}<button (click)="removeOutcome($index)">✕</button></span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Key Topics -->
+              <div class="sem-field">
+                <label class="sem-label">Key Topics</label>
+                <div class="chip-input-row">
+                  <input class="chip-input"
+                    [value]="cdTopicInput()"
+                    (input)="cdTopicInput.set($any($event.target).value)"
+                    (keydown.enter)="addTopic()"
+                    placeholder="e.g. Wave-particle duality, Euler's identity..." />
+                  <button class="chip-add-btn" (click)="addTopic()">+ Add</button>
+                </div>
+                @if (cdKeyTopics().length) {
+                  <div class="chips-row">
+                    @for (t of cdKeyTopics(); track $index) {
+                      <span class="chip topic-chip">{{ t }}<button (click)="removeTopic($index)">✕</button></span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Session Flow Timeline -->
+              <div class="sem-field">
+                <label class="sem-label">
+                  Complete Session Flow
+                  <span class="sem-hint">50-minute semantic arc</span>
+                </label>
+                <div class="session-timeline">
+                  @for (block of cdSessionFlow(); track block.slot; let i = $index; let last = $last) {
+                    <div class="timeline-row">
+                      <div class="timeline-slot-col">
+                        <div class="slot-badge" [style.background]="accentColor() + '22'" [style.color]="accentColor()">
+                          {{ block.slot }}
+                        </div>
+                        @if (!last) { <div class="slot-connector" [style.background]="accentColor() + '33'"></div> }
+                      </div>
+                      <div class="timeline-content-col">
+                        <input class="sem-inline-input phase-label-input"
+                          [value]="block.label"
+                          (input)="updateSessionBlock(i, 'label', $any($event.target).value)"
+                          placeholder="Phase name..." />
+                        <textarea class="sem-textarea sm" rows="2"
+                          [value]="block.activity"
+                          (input)="updateSessionBlock(i, 'activity', $any($event.target).value)"
+                          placeholder="What happens in this window..."></textarea>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Practical Activities -->
+              <div class="sem-field">
+                <label class="sem-label">Practical Activities</label>
+                <textarea class="sem-textarea" rows="2"
+                  [value]="cdActivities()"
+                  (input)="cdActivities.set($any($event.target).value)"
+                  placeholder="Hands-on exercises, problem sets, group experiments..."></textarea>
+              </div>
+
+              <!-- Transformation Goals -->
+              <div class="sem-field">
+                <label class="sem-label">Transformation Goals <span class="sem-hint">lasting change</span></label>
+                <textarea class="sem-textarea" rows="2"
+                  [value]="cdTransformGoals()"
+                  (input)="cdTransformGoals.set($any($event.target).value)"
+                  placeholder="What enduring shift in understanding or capability does this session create..."></textarea>
+              </div>
+
+              <!-- Methods & Tools -->
+              <div class="sem-field">
+                <label class="sem-label">Methods & Tools</label>
+                <div class="chip-input-row">
+                  <input class="chip-input"
+                    [value]="cdToolInput()"
+                    (input)="cdToolInput.set($any($event.target).value)"
+                    (keydown.enter)="addTool()"
+                    placeholder="e.g. Socratic dialogue, Desmos, Jupyter Notebook..." />
+                  <button class="chip-add-btn" (click)="addTool()">+ Add</button>
+                </div>
+                @if (cdTools().length) {
+                  <div class="chips-row">
+                    @for (t of cdTools(); track $index) {
+                      <span class="chip tool-chip">{{ t }}<button (click)="removeTool($index)">✕</button></span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Participation Mode -->
+              <div class="sem-field">
+                <label class="sem-label">Participation Mode</label>
+                <div class="mode-toggle">
+                  <button class="mode-btn" [class.active]="cdParticipationMode() === 'active'"  (click)="cdParticipationMode.set('active')">Active</button>
+                  <button class="mode-btn" [class.active]="cdParticipationMode() === 'passive'" (click)="cdParticipationMode.set('passive')">Passive</button>
+                  <button class="mode-btn" [class.active]="cdParticipationMode() === 'hybrid'"  (click)="cdParticipationMode.set('hybrid')">Hybrid</button>
+                </div>
+              </div>
+
+              <!-- Audience Targeting -->
+              <div class="sem-field">
+                <label class="sem-label">Audience Targeting</label>
+                <div class="chip-input-row">
+                  <input class="chip-input"
+                    [value]="cdAudienceTagInput()"
+                    (input)="cdAudienceTagInput.set($any($event.target).value)"
+                    (keydown.enter)="addAudienceTag()"
+                    placeholder="e.g. Beginners, Ages 14–18, Engineers, Researchers..." />
+                  <button class="chip-add-btn" (click)="addAudienceTag()">+ Add</button>
+                </div>
+                @if (cdAudienceTags().length) {
+                  <div class="chips-row">
+                    @for (a of cdAudienceTags(); track $index) {
+                      <span class="chip audience-chip">{{ a }}<button (click)="removeAudienceTag($index)">✕</button></span>
+                    }
+                  </div>
+                }
+              </div>
+
+            </div>
+          }
+        </div>
+
+        <!-- ── Expert Profile ── -->
+        <div class="semantic-section" [class.expanded]="epExpanded()">
+          <button class="sem-header" (click)="toggleEp()">
+            <div class="sem-header-left">
+              <span class="sem-icon" style="color:#10b981">◉</span>
+              <span class="sem-title">Expert Profile</span>
+              <span class="sem-badge trust-badge">Trust Lineage</span>
+            </div>
+            <div class="sem-header-right">
+              @if (!epExpanded()) {
+                <span class="sem-preview">{{ epSummary() }}</span>
+              }
+              <span class="sem-arrow" [class.open]="epExpanded()">⌄</span>
+            </div>
+          </button>
+
+          @if (epExpanded()) {
+            <div class="sem-body">
+
+              <!-- Trust Lineage -->
+              <div class="sem-field">
+                <label class="sem-label">Trust Lineage <span class="sem-hint">credential chain / who vouches</span></label>
+                <textarea class="sem-textarea" rows="2"
+                  [value]="epTrustLineage()"
+                  (input)="epTrustLineage.set($any($event.target).value)"
+                  placeholder="Institutional affiliation, mentor chain, peer references, certifications, awards..."></textarea>
+              </div>
+
+              <!-- Expertise Areas -->
+              <div class="sem-field">
+                <label class="sem-label">Expertise Areas</label>
+                <div class="chip-input-row">
+                  <input class="chip-input"
+                    [value]="epExpertiseInput()"
+                    (input)="epExpertiseInput.set($any($event.target).value)"
+                    (keydown.enter)="addExpertise()"
+                    placeholder="e.g. Quantum Mechanics, Vedic Mathematics, AI..." />
+                  <button class="chip-add-btn" (click)="addExpertise()">+ Add</button>
+                </div>
+                @if (epExpertise().length) {
+                  <div class="chips-row">
+                    @for (e of epExpertise(); track $index) {
+                      <span class="chip expertise-chip">{{ e }}<button (click)="removeExpertise($index)">✕</button></span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Teaching Style -->
+              <div class="sem-field">
+                <label class="sem-label">Teaching Style</label>
+                <div class="style-grid">
+                  @for (style of TEACHING_STYLES; track style.id) {
+                    <button class="style-btn" [class.active]="epTeachingStyle() === style.id"
+                      (click)="epTeachingStyle.set(style.id)">
+                      <span class="style-label">{{ style.label }}</span>
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <!-- Experience -->
+              <div class="sem-field sem-field--row">
+                <label class="sem-label">Years of Experience</label>
+                <input class="sem-inline-input exp-input"
+                  type="number" min="0"
+                  [value]="epExperience() ?? ''"
+                  (input)="onEpExperienceInput($event)"
+                  placeholder="e.g. 12" />
+              </div>
+
+              <!-- Mission -->
+              <div class="sem-field">
+                <label class="sem-label">Mission Statement</label>
+                <textarea class="sem-textarea" rows="2"
+                  [value]="epMission()"
+                  (input)="epMission.set($any($event.target).value)"
+                  placeholder="What drives your teaching? What transformation do you seek to create in learners..."></textarea>
+              </div>
+
+              <!-- Audience Focus -->
+              <div class="sem-field">
+                <label class="sem-label">Audience Focus</label>
+                <div class="chip-input-row">
+                  <input class="chip-input"
+                    [value]="epAudienceFocusInput()"
+                    (input)="epAudienceFocusInput.set($any($event.target).value)"
+                    (keydown.enter)="addAudienceFocus()"
+                    placeholder="e.g. School students, Researchers, Entrepreneurs..." />
+                  <button class="chip-add-btn" (click)="addAudienceFocus()">+ Add</button>
+                </div>
+                @if (epAudienceFocus().length) {
+                  <div class="chips-row">
+                    @for (a of epAudienceFocus(); track $index) {
+                      <span class="chip focus-chip">{{ a }}<button (click)="removeAudienceFocus($index)">✕</button></span>
+                    }
+                  </div>
+                }
+              </div>
+
+              <!-- Availability -->
+              <div class="sem-field">
+                <label class="sem-label">Availability Type</label>
+                <div class="mode-toggle">
+                  <button class="mode-btn" [class.active]="epAvailability() === 'full-time'"  (click)="epAvailability.set('full-time')">Full-Time</button>
+                  <button class="mode-btn" [class.active]="epAvailability() === 'part-time'"  (click)="epAvailability.set('part-time')">Part-Time</button>
+                  <button class="mode-btn" [class.active]="epAvailability() === 'on-demand'"  (click)="epAvailability.set('on-demand')">On-Demand</button>
+                  <button class="mode-btn" [class.active]="epAvailability() === 'volunteer'"  (click)="epAvailability.set('volunteer')">Volunteer</button>
+                </div>
+              </div>
+
+              <!-- Portfolio Links -->
+              <div class="sem-field">
+                <label class="sem-label">Portfolio Links</label>
+                <div class="chip-input-row">
+                  <input class="chip-input"
+                    type="url"
+                    [value]="epPortfolioInput()"
+                    (input)="epPortfolioInput.set($any($event.target).value)"
+                    (keydown.enter)="addPortfolioLink()"
+                    placeholder="https://..." />
+                  <button class="chip-add-btn" (click)="addPortfolioLink()">+ Add</button>
+                </div>
+                @if (epPortfolioLinks().length) {
+                  <div class="portfolio-list">
+                    @for (link of epPortfolioLinks(); track $index) {
+                      <div class="portfolio-item">
+                        <span class="portfolio-link-text">{{ link }}</span>
+                        <button class="portfolio-remove" (click)="removePortfolioLink($index)">✕</button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+
+            </div>
+          }
+        </div>
+
+        <!-- ── Sessions ── -->
+        <div class="section-block">
+          <div class="cwf-section-label"><span class="cwf-dot"></span>Sessions</div>
+
+          @if (localSchedules().length === 0 && !showAddForm()) {
+            <div class="cwf-empty-state--center">
+              <p>No sessions added yet. Add at least one to schedule.</p>
+              <button type="button" class="cwf-btn cwf-btn--outline" (click)="openAddForm()">
+                + Add Session
+              </button>
+            </div>
+          }
+
+          @if (localSchedules().length) {
+            <div class="cwf-session-list">
+              @for (s of localSchedules(); track $index) {
+                <div class="cwf-schedule-card">
+                  <div class="cwf-sc-time">{{ s.startTime }} – {{ s.endTime }}
+                    @if (sessionDuration(s)) {
+                      <span class="cwf-sc-duration">{{ sessionDuration(s) }}</span>
+                    }
+                  </div>
+                  <div class="cwf-sc-date">{{ formatDate(s.date) }}</div>
+                  <div class="cwf-sc-meta">
+                    <span class="cwf-tag" [class.cwf-tag--online]="s.mode === 'online'">{{ s.mode }}</span>
+                    <span class="cwf-sc-tz">{{ s.timezone }}</span>
+                    @if (s.capacity) {
+                      <span class="cwf-sc-cap">{{ s.capacity }} seats</span>
+                    }
+                  </div>
+                  <button class="cwf-sc-remove" (click)="removeSchedule($index)">✕</button>
+                </div>
+              }
+            </div>
+            @if (!showAddForm()) {
+              <button class="cwf-add-more-btn" (click)="openAddForm()">+ Add Another Session</button>
+            }
+          }
+
+          @if (showAddForm()) {
+            <div class="cwf-add-schedule-box">
+              <div class="cwf-box-header">
+                <h3>New Session</h3>
+                <button type="button" class="cwf-btn-close" (click)="cancelAddForm()">✕</button>
+              </div>
+
+              <form [formGroup]="addForm" class="cwf-add-form-grid">
+                <div class="cwf-field">
+                  <label class="cwf-label">Date <span class="required">*</span></label>
+                  <input type="date" class="cwf-input" formControlName="date" [min]="todayStr" />
+                </div>
+
+                <div class="cwf-field">
+                  <label class="cwf-label">Timezone <span class="required">*</span></label>
+                  <select class="cwf-input" formControlName="timezone">
+                    @for (tz of timezones; track tz.key) {
+                      <option [value]="tz.key">{{ tz.label }}</option>
+                    }
+                  </select>
+                </div>
+
+                <div class="cwf-field">
+                  <label class="cwf-label">Start Time <span class="required">*</span></label>
+                  <input type="time" class="cwf-input" formControlName="startTime" />
+                </div>
+
+                <div class="cwf-field">
+                  <label class="cwf-label">End Time <span class="required">*</span></label>
+                  <input type="time" class="cwf-input" formControlName="endTime" />
+                </div>
+
+                <div class="cwf-field">
+                  <label class="cwf-label">Capacity <span class="label-hint">(leave blank for unlimited)</span></label>
+                  <input type="number" class="cwf-input" formControlName="capacity" min="1" placeholder="Unlimited" />
+                </div>
+
+                <div class="cwf-field">
+                  <label class="cwf-label">Mode <span class="required">*</span></label>
+                  <div class="cwf-toggle-group">
+                    <label class="cwf-toggle">
+                      <input type="radio" formControlName="mode" value="online" />
+                      <span>Online</span>
+                    </label>
+                    <label class="cwf-toggle">
+                      <input type="radio" formControlName="mode" value="in-person" />
+                      <span>In-Person</span>
+                    </label>
+                    <label class="cwf-toggle">
+                      <input type="radio" formControlName="mode" value="hybrid" />
+                      <span>Hybrid</span>
+                    </label>
+                  </div>
+                </div>
+
+                @if (isOfflineMode) {
+                  <div class="cwf-field cwf-field--full">
+                    <label class="cwf-label">Venue / Facility <span class="required">*</span></label>
+                    @if (!addForm.get('facilityId')?.value) {
+                      <div class="cwf-location-picker" (click)="openDiscovery()">
+                        Find Verified Partner Facility
+                      </div>
+                    } @else {
+                      <div class="cwf-selected-facility">
+                        <div class="cwf-sf-info">{{ addForm.get('location')?.value }}</div>
+                        <button type="button" class="cwf-sf-remove" (click)="removeFacility()">↻</button>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <div class="cwf-form-footer cwf-field--full">
+                  <button type="button" class="cwf-btn cwf-btn--text" (click)="cancelAddForm()">Cancel</button>
+                  <button type="button" class="cwf-btn cwf-btn--primary" [disabled]="addForm.invalid"
+                    (click)="addScheduleToLocal()">
+                    + Add Session
+                  </button>
+                </div>
+              </form>
+            </div>
+          }
+
+          @if (showDiscovery()) {
+            <app-facility-discovery
+              [sessionDate]="addForm.get('date')?.value || ''"
+              [sessionStartTime]="addForm.get('startTime')?.value || ''"
+              [sessionEndTime]="addForm.get('endTime')?.value || ''"
+              [isOffline]="true" [requiredSlots]="1" [requiredCapacity]="0"
+              (facilitySelected)="onFacilitySelected($event)"
+              (close)="closeDiscovery()">
+            </app-facility-discovery>
+          }
+        </div>
+
+        <!-- ── Submit ── -->
+        <div class="submit-row">
+          <div class="submit-meta">
+            <span class="ucrs-tag" [style.border-color]="accentColor() + '66'" [style.color]="accentColor()">
+              AI-filtered · UCRS O(1)
+            </span>
+          </div>
+          <button class="submit-btn"
+            [disabled]="!canSubmit()"
+            [style.background]="canSubmit() ? accentColor() : ''"
+            (click)="submit()">
+            @if (submitting()) {
+              <span class="btn-spinner"></span> Scheduling...
+            } @else {
+              Schedule {{ selectedCat().label }}
+            }
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- ── My Schedules Tab ── -->
+  @if (activeTab() === 'mine') {
+    <div class="sched-canvas">
+      <div class="canvas-inner">
+        <div class="schedules-header">
+          <div class="section-label">Your Schedules</div>
+          <button class="refresh-btn" (click)="loadMySchedules()" title="Refresh">↻</button>
+        </div>
+
+        @if (loadingSchedules()) {
+          <div class="loading-state">
+            <div class="load-spinner"></div>
+            <span>Loading schedules...</span>
+          </div>
+        } @else if (!mySchedules().length) {
+          <div class="empty-state">
+            <div class="empty-title">No schedules yet</div>
+            <div class="empty-hint">Create your first schedule to share knowledge with the community.</div>
+            <button class="action-btn primary" (click)="setTab('create')">+ Create Schedule</button>
+          </div>
+        } @else {
+          <div class="schedule-list">
+            @for (s of mySchedules(); track s.scheduleId) {
+              <div class="schedule-card" [style.border-left-color]="getCatMeta(s.category).color">
+                <div class="sc-header">
+                  <div class="sc-category">
+                    <span class="sc-cat-label" [style.color]="getCatMeta(s.category).color">{{ getCatMeta(s.category).label }}</span>
+                  </div>
+                  <div class="sc-status" [class.active]="s.status === 'ACTIVE'" [class.revoked]="s.status === 'REVOKED'">
+                    {{ s.status }}
+                  </div>
+                </div>
+                <div class="sc-title">{{ s.programTitle }}</div>
+                @if (s.sectionTitle) {
+                  <div class="sc-sub">{{ s.sectionTitle }}</div>
+                }
+                @if (s.contentTitle) {
+                  <div class="sc-content-title">{{ s.contentTitle }}</div>
+                }
+                <div class="sc-meta-row">
+                  <span class="sc-date">{{ formatDate(s.scheduledDate) }}</span>
+                  <span class="sc-time">{{ s.startTime }} – {{ s.endTime }}</span>
+                  <span class="sc-mode">{{ s.deliveryMode }}</span>
+                </div>
+                <div class="sc-footer">
+                  <div class="sc-id">{{ s.scheduleId }}</div>
+                  <div class="sc-enrol-count">
+                    {{ s.enrolmentCount }} enrolled
+                    @if (s.capacity) { / {{ s.capacity }} }
+                  </div>
+                  @if (s.status === 'ACTIVE') {
+                    <button class="sc-cancel-btn" (click)="cancelSchedule(s.scheduleId)">Cancel</button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <app-toast></app-toast>
+</div>

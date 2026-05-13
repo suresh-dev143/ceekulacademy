@@ -65,14 +65,14 @@
                 [dqrgDraggable]="true"
                 [dqrgCid]="item.hybridId"
                 [dqrgTitle]="item.title || '(untitled)'"
-                [dqrgCategory]="item.category"
+                [dqrgCategory]="item.contentTitle"
                 title="Drag to DQRG panel to analyse with AI">
               <td class="col-title">
                 <span class="drag-handle" title="Drag to DQRG">⠿</span>
                 {{ item.title || '(untitled)' }}
               </td>
               <td>
-                <span class="badge badge-cat">{{ item.category }}</span>
+                <span class="badge badge-cat">{{ item.contentTitle }}</span>
               </td>
               <td>
                 <span [class]="'badge badge-status-' + getItemState(item)">

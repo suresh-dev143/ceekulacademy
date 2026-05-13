@@ -37,7 +37,7 @@ export class CourseFormComponent implements OnInit {
         return all.filter(d =>
             d.title.toLowerCase().includes(q) ||
             d.domain?.toLowerCase().includes(q) ||
-            d.category?.toLowerCase().includes(q)
+            d.contentTitle?.toLowerCase().includes(q)
         );
     });
 

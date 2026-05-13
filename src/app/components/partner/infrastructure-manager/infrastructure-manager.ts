@@ -378,7 +378,7 @@ import { finalize } from 'rxjs';
     }
     .nav-brand {
         display: flex; align-items: center; gap: 0.8rem;
-        i { color: var(--accent); font-size: 1.2rem; background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        i { color: var(--accent); font-size: 1.2rem; background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         span { font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.85rem; }
     }
     .nav-tabs { display: flex; gap: 0.5rem; }

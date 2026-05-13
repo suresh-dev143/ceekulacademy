@@ -89,7 +89,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
       data = data.filter(d =>
         d.title.toLowerCase().includes(q) ||
         d.hybridId.toLowerCase().includes(q) ||
-        d.category.toLowerCase().includes(q)
+        (d.contentTitle ?? '').toLowerCase().includes(q)
       );
     }
     if (this.selectedStatus() !== 'all') {

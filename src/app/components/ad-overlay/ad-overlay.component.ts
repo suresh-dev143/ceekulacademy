@@ -27,7 +27,7 @@ export interface AdOverlayOptions {
           <!-- Header row -->
           <div class="ad-header">
             <span class="ad-badge">AD</span>
-            <span class="ad-title-text">{{ currentAd()?.title }}</span>
+            <span class="ad-title-text">{{ currentAd().title }}</span>
             <span class="ad-counter">{{ currentIndex() + 1 }}&thinsp;/&thinsp;{{ ads().length }}</span>
             <div class="ad-skip-zone" (click)="$event.stopPropagation()">
               @if (skipCountdown() > 0) {
@@ -40,7 +40,7 @@ export interface AdOverlayOptions {
 
           <!-- Media -->
           <div class="ad-media-wrap">
-            @if (currentAd()?.adType === 'video') {
+            @if (currentAd().adType === 'video') {
               <video
                 class="ad-media"
                 [src]="currentAd()!.mediaUrl"
@@ -65,7 +65,7 @@ export interface AdOverlayOptions {
           </div>
 
           <!-- CTA hint (only when clickThroughUrl exists and detail is hidden) -->
-          @if (currentAd()?.clickThroughUrl && !showDetail()) {
+          @if (currentAd().clickThroughUrl && !showDetail()) {
             <div class="cta-hint">&#9432; Tap for details</div>
           }
 
@@ -78,7 +78,7 @@ export interface AdOverlayOptions {
         </div>
 
         <!-- ── Detail panel (slides up from bottom) ── -->
-        @if (showDetail() && currentAd()?.clickThroughUrl) {
+        @if (showDetail() && currentAd().clickThroughUrl) {
           <div class="detail-panel" (click)="$event.stopPropagation()">
             <button class="detail-close" (click)="showDetail.set(false)">&#10005;</button>
             <p class="detail-category">{{ currentAd()!.category }}</p>

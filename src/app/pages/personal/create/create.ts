@@ -87,7 +87,7 @@ export class CeekulRendererPipe implements PipeTransform {
 @Component({
   selector: 'app-create',
   standalone: true,
-  imports: [CommonModule, CeekulRendererPipe, ToastComponent],
+  imports: [CommonModule, ToastComponent],
   templateUrl: './create.html',
   styleUrl: './create.scss',
 })
@@ -99,7 +99,7 @@ export class Create implements OnInit, OnDestroy {
   private readonly toast = inject(ToastService);
   private readonly destroy$ = new Subject<void>();
   private _isExistingDraft = false;
-  private _loadedIdentity = { title: '', category: '' };
+  private _loadedIdentity = { title: '', contentTitle: '' };
 
   // ── Sync State ─────────────────────────────────────────────────────────────
   readonly syncStatus = signal<'synced' | 'saving' | 'error'>('synced');
@@ -114,7 +114,7 @@ export class Create implements OnInit, OnDestroy {
   readonly subtitle = signal('');
   readonly contentType = signal<ContentType>('L');
   readonly domain = signal('education');
-  readonly category = signal<string>('');
+  readonly contentTitle = signal('');
   readonly contentState = signal<ContentState>('draft');
   readonly collaboratorIds = signal<string[]>([]);
   readonly blocks = signal<Block[]>([]);
@@ -158,16 +158,6 @@ export class Create implements OnInit, OnDestroy {
 
 
 
-  readonly CONTENT_CATEGORIES: { id: string; label: string; icon: string }[] = [
-    { id: 'course', label: 'Course', icon: '📚' },
-    { id: 'research', label: 'Research', icon: '🔬' },
-    { id: 'project', label: 'Project', icon: '🏗️' },
-    { id: 'webinar', label: 'Webinar', icon: '🎙️' },
-    { id: 'workshop', label: 'Workshop', icon: '🛠️' },
-    { id: 'entertainment', label: 'Entertainment', icon: '🎭' },
-    { id: 'other', label: 'Other', icon: '📢' },
-  ];
-
   readonly CATEGORY_META: Record<string, { color: string; template: BlockType[] }> = {
     course: { color: '#6366f1', template: ['text', 'code'] },
     research: { color: '#10b981', template: ['text', 'text'] },
@@ -190,11 +180,7 @@ export class Create implements OnInit, OnDestroy {
 
   // ── Computed ───────────────────────────────────────────────────────────────
 
-  readonly categoryAccentColor = computed(() => {
-    const cat = this.category().toLowerCase().trim();
-    const match = this.CONTENT_CATEGORIES.find(c => c.label.toLowerCase() === cat);
-    return match ? (this.CATEGORY_META[match.id]?.color ?? '#6366f1') : '#6366f1';
-  });
+  readonly categoryAccentColor = computed(() => '#6366f1');
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
 
@@ -246,8 +232,8 @@ export class Create implements OnInit, OnDestroy {
   fetchIdeas(): void {
     this.ideasLoading.set(true);
     this.claudeService.askCoTeacher({
-      userMessage: `For the topic "${this.title()}" (category: ${this.category() || 'general'}), share 5 recent research insights that would enrich this content. Numbered list, one concise paragraph each.`,
-      contentContext: { title: this.title(), category: this.category() },
+      userMessage: `For the topic "${this.title()}" (content title: ${this.contentTitle() || 'general'}), share 5 recent research insights that would enrich this content. Numbered list, one concise paragraph each.`,
+      contentContext: { title: this.title(), category: this.contentTitle() },
     }).subscribe({
       next: ({ data }) => {
         this.ideasText.set(data.reply);
@@ -285,7 +271,7 @@ export class Create implements OnInit, OnDestroy {
       .slice(0, 300);
     this.claudeService.askCoTeacher({
       userMessage: `For content titled "${this.title()}" — context: "${snippet}" — provide 3 research-backed updates. Each on one line: TARGET: [exact phrase to enhance] | UPDATE: [enriched replacement]`,
-      contentContext: { title: this.title(), category: this.category() },
+      contentContext: { title: this.title(), category: this.contentTitle() },
     }).subscribe({
       next: ({ data }) => {
         this.aiUpdateResult.set(data.reply);
@@ -328,7 +314,7 @@ export class Create implements OnInit, OnDestroy {
     this.title.set('');
     this.subtitle.set('');
     this.blocks.set([]);
-    this.category.set('');
+    this.contentTitle.set('');
     this.domain.set('education');
     this.contentType.set('L');
     this.contentState.set('draft');
@@ -359,9 +345,10 @@ export class Create implements OnInit, OnDestroy {
       subtitle: this.subtitle(),
       contentType: this.contentType(),
       domain: this.domain(),
-      category: this.category(),
+      contentTitle: this.contentTitle(),
       blocks: apiBlocks,
     };
+    console.log('Saving payload:', payload);
 
     if (this.baseId()) {
       this.creatorService.updateDraft(this.baseId(), payload).subscribe({
@@ -452,11 +439,11 @@ export class Create implements OnInit, OnDestroy {
 
     const changed =
       this.title() !== this._loadedIdentity.title ||
-      this.category() !== this._loadedIdentity.category;
+      this.contentTitle() !== this._loadedIdentity.contentTitle;
 
     if (changed) {
       this._isExistingDraft = false;
-      this._loadedIdentity = { title: '', category: '' };
+      this._loadedIdentity = { title: '', contentTitle: '' };
       this.baseId.set('');
       this.hybridId.set('');
       this.blocks.set([]);
@@ -475,10 +462,10 @@ export class Create implements OnInit, OnDestroy {
         this.hybridId.set(data.hybridId);
         this.contentType.set(data.contentType);
         this.domain.set(data.domain);
-        this.category.set(data.category ?? '');
+        this.contentTitle.set(data.contentTitle ?? '');
         this.contentState.set(data.state);
         this._isExistingDraft = true;
-        this._loadedIdentity = { title: data.title, category: data.category ?? '' };
+        this._loadedIdentity = { title: data.title, contentTitle: data.contentTitle ?? '' };
         const rawBlocks = (data as unknown as Record<string, unknown>)['blocks'] as CreatorBlock[] | undefined;
         if (rawBlocks?.length) {
           this.blocks.set(rawBlocks.map(b => ({

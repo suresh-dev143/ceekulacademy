@@ -1,0 +1,82 @@
+<!-- ══ AI FOR EVERYONE ══════════════════════════════════════════════════════ -->
+<!-- <div class="ma-ai-hub">
+  <div class="ma-ai-hub__card">
+    <div class="ma-ai-hub__header">
+      <h2 class="ma-ai-hub__title">AI for Everyone</h2>
+      <div class="ma-ai-hub__glow"></div>
+    </div>
+    <div class="ma-ai-hub__grid">
+      <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/self-improvement">
+
+        Self Improvement
+      </a>
+      <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/creative">
+
+        Creative Expression
+      </a>
+      <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/innovation">
+
+        Innovation & Research
+      </a>
+      <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/family">
+
+        Family Transformation
+      </a>
+      <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/digital-system">
+
+        Evolving Digital System
+      </a>
+      <a class="ma-ai-hub__item" routerLink="/personal/ai-everyone/projects">
+
+        Identify Your Project
+      </a>
+    </div>
+  </div>
+</div> -->
+
+<!-- ══ PERSONAL HUB ════════════════════════════════════════════════════════ -->
+<div class="ma-hub">
+
+  <div class="ma-hub__body" [class.ma-hub__body--collapsed]="collapsed()">
+
+    <!-- Top-right: date + time -->
+    <div class="ma-hub__cell ma-hub__cell--meta">
+      <span class="ma-hub__date">{{ currentDate() }}</span>
+      <span class="ma-hub__clock">{{ currentTime() }}</span>
+    </div>
+
+    <!-- Center: CB ID -->
+    <!-- <div class="ma-hub__cell ma-hub__cell--core">
+        @if (ceebrainId()) {
+          <a class="ma-hub__cbid" routerLink="/personal/digital-life">{{ ceebrainId() }}</a>
+          <span class="ma-hub__cbid-label">Ceebrain Identity</span>
+        } @else {
+          <span class="ma-hub__cbid ma-hub__cbid--guest">Ceebrain Space</span>
+          <span class="ma-hub__cbid-label ma-hub__cbid-label--guest">Register to get your unique ID</span>
+        }
+      </div> -->
+
+    <!-- Bottom row: nav links -->
+    <div class="ma-hub__cell ma-hub__cell--todays">
+      <span class="ma-hub__nav ma-hub__nav--current">Today's Content</span>
+    </div>
+
+    <div class="ma-hub__cell ma-hub__cell--set">
+      <a class="ma-hub__nav" routerLink="/personal/set-my-content">Set My Content</a>
+    </div>
+
+    <div class="ma-hub__cell ma-hub__cell--past">
+      <a class="ma-hub__nav" routerLink="/personal/past-content">Past Content</a>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- Always-visible strip with collapse arrow -->
+  <button class="ma-hub__strip" (click)="toggleHub()" [attr.aria-label]="collapsed() ? 'Expand hub' : 'Collapse hub'">
+    @if (collapsed() && ceebrainId()) {
+    <span class="ma-hub__strip-id">{{ ceebrainId() }}</span>
+    }
+    <span class="ma-hub__arrow" [class.ma-hub__arrow--flipped]="collapsed()">⌃</span>
+  </button>
+
+</div><!-- /hub -->

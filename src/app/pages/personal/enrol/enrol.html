@@ -1,0 +1,239 @@
+<div class="ceekul-enrol-surface">
+
+  <!-- ── Top Bar ── -->
+  <header class="enrol-topbar">
+    <div class="topbar-left">
+      <div class="enrol-brand">
+        <span class="brand-icon">◈</span>
+        <span class="brand-label">Enrol</span>
+      </div>
+    </div>
+
+    <div class="topbar-tabs">
+      <button class="tab-btn" [class.active]="activeTab() === 'search'" (click)="setTab('search')">
+        Discover
+      </button>
+      <button class="tab-btn" [class.active]="activeTab() === 'mine'" (click)="setTab('mine')">
+        My Enrolments
+        @if (myEnrolments().length) {
+          <span class="tab-count">{{ myEnrolments().length }}</span>
+        }
+      </button>
+    </div>
+
+    <div class="topbar-right">
+      <button class="action-btn" (click)="navigateToSchedule()">
+        ← Schedule
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Discover Tab ── -->
+  @if (activeTab() === 'search') {
+    <div class="enrol-canvas">
+      <div class="canvas-inner">
+
+        <!-- ── Search Filters ── -->
+        <div class="filter-card">
+          <div class="filter-label">Find a Schedule</div>
+
+          <div class="filter-grid">
+            <div class="filter-field">
+              <label class="field-label">Category</label>
+              <select class="filter-select"
+                [value]="searchCategory()"
+                (change)="searchCategory.set($any($event.target).value); onFieldInput()">
+                @for (cat of CATEGORIES; track cat.id) {
+                  <option [value]="cat.id">{{ cat.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="filter-field">
+              <label class="field-label">Program Title</label>
+              <input class="filter-input"
+                [value]="searchProgramTitle()"
+                (input)="searchProgramTitle.set($any($event.target).value); onFieldInput()"
+                placeholder="e.g. Quantum Physics..." />
+            </div>
+
+            <div class="filter-field">
+              <label class="field-label">Section Title</label>
+              <input class="filter-input"
+                [value]="searchSectionTitle()"
+                (input)="searchSectionTitle.set($any($event.target).value); onFieldInput()"
+                placeholder="e.g. Module 2..." />
+            </div>
+
+            <div class="filter-field">
+              <label class="field-label">Content Title</label>
+              <input class="filter-input"
+                [value]="searchContentTitle()"
+                (input)="searchContentTitle.set($any($event.target).value); onFieldInput()"
+                placeholder="e.g. Wave equations..." />
+            </div>
+          </div>
+
+          <!-- Creator CB-ID filter -->
+          <div class="cbid-row">
+            <div class="cbid-field">
+              <label class="field-label">CB-ID of Content Creator <span class="label-hint">(optional — filter by creator when titles overlap)</span></label>
+              <input class="filter-input mono-input"
+                [value]="selfCbId()"
+                (input)="selfCbId.set($any($event.target).value)"
+                placeholder="CB0000000000000..." />
+            </div>
+          </div>
+
+          <div class="filter-actions">
+            @if (hasSearched()) {
+              <button class="clear-btn" (click)="clearSearch()">Clear</button>
+            }
+            <button class="search-btn" [disabled]="!canSearch() || searching()" (click)="search()">
+              @if (searching()) {
+                <span class="btn-spinner"></span> Searching...
+              } @else {
+                Search
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Results ── -->
+        @if (searching()) {
+          <div class="loading-state">
+            <div class="load-spinner"></div>
+            <span>Finding schedules...</span>
+          </div>
+        } @else if (hasSearched() && !results().length) {
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">No schedules found</div>
+            <div class="empty-hint">Try different search terms or a broader category.</div>
+          </div>
+        } @else if (results().length) {
+          <div class="results-header">
+            <span class="results-count">{{ results().length }} schedule{{ results().length !== 1 ? 's' : '' }} found</span>
+          </div>
+          <div class="results-list">
+            @for (s of results(); track s.scheduleId) {
+              <div class="result-card" [style.border-left-color]="getCatMeta(s.category).color">
+                <div class="rc-header">
+                  <div class="rc-category">
+                    <span class="rc-cat-icon">{{ getCatMeta(s.category).icon }}</span>
+                    <span class="rc-cat-label" [style.color]="getCatMeta(s.category).color">
+                      {{ s.category }}
+                    </span>
+                  </div>
+                  <div class="rc-capacity" [class.full]="isFull(s)">
+                    {{ capacityLabel(s) }}
+                  </div>
+                </div>
+
+                <div class="rc-title">{{ s.programTitle }}</div>
+                @if (s.sectionTitle) {
+                  <div class="rc-sub">{{ s.sectionTitle }}</div>
+                }
+                @if (s.contentTitle) {
+                  <div class="rc-content">{{ s.contentTitle }}</div>
+                }
+
+                <div class="rc-meta">
+                  <span>📅 {{ formatDate(s.scheduledDate) }}</span>
+                  <span>⏰ {{ s.startTime }} – {{ s.endTime }}</span>
+                  <span>{{ s.timezone }}</span>
+                  <span>{{ s.deliveryMode === 'online' ? '🌐' : s.deliveryMode === 'in-person' ? '🏫' : '⚡' }} {{ s.deliveryMode }}</span>
+                </div>
+
+                <div class="rc-footer">
+                  <div class="rc-id">{{ s.scheduleId }}</div>
+                  <div class="rc-enrol-count">{{ s.enrolmentCount }} enrolled</div>
+                  <button class="enrol-btn"
+                    [disabled]="isFull(s) || enrollingId() === s.scheduleId"
+                    [style.background]="isFull(s) ? '' : getCatMeta(s.category).color"
+                    (click)="enrol(s.scheduleId)">
+                    @if (enrollingId() === s.scheduleId) {
+                      <span class="btn-spinner white"></span>
+                    } @else if (isFull(s)) {
+                      Full
+                    } @else {
+                      Enrol
+                    }
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        } @else if (!hasSearched()) {
+          <div class="start-prompt">
+            <div class="prompt-icon">🌐</div>
+            <div class="prompt-title">Discover Knowledge Sessions</div>
+            <div class="prompt-hint">Search for courses, workshops, webinars, research sessions and more. Use any combination of filters above.</div>
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+
+  <!-- ── My Enrolments Tab ── -->
+  @if (activeTab() === 'mine') {
+    <div class="enrol-canvas">
+      <div class="canvas-inner">
+
+        @if (loadingEnrolments()) {
+          <div class="loading-state">
+            <div class="load-spinner"></div>
+            <span>Loading your enrolments...</span>
+          </div>
+        } @else if (!myEnrolments().length) {
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-title">No active enrolments</div>
+            <div class="empty-hint">Discover and enrol in knowledge sessions to see them here.</div>
+            <button class="action-btn primary" (click)="setTab('search')">Discover Sessions</button>
+          </div>
+        } @else {
+          <div class="enrolment-list">
+            @for (e of myEnrolments(); track e.scheduleId) {
+              <div class="enrolment-card"
+                [style.border-left-color]="e.schedule ? getCatMeta(e.schedule.category).color : '#6366f1'">
+                @if (e.schedule) {
+                  <div class="ec-header">
+                    <div class="ec-category">
+                      <span class="ec-cat-icon">{{ getCatMeta(e.schedule.category).icon }}</span>
+                      <span class="ec-cat-label" [style.color]="getCatMeta(e.schedule.category).color">
+                        {{ e.schedule.category }}
+                      </span>
+                    </div>
+                    <div class="ec-status">Active</div>
+                  </div>
+                  <div class="ec-title">{{ e.schedule.programTitle }}</div>
+                  @if (e.schedule.sectionTitle) {
+                    <div class="ec-sub">{{ e.schedule.sectionTitle }}</div>
+                  }
+                  <div class="ec-meta">
+                    <span>📅 {{ formatDate(e.schedule.scheduledDate) }}</span>
+                    <span>⏰ {{ e.schedule.startTime }} – {{ e.schedule.endTime }}</span>
+                    <span>{{ e.schedule.deliveryMode === 'online' ? '🌐' : '🏫' }} {{ e.schedule.deliveryMode }}</span>
+                  </div>
+                } @else {
+                  <div class="ec-title">{{ e.scheduleId }}</div>
+                }
+                <div class="ec-footer">
+                  <div class="ec-schedule-id">{{ e.scheduleId }}</div>
+                  <button class="cancel-enrol-btn" (click)="cancelEnrolment(e.scheduleId)">
+                    Cancel Enrolment
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+
+  <app-toast></app-toast>
+</div>

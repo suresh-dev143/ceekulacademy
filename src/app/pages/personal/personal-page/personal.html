@@ -1,0 +1,90 @@
+<div class="orch" [class.orch--sleep]="orc.isSleepMode()">
+
+  @if (orc.isSleepMode()) {
+  <div class="orch-sleep">
+    <div class="orch-sleep__orb"></div>
+
+    <p class="orch-sleep__label">Autonomous Regeneration Mode</p>
+    <p class="orch-sleep__time">{{ currentTime() }}</p>
+    <p class="orch-sleep__hint">No content. No stimulation. Rest.</p>
+  </div>
+  } @else {
+
+
+
+  <!-- ══ CONTENT OF THE HOUR ══════════════════════════════════════════════════ -->
+  <app-todays-content></app-todays-content>
+
+  <!-- ══ LIFE SERVICES ════════════════════════════════════════════════════════ -->
+  <div class="ls-wrap">
+    <div class="ls-header">
+      <span class="ls-header__label">Life Services</span>
+      @if (ceebrainId()) {
+      <span class="ls-header__id">{{ ceebrainId() }}</span>
+      }
+    </div>
+    <div class="ls-grid">
+      @for (svc of lifeServices; track svc.id) {
+      @if (svc.available) {
+      <a class="ls-card ls-card--active" [routerLink]="svc.route">
+        <span class="ls-card__icon">{{ svc.icon }}</span>
+        <span class="ls-card__name">{{ svc.name }}</span>
+        <span class="ls-card__status ls-card__status--live">Active</span>
+      </a>
+      } @else {
+      <div class="ls-card">
+        <span class="ls-card__icon">{{ svc.icon }}</span>
+        <span class="ls-card__name">{{ svc.name }}</span>
+        <span class="ls-card__status">Soon</span>
+      </div>
+      }
+      }
+    </div>
+  </div>
+
+  <!-- ══ MY DAY MAP ════════════════════════════════════════════════════════════ -->
+  <div class="ma-daymap">
+    <div class="ma-daymap__header">
+      <span class="ma-daymap__title">My Day</span>
+      <span class="ma-daymap__hint">Click any hour to set your content</span>
+      <a class="ma-daymap__edit-all" routerLink="/personal/set-my-content">Edit All</a>
+    </div>
+
+    <div class="orch-schedule__list">
+      @for (block of orc.schedule(); track block.hour) {
+      <div class="orch-row" [class.orch-row--current]="isCurrentHour(block.hour)"
+        [class.orch-row--past]="isPastHour(block.hour)" [class.orch-row--sleep]="block.phase === 'sleep'"
+        [style.--row-accent]="orc.phaseAccent(block.phase)">
+
+        <div class="orch-row__time">
+          <span class="orch-row__hour">{{ block.hour_block }}</span>
+          @if (isCurrentHour(block.hour)) {
+          <span class="orch-row__now">Now</span>
+          }
+        </div>
+
+        <div class="orch-row__bar"></div>
+
+        <div class="orch-row__content">
+          <span class="orch-row__intent">{{ contentTitle(block) }}</span>
+          <span class="orch-row__activity">{{ contentSubtitle(block) }}</span>
+        </div>
+
+        <div class="orch-row__right">
+          <span class="orch-row__tag" [class.orch-row__tag--override]="block.user_override && !block.custom_content"
+            [class.orch-row__tag--content]="!!block.custom_content">
+            {{ contentTypeLabel(block) }}
+          </span>
+          @if (block.phase !== 'sleep') {
+          <a class="orch-row__edit" [routerLink]="['/personal/set-my-content']" [queryParams]="{hour: block.hour}">✎</a>
+          }
+        </div>
+
+      </div>
+      }
+    </div>
+  </div>
+
+  }
+
+</div>

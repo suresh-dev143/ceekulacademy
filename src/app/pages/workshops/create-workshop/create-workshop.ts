@@ -97,29 +97,29 @@ interface HourRef {
 })
 export class CreateWorkshop implements OnInit {
 
-    private fb         = inject(FormBuilder);
-    private ws         = inject(WorkshopService);
-    private auth       = inject(AuthService);
-    private toast      = inject(ToastService);
+    private fb = inject(FormBuilder);
+    private ws = inject(WorkshopService);
+    private auth = inject(AuthService);
+    private toast = inject(ToastService);
     private creatorSvc = inject(CreatorService);
 
     workshopForm!: FormGroup;
-    isSubmitting    = signal(false);
+    isSubmitting = signal(false);
     workshopCreated = output<CreatedWorkshopData>();
-    cancel          = output<void>();
+    cancel = output<void>();
 
     // ── Edit mode ─────────────────────────────────────────────────────────────
     workshopToEdit = input<WorkshopListItem | null>(null);
-    isEditMode     = computed(() => !!this.workshopToEdit());
+    isEditMode = computed(() => !!this.workshopToEdit());
 
     // ── Content library ───────────────────────────────────────────────────────
     private _allContent = signal<DraftSummary[]>([]);
-    contentLoading      = signal(false);
-    contentError        = signal('');
+    contentLoading = signal(false);
+    contentError = signal('');
 
     // ── Schedules (Session Form) ─────────────────────────────────────────────
     localSchedules = signal<Partial<WorkshopApiSchedule>[]>([]);
-    showAddForm    = signal(false);
+    showAddForm = signal(false);
     addForm!: FormGroup;
 
     readonly timezones = [
@@ -138,11 +138,11 @@ export class CreateWorkshop implements OnInit {
 
 
     // ── Search ────────────────────────────────────────────────────────────────
-    searchTitle    = signal('');
+    searchTitle = signal('');
     searchSubtitle = signal('');
 
     // ── Identity (from Create Page) ──────────────────────────────────────────
-    readonly title    = signal('');
+    readonly title = signal('');
     readonly subtitle = signal('');
     readonly category = signal<string>('');
 
@@ -180,8 +180,8 @@ export class CreateWorkshop implements OnInit {
 
     searchResults = computed(() => {
         const all = this._allContent();
-        const t   = this.searchTitle().trim().toLowerCase();
-        const s   = this.searchSubtitle().trim().toLowerCase();
+        const t = this.searchTitle().trim().toLowerCase();
+        const s = this.searchSubtitle().trim().toLowerCase();
         if (!t && !s) return [];
         return all.filter(d => {
             const tMatch = !t || d.title.toLowerCase().includes(t);
@@ -197,21 +197,29 @@ export class CreateWorkshop implements OnInit {
 
     anyHourAssigned = computed(() => !!(this.hour1Ref() || this.hour2Ref() || this.hour3Ref()));
 
+    // ── Content matches (reactive on title + subtitle) ────────────────────────
+    titleMatches = computed(() => {
+        const t = this.title().trim().toLowerCase();
+        const s = this.subtitle().trim();
+        if (!t || !s) return [];
+        return this._allContent().filter(d => d.title.trim().toLowerCase() === t);
+    });
+
     // ── Ad configuration ──────────────────────────────────────────────────────
-    adOverrideBy      = signal<'creator' | 'instructor' | 'learner'>('learner');
-    adDomains         = signal<string[]>([]);
-    adCategories      = signal<string[]>([]);
-    adKeywords        = signal<string[]>([]);
+    adOverrideBy = signal<'creator' | 'instructor' | 'learner'>('learner');
+    adDomains = signal<string[]>([]);
+    adCategories = signal<string[]>([]);
+    adKeywords = signal<string[]>([]);
     adBreakActivities = signal<Set<AdBreakActivity>>(new Set());
 
     readonly BREAK_ACTIVITY_OPTIONS: { key: AdBreakActivity; label: string; icon: string }[] = [
-        { key: 'stretch',    label: 'Quick Stretch',          icon: '🤸' },
+        { key: 'stretch', label: 'Quick Stretch', icon: '🤸' },
         { key: 'meditation', label: 'Breathing & Meditation', icon: '🧘' },
-        { key: 'notes',      label: 'Review & Take Notes',    icon: '📝' },
-        { key: 'quiz',       label: 'Self-Quiz',              icon: '🧠' },
-        { key: 'discussion', label: 'Open Discussion',        icon: '💬' },
-        { key: 'walk',       label: 'Short Walk',             icon: '🚶' },
-        { key: 'custom',     label: 'Custom Activity',        icon: '✨' },
+        { key: 'notes', label: 'Review & Take Notes', icon: '📝' },
+        { key: 'quiz', label: 'Self-Quiz', icon: '🧠' },
+        { key: 'discussion', label: 'Open Discussion', icon: '💬' },
+        { key: 'walk', label: 'Short Walk', icon: '🚶' },
+        { key: 'custom', label: 'Custom Activity', icon: '✨' },
     ];
 
     toggleBreakActivity(key: AdBreakActivity) {
@@ -231,9 +239,9 @@ export class CreateWorkshop implements OnInit {
         if (val && !list().includes(val)) list.update(a => [...a, val]);
     }
 
-    addDomain(val: string)    { this._chipInput(this.adDomains, val); }
-    addCategory(val: string)  { this._chipInput(this.adCategories, val); }
-    addKeyword(val: string)   { this._chipInput(this.adKeywords, val); }
+    addDomain(val: string) { this._chipInput(this.adDomains, val); }
+    addCategory(val: string) { this._chipInput(this.adCategories, val); }
+    addKeyword(val: string) { this._chipInput(this.adKeywords, val); }
 
     removeChip(list: ReturnType<typeof signal<string[]>>, item: string) {
         list.update(a => a.filter(x => x !== item));
@@ -261,9 +269,9 @@ export class CreateWorkshop implements OnInit {
 
     ngOnInit() {
         this.workshopForm = this.fb.group({
-            workshopTitle:       ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
+            workshopTitle: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
             workshopDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(1000)]],
-            expertDescription:   ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
+            expertDescription: ['', [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
         });
 
         this.buildAddForm();
@@ -274,9 +282,9 @@ export class CreateWorkshop implements OnInit {
         if (!editData) return;
 
         this.workshopForm.patchValue({
-            workshopTitle:       editData.workshopTitle,
+            workshopTitle: editData.workshopTitle,
             workshopDescription: editData.workshopDescription,
-            expertDescription:   editData.expertDescription,
+            expertDescription: editData.expertDescription,
         });
 
         // Sync signals
@@ -291,10 +299,10 @@ export class CreateWorkshop implements OnInit {
 
         const ac = editData.adConfig as AdConfig | undefined;
         if (ac) {
-            if (ac.overrideBy)              this.adOverrideBy.set(ac.overrideBy);
-            if (ac.filters?.domains)        this.adDomains.set([...ac.filters.domains]);
-            if (ac.filters?.categories)     this.adCategories.set([...ac.filters.categories]);
-            if (ac.filters?.keywords)       this.adKeywords.set([...ac.filters.keywords]);
+            if (ac.overrideBy) this.adOverrideBy.set(ac.overrideBy);
+            if (ac.filters?.domains) this.adDomains.set([...ac.filters.domains]);
+            if (ac.filters?.categories) this.adCategories.set([...ac.filters.categories]);
+            if (ac.filters?.keywords) this.adKeywords.set([...ac.filters.keywords]);
             if (ac.breakActivities?.length) this.adBreakActivities.set(new Set(ac.breakActivities));
         }
     }
@@ -303,8 +311,8 @@ export class CreateWorkshop implements OnInit {
         this.contentLoading.set(true);
         this.contentError.set('');
         this.creatorSvc.listDrafts().subscribe({
-            next:  res => { this._allContent.set(res.data); this.contentLoading.set(false); },
-            error: ()  => { this.contentError.set('Failed to load content library'); this.contentLoading.set(false); },
+            next: res => { this._allContent.set(res.data); this.contentLoading.set(false); },
+            error: () => { this.contentError.set('Failed to load content library'); this.contentLoading.set(false); },
         });
     }
 
@@ -442,7 +450,7 @@ export class CreateWorkshop implements OnInit {
             location: `${selection.facilityName}, ${selection.partnerName}`,
             facilityDetails: selection,
             startTime: selection.selectedSlots?.[0]?.split('-')[0] || this.addForm.get('startTime')?.value,
-            endTime: selection.selectedSlots?.[selection.selectedSlots.length - 1]?.split('-')[1]?.replace('24:00','23:59') || this.addForm.get('endTime')?.value
+            endTime: selection.selectedSlots?.[selection.selectedSlots.length - 1]?.split('-')[1]?.replace('24:00', '23:59') || this.addForm.get('endTime')?.value
         });
         this.closeDiscovery();
     }
@@ -452,7 +460,7 @@ export class CreateWorkshop implements OnInit {
     }
 
     get isOfflineMode(): boolean { return this.addForm?.get('mode')?.value === 'offline'; }
-    get isOnlineMode(): boolean  { return this.addForm?.get('mode')?.value === 'online'; }
+    get isOnlineMode(): boolean { return this.addForm?.get('mode')?.value === 'online'; }
     get todayStr(): string { return nowInTz(this.addForm?.get('timezone')?.value || 'IST').dateStr; }
     get isAddingForToday(): boolean {
         const d = this.addForm?.get('date')?.value;
@@ -474,43 +482,43 @@ export class CreateWorkshop implements OnInit {
     }
 
     private _buildPayload() {
-        const v  = this.workshopForm.getRawValue();
+        const v = this.workshopForm.getRawValue();
         const h1 = this.hour1Ref();
         const h2 = this.hour2Ref();
         const h3 = this.hour3Ref();
 
-        const domains    = this.adDomains();
+        const domains = this.adDomains();
         const categories = this.adCategories();
-        const keywords   = this.adKeywords();
+        const keywords = this.adKeywords();
 
         const breakActivities = [...this.adBreakActivities()] as AdBreakActivity[];
 
         const adConfig: AdConfig = {
             contentDurationMinutes: 50,
-            adBreakMinutes:         10,
-            overrideBy:             this.adOverrideBy(),
+            adBreakMinutes: 10,
+            overrideBy: this.adOverrideBy(),
             filters: {
-                ...(domains.length    && { domains }),
+                ...(domains.length && { domains }),
                 ...(categories.length && { categories }),
-                ...(keywords.length   && { keywords }),
+                ...(keywords.length && { keywords }),
             },
             ...(breakActivities.length && { breakActivities }),
         };
 
         return {
-            workshopTitle:       v.workshopTitle.trim(),
+            workshopTitle: v.workshopTitle.trim(),
             workshopDescription: v.workshopDescription.trim(),
-            expertDescription:   v.expertDescription.trim(),
-            schedules:           this.localSchedules() as any,
+            expertDescription: v.expertDescription.trim(),
+            schedules: this.localSchedules() as any,
             contentRef: {
                 hour1: h1 ? { cid: h1.cid, version: h1.version } : null,
                 hour2: h2 ? { cid: h2.cid, version: h2.version } : null,
                 hour3: h3 ? { cid: h3.cid, version: h3.version } : null,
             },
             threeHourPlan: {
-                hour1: { title: h1?.title ?? this.hourLabel(1), description: h1?.subtitle ?? '', expertAllowed: true,  instructorAllowed: false },
-                hour2: { title: h2?.title ?? this.hourLabel(2), description: h2?.subtitle ?? '', expertAllowed: true,  instructorAllowed: false },
-                hour3: { title: h3?.title ?? this.hourLabel(3), description: h3?.subtitle ?? '', expertAllowed: true,  instructorAllowed: true  },
+                hour1: { title: h1?.title ?? this.hourLabel(1), description: h1?.subtitle ?? '', expertAllowed: true, instructorAllowed: false },
+                hour2: { title: h2?.title ?? this.hourLabel(2), description: h2?.subtitle ?? '', expertAllowed: true, instructorAllowed: false },
+                hour3: { title: h3?.title ?? this.hourLabel(3), description: h3?.subtitle ?? '', expertAllowed: true, instructorAllowed: true },
             },
             adConfig,
         };
@@ -518,7 +526,7 @@ export class CreateWorkshop implements OnInit {
 
     private _save() {
         this.isSubmitting.set(true);
-        const payload  = this._buildPayload();
+        const payload = this._buildPayload();
         const editData = this.workshopToEdit();
 
         if (editData) {

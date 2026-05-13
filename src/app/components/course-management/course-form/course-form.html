@@ -104,7 +104,7 @@
                 @for (draft of filteredPickerDrafts(); track draft.baseId) {
                     <button type="button" class="cp-item" (click)="applyDraftContent(draft)">
                         <div class="cp-item-title">{{ draft.title }}</div>
-                        <div class="cp-item-meta">{{ draft.domain }} · {{ draft.category }} · {{ draft.wordCount }} words</div>
+                        <div class="cp-item-meta">{{ draft.domain }} · {{ draft.contentTitle }} · {{ draft.wordCount }} words</div>
                     </button>
                 }
             </div>

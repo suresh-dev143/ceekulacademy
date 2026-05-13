@@ -15,10 +15,10 @@ export interface CreatorBlock {
 
 export interface DraftPayload {
   title: string;
-  subtitle?: string;
+  subtitle: string;
   contentType: ContentType;
   domain: string;
-  category: string;
+  contentTitle: string;
   blocks?: CreatorBlock[];
   domainTags?: string[];
 }
@@ -30,7 +30,7 @@ export interface DraftSummary {
   subtitle: string;
   contentType: ContentType;
   domain: string;
-  category: string;
+  contentTitle: string;
   version: number;
   wordCount: number;
   state: ContentState;

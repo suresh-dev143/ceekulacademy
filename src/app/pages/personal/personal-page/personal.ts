@@ -6,14 +6,14 @@ import { AuthService } from '../../../services/auth.service';
 import { TodaysContent } from './todays-content/todays-content';
 
 @Component({
-  selector: 'app-my-activites',
+  selector: 'app-personal',
   standalone: true,
   imports: [CommonModule, RouterLink, TodaysContent],
-  templateUrl: './my-activites.html',
-  styleUrl: './my-activites.scss',
+  templateUrl: './personal.html',
+  styleUrl: './personal.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class MyActivities implements OnInit, OnDestroy {
+export class Personal implements OnInit, OnDestroy {
   readonly orc = inject(LifeOrchestratorService);
   readonly auth = inject(AuthService);
 
@@ -30,6 +30,23 @@ export class MyActivities implements OnInit, OnDestroy {
   readonly collapsed = signal(false);
 
   toggleHub(): void { this.collapsed.update(v => !v); }
+
+  // ── Life Services surface ─────────────────────────────────────────────────
+
+  readonly lifeServices = [
+    { id: 'education',   name: 'Education',   icon: '◎', route: '/workshops',            available: true  },
+    { id: 'digital',     name: 'Digital Life', icon: '⬡', route: '/personal/digital-life', available: true  },
+    { id: 'create',      name: 'Create',       icon: '◈', route: '/personal/create',       available: true  },
+    { id: 'health',      name: 'Health',       icon: '♡', route: '',                       available: false },
+    { id: 'housing',     name: 'Housing',      icon: '⌂', route: '',                       available: false },
+    { id: 'nutrition',   name: 'Nutrition',    icon: '❋', route: '',                       available: false },
+    { id: 'justice',     name: 'Justice',      icon: '⚖', route: '',                       available: false },
+    { id: 'security',    name: 'Security',     icon: '◉', route: '',                       available: false },
+    { id: 'governance',  name: 'Governance',   icon: '⬟', route: '',                       available: false },
+    { id: 'community',   name: 'Community',    icon: '⬢', route: '',                       available: false },
+    { id: 'economy',     name: 'Economy',      icon: '◆', route: '',                       available: false },
+    { id: 'environment', name: 'Environment',  icon: '❂', route: '',                       available: false },
+  ];
 
   // ── Day-map helpers ───────────────────────────────────────────────────────
 

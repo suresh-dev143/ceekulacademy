@@ -1,6 +1,6 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router ,RouterLink} from '@angular/router';
+import { Router } from '@angular/router';
 import { GlobalSearchComponent } from '../../components/global-search/global-search';
 import { StoryService, StoryItem, STORY_CATEGORY_LABELS } from '../../services/story.service';
 import { DiscussionChatComponent } from '../../components/discussion-chat/discussion-chat';
@@ -25,7 +25,7 @@ interface ContentSection {
 
 @Component({
   selector: 'app-landing',
-  imports: [CommonModule, RouterLink,GlobalSearchComponent, DiscussionChatComponent],
+  imports: [CommonModule, GlobalSearchComponent, DiscussionChatComponent],
   templateUrl: './landing.html',
   styleUrl: './landing.scss'
 })

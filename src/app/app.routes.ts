@@ -13,6 +13,8 @@ import { Potential } from './pages/personal/potential/potential';
 import { Projects } from './pages/personal/projects/projects';
 import { Supply } from './pages/personal/supply/supply';
 import { Register } from './pages/register copy/register';
+import { Personal } from './pages/personal/personal-page/personal';
+import { MyActivities } from './pages/personal/my-activities/my-activities';
 
 export const routes: Routes = [
   { path: 'home', loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent) },
@@ -23,8 +25,8 @@ export const routes: Routes = [
   { path: 'dashboard/student', loadComponent: () => import('./pages/student-dashboard/student-dashboard').then(m => m.StudentDashboardComponent) },
   { path: 'dashboard/student/nearby', loadComponent: () => import('./pages/student-nearby/student-nearby').then(m => m.StudentNearbyComponent) },
   { path: 'dashboard/teacher', loadComponent: () => import('./pages/teacher-dashboard/teacher-dashboard').then(m => m.TeacherDashboardComponent) },
-  { path: 'about', loadComponent: () => import('./pages/about/about').then(m => m.AboutComponent) } ,
-   { path: 'profile', loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent) },
+  { path: 'about', loadComponent: () => import('./pages/about/about').then(m => m.AboutComponent) },
+  { path: 'profile', loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent) },
   { path: 'contact', loadComponent: () => import('./pages/contact/contact').then(m => m.ContactPageComponent) },
   { path: 'district', loadComponent: () => import('./pages/district/district').then(m => m.DistrictComponent) },
   { path: 'issues', loadComponent: () => import('./pages/issues/issues').then(m => m.IssuesPageComponent) },
@@ -60,7 +62,7 @@ export const routes: Routes = [
 
   // Registration — standalone full-page layout (not wrapped in PersonalLayout)
   { path: 'register', component: Register },
-   { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
+  { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
 
   {
     path: '',
@@ -73,9 +75,7 @@ export const routes: Routes = [
     path: 'personal',
     component: PersonalLayout,
     children: [
-      { path: '', loadComponent: () => import('./pages/personal/personal-hub/personal-hub').then(m => m.PersonalHubComponent) },
-
-     
+      { path: '', component: Personal },
 
       { path: 'dashboard/teacher/workshops', redirectTo: 'dashboard/my-workshops', pathMatch: 'full' },
       { path: 'dashboard/my-workshops', loadComponent: () => import('./pages/workshops/my-workshops/my-workshops').then(m => m.MyWorkshopsComponent) },
@@ -91,11 +91,10 @@ export const routes: Routes = [
       { path: 'programs/:programId/:sectionId/:subSectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
       {
         path: 'my-activities',
-        loadComponent: () => import('./pages/personal/my-activities/my-activites').then(m => m.MyActivities),
-        data: { leftSidebar: 'meta' },
+        component: MyActivities,
       },
-      { path: 'set-my-content', loadComponent: () => import('./pages/personal/my-activities/set-my-content/set-my-content').then(m => m.SetMyContent),   data: { leftSidebar: 'meta' } },
-      { path: 'past-content',   loadComponent: () => import('./pages/personal/my-activities/past-content/past-content').then(m => m.PastContent),         data: { leftSidebar: 'meta' } },
+      { path: 'set-my-content', loadComponent: () => import('./pages/personal/personal-page/set-my-content/set-my-content').then(m => m.SetMyContent), data: { leftSidebar: 'meta' } },
+      { path: 'past-content', loadComponent: () => import('./pages/personal/personal-page/past-content/past-content').then(m => m.PastContent), data: { leftSidebar: 'meta' } },
       { path: 'potential', component: Potential },
       { path: 'projects', component: Projects },
       { path: 'neurons', component: Neurons },
@@ -108,6 +107,12 @@ export const routes: Routes = [
       // Top navbar routes
       { path: 'create', component: Create, data: { leftSidebar: 'contextual' } },
       { path: 'create/:pageId', component: Create, data: { leftSidebar: 'contextual' } },
+      {
+        path: 'schedule', loadComponent: () => import('./pages/schedule/schedule').then(m => m.Schedule), data: { leftSidebar: 'contextual' },
+      },
+      {
+        path: 'enrol', loadComponent: () => import('./pages/personal/enrol/enrol').then(m => m.Enrol), data: { leftSidebar: 'contextual' },
+      },
       { path: 'advertise', loadComponent: () => import('./pages/advertiser-dashboard/advertiser-dashboard').then(m => m.AdvertiserDashboardComponent) },
       { path: 'demand', component: Demand },
       { path: 'supply', component: Supply },
@@ -125,14 +130,14 @@ export const routes: Routes = [
     component: AdminLayout,
     children: [
       { path: '', redirectTo: 'command', pathMatch: 'full' },
-      { path: 'command',  loadComponent: () => import('./pages/admin/command-center/command-center').then(m => m.CommandCenter) },
+      { path: 'command', loadComponent: () => import('./pages/admin/command-center/command-center').then(m => m.CommandCenter) },
       { path: 'homepage', loadComponent: () => import('./pages/admin/homepage-engine/homepage-engine').then(m => m.HomepageEngine) },
-      { path: 'content',  loadComponent: () => import('./pages/admin/content-mod/content-mod').then(m => m.ContentMod) },
-      { path: 'cid',      loadComponent: () => import('./pages/admin/cid-explorer/cid-explorer').then(m => m.CidExplorer) },
-      { path: 'ads',      loadComponent: () => import('./pages/admin/ad-manager/ad-manager').then(m => m.AdManager) },
-      { path: 'users',    loadComponent: () => import('./pages/admin/user-mgmt/user-mgmt').then(m => m.UserMgmt) },
-      { path: 'analytics',loadComponent: () => import('./pages/admin/analytics/analytics').then(m => m.Analytics) },
-      { path: 'infra',    loadComponent: () => import('./pages/admin/infra/infra').then(m => m.Infra) },
+      { path: 'content', loadComponent: () => import('./pages/admin/content-mod/content-mod').then(m => m.ContentMod) },
+      { path: 'cid', loadComponent: () => import('./pages/admin/cid-explorer/cid-explorer').then(m => m.CidExplorer) },
+      { path: 'ads', loadComponent: () => import('./pages/admin/ad-manager/ad-manager').then(m => m.AdManager) },
+      { path: 'users', loadComponent: () => import('./pages/admin/user-mgmt/user-mgmt').then(m => m.UserMgmt) },
+      { path: 'analytics', loadComponent: () => import('./pages/admin/analytics/analytics').then(m => m.Analytics) },
+      { path: 'infra', loadComponent: () => import('./pages/admin/infra/infra').then(m => m.Infra) },
       { path: 'identity', loadComponent: () => import('./pages/admin/identity/identity').then(m => m.Identity) },
       { path: 'settings', loadComponent: () => import('./pages/admin/settings/settings').then(m => m.Settings) },
     ]

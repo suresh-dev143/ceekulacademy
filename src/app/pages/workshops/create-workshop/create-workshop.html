@@ -36,6 +36,101 @@
 
 
         </section>
+
+        <!-- ══ 2. CONTENT ASSIGNMENT ════════════════════════════════════════ -->
+        @if (title() && subtitle()) {
+        <section class="cwf-section">
+            <div class="cwf-section-label"><span class="cwf-dot"></span>Content Assignment</div>
+
+            @if (contentLoading()) {
+            <div class="cwf-search-state">
+                <i class="fas fa-spinner fa-spin"></i> Loading content library…
+            </div>
+            } @else if (contentError()) {
+            <div class="cwf-search-state cwf-search-state--error">{{ contentError() }}</div>
+            } @else if (titleMatches().length === 0) {
+            <div class="cwf-search-state cwf-search-state--idle">
+                No drafts found matching "{{ title() }}"
+            </div>
+            } @else {
+            <div class="cwf-results-list">
+                @for (draft of titleMatches(); track draft.baseId) {
+                <div class="cwf-result-item">
+                    <div class="cwf-result-meta">
+                        <div class="cwf-result-title">{{ draft.title }}</div>
+                        <div class="cwf-result-sub">{{ draft.subtitle }}</div>
+                        <div class="cwf-result-tags">
+                            <span class="cwf-tag">{{ draft.contentType }}</span>
+                            <span class="cwf-tag cwf-tag--state">{{ draft.state }}</span>
+                        </div>
+                    </div>
+                    <div class="cwf-result-actions">
+                        <button type="button" class="cwf-hour-btn" [class.is-set]="isAssignedTo(draft, 1)"
+                            (click)="setHour(1, draft)">H1</button>
+                        <button type="button" class="cwf-hour-btn" [class.is-set]="isAssignedTo(draft, 2)"
+                            (click)="setHour(2, draft)">H2</button>
+                        <button type="button" class="cwf-hour-btn" [class.is-set]="isAssignedTo(draft, 3)"
+                            (click)="setHour(3, draft)">H3</button>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+
+            <!-- ── Hour slot summary ── -->
+            <div class="cwf-hours-grid">
+                <div class="cwf-hour-slot" [class.is-filled]="!!hour1Ref()">
+                    <div class="cwf-hour-num">Hour 1</div>
+                    <div class="cwf-hour-label">{{ hourLabel(1) }}</div>
+                    @if (hour1Ref(); as ref) {
+                    <div class="cwf-hour-content">
+                        <div class="cwf-hour-content-title">{{ ref.title }}</div>
+                        <div class="cwf-hour-content-sub">{{ ref.subtitle }}</div>
+                        <div class="cwf-hour-ver">v{{ ref.version }}</div>
+                    </div>
+                    <button type="button" class="cwf-hour-clear" (click)="clearHour(1)">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                    } @else {
+                    <div class="cwf-hour-empty">Not assigned</div>
+                    }
+                </div>
+                <div class="cwf-hour-slot" [class.is-filled]="!!hour2Ref()">
+                    <div class="cwf-hour-num">Hour 2</div>
+                    <div class="cwf-hour-label">{{ hourLabel(2) }}</div>
+                    @if (hour2Ref(); as ref) {
+                    <div class="cwf-hour-content">
+                        <div class="cwf-hour-content-title">{{ ref.title }}</div>
+                        <div class="cwf-hour-content-sub">{{ ref.subtitle }}</div>
+                        <div class="cwf-hour-ver">v{{ ref.version }}</div>
+                    </div>
+                    <button type="button" class="cwf-hour-clear" (click)="clearHour(2)">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                    } @else {
+                    <div class="cwf-hour-empty">Not assigned</div>
+                    }
+                </div>
+                <div class="cwf-hour-slot" [class.is-filled]="!!hour3Ref()">
+                    <div class="cwf-hour-num">Hour 3</div>
+                    <div class="cwf-hour-label">{{ hourLabel(3) }}</div>
+                    @if (hour3Ref(); as ref) {
+                    <div class="cwf-hour-content">
+                        <div class="cwf-hour-content-title">{{ ref.title }}</div>
+                        <div class="cwf-hour-content-sub">{{ ref.subtitle }}</div>
+                        <div class="cwf-hour-ver">v{{ ref.version }}</div>
+                    </div>
+                    <button type="button" class="cwf-hour-clear" (click)="clearHour(3)">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                    } @else {
+                    <div class="cwf-hour-empty">Not assigned</div>
+                    }
+                </div>
+            </div>
+        </section>
+        }
+
         <section class="cwf-section">
             <div class="cwf-field">
                 <label class="cwf-label">Workshop Description *</label>

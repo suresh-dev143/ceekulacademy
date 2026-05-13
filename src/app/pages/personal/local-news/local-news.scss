@@ -16,7 +16,6 @@ $border-color: #2a2a2a;
     display: flex;
     justify-content: space-between;
     padding: 0 1rem;
-    margin-bottom: 1.5rem;
 }
 
 .lnp-dropdown {
@@ -86,25 +85,27 @@ $border-color: #2a2a2a;
                 background: rgba(255, 255, 255, 0.05);
                 color: $accent;
                 padding-left: 1.25rem;
+                cursor: pointer;
             }
         }
+    }
 
-        &__split {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            color: $text-muted;
-            padding: 0.8rem 1rem;
+    &__split {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: $text-muted;
+        padding: 0.8rem 1rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+
+        span {
             cursor: pointer;
-            font-size: 0.9rem;
+            transition: color 0.2s ease;
 
-            span {
-
-                transition: color 0.2s ease;
-
-                &:hover {
-                    color: $accent;
-                }
+            &:hover {
+                color: $accent;
+                text-decoration: underline;
             }
         }
     }
@@ -149,7 +150,7 @@ $border-color: #2a2a2a;
         display: flex;
         align-items: center;
         justify-content: right;
-        padding: 0.79rem;
+        padding: 0.35rem;
         border-bottom: 1px solid rgba($accent, 0.2);
     }
 

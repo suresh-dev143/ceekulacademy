@@ -14,24 +14,20 @@
     <div class="create-canvas" [style.--accent]="categoryAccentColor()">
       <div class="canvas-inner">
 
-        <!-- ── CATEGORY / DOMAIN / TITLE / SUBTITLE ── -->
+        <!-- ── CONTENT TITLE / PROGRAM TITLE / SUBTITLE ── -->
+      
         <div class="topbar-center topbar-meta-row">
-          <select class="category-ghost-select" [value]="category()"
-            (change)="category.set($any($event.target).value); onIdentityChange()">
-            <option value="" disabled selected hidden>Category...</option>
-            @for (cat of CONTENT_CATEGORIES; track cat.id) {
-            <option [value]="cat.label">{{ cat.label }}</option>
-            }
-          </select>
-
-        </div>
-        <div class="topbar-center">
           <input class="title-ghost-input" [value]="title()" (input)="title.set($any($event.target).value)"
-            (blur)="onIdentityChange()" placeholder="Title..." />
+            (blur)="onIdentityChange()" placeholder="Program Title..." />
         </div>
         <div class="topbar-center">
           <input class="subtitle-ghost-input" [value]="subtitle()" (input)="subtitle.set($any($event.target).value)"
-            (blur)="onIdentityChange()" placeholder="Subtitle..." />
+            (blur)="onIdentityChange()" placeholder="Section Title..." />
+        </div>
+          <div class="topbar-center ">
+          <input class="category-ghost-select" [value]="contentTitle()"
+            (input)="contentTitle.set($any($event.target).value)"
+            (blur)="onIdentityChange()" placeholder="Content Title..." />
         </div>
 
         <!-- ── BLOCKS ── -->
