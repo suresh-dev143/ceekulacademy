@@ -20,7 +20,12 @@ export const routes: Routes = [
   { path: 'home', loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent) },
   { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard-home').then(m => m.DashboardHomeComponent) },
   { path: 'dashboard/courses', loadComponent: () => import('./pages/courses/courses').then(m => m.CoursesComponent) },
+  { path: 'dashboard/advisor', loadComponent: () => import('./pages/advisor-dashboard/advisor-dashboard').then(m => m.AdvisorDashboardComponent) },
   { path: 'dashboard/director', loadComponent: () => import('./pages/director-dashboard/director-dashboard').then(m => m.DirectorDashboardComponent) },
+  { path: 'dashboard/manager', loadComponent: () => import('./pages/manager-dashboard/manager-dashboard').then(m => m.ManagerDashboardComponent) },
+  
+  { path: 'cg/:cgId', loadComponent: () => import('./pages/cg-page/cg-page').then(m => m.CgPageComponent) },
+  { path: 'dashboard/volunteer', loadComponent: () => import('./pages/volunteer-dashboard/volunteer-dashboard').then(m => m.VolunteerDashboardComponent) },
   { path: 'dashboard/partner', loadComponent: () => import('./pages/partner-dashboard/partner-dashboard').then(m => m.PartnerDashboardComponent) },
   { path: 'dashboard/student', loadComponent: () => import('./pages/student-dashboard/student-dashboard').then(m => m.StudentDashboardComponent) },
   { path: 'dashboard/student/nearby', loadComponent: () => import('./pages/student-nearby/student-nearby').then(m => m.StudentNearbyComponent) },
@@ -57,6 +62,9 @@ export const routes: Routes = [
   // ==================== NEURON PARTICIPATION HUB ====================
   { path: 'neurons', loadComponent: () => import('./pages/neuron-hub/neuron-hub').then(m => m.NeuronHubComponent) },
 
+  // ==================== CEEKUL MISSION ====================
+  { path: 'mission', loadComponent: () => import('./pages/mission/mission').then(m => m.MissionComponent) },
+
   // ==================== PAYMENT RETURN (Cramib redirect-back) ====================
   { path: 'payment/return', loadComponent: () => import('./pages/payment-return/payment-return').then(m => m.PaymentReturn) },
 
@@ -80,6 +88,7 @@ export const routes: Routes = [
       { path: 'dashboard/teacher/workshops', redirectTo: 'dashboard/my-workshops', pathMatch: 'full' },
       { path: 'dashboard/my-workshops', loadComponent: () => import('./pages/workshops/my-workshops/my-workshops').then(m => m.MyWorkshopsComponent) },
       { path: 'dashboard/enrolled-workshops', loadComponent: () => import('./pages/workshops/enrolled-workshops/enrolled-workshops').then(m => m.EnrolledWorkshopsComponent) },
+      { path: 'infrastructure', loadComponent: () => import('./pages/partner-dashboard/partner-dashboard').then(m => m.PartnerDashboardComponent) },
 
       { path: 'workshops', loadComponent: () => import('./pages/workshops/workshops').then(m => m.PublicWorkshopsPageComponent) },
       { path: 'workshops/:workshopId/live/:scheduleId', loadComponent: () => import('./pages/workshops/live-room/live-room').then(m => m.LiveRoomComponent) },
@@ -108,7 +117,7 @@ export const routes: Routes = [
       { path: 'create', component: Create, data: { leftSidebar: 'contextual' } },
       { path: 'create/:pageId', component: Create, data: { leftSidebar: 'contextual' } },
       {
-        path: 'schedule', loadComponent: () => import('./pages/schedule/schedule').then(m => m.Schedule), data: { leftSidebar: 'contextual' },
+        path: 'schedule', loadComponent: () => import('./pages/schedule/schedule').then(m => m.Schedule),
       },
       {
         path: 'enrol', loadComponent: () => import('./pages/personal/enrol/enrol').then(m => m.Enrol), data: { leftSidebar: 'contextual' },

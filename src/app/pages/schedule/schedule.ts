@@ -88,6 +88,7 @@ interface LocalSession {
   capacity: number | null;
   facilityId?: string;
   location?: string;
+  fee?: number;
 }
 
 const DEFAULT_SESSION_FLOW: SessionBlock[] = [
@@ -268,9 +269,10 @@ export class Schedule implements OnInit, OnDestroy {
       partnerName:     [''],
       location:        [''],
       facilityDetails: [null],
+      fee:             [null],
     }, { validators: [sessionConstraintsValidator(getTz)] });
 
-    this.addForm.get('mode')!.valueChanges.subscribe(m => this._syncFacilityValidator(m ?? 'online'));
+    this.addForm.get('mode')!.valueChanges.subscribe(m => this._syncFacilityValidator(m ?? 'offline'));
   }
 
   private _syncFacilityValidator(mode: string): void {
@@ -282,6 +284,7 @@ export class Schedule implements OnInit, OnDestroy {
     } else {
       loc.clearValidators(); loc.setValue('');
       facId.clearValidators(); facId.setValue('');
+      this.addForm.get('fee')!.setValue(null);
     }
     loc.updateValueAndValidity();
     facId.updateValueAndValidity();
@@ -299,6 +302,7 @@ export class Schedule implements OnInit, OnDestroy {
     if (this.addForm.invalid) return;
     const v = this.addForm.getRawValue();
     const rawCap = parseInt(v.capacity, 10);
+    const rawFee = parseFloat(v.fee);
     const session: LocalSession = {
       date:       v.date,
       startTime:  v.startTime,
@@ -308,6 +312,7 @@ export class Schedule implements OnInit, OnDestroy {
       capacity:   isNaN(rawCap) ? null : Math.max(1, rawCap),
       facilityId: v.facilityId || undefined,
       location:   v.location  || undefined,
+      fee:        isNaN(rawFee) ? undefined : Math.max(0, rawFee),
     };
     this.localSchedules.update(list => [...list, session]);
     this.cancelAddForm();

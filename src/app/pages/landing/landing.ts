@@ -136,6 +136,7 @@ export class Landing implements OnInit {
     return this.storyService.getContentParagraphs(content);
   }
 
-  onRegister(): void { this.router.navigate(['/register']); }
-  onContact(): void  { this.router.navigate(['/contact']); }
+  onRegister(): void    { this.router.navigate(['/register']); }
+  onContact(): void     { this.router.navigate(['/contact']); }
+  onGoPersonal(): void  { this.router.navigate(['/personal']); }
 }

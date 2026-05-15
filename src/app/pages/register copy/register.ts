@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, signal, computed, inject, PLATFORM_ID, Inject, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CeebrainIdService } from '../../services/ceebrain-id.service';
 import { LifeOrchestratorService } from '../../services/life-orchestrator.service';
@@ -24,7 +24,7 @@ type DisagreementCategory = 'confusion' | 'suggestion' | 'concern' | 'rejection'
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, Navbar],
+  imports: [ReactiveFormsModule, RouterLink, Navbar],
   templateUrl: './register.html',
   styleUrl: './register.scss'
 })
@@ -549,4 +549,5 @@ export class Register implements OnInit, OnDestroy, AfterViewInit {
       }
     } catch {}
   }
+  onLogin():void { this.router.navigate(['/personal']); }
 }

@@ -1,6 +1,5 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LayoutComponent } from '../../components/layout/layout';
 import { PartnerOverviewComponent } from '../../components/partner/partner-overview/partner-overview';
 import { NearbyTeachersComponent } from '../../components/partner/nearby-teachers/nearby-teachers';
 import { NearbyStudentsComponent } from '../../components/partner/nearby-students/nearby-students';
@@ -11,14 +10,13 @@ import { PartnerService } from '../../services/partner.service';
   selector: 'app-partner-dashboard',
   standalone: true,
   imports: [
-    LayoutComponent,
     PartnerOverviewComponent,
     NearbyTeachersComponent,
     NearbyStudentsComponent,
     InfrastructureManagerComponent
   ],
   template: `
-    <app-layout>
+  
       <div class="partner-dashboard-container">
         <!-- Partner Overview Hub -->
         <app-partner-overview
@@ -49,7 +47,6 @@ import { PartnerService } from '../../services/partner.service';
           </div>
         </div>
       </div>
-    </app-layout>
   `,
   styles: [`
     .partner-dashboard-container { 

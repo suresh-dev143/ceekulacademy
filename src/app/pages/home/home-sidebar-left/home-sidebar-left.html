@@ -1,16 +1,19 @@
 <nav class="snav">
     <div class="snav-district">
         <div class="snav-district-name">RAEBARELI</div>
+        <a class="snav-cg-link" routerLink="/cg/CG100000100001" routerLinkActive="snav-cg-link--active">⬡ Village CG Page</a>
     </div>
 
     <div class="snav-body">
         <div class="snav-section">
             <div class="snav-section-lbl">LEADERSHIP</div>
-            <a class="snav-item snav-item"> ADVISOR</a>
-            <a class="snav-item snav-item" routerLink="/dashboard/director">
-                DIRECTOR</a>
-            <a class="snav-item snav-item"> MANAGER</a>
-            <a class="snav-item snav-item">VOLUNTEER</a>
+            <a class="snav-item" routerLink="/dashboard/advisor" routerLinkActive="snav-item--active">ADVISOR</a>
+            <a class="snav-item" routerLink="/dashboard/director" routerLinkActive="snav-item--active">DIRECTOR</a>
+            <a class="snav-item" routerLink="/dashboard/manager" routerLinkActive="snav-item--active">MANAGER</a>
+            <a class="snav-item" routerLink="/dashboard/volunteer" routerLinkActive="snav-item--active">VOLUNTEER</a>
+        </div>
+        <div class="snav-section">
+            <a class="snav-section-lbl" routerLink="/mission" routerLinkActive="snav-section-lbl--active">CEEKUL MISSION</a>
         </div>
         <!-- <div class="snav-section">
             <div class="snav-section-lbl">LOCAL ISSUES</div>

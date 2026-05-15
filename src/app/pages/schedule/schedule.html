@@ -517,6 +517,10 @@
                   <label class="cwf-label">Capacity <span class="label-hint">(leave blank for unlimited)</span></label>
                   <input type="number" class="cwf-input" formControlName="capacity" min="1" placeholder="Unlimited" />
                 </div>
+                 <div class="cwf-field">
+                    <label class="cwf-label">Fee <span class="label-hint">(leave blank if free)</span></label>
+                    <input type="number" class="cwf-input" formControlName="fee" min="0" step="0.01" placeholder="0.00" />
+                  </div>
 
                 <div class="cwf-field">
                   <label class="cwf-label">Mode <span class="required">*</span></label>
@@ -525,13 +529,10 @@
                       <input type="radio" formControlName="mode" value="online" />
                       <span>Online</span>
                     </label>
+                  
                     <label class="cwf-toggle">
                       <input type="radio" formControlName="mode" value="in-person" />
-                      <span>In-Person</span>
-                    </label>
-                    <label class="cwf-toggle">
-                      <input type="radio" formControlName="mode" value="hybrid" />
-                      <span>Hybrid</span>
+                      <span>Offline</span>
                     </label>
                   </div>
                 </div>
@@ -550,6 +551,8 @@
                       </div>
                     }
                   </div>
+
+                 
                 }
 
                 <div class="cwf-form-footer cwf-field--full">

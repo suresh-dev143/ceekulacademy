@@ -199,16 +199,15 @@
     <!-- Right Column: Chat -->
     <aside class="three-col__right" [class.mobile-active]="activeTab() === 'chat'">
       <div class="chat-container">
-        <!-- <div class="chat-container__header">
+        <div class="chat-container__header">
           @if (isLoggedIn()) {
-          <button routerLink="/personal/my-activities"><span class="ceebrain-id-badge" aria-label="Ceebrain ID">CB{{
-              currentUser()?.ceebrainId }}</span>
-          </button>
+            <button class="chat-header-btn chat-header-btn--go" (click)="onGoPersonal()" aria-label="Go to personal page">
+              &#8594;
+            </button>
           } @else {
-          <button class="chat-header-btn" (click)="onRegister()" aria-label="Register">Register</button>
+            <button class="chat-header-btn" (click)="onRegister()" aria-label="Register">Register</button>
           }
-        </div> -->
-<button class="chat-header-btn" (click)="onRegister()" aria-label="Register">Register</button>
+        </div>
         <!-- Formats Panel -->
         <div class="formats-panel">
           <span class="formats-panel__label">Formats</span>

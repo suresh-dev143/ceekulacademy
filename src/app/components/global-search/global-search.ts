@@ -8,7 +8,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService, UserRole } from '../../services/auth.service';
 import {
     SearchService, SearchResult, SearchCategory,
-    FilterCategory, SearchStatus, DateRange, SearchScope, SearchFilters
+    FilterCategory, SearchStatus, DateRange, SearchScope
 } from '../../services/search.service';
 
 // ── Static option tables (UI-only constants) ────────────────────────────────────
@@ -189,13 +189,12 @@ export class GlobalSearchComponent {
     constructor() {
         // ── Restore persisted filters ──────────────────────────────────────────
         const saved = this.searchService.loadSavedFilters();
-        // Ensure all properties are explicitly set to default if undefined, to satisfy SearchFilters type
-        if (saved.category || saved.status || saved.dateRange || saved.scope) {
+        if (saved.category || saved.status || saved.dateRange) {
             this.searchService.globalFilters.set({
                 category: saved.category || 'all',
                 status: saved.status || [],
                 dateRange: saved.dateRange || '',
-                scope: saved.scope || 'global'
+                scope: 'global'   // never restore local scope — always open in global mode
             });
         }
 
@@ -233,6 +232,14 @@ export class GlobalSearchComponent {
 
     // ── Keyboard navigation ────────────────────────────────────────────────────
     onKeydown(event: KeyboardEvent) {
+        if (event.key === 'Escape') {
+            this.clearQuery();
+            this.filtersOpen.set(false);
+            this.menuOpen.set(false);
+            this.isMobileExpanded.set(false);
+            return;
+        }
+
         if (this.searchScope() === 'local') return;
 
         const len = this.filteredResults().length;
@@ -252,12 +259,6 @@ export class GlobalSearchComponent {
                 else if (res[0]) this.selectResult(res[0]);
                 break;
             }
-            case 'Escape':
-                this.clearQuery();
-                this.filtersOpen.set(false);
-                this.menuOpen.set(false);
-                this.isMobileExpanded.set(false);
-                break;
         }
     }
 

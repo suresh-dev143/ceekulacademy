@@ -1,6 +1,6 @@
 import { Component, signal, input, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { Router,RouterLink, RouterModule, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
 import { ThemeService } from '../../../services/theme/theme';
@@ -14,7 +14,7 @@ export interface NavLink {
 
 @Component({
   selector: 'app-navbar',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterLink,RouterModule],
   templateUrl: './landing-navbar.html',
   styleUrl: './landing-navbar.scss'
 })

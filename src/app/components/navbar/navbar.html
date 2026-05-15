@@ -2,11 +2,9 @@
   <div class="navbar-container">
     <a routerLink="/" class="navbar-brand" (click)="closeMenu()">
       <div class="logo-text">
-        <div class="logo-main">CEEKUL ACADEMY</div>
-
+        <div class="logo-main">CEEKUL MISSION</div>
       </div>
     </a>
-
     <button class="menu-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen">
       <span>&#x2B24;</span>
 
@@ -28,7 +26,7 @@
       </a>
       <a routerLink="/programs" routerLinkActive="active" class="nav-link dropdown-toggle"
         (click)="togglePrograms($event)">
-        Programs
+        Projects
       </a>
       <!-- Programs Dropdown (Hover-based/Click for mobile) -->
       <!-- <div class="nav-dropdown" [class.active]="isProgramsOpen">
@@ -54,17 +52,22 @@
         </div>
       </div> -->
 
-      <a routerLink="/centers" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
-        Centers
+    <a routerLink="/donate" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
+        Donate
       </a>
-      <a routerLink="/interactive-learning" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
-        Interactive Learning
+      <a routerLink="/home" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
+        Contribute
       </a>
-      @if (!isLoggedIn()) {
-      <a routerLink="/login" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
-        Login
+   
+      <a routerLink="/home" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
+        Collaborate
       </a>
-      }
+         <a routerLink="/invest" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
+        Construct
+      </a>
+      <a routerLink="/contact" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
+        Contact
+      </a>
       <!-- Search Bar -->
       <!-- <div class="nav-search">
         <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search..."
@@ -74,15 +77,7 @@
         </button>
       </div> -->
 
-      <a routerLink="/donate" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
-        Donate
-      </a>
-      <a routerLink="/invest" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
-        Invest
-      </a>
-      <a routerLink="/contact" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
-        Contact
-      </a>
+     
     </div>
   </div>
 </nav>

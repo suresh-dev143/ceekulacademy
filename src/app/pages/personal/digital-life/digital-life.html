@@ -1,15 +1,44 @@
-<div class="activities-container">
-  <div class="activities-header">
-    <a routerLink="/personal/my-activities"><span>←</span></a>
-  </div>
-  <div class="activities-links">
+<div class="dl-container">
 
-    @for (section of sections; track section.title) {
-    <a [routerLink]="section.route" class="activity-link-card">
-      <div class="activity-link-content">
-        <h2>{{ section.title }}</h2>
-      </div>
-    </a>
+  <!-- ── CB ID Header ──────────────────────────────────────────────────── -->
+  <div class="dl-identity">
+    <div class="dl-avatar">{{ initials() }}</div>
+    <div class="dl-identity-info">
+      <div class="dl-name">{{ userName() }}</div>
+      @if (cbId()) {
+        <div class="dl-cbid">
+          <span class="dl-cbid-label">CB ID</span>
+          <span class="dl-cbid-value">{{ cbId() }}</span>
+        </div>
+      } @else {
+        <div class="dl-cbid dl-cbid--pending">
+          <span class="dl-cbid-label">CB ID</span>
+          <span class="dl-cbid-value dl-cbid-value--muted">Not generated yet</span>
+        </div>
+      }
+    </div>
+    <div class="dl-identity-badge">
+      <i class="fas fa-shield-alt"></i>
+      Digital Life
+    </div>
+  </div>
+
+  <!-- ── Section Cards ─────────────────────────────────────────────────── -->
+  <div class="dl-sections">
+    @for (section of sections; track section.route) {
+      <a [routerLink]="section.route" class="dl-card">
+        <div class="dl-card-icon">
+          <i class="fas {{ section.icon }}"></i>
+        </div>
+        <div class="dl-card-body">
+          <div class="dl-card-title">{{ section.title }}</div>
+          <div class="dl-card-desc">{{ section.description }}</div>
+        </div>
+        <div class="dl-card-arrow">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </a>
     }
   </div>
+
 </div>

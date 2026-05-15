@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-digital-life',
@@ -9,11 +10,23 @@ import { RouterLink } from '@angular/router';
   styleUrl: './digital-life.scss',
 })
 export class DigitalLife {
+  private readonly auth = inject(AuthService);
+
+  readonly currentUser = this.auth.currentUserProfile;
+
+  readonly cbId = computed(() => this.currentUser()?.ceebrainId ?? null);
+  readonly userName = computed(() => this.currentUser()?.name ?? 'Citizen');
+
+  readonly initials = computed(() => {
+    const name = this.currentUser()?.name ?? '';
+    return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'CB';
+  });
+
   readonly sections = [
-    { title: 'My Ceevolution', route: '/personal/digital-life' },
-    { title: 'My Activities', route: '/personal/my-activities' },
-    { title: 'My Neurons', route: '/personal/neurons' },
-    { title: 'My Kutumb', route: '/personal/kutumb' },
-    { title: 'My Future', route: '/personal/future' },
+    { title: 'My Ceevolution', icon: 'fa-seedling', route: '/personal/digital-life', description: 'Your growth journey & milestones' },
+    { title: 'My Activities', icon: 'fa-bolt', route: '/personal/my-activities', description: 'Contributions & participation log' },
+    { title: 'My Neurons', icon: 'fa-brain', route: '/personal/neurons', description: 'FUN · CUN · SUN neuron workspace' },
+    { title: 'My Kutumb', icon: 'fa-users', route: '/personal/kutumb', description: 'Family & community network' },
+    { title: 'My Future', icon: 'fa-rocket', route: '/personal/future', description: 'Goals, aspirations & life plan' },
   ];
 }

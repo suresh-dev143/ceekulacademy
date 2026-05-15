@@ -12,35 +12,47 @@
       <div class="reg-glass reg-guide">
         <p class="reg-guide__label">Guidelines</p>
         <div class="reg-guide__line"></div>
-        <ul class="reg-guide__list">
-          <li class="reg-guide__item">
-            <span class="reg-guide__dot"></span>
-            Secure digital identity
-          </li>
-          <li class="reg-guide__item">
-            <span class="reg-guide__dot"></span>
-            One account per individual
-          </li>
-          <li class="reg-guide__item">
-            <span class="reg-guide__dot"></span>
-            Biometric is always optional
-          </li>
-          <li class="reg-guide__item">
-            <span class="reg-guide__dot"></span>
-            Open to every human being
-          </li>
-          <li class="reg-guide__item">
-            <span class="reg-guide__dot"></span>
-            Fully self-regulated
-          </li>
-          <li class="reg-guide__item">
-            <span class="reg-guide__dot"></span>
-            No surveillance, no profit from data
-          </li>
-        </ul>
-        <p class="reg-guide__footer">
-          Creating your CeeBrain ID is a commitment to the self-regulatory framework.
+
+        <p class="reg-guide__para">
+          Ceekul Mission operates as a registered implementation and coordination entity for the Ceekul ecosystem.
         </p>
+
+        <p class="reg-guide__para">
+          The Ceekul Portal functions as a digital participation and coordination platform for structured development activities, collaborative programs, ecosystem services, innovation initiatives, and community-oriented infrastructure systems.
+        </p>
+
+        <p class="reg-guide__para">
+          Members participate voluntarily through authorised implementation entities and associated ecosystem programs.
+        </p>
+
+        <p class="reg-guide__para">
+          Internal participation units ("neurons") are ecosystem coordination and allocation units usable only within the Ceekul ecosystem for participation in approved services, activities, collaborative programs, and development initiatives.
+        </p>
+
+        <p class="reg-guide__sub-label">Neurons:</p>
+        <ul class="reg-guide__bullets">
+          <li>are non-monetary ecosystem participation units</li>
+          <li>do not represent currency, deposits, securities, or financial instruments</li>
+          <li>are not redeemable or transferable outside the ecosystem</li>
+        </ul>
+
+        <p class="reg-guide__para">
+          All operational, financial, taxation, compliance, implementation, and statutory activities are conducted exclusively through legally registered implementation entities and authorised partners in accordance with applicable laws.
+        </p>
+
+        <p class="reg-guide__para reg-guide__para--last">
+          Participation in ecosystem initiatives, collaborative projects, infrastructure programs, and implementation activities is governed by applicable policies, agreements, governance standards, and regulatory requirements of the respective implementation entities.
+        </p>
+        <a routerLink="/mission" class="reg-mission-link">
+          <div class="reg-mission-link__ccc">
+            <span class="reg-mission-link__c reg-mission-link__c--contribute">Contribute</span>
+            <span class="reg-mission-link__sep">·</span>
+            <span class="reg-mission-link__c reg-mission-link__c--collaborate">Collaborate</span>
+            <span class="reg-mission-link__sep">·</span>
+            <span class="reg-mission-link__c reg-mission-link__c--construct">Construct</span>
+          </div>
+          <span class="reg-mission-link__label">Ceekul Mission →</span>
+        </a>
       </div>
     </aside>
 
@@ -389,7 +401,12 @@
           </p>
         </div>
       }
-
+  <div class="form-footer">
+                    <p class="footer-text">
+                        Already have an account?
+                        <a (click)="onLogin()" class="footer-link">Login</a>
+                    </p>
+                </div>
       </div><!-- /.reg-center-content -->
 
     </main>

@@ -21,11 +21,35 @@
 
 .snav-district {
     display: flex;
-    justify-content: start;
-    align-items: center;
+    flex-direction: column;
+    gap: 0.4rem;
     padding-bottom: 0.65rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     margin-bottom: 1rem;
+}
+
+.snav-cg-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #f97316;
+    text-decoration: none;
+    padding: 3px 8px;
+    border: 1px solid rgba(249, 115, 22, 0.25);
+    border-radius: 6px;
+    background: rgba(249, 115, 22, 0.07);
+    width: fit-content;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+
+    &:hover, &.snav-cg-link--active {
+        background: rgba(249, 115, 22, 0.18);
+        border-color: rgba(249, 115, 22, 0.6);
+        color: #fb923c;
+    }
 }
 
 .snav-district-name {
@@ -71,8 +95,10 @@
 a.snav-section-lbl {
     cursor: pointer;
     transition: color 0.2s ease;
+    text-decoration: none;
+    display: block;
 
-    &:hover {
+    &:hover, &.snav-section-lbl--active {
         color: #00d2ff;
     }
 }

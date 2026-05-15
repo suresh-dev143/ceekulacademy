@@ -45,6 +45,8 @@ const PAGES: SearchResult[] = [
     { id: 'p-centers', title: 'Centers', subtitle: 'Find learning centers near you', category: 'Page', icon: 'fa-map-marker-alt', route: '/centers' },
     { id: 'p-programs', title: 'Programs', subtitle: 'Browse all educational programs', category: 'Page', icon: 'fa-graduation-cap', route: '/personal/programs' },
     { id: 'p-workshops', title: 'Workshops', subtitle: 'Public workshops and events', category: 'Page', icon: 'fa-chalkboard-teacher', route: '/personal/workshops' },
+    { id: 'p-infrastructure', title: 'Infrastructure', subtitle: 'Learn about our infrastructure', category: 'Page', icon: 'fa-building', route: '/personal/infrastructure' },
+    { id: 'p-ceekul-mission', title: 'Ceekul Mission', subtitle: 'Explore our projects', category: 'Page', icon: 'fa-tasks', route: '/dashboard/director' },
     { id: 'p-donate', title: 'Donate', subtitle: 'Support Ceekul Mission', category: 'Page', icon: 'fa-heart', route: '/donate' },
     { id: 'p-invest', title: 'Invest', subtitle: 'Investment opportunities', category: 'Page', icon: 'fa-chart-line', route: '/invest' },
     { id: 'p-contact', title: 'Contact', subtitle: 'Get in touch with us', category: 'Page', icon: 'fa-envelope', route: '/contact' },
@@ -277,9 +279,10 @@ export class SearchService {
             out = out.filter(r => allowedCats.includes(r.category));
         }
 
-        // Status filter (multi-select OR logic)
+        // Status filter — only exclude items that explicitly have a non-matching status;
+        // items with no status (e.g. static pages) are always kept.
         if (filters.status.length > 0) {
-            out = out.filter(r => r.status && filters.status.includes(r.status));
+            out = out.filter(r => !r.status || filters.status.includes(r.status));
         }
 
 
