@@ -1,0 +1,115 @@
+<div class="dir-page">
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="dir-header">
+    <div class="dir-header__seal" aria-hidden="true">
+      <div class="dir-seal">
+        <div class="dir-seal__ring dir-seal__ring--outer"></div>
+        <div class="dir-seal__ring dir-seal__ring--inner"></div>
+        <span class="dir-seal__glyph">◈</span>
+      </div>
+    </div>
+
+    <div class="dir-header__body">
+      <span class="dir-header__eyebrow">Office of the</span>
+      <h1 class="dir-header__title">Directors</h1>
+      <p class="dir-header__subtitle">Ceekul Academy · Domain Governance & Accountability</p>
+    </div>
+
+    <div class="dir-header__rule" aria-hidden="true">
+      <div class="dir-header__rule-line"></div>
+      <span class="dir-header__rule-glyph">◈</span>
+      <div class="dir-header__rule-line"></div>
+    </div>
+
+    <blockquote class="dir-mission">
+      <p class="dir-mission__text">
+        "Accountability is not a burden — it is a gift of clarity. When a Director owns
+        their domain completely, every person within it knows where they stand, what is
+        expected, and why it matters. Civilizations advance not through diffused
+        responsibility but through precise, courageous ownership."
+      </p>
+      <footer class="dir-mission__attr">— Director Charter, Governance Mandate I</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ GOVERNANCE MANDATES ════════════════════════════════════════════════ -->
+  <section class="dir-mandates">
+    <div class="dir-section-label">
+      <span class="dir-section-label__line" aria-hidden="true"></span>
+      <span class="dir-section-label__text">Governance Mandates</span>
+      <span class="dir-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="dir-mnd-list">
+      @for (mnd of mandates; track mnd.id; let i = $index) {
+      <div class="dir-mnd"
+        [class.dir-mnd--open]="expandedId() === mnd.id"
+        [style.--mnd-delay]="(i * 60) + 'ms'">
+
+        <button class="dir-mnd__trigger" (click)="toggleMandate(mnd.id)" [attr.aria-expanded]="expandedId() === mnd.id">
+          <span class="dir-mnd__code">{{ mnd.code }}</span>
+          <span class="dir-mnd__title">{{ mnd.title }}</span>
+          <span class="dir-mnd__chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="4 6 8 10 12 6"/>
+            </svg>
+          </span>
+        </button>
+
+        @if (expandedId() === mnd.id) {
+        <div class="dir-mnd__body">
+          <p class="dir-mnd__text">{{ mnd.body }}</p>
+          <div class="dir-mnd__pillars">
+            @for (p of mnd.pillars; track p) {
+            <span class="dir-mnd__pillar">{{ p }}</span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ GOVERNANCE FRAMEWORKS ══════════════════════════════════════════════ -->
+  <section class="dir-frameworks">
+    <div class="dir-section-label">
+      <span class="dir-section-label__line" aria-hidden="true"></span>
+      <span class="dir-section-label__text">Governance Frameworks</span>
+      <span class="dir-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="dir-fw-grid">
+      @for (fw of frameworks; track fw.code; let i = $index) {
+      <div class="dir-fw" [style.--fw-accent]="fw.accent" [style.--fw-delay]="(i * 70) + 'ms'">
+        <div class="dir-fw__head">
+          <span class="dir-fw__code">{{ fw.code }}</span>
+          <div class="dir-fw__badges">
+            <span class="dir-fw__status dir-fw__status--{{ fw.status.toLowerCase() }}">{{ fw.status }}</span>
+            <span class="dir-fw__domain">{{ fw.domain }}</span>
+          </div>
+        </div>
+        <h3 class="dir-fw__title">{{ fw.title }}</h3>
+        <p class="dir-fw__desc">{{ fw.descriptor }}</p>
+        <div class="dir-fw__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ DIRECTOR STATEMENT ═════════════════════════════════════════════════ -->
+  <footer class="dir-statement">
+    <div class="dir-statement__rule" aria-hidden="true"></div>
+    <p class="dir-statement__text">
+      The Director holds the bridge between the civilization's highest ambitions and
+      the operational reality of making them happen. This is not a comfortable position —
+      it demands equal fluency in vision and execution, equal courage in accepting
+      ownership and in demanding excellence. The Director who masters this bridge
+      becomes one of civilization's most essential architects.
+    </p>
+    <span class="dir-statement__seal" aria-hidden="true">◈ Ceekul Academy · Directors · Domain Governance Division</span>
+  </footer>
+
+</div>

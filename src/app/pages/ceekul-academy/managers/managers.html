@@ -1,0 +1,115 @@
+<div class="mgr-page">
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="mgr-header">
+    <div class="mgr-header__seal" aria-hidden="true">
+      <div class="mgr-seal">
+        <div class="mgr-seal__ring mgr-seal__ring--outer"></div>
+        <div class="mgr-seal__ring mgr-seal__ring--inner"></div>
+        <span class="mgr-seal__glyph">◉</span>
+      </div>
+    </div>
+
+    <div class="mgr-header__body">
+      <span class="mgr-header__eyebrow">Office of the</span>
+      <h1 class="mgr-header__title">Managers</h1>
+      <p class="mgr-header__subtitle">Ceekul Academy · Field Operations & Community Delivery</p>
+    </div>
+
+    <div class="mgr-header__rule" aria-hidden="true">
+      <div class="mgr-header__rule-line"></div>
+      <span class="mgr-header__rule-glyph">◉</span>
+      <div class="mgr-header__rule-line"></div>
+    </div>
+
+    <blockquote class="mgr-mission">
+      <p class="mgr-mission__text">
+        "Every civilization is ultimately built at the field level — in the conversations,
+        the tasks, the small daily acts that either move things forward or allow them to drift.
+        The Manager is the civilization's metabolic rate: the pulse that determines
+        whether the grand vision becomes lived community reality."
+      </p>
+      <footer class="mgr-mission__attr">— Manager Charter, Operations Mandate I</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ OPERATIONS MANDATES ════════════════════════════════════════════════ -->
+  <section class="mgr-mandates">
+    <div class="mgr-section-label">
+      <span class="mgr-section-label__line" aria-hidden="true"></span>
+      <span class="mgr-section-label__text">Operations Mandates</span>
+      <span class="mgr-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="mgr-mnd-list">
+      @for (mnd of mandates; track mnd.id; let i = $index) {
+      <div class="mgr-mnd"
+        [class.mgr-mnd--open]="expandedId() === mnd.id"
+        [style.--mnd-delay]="(i * 60) + 'ms'">
+
+        <button class="mgr-mnd__trigger" (click)="toggleMandate(mnd.id)" [attr.aria-expanded]="expandedId() === mnd.id">
+          <span class="mgr-mnd__code">{{ mnd.code }}</span>
+          <span class="mgr-mnd__title">{{ mnd.title }}</span>
+          <span class="mgr-mnd__chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="4 6 8 10 12 6"/>
+            </svg>
+          </span>
+        </button>
+
+        @if (expandedId() === mnd.id) {
+        <div class="mgr-mnd__body">
+          <p class="mgr-mnd__text">{{ mnd.body }}</p>
+          <div class="mgr-mnd__pillars">
+            @for (p of mnd.pillars; track p) {
+            <span class="mgr-mnd__pillar">{{ p }}</span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ OPERATION SYSTEMS ══════════════════════════════════════════════════ -->
+  <section class="mgr-systems">
+    <div class="mgr-section-label">
+      <span class="mgr-section-label__line" aria-hidden="true"></span>
+      <span class="mgr-section-label__text">Operation Systems</span>
+      <span class="mgr-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="mgr-sys-grid">
+      @for (sys of systems; track sys.code; let i = $index) {
+      <div class="mgr-sys" [style.--sys-accent]="sys.accent" [style.--sys-delay]="(i * 70) + 'ms'">
+        <div class="mgr-sys__head">
+          <span class="mgr-sys__code">{{ sys.code }}</span>
+          <div class="mgr-sys__badges">
+            <span class="mgr-sys__status mgr-sys__status--{{ sys.status.toLowerCase() }}">{{ sys.status }}</span>
+            <span class="mgr-sys__scope">{{ sys.scope }}</span>
+          </div>
+        </div>
+        <h3 class="mgr-sys__title">{{ sys.title }}</h3>
+        <p class="mgr-sys__desc">{{ sys.descriptor }}</p>
+        <div class="mgr-sys__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ MANAGER STATEMENT ══════════════════════════════════════════════════ -->
+  <footer class="mgr-statement">
+    <div class="mgr-statement__rule" aria-hidden="true"></div>
+    <p class="mgr-statement__text">
+      The Manager is not the least of the civilization's architects — they are its foundation.
+      Every program that reaches a community, every person whose life shifts because of a
+      Ceekul initiative, every moment where strategy becomes reality: these are the Manager's
+      legacy. A civilization is only as good as its ability to deliver on its promises,
+      and it is the Manager who makes delivery possible.
+    </p>
+    <span class="mgr-statement__seal" aria-hidden="true">◉ Ceekul Academy · Managers · Field Operations Division</span>
+  </footer>
+
+</div>

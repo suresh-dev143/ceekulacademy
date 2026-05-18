@@ -1,0 +1,115 @@
+<div class="trn-page">
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="trn-header">
+    <div class="trn-header__seal" aria-hidden="true">
+      <div class="trn-seal">
+        <div class="trn-seal__ring trn-seal__ring--outer"></div>
+        <div class="trn-seal__ring trn-seal__ring--inner"></div>
+        <span class="trn-seal__glyph">◬</span>
+      </div>
+    </div>
+
+    <div class="trn-header__body">
+      <span class="trn-header__eyebrow">Office of the</span>
+      <h1 class="trn-header__title">Transformers</h1>
+      <p class="trn-header__subtitle">Ceekul Academy · Active Transformation Network</p>
+    </div>
+
+    <div class="trn-header__rule" aria-hidden="true">
+      <div class="trn-header__rule-line"></div>
+      <span class="trn-header__rule-glyph">◬</span>
+      <div class="trn-header__rule-line"></div>
+    </div>
+
+    <blockquote class="trn-mission">
+      <p class="trn-mission__text">
+        "Transformation is not a single event — it is the sustained conversion of what exists
+        into what is needed. The Transformer's discipline is to keep that conversion running
+        simultaneously across every domain, at every scale, without ever losing the thread
+        that connects each change to the civilization it is building toward."
+      </p>
+      <footer class="trn-mission__attr">— Transformer Charter, Change Mandate I</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ TRANSFORMATION MANDATES ════════════════════════════════════════════ -->
+  <section class="trn-mandates">
+    <div class="trn-section-label">
+      <span class="trn-section-label__line" aria-hidden="true"></span>
+      <span class="trn-section-label__text">Transformation Mandates</span>
+      <span class="trn-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="trn-mnd-list">
+      @for (mnd of mandates; track mnd.id; let i = $index) {
+      <div class="trn-mnd"
+        [class.trn-mnd--open]="expandedId() === mnd.id"
+        [style.--mnd-delay]="(i * 60) + 'ms'">
+
+        <button class="trn-mnd__trigger" (click)="toggleMandate(mnd.id)" [attr.aria-expanded]="expandedId() === mnd.id">
+          <span class="trn-mnd__code">{{ mnd.code }}</span>
+          <span class="trn-mnd__title">{{ mnd.title }}</span>
+          <span class="trn-mnd__chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="4 6 8 10 12 6"/>
+            </svg>
+          </span>
+        </button>
+
+        @if (expandedId() === mnd.id) {
+        <div class="trn-mnd__body">
+          <p class="trn-mnd__text">{{ mnd.body }}</p>
+          <div class="trn-mnd__pillars">
+            @for (p of mnd.pillars; track p) {
+            <span class="trn-mnd__pillar">{{ p }}</span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ TRANSFORMATION PROGRAMS ════════════════════════════════════════════ -->
+  <section class="trn-programs">
+    <div class="trn-section-label">
+      <span class="trn-section-label__line" aria-hidden="true"></span>
+      <span class="trn-section-label__text">Transformation Programs</span>
+      <span class="trn-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="trn-prog-grid">
+      @for (prog of programs; track prog.code; let i = $index) {
+      <div class="trn-prog" [style.--prog-accent]="prog.accent" [style.--prog-delay]="(i * 70) + 'ms'">
+        <div class="trn-prog__head">
+          <span class="trn-prog__code">{{ prog.code }}</span>
+          <div class="trn-prog__badges">
+            <span class="trn-prog__status trn-prog__status--{{ prog.status.toLowerCase() }}">{{ prog.status }}</span>
+            <span class="trn-prog__domain">{{ prog.domain }}</span>
+          </div>
+        </div>
+        <h3 class="trn-prog__title">{{ prog.title }}</h3>
+        <p class="trn-prog__desc">{{ prog.descriptor }}</p>
+        <div class="trn-prog__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ TRANSFORMER STATEMENT ══════════════════════════════════════════════ -->
+  <footer class="trn-statement">
+    <div class="trn-statement__rule" aria-hidden="true"></div>
+    <p class="trn-statement__text">
+      The Transformer does not wait for permission to begin. The work of civilizational
+      change is always urgent, always parallel, always incomplete — and the Transformer's
+      commitment is to move it forward every day across every domain, with the precision
+      of an engineer and the endurance of a builder who knows the structure they are
+      raising will stand long after them.
+    </p>
+    <span class="trn-statement__seal" aria-hidden="true">◬ Ceekul Academy · Transformers · Active Change Division</span>
+  </footer>
+
+</div>

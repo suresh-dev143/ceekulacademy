@@ -1,0 +1,113 @@
+<div class="pln-page">
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="pln-header">
+    <div class="pln-header__seal" aria-hidden="true">
+      <div class="pln-seal">
+        <div class="pln-seal__ring pln-seal__ring--outer"></div>
+        <div class="pln-seal__ring pln-seal__ring--inner"></div>
+        <span class="pln-seal__glyph">◎</span>
+      </div>
+    </div>
+
+    <div class="pln-header__body">
+      <span class="pln-header__eyebrow">Office of the</span>
+      <h1 class="pln-header__title">Planners</h1>
+      <p class="pln-header__subtitle">Ceekul Academy · Infrastructure & Future Blueprints</p>
+    </div>
+
+    <div class="pln-header__rule" aria-hidden="true">
+      <div class="pln-header__rule-line"></div>
+      <span class="pln-header__rule-glyph">◎</span>
+      <div class="pln-header__rule-line"></div>
+    </div>
+
+    <blockquote class="pln-mission">
+      <p class="pln-mission__text">
+        "The present is always built from the blueprints of those willing to think
+        in decades. A civilization without Planners moves through time like a city
+        without architects — always reacting, never creating the future it deserves."
+      </p>
+      <footer class="pln-mission__attr">— Planner Charter, Infrastructure Mandate I</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ PLANNING MANDATES ══════════════════════════════════════════════════ -->
+  <section class="pln-mandates">
+    <div class="pln-section-label">
+      <span class="pln-section-label__line" aria-hidden="true"></span>
+      <span class="pln-section-label__text">Planning Mandates</span>
+      <span class="pln-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="pln-mnd-list">
+      @for (mnd of mandates; track mnd.id; let i = $index) {
+      <div class="pln-mnd"
+        [class.pln-mnd--open]="expandedId() === mnd.id"
+        [style.--mnd-delay]="(i * 60) + 'ms'">
+
+        <button class="pln-mnd__trigger" (click)="toggleMandate(mnd.id)" [attr.aria-expanded]="expandedId() === mnd.id">
+          <span class="pln-mnd__code">{{ mnd.code }}</span>
+          <span class="pln-mnd__title">{{ mnd.title }}</span>
+          <span class="pln-mnd__chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="4 6 8 10 12 6"/>
+            </svg>
+          </span>
+        </button>
+
+        @if (expandedId() === mnd.id) {
+        <div class="pln-mnd__body">
+          <p class="pln-mnd__text">{{ mnd.body }}</p>
+          <div class="pln-mnd__pillars">
+            @for (p of mnd.pillars; track p) {
+            <span class="pln-mnd__pillar">{{ p }}</span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ BLUEPRINTS ══════════════════════════════════════════════════════════ -->
+  <section class="pln-blueprints">
+    <div class="pln-section-label">
+      <span class="pln-section-label__line" aria-hidden="true"></span>
+      <span class="pln-section-label__text">Active Blueprints</span>
+      <span class="pln-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="pln-bp-grid">
+      @for (bp of blueprints; track bp.code; let i = $index) {
+      <div class="pln-bp" [style.--bp-accent]="bp.accent" [style.--bp-delay]="(i * 70) + 'ms'">
+        <div class="pln-bp__head">
+          <span class="pln-bp__code">{{ bp.code }}</span>
+          <div class="pln-bp__badges">
+            <span class="pln-bp__status pln-bp__status--{{ bp.status.toLowerCase() }}">{{ bp.status }}</span>
+            <span class="pln-bp__horizon">{{ bp.horizon }}</span>
+          </div>
+        </div>
+        <h3 class="pln-bp__title">{{ bp.title }}</h3>
+        <p class="pln-bp__desc">{{ bp.descriptor }}</p>
+        <div class="pln-bp__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ PLANNER STATEMENT ══════════════════════════════════════════════════ -->
+  <footer class="pln-statement">
+    <div class="pln-statement__rule" aria-hidden="true"></div>
+    <p class="pln-statement__text">
+      The Planner's conviction is that the future is not a destination that arrives —
+      it is a structure that is built. Every infrastructure gap, every resource misallocation,
+      every missed milestone is a blueprint that was never written or never followed.
+      Planners write the blueprints and hold the civilization accountable to them.
+    </p>
+    <span class="pln-statement__seal" aria-hidden="true">◎ Ceekul Academy · Planners · Infrastructure Intelligence Division</span>
+  </footer>
+
+</div>

@@ -1,0 +1,139 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// DIRECTORS PAGE — Domain Governance & Accountability
+// ═══════════════════════════════════════════════════════════════════════════
+
+$violet:      #7c3aed;
+$violet-dim:  rgba(124, 58, 237, 0.5);
+$violet-glow: rgba(124, 58, 237, 0.1);
+$violet-soft: rgba(124, 58, 237, 0.06);
+
+$bg-card:    #0d0016;
+$bg-surface: #11001c;
+$text-ghost:  #160020;
+$text-muted:  #200030;
+$text-dim:    #3a0060;
+$text-mid:    #6020a8;
+$text-body:   #9060d8;
+$text-light:  #c090f8;
+$text-bright: #e0c8ff;
+
+@keyframes fadeUp        { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes sealSpin      { from { transform: rotate(0deg); }  to { transform: rotate(360deg); }  }
+@keyframes sealSpinRev   { from { transform: rotate(0deg); }  to { transform: rotate(-360deg); } }
+@keyframes expandBody    { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes mndSlideIn    { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes modelSlideIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.dir-page {
+  padding: 2rem 2.5rem 4rem;
+  max-width: 860px;
+  margin: 0 auto;
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  @media (max-width: 600px) { padding: 1.5rem 1.25rem 3rem; }
+}
+
+.dir-header { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 3.5rem; }
+.dir-header__seal { margin-bottom: 1.5rem; }
+
+.dir-seal {
+  position: relative; width: 72px; height: 72px;
+  display: flex; align-items: center; justify-content: center;
+  &__ring {
+    position: absolute; border-radius: 50%;
+    &--outer { width: 100%; height: 100%; animation: sealSpin 24s linear infinite; border: 1px dashed rgba($violet, 0.2); }
+    &--inner { width: 62%; height: 62%; animation: sealSpinRev 16s linear infinite; border: 1px solid rgba($violet, 0.35); }
+  }
+  &__glyph { font-size: 1.5rem; color: $violet; position: relative; z-index: 1; text-shadow: 0 0 16px $violet-glow; }
+}
+
+.dir-header__body { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; margin-bottom: 1.5rem; }
+.dir-header__eyebrow { display: block; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase; color: $violet-dim; }
+.dir-header__title {
+  margin: 0.2rem 0 0.3rem;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  background: linear-gradient(135deg, $text-bright 30%, $violet 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.dir-header__subtitle { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: $text-muted; margin: 0; }
+
+.dir-header__rule { display: flex; align-items: center; gap: 0.75rem; width: 100%; max-width: 28rem; margin-bottom: 1.75rem; }
+.dir-header__rule-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba($violet, 0.2));
+  &:last-child { background: linear-gradient(270deg, transparent, rgba($violet, 0.2)); }
+}
+.dir-header__rule-glyph { font-size: 0.7rem; color: $violet-dim; }
+
+.dir-mission {
+  margin: 0; padding: 1.25rem 1.75rem;
+  border: 1px solid rgba($violet, 0.1); border-radius: 0.5rem;
+  background: $violet-soft; max-width: 36rem; position: relative;
+  &::before { content: '"'; position: absolute; top: -0.6rem; left: 1.25rem; font-size: 3rem; color: rgba($violet, 0.15); font-family: Georgia, serif; line-height: 1; }
+  &__text { margin: 0 0 0.75rem; font-size: 0.88rem; line-height: 1.7; color: $text-body; font-style: italic; }
+  &__attr { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: $violet-dim; }
+}
+
+.dir-section-label {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;
+  &__line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba($violet, 0.15), transparent); &:last-child { background: linear-gradient(270deg, rgba($violet, 0.15), transparent); } }
+  &__text { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: $text-dim; white-space: nowrap; }
+}
+
+.dir-mandates { margin-bottom: 3.5rem; }
+.dir-mnd-list { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.dir-mnd {
+  border: 1px solid rgba($violet, 0.08); border-radius: 0.5rem; background: $bg-card;
+  overflow: hidden; animation: mndSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--mnd-delay, 0ms); transition: border-color 0.2s;
+  &:hover { border-color: rgba($violet, 0.18); }
+  &--open { border-color: rgba($violet, 0.25); background: $bg-surface; }
+}
+
+.dir-mnd__trigger {
+  width: 100%; display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 1.25rem; background: transparent; border: none; cursor: pointer; text-align: left;
+  &:hover .dir-mnd__title { color: $text-light; }
+}
+.dir-mnd__code { font-size: 0.52rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase; color: $violet-dim; flex-shrink: 0; font-family: 'Courier New', monospace; }
+.dir-mnd__title { flex: 1; font-size: 0.88rem; font-weight: 600; color: $text-mid; transition: color 0.2s; }
+.dir-mnd__chevron {
+  flex-shrink: 0; width: 1rem; height: 1rem; color: $text-dim; transition: transform 0.25s ease;
+  .dir-mnd--open & { transform: rotate(180deg); color: $violet-dim; }
+}
+.dir-mnd__body { padding: 0 1.25rem 1.25rem; animation: expandBody 0.22s ease both; }
+.dir-mnd__text { margin: 0 0 1rem; font-size: 0.83rem; line-height: 1.72; color: $text-body; }
+.dir-mnd__pillars { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.dir-mnd__pillar { padding: 0.22rem 0.65rem; font-size: 0.58rem; font-weight: 600; letter-spacing: 0.08em; color: $violet-dim; border: 1px solid rgba($violet, 0.15); border-radius: 2rem; background: rgba($violet, 0.04); }
+
+.dir-frameworks { margin-bottom: 3.5rem; }
+.dir-fw-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; @media (max-width: 560px) { grid-template-columns: 1fr; } }
+
+.dir-fw {
+  position: relative; padding: 1.25rem;
+  border: 1px solid rgba($violet, 0.08); border-radius: 0.5rem; background: $bg-card;
+  overflow: hidden; animation: modelSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--fw-delay, 0ms); transition: border-color 0.2s, background 0.2s;
+  &:hover { border-color: rgba($violet, 0.22); background: $bg-surface; .dir-fw__bar { opacity: 0.6; } }
+  &__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem; }
+  &__code { font-size: 0.52rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: $text-dim; font-family: 'Courier New', monospace; }
+  &__badges { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+  &__status {
+    font-size: 0.48rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.1rem 0.4rem; border-radius: 2rem;
+    &--active   { color: #34d399; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2); }
+    &--research { color: #60a5fa; background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.2); }
+    &--design   { color: #c084fc; background: rgba(192,132,252,0.1);border: 1px solid rgba(192,132,252,0.2); }
+  }
+  &__domain { font-size: 0.5rem; font-weight: 600; letter-spacing: 0.08em; color: $text-dim; }
+  &__title  { margin: 0 0 0.5rem; font-size: 0.95rem; font-weight: 700; color: $text-light; line-height: 1.3; }
+  &__desc   { margin: 0; font-size: 0.75rem; line-height: 1.65; color: $text-body; }
+  &__bar    { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--fw-accent, $violet); opacity: 0.25; transition: opacity 0.2s; }
+}
+
+.dir-statement {
+  border-top: 1px solid rgba($violet, 0.08); padding-top: 2rem; text-align: center;
+  &__rule { width: 3rem; height: 1px; background: linear-gradient(90deg, transparent, $violet-dim, transparent); margin: 0 auto 1.5rem; }
+  &__text { margin: 0 auto 1.25rem; max-width: 36rem; font-size: 0.85rem; line-height: 1.75; color: $text-dim; font-style: italic; }
+  &__seal { font-size: 0.52rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: $text-ghost; font-family: 'Courier New', monospace; }
+}

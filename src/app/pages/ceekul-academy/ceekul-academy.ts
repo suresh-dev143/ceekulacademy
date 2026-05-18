@@ -6,6 +6,10 @@ import { Civilizer } from './civilizer/civilizer';
 import { Reformers } from './reformers/reformers';
 import { ExecutiveCouncil } from './executive-council/executive-council';
 import { CGPool } from './cg-pool/cg-pool';
+import { Planners } from './planners/planners';
+import { Transformers } from './transformers/transformers';
+import { Directors } from './directors/directors';
+import { Managers } from './managers/managers';
 
 interface AcademyPillar {
   title: string;
@@ -202,6 +206,10 @@ export class CeekulAcademy {
     'reformers':         Reformers,
     'executive-council': ExecutiveCouncil,
     'cg-pool':           CGPool,
+    'planners':          Planners,
+    'transformers':      Transformers,
+    'directors':         Directors,
+    'managers':          Managers,
   };
 
   selectSection(id: string): void {
