@@ -19,6 +19,15 @@
     }
 }
 
+.snav-district {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 1rem;
+}
+
 .snav-cg-link {
     display: inline-flex;
     align-items: center;
@@ -43,6 +52,13 @@
     }
 }
 
+.snav-district-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #12650f;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
 
 .snav-body {
     flex: 1;
@@ -102,7 +118,6 @@ a.snav-section-lbl {
     white-space: nowrap;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 
-    /* Default Surface Shading */
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.03);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -134,9 +149,7 @@ a.snav-section-lbl {
         border-color: #00d2ff;
         box-shadow: inset 0 1px 0 rgba(0, 210, 255, 0.3), 0 4px 16px rgba(0, 210, 255, 0.2);
 
-        i {
-            color: #00d2ff;
-        }
+        i { color: #00d2ff; }
     }
 
     &.snav-item--disabled {

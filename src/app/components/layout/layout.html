@@ -6,32 +6,32 @@
         <!-- ── Left Column ─────────────────────────────────────────────── -->
         @if (showLeftSidebar) {
         <aside class="col-left" [class.active]="mobileSidebarOpen()" [class.collapsed]="leftCollapsed()">
-
+            @if (!leftCollapsed()) {
+            <button class="toggle-sidebar-btn left" (click)="toggleLeft()">◀</button>
+            }
             @if (leftCollapsed()) {
-            <!-- Collapsed: expand button only -->
-            <button class="col-expand-btn" (click)="expandLeft()" aria-label="Expand sidebar">▶</button>
-            } @else {
-            <!-- Label box -->
+            <button class="expand-sidebar-btn left" (click)="expandLeft()">▶</button>
+            }
+
+            <!-- 4rem label box — only when a label is supplied -->
+            @if (leftLabel && !leftCollapsed()) {
             <div class="col-panel-label">
                 <span class="col-panel-label__text">{{ leftLabel }}</span>
-                <button class="col-panel-label__collapse" (click)="toggleLeft()" aria-label="Collapse sidebar">◀</button>
             </div>
-            <!-- Scrollable content -->
-            <div class="col-content">
+            }
+
+            <div class="sidebar-content">
                 @if (customLeftSidebar) {
                 <ng-content select="[slot=left-panel]"></ng-content>
                 } @else {
                 <app-sidebar-left [collapsed]="leftCollapsed()"></app-sidebar-left>
                 }
             </div>
-            }
-
         </aside>
         }
 
         <!-- ── Center Column ───────────────────────────────────────────── -->
         <main class="col-center" [class.left-collapsed]="leftCollapsed()" [class.right-collapsed]="rightCollapsed()">
-
             @if (showSearch) {
             <div class="center-search-bar">
                 <div class="csb-rule csb-rule--top"></div>
@@ -39,30 +39,30 @@
                 <div class="csb-rule csb-rule--bottom"></div>
             </div>
             }
-
             <ng-content></ng-content>
         </main>
 
         <!-- ── Right Column ────────────────────────────────────────────── -->
         @if (showRightSidebar) {
         <aside class="col-right" [class.collapsed]="rightCollapsed()" [class.active]="mobileRightSidebarOpen()">
-
+            @if (!rightCollapsed()) {
+            <button class="toggle-sidebar-btn right" (click)="toggleRight()">▶</button>
+            }
             @if (rightCollapsed()) {
-            <!-- Collapsed: expand button only -->
-            <button class="col-expand-btn col-expand-btn--right" (click)="expandRight()" aria-label="Expand sidebar">◀</button>
-            } @else {
-            <!-- Label box -->
+            <button class="expand-sidebar-btn right" (click)="expandRight()">◀</button>
+            }
+
+            <!-- 4rem label box — only when a label is supplied -->
+            @if (rightLabel && !rightCollapsed()) {
             <div class="col-panel-label col-panel-label--right">
-                <button class="col-panel-label__collapse col-panel-label__collapse--right" (click)="toggleRight()" aria-label="Collapse sidebar">▶</button>
                 <span class="col-panel-label__text">{{ rightLabel }}</span>
-            </div>
-            <!-- Scrollable content -->
-            <div class="col-content" [class.hidden]="rightCollapsed()">
-                <ng-content select="[slot=right-panel]"></ng-content>
-                <app-chat-panel (closeChat)="toggleMobileRightSidebar()"></app-chat-panel>
             </div>
             }
 
+            <div class="sidebar-content" [class.hidden]="rightCollapsed()">
+                <ng-content select="[slot=right-panel]"></ng-content>
+                <app-chat-panel (closeChat)="toggleMobileRightSidebar()"></app-chat-panel>
+            </div>
         </aside>
         }
 
