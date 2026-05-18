@@ -9,7 +9,7 @@ export type ScheduleCategory =
   | 'course' | 'workshop' | 'webinar' | 'research'
   | 'project' | 'advertisement' | 'vision-flow' | 'other';
 
-export type DeliveryMode = 'online' | 'in-person' | 'hybrid';
+export type DeliveryMode = 'online' | 'offline' | 'hybrid';
 
 export interface SessionBlock {
   slot: string;
@@ -53,6 +53,10 @@ export interface SchedulePayload {
   timezone: string;
   deliveryMode: DeliveryMode;
   capacity?: number | null;
+  fee?: number;
+  streamingFee?: number;
+  streamingPlatform?: string;
+  workshopHour?: number;
   contentDescription?: ContentDescription;
   expertProfile?: ExpertProfile;
 }

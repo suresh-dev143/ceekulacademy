@@ -27,7 +27,7 @@ export class Personal implements OnInit, OnDestroy {
   });
   readonly currentTime = signal('');
   readonly currentDate = signal('');
-  readonly collapsed = signal(false);
+  readonly collapsed = signal(true);
 
   toggleHub(): void { this.collapsed.update(v => !v); }
 

@@ -1,0 +1,60 @@
+<div class="rg-root">
+  <div class="rg-header">
+    <span class="rg-title">REFERENCE GRAPH</span>
+    @if (graph()) { <span class="rg-ctx">{{ graph()!.context | uppercase }}</span> }
+    <button class="rg-reload" (click)="reload()" title="Reload">↻</button>
+  </div>
+
+  @if (loading()) {
+    <div class="rg-empty">Loading graph…</div>
+  } @else if (error()) {
+    <div class="rg-empty rg-empty--err">{{ error() }}</div>
+  } @else if (!graph() || graph()!.nodes.length === 0) {
+    <div class="rg-empty">No connections yet. Interact with the canvas to build the graph.</div>
+  } @else {
+    <svg class="rg-svg" viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
+      <!-- Edges -->
+      @for (node of graph()!.nodes; track node.cid; let i = $index) {
+        <line
+          [attr.x1]="cx" [attr.y1]="cy"
+          [attr.x2]="nodeX(i, graph()!.nodes.length)"
+          [attr.y2]="nodeY(i, graph()!.nodes.length)"
+          class="rg-edge"
+          [class.rg-edge--out]="node.direction === 'out'"
+          [class.rg-edge--in]="node.direction === 'in'"
+        />
+      }
+
+      <!-- Center node -->
+      <circle [attr.cx]="cx" [attr.cy]="cy" [attr.r]="r * 0.55" class="rg-node rg-node--center" />
+      <text [attr.x]="cx" [attr.y]="cy + 4" class="rg-label rg-label--center">
+        {{ graph()!.context | uppercase }}
+      </text>
+
+      <!-- Neighbour nodes -->
+      @for (node of graph()!.nodes; track node.cid; let i = $index) {
+        <g class="rg-node-group" (click)="tapNode(node)">
+          <circle
+            [attr.cx]="nodeX(i, graph()!.nodes.length)"
+            [attr.cy]="nodeY(i, graph()!.nodes.length)"
+            r="28"
+            class="rg-node"
+            [class.rg-node--out]="node.direction === 'out'"
+            [class.rg-node--in]="node.direction === 'in'"
+          />
+          <text
+            [attr.x]="nodeX(i, graph()!.nodes.length)"
+            [attr.y]="nodeY(i, graph()!.nodes.length) + 4"
+            class="rg-label"
+          >{{ node.label | uppercase | slice:0:8 }}</text>
+        </g>
+      }
+    </svg>
+
+    <!-- Legend -->
+    <div class="rg-legend">
+      <span class="rg-legend-item rg-legend-item--out">→ derives from</span>
+      <span class="rg-legend-item rg-legend-item--in">← referenced by</span>
+    </div>
+  }
+</div>

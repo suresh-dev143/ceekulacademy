@@ -46,6 +46,7 @@ export class PersonalLayout implements OnInit {
 
         { label: 'NEARBY', route: '/personal/local-news' },
         { label: 'AI TOOLS', route: '/personal/ai-tools' },
+        { label: 'WORKSPACE', route: '/workspace' },
         { label: 'ADVERTISE', route: '/personal/advertise' },
         { label: 'DEMAND', route: '/personal/demand' },
         { label: 'SUPPLY', route: '/personal/supply' },

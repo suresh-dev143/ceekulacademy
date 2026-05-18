@@ -3,6 +3,18 @@
 
 <div class="now-view">
 
+  <!-- TOC Box — shown when custom content has subtitles -->
+  @if (block.custom_content?.subtitles?.length) {
+  <div class="content-toc">
+    <span class="content-toc__title">{{ block.custom_content!.title }}</span>
+    <div class="content-toc__chips">
+      @for (sub of block.custom_content!.subtitles; track sub) {
+      <button class="toc-chip" (click)="toggleDetail()">{{ sub }}</button>
+      }
+    </div>
+  </div>
+  }
+
   <!-- Content Card — title only by default, expands on click -->
   <div class="now-card"
        [class.now-card--expanded]="showDetail()"
@@ -102,6 +114,18 @@
 
     </div>
 
+    <!-- External content watch row -->
+    @if (block.custom_content?.externalUrl) {
+    <div class="ext-watch-row">
+      @if (adTimerActive()) {
+        <span class="ext-timer">Ad in {{ formatTimer(adTimerRemaining()) }}</span>
+      }
+      <button class="ext-watch-btn" (click)="watchExternal(block.custom_content!.externalUrl!)">
+        Watch on {{ platformLabel(block.custom_content!.externalUrl!) }}
+      </button>
+    </div>
+    }
+
     <!-- Actions -->
     <div class="now-detail__actions">
       @if (block.custom_content) {
@@ -128,6 +152,19 @@
 <div class="now-empty">
   <span class="now-empty__glyph">◌</span>
   <p class="now-empty__text">No content assigned for the current hour.</p>
+</div>
+}
+
+<!-- ══ AD OVERLAY (after 50 min of external content) ═════════════════════ -->
+@if (showAdOverlay()) {
+<div class="ad-overlay">
+  <div class="ad-overlay__card">
+    <p class="ad-overlay__msg">Your 50-minute session has ended. Ceekul Ads are now playing.</p>
+    <div class="ad-overlay__actions">
+      <button class="ad-overlay__btn ad-overlay__btn--skip" (click)="skipAd()">Skip Ad</button>
+      <button class="ad-overlay__btn ad-overlay__btn--continue" (click)="continueScheduled()">Continue as Scheduled</button>
+    </div>
+  </div>
 </div>
 }
 

@@ -38,6 +38,7 @@ export class Navbar {
   );
 
   readonly isRegisterPage = computed(() => this.currentUrl().startsWith('/register'));
+  readonly isAcademyPage  = computed(() => this.currentUrl().startsWith('/academy'));
 
   protected readonly isMobileMenuOpen = signal(false);
   protected readonly isLandingActionsOpen = signal(false);

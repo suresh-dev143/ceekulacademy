@@ -1,0 +1,35 @@
+<div class="cp-root">
+  <div class="cp-context-pill">
+    <span class="cp-context-dot"></span>{{ context() | uppercase }}
+  </div>
+
+  <div class="cp-messages">
+    @for (msg of messages(); track $index) {
+      <div class="cp-msg" [class.cp-msg--user]="msg.role === 'user'" [class.cp-msg--ai]="msg.role === 'assistant'">
+        <span class="cp-msg-role">{{ msg.role === 'user' ? 'YOU' : 'AI' }}</span>
+        <p class="cp-msg-text">{{ msg.text }}</p>
+      </div>
+    }
+    @if (loading()) {
+      <div class="cp-msg cp-msg--ai cp-msg--loading">
+        <span class="cp-msg-role">AI</span>
+        <span class="cp-dot-pulse"></span>
+      </div>
+    }
+    <div #scrollAnchor></div>
+  </div>
+
+  <div class="cp-input-row">
+    <textarea
+      class="cp-textarea"
+      rows="2"
+      placeholder="Ask about this context…"
+      [ngModel]="draft()"
+      (ngModelChange)="draft.set($event)"
+      (keydown)="onKey($event)"
+    ></textarea>
+    <button class="cp-send" [disabled]="loading() || !draft().trim()" (click)="send()">
+      {{ loading() ? '…' : '↑' }}
+    </button>
+  </div>
+</div>

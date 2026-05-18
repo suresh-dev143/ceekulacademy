@@ -73,7 +73,6 @@
   <nav class="workspace__tabs" aria-label="Workspace sections">
     @for (tab of [
       { id: 'overview',    label: 'Overview' },
-      { id: 'contribute',  label: 'Contribute' },
       { id: 'transfer',    label: 'Transfer' },
       { id: 'invest',      label: 'Invest' },
       { id: 'send',        label: 'Send Neurons' },
@@ -85,9 +84,6 @@
               [class.workspace__tab--active]="activeTab() === tab.id"
               (click)="setTab($any(tab.id))">
         {{ tab.label }}
-        @if (tab.id === 'contribute' && neuronService.pendingContributions().length > 0) {
-          <span class="workspace__badge">{{ neuronService.pendingContributions().length }}</span>
-        }
         @if (tab.id === 'invest' && neuronService.lockedInvestments().length > 0) {
           <span class="workspace__badge">{{ neuronService.lockedInvestments().length }}</span>
         }
@@ -141,85 +137,6 @@
                 <span class="tx-item__dot" [style.background]="bucketColor(tx.toBucket)"></span>
                 <span class="tx-item__desc">{{ tx.description }}</span>
                 <span class="tx-item__amount">+{{ tx.amount | number }}</span>
-              </li>
-            }
-          </ul>
-        }
-      </div>
-    }
-
-    <!-- ─── CONTRIBUTION ─── -->
-    @if (activeTab() === 'contribute') {
-      <div class="panel-form">
-        <h2 class="panel__heading">Contribute via Cramib</h2>
-        <p class="panel__note">
-          Select the entity you want to contribute to and enter the amount.
-          You will be redirected to <b>Cramib</b> to complete the payment securely.
-          Neurons (1 INR = 1 Neuron) are credited to your <b>FUN bucket</b>
-          automatically once payment is verified.
-        </p>
-        <p class="panel__compliance">
-          ⚠️ Neurons are non-monetary participation units and cannot be withdrawn or converted.
-        </p>
-
-        <form [formGroup]="contributionForm" (ngSubmit)="onSubmitContribution()" class="form">
-          <div class="form__field">
-            <label class="form__label">Receiving Entity Type</label>
-            <select formControlName="entityType" class="form__input form__select">
-              <option value="" disabled>Select entity type</option>
-              <option value="Trust">Trust</option>
-              <option value="Section8">Section 8 Company</option>
-              <option value="PvtLtd">Private Limited Company</option>
-            </select>
-          </div>
-
-          <div class="form__field">
-            <label class="form__label">Entity Name</label>
-            <input type="text" formControlName="entityName" class="form__input"
-                   placeholder="Full registered name of the entity" />
-          </div>
-
-          <div class="form__field">
-            <label class="form__label">Amount (₹ INR)</label>
-            <input type="number" formControlName="amountINR" class="form__input"
-                   placeholder="e.g. 500" min="1" />
-            @if (contributionForm.get('amountINR')?.value > 0) {
-              <span class="form__hint">= {{ contributionForm.get('amountINR')?.value | number }} neurons will be credited to FUN</span>
-            }
-          </div>
-
-          <div class="form__field">
-            <label class="form__label">Notes (optional)</label>
-            <textarea formControlName="notes" class="form__input form__textarea"
-                      placeholder="Any additional information for the entity"></textarea>
-          </div>
-
-          @if (contributionError()) {
-            <div class="form__error">{{ contributionError() }}</div>
-          }
-
-          <button type="submit" class="form__submit" [disabled]="contributionLoading()">
-            {{ contributionLoading() ? 'Processing…' : 'Pay via Cramib' }}
-          </button>
-        </form>
-
-        <!-- Existing contributions -->
-        @if (neuronService.contributions().length > 0) {
-          <h3 class="panel__subheading">My Contributions</h3>
-          <ul class="record-list">
-            @for (c of neuronService.contributions(); track c._id) {
-              <li class="record-item">
-                <div class="record-item__row">
-                  <span class="record-item__name">{{ c.entityName }}</span>
-                  <span class="record-item__amount">₹{{ c.amountINR | number }}</span>
-                </div>
-                <div class="record-item__row record-item__row--meta">
-                  <span class="record-item__type">{{ c.entityType }}</span>
-                  <span class="record-item__status" [class]="statusClass(c.status)">{{ c.status }}</span>
-                  @if (c.status === 'confirmed') {
-                    <span class="record-item__neurons">{{ c.neuronsIssued | number }} neurons credited</span>
-                  }
-                </div>
               </li>
             }
           </ul>

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LifeOrchestratorService, HourBlock } from '../../../../services/life-orchestrator.service';
 
@@ -9,8 +9,14 @@ import { LifeOrchestratorService, HourBlock } from '../../../../services/life-or
   templateUrl: './todays-content.html',
   styleUrl: './todays-content.scss'
 })
-export class TodaysContent {
+export class TodaysContent implements OnDestroy {
   readonly orc = inject(LifeOrchestratorService);
+
+  // ── 50-min external content timer ──────────────────────────────────────────
+  readonly adTimerActive    = signal(false);
+  readonly adTimerRemaining = signal(50 * 60);
+  readonly showAdOverlay    = signal(false);
+  private _adTimer: ReturnType<typeof setInterval> | null = null;
 
   readonly showDetail        = signal(false);
   readonly showOverrideModal = signal(false);
@@ -91,4 +97,56 @@ export class TodaysContent {
   blockFor(hour: number): HourBlock | undefined {
     return this.orc.schedule().find(b => b.hour === hour);
   }
+
+  watchExternal(url: string): void {
+    window.open(url, '_blank', 'noopener,noreferrer');
+    this._startAdTimer();
+  }
+
+  skipAd(): void {
+    this.showAdOverlay.set(false);
+    this.adTimerActive.set(false);
+  }
+
+  continueScheduled(): void {
+    this.showAdOverlay.set(false);
+    this.adTimerActive.set(false);
+  }
+
+  formatTimer(secs: number): string {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  platformLabel(url: string): string {
+    if (/youtube\.com|youtu\.be/.test(url)) return 'YouTube';
+    if (/google\.com/.test(url))            return 'Google';
+    return 'External';
+  }
+
+  private _startAdTimer(): void {
+    this._clearAdTimer();
+    this.adTimerActive.set(true);
+    this.adTimerRemaining.set(50 * 60);
+    this._adTimer = setInterval(() => {
+      this.adTimerRemaining.update(s => {
+        if (s <= 1) {
+          this._clearAdTimer();
+          this.showAdOverlay.set(true);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+  }
+
+  private _clearAdTimer(): void {
+    if (this._adTimer !== null) {
+      clearInterval(this._adTimer);
+      this._adTimer = null;
+    }
+  }
+
+  ngOnDestroy(): void { this._clearAdTimer(); }
 }

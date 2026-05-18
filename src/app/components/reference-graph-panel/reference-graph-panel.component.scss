@@ -1,0 +1,114 @@
+:host { display: flex; flex: 1; min-height: 0; }
+
+.rg-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--bg-secondary);
+}
+
+.rg-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.rg-title {
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.30);
+  flex: 1;
+}
+
+.rg-ctx {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--accent-primary);
+}
+
+.rg-reload {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.25);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  &:hover { color: var(--accent-primary); }
+}
+
+.rg-svg {
+  flex: 1;
+  width: 100%;
+  overflow: visible;
+}
+
+.rg-edge {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 1;
+  &--out { stroke: rgba(239, 157, 87, 0.25); stroke-dasharray: 4 3; }
+  &--in  { stroke: rgba(129, 140, 248, 0.25); }
+}
+
+.rg-node {
+  fill: rgba(255, 255, 255, 0.04);
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 1;
+  transition: fill 120ms;
+
+  &--center {
+    fill: rgba(239, 157, 87, 0.12);
+    stroke: rgba(239, 157, 87, 0.40);
+    stroke-width: 1.5;
+  }
+  &--out { stroke: rgba(239, 157, 87, 0.30); }
+  &--in  { stroke: rgba(129, 140, 248, 0.30); }
+}
+
+.rg-node-group {
+  cursor: pointer;
+  &:hover .rg-node { fill: rgba(239, 157, 87, 0.10); }
+}
+
+.rg-label {
+  fill: rgba(255, 255, 255, 0.45);
+  font-size: 7px;
+  font-family: inherit;
+  letter-spacing: 0.8px;
+  text-anchor: middle;
+  pointer-events: none;
+  &--center { fill: var(--accent-primary); font-size: 8px; font-weight: 700; }
+}
+
+.rg-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+  text-align: center;
+  line-height: 1.6;
+  &--err { color: #fc8181; }
+}
+
+.rg-legend {
+  display: flex;
+  gap: 16px;
+  padding: 6px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+.rg-legend-item {
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.25);
+  &--out { color: rgba(239, 157, 87, 0.6); }
+  &--in  { color: rgba(129, 140, 248, 0.6); }
+}

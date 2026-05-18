@@ -4,19 +4,16 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { RouterModule } from '@angular/router';
 import { NeuronService } from '../../../services/neuron.service';
 import { CeegroupService } from '../../../services/ceegroup.service';
-import { PaymentService } from '../../../services/payment.service';
-import { environment } from '../../../../environments/environment';
 import {
   BUCKET_META,
   TRANSFER_TARGETS,
   NEURON_DISCLAIMER,
   NeuronBucket,
-  NeuronContribution,
   NeuronInvestment,
 } from '../../../core/models/neuron.model';
 import { entityTypeOf } from '../../../core/models/ceegroup.model';
 
-type WorkspaceTab = 'overview' | 'contribute' | 'transfer' | 'invest' | 'history' | 'support' | 'send' | 'groups';
+type WorkspaceTab = 'overview' | 'transfer' | 'invest' | 'history' | 'support' | 'send' | 'groups';
 
 @Component({
   selector: 'app-neurons',
@@ -29,19 +26,13 @@ export class Neurons implements OnInit {
   readonly neuronService   = inject(NeuronService);
   readonly ceegroupService = inject(CeegroupService);
   private readonly fb      = inject(FormBuilder);
-  private readonly paymentService = inject(PaymentService);
-  private readonly platformId     = inject(PLATFORM_ID);
+  private readonly platformId = inject(PLATFORM_ID);
 
   readonly bucketMeta    = BUCKET_META;
   readonly disclaimer    = NEURON_DISCLAIMER;
   readonly transferRules = TRANSFER_TARGETS;
 
   activeTab = signal<WorkspaceTab>('overview');
-
-  // ── Contribution form ─────────────────────────────────────────────────
-  contributionForm!: FormGroup;
-  contributionLoading = signal(false);
-  contributionError   = signal<string | null>(null);
 
   // ── Transfer form ─────────────────────────────────────────────────────
   transferForm!: FormGroup;
@@ -110,13 +101,6 @@ export class Neurons implements OnInit {
   }
 
   private _buildForms(): void {
-    this.contributionForm = this.fb.group({
-      entityType: ['', Validators.required],
-      entityName: ['', [Validators.required, Validators.minLength(3)]],
-      amountINR:  ['', [Validators.required, Validators.min(1)]],
-      notes:      [''],
-    });
-
     this.transferForm = this.fb.group({
       fromBucket: ['fun', Validators.required],
       toBucket:   ['cun', Validators.required],
@@ -165,26 +149,6 @@ export class Neurons implements OnInit {
     this.depositForm = this.fb.group({
       fromBucket: ['fun', Validators.required],
       amount:     ['', [Validators.required, Validators.min(1)]],
-    });
-  }
-
-  // ── Contribution submit — redirects to Cramib, which auto-opens payment ──
-  onSubmitContribution(): void {
-    if (this.contributionForm.invalid) { this.contributionForm.markAllAsTouched(); return; }
-    this.contributionLoading.set(true);
-    this.contributionError.set(null);
-
-    this.paymentService.initiatePayment(this.contributionForm.value).subscribe({
-      next: (session) => {
-        this.contributionLoading.set(false);
-        const returnUrl = `${environment.appUrl}/payment/return`;
-        const params = new URLSearchParams({ sess: session.sessionId, returnUrl });
-        window.location.href = `${environment.crasmibUrl}/pay?${params.toString()}`;
-      },
-      error: (e) => {
-        this.contributionLoading.set(false);
-        this.contributionError.set(e?.error?.message ?? 'Failed to initiate payment. Please try again.');
-      },
     });
   }
 
@@ -398,6 +362,5 @@ export class Neurons implements OnInit {
     return BUCKET_META.find(m => m.key === bucket)?.color ?? '#888';
   }
 
-  isContribution(c: NeuronContribution): boolean { return !!c; }
   isInvestment(i: NeuronInvestment): boolean { return !!i; }
 }

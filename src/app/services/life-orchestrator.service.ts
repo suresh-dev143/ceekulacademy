@@ -23,8 +23,9 @@ export interface CustomContent {
   title: string;
   subtitles: string[];
   body: string;
-  source: 'ceekul' | 'upload';
+  source: 'ceekul' | 'upload' | 'vision-flow';
   contentId?: string;
+  externalUrl?: string;
 }
 
 export interface HourBlock {

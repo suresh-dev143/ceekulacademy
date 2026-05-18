@@ -1,0 +1,885 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// CHANCELLOR PAGE — Official Academic Authority
+// ═══════════════════════════════════════════════════════════════════════════
+
+$violet:      #a78bfa;
+$violet-dim:  rgba(167, 139, 250, 0.5);
+$violet-glow: rgba(167, 139, 250, 0.1);
+$violet-soft: rgba(167, 139, 250, 0.06);
+
+$bg-card:    #0c1120;
+$bg-surface: #0e1428;
+$border:     rgba(167, 139, 250, 0.12);
+$border-faint: rgba(30, 40, 80, 0.4);
+
+$text-ghost:  #1e2a50;
+$text-muted:  #2e3f6e;
+$text-dim:    #4a5a8a;
+$text-mid:    #6878a8;
+$text-body:   #8898c8;
+$text-light:  #aab8d8;
+$text-bright: #d0daf8;
+
+// ── Animations ────────────────────────────────────────────────────────────────
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes sealSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes sealSpinReverse {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+@keyframes expandBody {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes dirSlideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+@keyframes progSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+// ── Root ─────────────────────────────────────────────────────────────────────
+.chancellor-page {
+  padding: 2.5rem 0 5rem;
+  animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+// ── Vision Flow Trigger ───────────────────────────────────────────────────────
+.ch-vf-trigger-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.ch-vf-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background: $violet-soft;
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 8px;
+  color: $violet;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: rgba(167, 139, 250, 0.12);
+    border-color: rgba(167, 139, 250, 0.4);
+    box-shadow: 0 0 14px rgba(167, 139, 250, 0.12);
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &__glyph { font-size: 0.75rem; opacity: 0.8; }
+  &__arrow  { font-size: 0.7rem; opacity: 0.6; }
+}
+
+.ch-vf-trigger__hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: $text-muted;
+  letter-spacing: 0.02em;
+}
+
+// ── Vision Flow Panel ─────────────────────────────────────────────────────────
+@keyframes panelSlideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+.vf-panel {
+  margin-bottom: 2.5rem;
+  background: $bg-surface;
+  border: 1px solid $border;
+  border-radius: 0.875rem;
+  overflow: hidden;
+  animation: panelSlideDown 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid $border-faint;
+    background: rgba(167, 139, 250, 0.04);
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__glyph {
+    font-size: 0.75rem;
+    color: $violet-dim;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $text-light;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    color: $text_dim;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: color 0.15s ease, background 0.15s ease;
+
+    &:hover { color: $text-light; background: rgba(255,255,255,0.05); }
+  }
+
+  &__body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+
+    @media (max-width: 680px) { grid-template-columns: 1fr; }
+  }
+}
+
+// ── Form Side ─────────────────────────────────────────────────────────────────
+.vf-form {
+  padding: 1.25rem;
+  border-right: 1px solid $border-faint;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+
+  @media (max-width: 680px) {
+    border-right: none;
+    border-bottom: 1px solid $border-faint;
+  }
+}
+
+.vf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.vf-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $text_muted;
+}
+
+.vf-req {
+  color: $violet-dim;
+  margin-left: 0.15rem;
+}
+
+.vf-input,
+.vf-select {
+  background: $bg-card;
+  border: 1px solid $border-faint;
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  color: $text-light;
+  font-size: 0.8rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+
+  &:focus {
+    border-color: rgba(167, 139, 250, 0.4);
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.06);
+  }
+
+  &::placeholder { color: $text_ghost; }
+}
+
+.vf-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234a5a8a'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 8px;
+  padding-right: 2rem;
+
+  option { background: #0c1120; }
+}
+
+.vf-selected-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(167, 139, 250, 0.07);
+  border: 1px solid rgba(167, 139, 250, 0.18);
+  border-radius: 6px;
+  flex-wrap: wrap;
+
+  &__label {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: $violet-dim;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    flex: 1;
+    font-size: 0.75rem;
+    color: $text-light;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  &__clear {
+    background: none;
+    border: none;
+    color: $text-muted;
+    cursor: pointer;
+    font-size: 0.65rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+    transition: color 0.15s;
+    &:hover { color: $text-light; }
+  }
+}
+
+.vf-actions {
+  display: flex;
+  gap: 0.625rem;
+  margin-top: 0.25rem;
+}
+
+.vf-btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 7px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  &--cancel {
+    background: transparent;
+    border: 1px solid $border-faint;
+    color: $text-dim;
+    &:hover { border-color: rgba(255,255,255,0.12); color: $text-mid; }
+  }
+
+  &--save {
+    background: rgba(167, 139, 250, 0.14);
+    border: 1px solid rgba(167, 139, 250, 0.28);
+    color: $violet;
+    &:hover:not(:disabled) {
+      background: rgba(167, 139, 250, 0.22);
+      box-shadow: 0 0 14px rgba(167, 139, 250, 0.15);
+    }
+    &:disabled { opacity: 0.45; cursor: not-allowed; }
+  }
+}
+
+// ── Library Side ──────────────────────────────────────────────────────────────
+.vf-library {
+  display: flex;
+  flex-direction: column;
+  max-height: 360px;
+
+  &__head {
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid $border-faint;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__title {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $text-muted;
+  }
+
+  &__search {
+    background: $bg-card;
+    border: 1px solid $border-faint;
+    border-radius: 5px;
+    padding: 0.4rem 0.625rem;
+    color: $text-light;
+    font-size: 0.75rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+
+    &:focus { border-color: rgba(167, 139, 250, 0.35); }
+    &::placeholder { color: $text-ghost; }
+  }
+
+  &__list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: $bg-card transparent;
+
+    &::-webkit-scrollbar { width: 3px; }
+    &::-webkit-scrollbar-thumb { background: $bg-card; border-radius: 2px; }
+  }
+}
+
+// ── Skeleton loader ───────────────────────────────────────────────────────────
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+%skel { background: linear-gradient(90deg, #0e1428 25%, #141d38 50%, #0e1428 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 3px; }
+
+.vf-lib-skeleton { padding: 0.5rem 0; }
+
+.vf-lib-skel-item {
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid $border-faint;
+
+  &__title { @extend %skel; height: 11px; width: 75%; margin-bottom: 0.4rem; }
+  &__meta  { @extend %skel; height: 9px;  width: 45%; }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+.vf-lib-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2.5rem 1rem;
+
+  &__glyph { font-size: 1.25rem; color: $text-ghost; }
+  &__text  { margin: 0; font-size: 0.72rem; color: $text-muted; }
+}
+
+// ── Library item ──────────────────────────────────────────────────────────────
+.vf-lib-item {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid $border-faint;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:last-child { border-bottom: none; }
+
+  &:hover { background: rgba(167, 139, 250, 0.04); }
+
+  &--selected {
+    background: rgba(167, 139, 250, 0.08);
+    border-left: 2px solid $violet-dim;
+    padding-left: calc(1.25rem - 2px);
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.3rem;
+  }
+
+  &__state {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.12rem 0.45rem;
+    border-radius: 100px;
+
+    &--draft     { background: rgba(74,158,255,0.1);  color: #4a9eff; }
+    &--shared    { background: rgba(167,139,250,0.1); color: $violet; }
+    &--published { background: rgba(52,211,153,0.1);  color: #34d399; }
+  }
+
+  &__id {
+    font-size: 0.55rem;
+    color: $text-ghost;
+    letter-spacing: 0.06em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__title {
+    margin: 0 0 0.2rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $text-light;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__sub {
+    margin: 0;
+    font-size: 0.68rem;
+    color: $text-muted;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// ── Seal Header ───────────────────────────────────────────────────────────────
+.ch-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.ch-header__seal {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+}
+
+.ch-seal {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__ring {
+    position: absolute;
+    border-radius: 50%;
+    border-style: solid;
+
+    &--outer {
+      width: 80px;
+      height: 80px;
+      border-width: 1px;
+      border-color: $border;
+      animation: sealSpin 18s linear infinite;
+      background: radial-gradient(circle, transparent 60%, rgba(167,139,250,0.03) 100%);
+    }
+
+    &--inner {
+      width: 58px;
+      height: 58px;
+      border-width: 1px;
+      border-color: rgba(167, 139, 250, 0.2);
+      border-style: dashed;
+      animation: sealSpinReverse 12s linear infinite;
+    }
+  }
+
+  &__glyph {
+    font-size: 1.5rem;
+    color: $violet;
+    z-index: 1;
+    line-height: 1;
+  }
+}
+
+.ch-header__body {
+  margin-bottom: 1.5rem;
+}
+
+.ch-header__eyebrow {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: $text-muted;
+  margin-bottom: 0.5rem;
+}
+
+.ch-header__title {
+  margin: 0 0 0.35rem;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, $text-bright 30%, $violet 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+}
+
+.ch-header__subtitle {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $text-muted;
+  margin: 0;
+}
+
+.ch-header__gov-id {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: $violet;
+  border: 1px solid rgba($violet, 0.25);
+  border-radius: 2rem;
+  background: rgba($violet, 0.06);
+  font-variant-numeric: tabular-nums;
+  font-family: 'Courier New', monospace;
+}
+
+.ch-header__rule {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin: 1.5rem auto 1.75rem;
+  max-width: 28rem;
+}
+
+.ch-header__rule-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, $border);
+
+  &:last-child {
+    background: linear-gradient(270deg, transparent, $border);
+  }
+}
+
+.ch-header__rule-glyph {
+  font-size: 0.75rem;
+  color: $violet-dim;
+  flex-shrink: 0;
+}
+
+// ── Mission Quote ─────────────────────────────────────────────────────────────
+.ch-mission {
+  margin: 0 auto;
+  max-width: 36rem;
+  padding: 1.5rem 2rem;
+  background: $violet-soft;
+  border: 1px solid $border;
+  border-radius: 0.75rem;
+  position: relative;
+
+  &::before {
+    content: '\201C';
+    position: absolute;
+    top: -0.5rem;
+    left: 1.5rem;
+    font-size: 3rem;
+    color: $violet-dim;
+    line-height: 1;
+    font-family: Georgia, serif;
+  }
+
+  &__text {
+    margin: 0 0 0.75rem;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: $text-light;
+    font-style: italic;
+    letter-spacing: 0.01em;
+  }
+
+  &__attr {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: $violet-dim;
+    text-transform: uppercase;
+  }
+}
+
+// ── Section Label ─────────────────────────────────────────────────────────────
+.ch-section-label {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 3rem 0 1.5rem;
+
+  &__line {
+    flex: 1;
+    height: 1px;
+    background: $border-faint;
+  }
+
+  &__text {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: $text-muted;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+// ── Directives Accordion ──────────────────────────────────────────────────────
+.ch-dir-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.ch-dir {
+  border: 1px solid $border-faint;
+  border-radius: 0.625rem;
+  overflow: hidden;
+  background: $bg-card;
+  animation: dirSlideIn 0.35s ease both;
+  animation-delay: var(--dir-delay, 0ms);
+  transition: border-color 0.2s ease;
+
+  &--open {
+    border-color: $border;
+    background: $bg-surface;
+  }
+
+  &__trigger {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 1.1rem 1.25rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.18s ease;
+
+    &:hover {
+      background: rgba(167, 139, 250, 0.04);
+    }
+
+    .ch-dir--open & {
+      background: rgba(167, 139, 250, 0.06);
+    }
+  }
+
+  &__code {
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: $violet-dim;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__title {
+    flex: 1;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: $text-light;
+    transition: color 0.2s ease;
+
+    .ch-dir--open & {
+      color: $text-bright;
+    }
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: $text-dim;
+    transition: transform 0.25s ease, color 0.2s ease;
+
+    svg { width: 100%; height: 100%; display: block; }
+
+    .ch-dir--open & {
+      transform: rotate(180deg);
+      color: $violet-dim;
+    }
+  }
+
+  &__body {
+    padding: 0 1.25rem 1.25rem;
+    animation: expandBody 0.22s ease both;
+  }
+
+  &__text {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: $text-body;
+    margin: 0 0 1rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid $border-faint;
+    padding-top: 1rem;
+  }
+
+  &__pillars {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__pillar {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid rgba(167, 139, 250, 0.18);
+    border-radius: 100px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: $violet-dim;
+    background: $violet-soft;
+    white-space: nowrap;
+  }
+}
+
+// ── Programs Grid ─────────────────────────────────────────────────────────────
+.ch-prog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: 680px) { grid-template-columns: 1fr; }
+}
+
+.ch-prog {
+  position: relative;
+  background: $bg-card;
+  border: 1px solid $border-faint;
+  border-radius: 0.75rem;
+  padding: 1.375rem 1.25rem 1.5rem;
+  overflow: hidden;
+  animation: progSlideIn 0.38s ease both;
+  animation-delay: var(--prog-delay, 0ms);
+  transition:
+    border-color 0.22s ease,
+    transform    0.22s ease,
+    box-shadow   0.22s ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--prog-accent) 30%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.875rem;
+  }
+
+  &__code {
+    font-size: 0.55rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    color: var(--prog-accent, $violet);
+    opacity: 0.7;
+  }
+
+  &__badges {
+    display: flex;
+    gap: 0.375rem;
+  }
+
+  &__level,
+  &__duration {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.18rem 0.5rem;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: $text-dim;
+    white-space: nowrap;
+  }
+
+  &__title {
+    margin: 0 0 0.625rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: $text-light;
+    line-height: 1.4;
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: $text-dim;
+  }
+
+  // Accent bar at bottom
+  &__bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--prog-accent, $violet), transparent 60%);
+    opacity: 0.4;
+    transition: opacity 0.22s ease;
+  }
+
+  &:hover &__bar { opacity: 0.8; }
+}
+
+// ── Office Statement ──────────────────────────────────────────────────────────
+.ch-statement {
+  margin-top: 3.5rem;
+  text-align: center;
+
+  &__rule {
+    width: 4rem;
+    height: 1px;
+    background: $border;
+    margin: 0 auto 1.5rem;
+  }
+
+  &__text {
+    max-width: 34rem;
+    margin: 0 auto 1.25rem;
+    font-size: 0.82rem;
+    line-height: 1.85;
+    color: $text-dim;
+    font-style: italic;
+  }
+
+  &__seal {
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: $text-ghost;
+  }
+}

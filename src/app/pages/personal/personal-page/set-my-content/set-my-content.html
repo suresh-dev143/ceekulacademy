@@ -30,12 +30,28 @@
             }
           </td>
 
-          <!-- Vision Flow — read-only -->
+          <!-- Vision Flow — shows Chancellor Vision Flow data when set, else schedule intent -->
           <td class="smc-tbl__td smc-tbl__td--vision">
-            <span class="smc-tbl__intent"
-                  [class.smc-tbl__intent--replaced]="!!block.custom_content">
-              {{ block.intent }}
-            </span>
+            @if (block.custom_content?.source === 'vision-flow') {
+              <div class="smc-tbl__vf-content">
+                <span class="smc-tbl__vf-badge">◈ Vision Flow</span>
+                <span class="smc-tbl__vf-title">{{ block.custom_content!.title }}</span>
+                @if (block.custom_content!.subtitles[0]) {
+                  <span class="smc-tbl__vf-sub">{{ block.custom_content!.subtitles[0] }}</span>
+                }
+                @if (block.custom_content!.body) {
+                  <span class="smc-tbl__vf-body">{{ block.custom_content!.body }}</span>
+                }
+                <button class="smc-tbl__clear"
+                        (click)="$event.stopPropagation(); clearContent(hour)"
+                        title="Remove">✕</button>
+              </div>
+            } @else {
+              <span class="smc-tbl__intent"
+                    [class.smc-tbl__intent--replaced]="!!block.custom_content">
+                {{ block.intent }}
+              </span>
+            }
           </td>
 
           <!-- Curated Content — clickable -->
@@ -121,6 +137,9 @@
                 rows="4"
                 [value]="workBody()"
                 (input)="workBody.set($any($event.target).value)"></textarea>
+      <input class="smc-edit__input" type="url" placeholder="External URL — YouTube, Google… (optional)"
+             [value]="workExternalUrl()"
+             (input)="workExternalUrl.set($any($event.target).value)" />
     </div>
     <div class="smc-edit__footer">
       <button class="smc-edit__btn smc-edit__btn--cancel" (click)="closeEdit()">Cancel</button>

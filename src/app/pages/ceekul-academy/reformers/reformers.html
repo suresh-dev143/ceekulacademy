@@ -1,0 +1,112 @@
+<div class="ref-page">
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="ref-header">
+    <div class="ref-header__seal" aria-hidden="true">
+      <div class="ref-seal">
+        <div class="ref-seal__ring ref-seal__ring--outer"></div>
+        <div class="ref-seal__ring ref-seal__ring--inner"></div>
+        <span class="ref-seal__glyph">◇</span>
+      </div>
+    </div>
+
+    <div class="ref-header__body">
+      <span class="ref-header__eyebrow">Office of the</span>
+      <h1 class="ref-header__title">Reformers</h1>
+      <p class="ref-header__subtitle">Ceekul Academy · Policy Innovation & Structural Redesign</p>
+    </div>
+
+    <div class="ref-header__rule" aria-hidden="true">
+      <div class="ref-header__rule-line"></div>
+      <span class="ref-header__rule-glyph">◈</span>
+      <div class="ref-header__rule-line"></div>
+    </div>
+
+    <blockquote class="ref-mission">
+      <p class="ref-mission__text">
+        "Every institution is a hypothesis — a bet placed by a previous generation
+        on how to solve a problem that may no longer exist. Reformers are the ones
+        who dare to test that hypothesis against the evidence of the present."
+      </p>
+      <footer class="ref-mission__attr">— Reformers Charter, Opening Mandate</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ REFORM MANDATES ═════════════════════════════════════════════════════ -->
+  <section class="ref-mandates">
+    <div class="ref-section-label">
+      <span class="ref-section-label__line" aria-hidden="true"></span>
+      <span class="ref-section-label__text">Reform Mandates</span>
+      <span class="ref-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="ref-mnd-list">
+      @for (mnd of mandates; track mnd.id; let i = $index) {
+      <div class="ref-mnd"
+        [class.ref-mnd--open]="expandedId() === mnd.id"
+        [style.--mnd-delay]="(i * 60) + 'ms'">
+
+        <button class="ref-mnd__trigger" (click)="toggleMandate(mnd.id)" [attr.aria-expanded]="expandedId() === mnd.id">
+          <span class="ref-mnd__code">{{ mnd.code }}</span>
+          <span class="ref-mnd__title">{{ mnd.title }}</span>
+          <span class="ref-mnd__chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="4 6 8 10 12 6"/>
+            </svg>
+          </span>
+        </button>
+
+        @if (expandedId() === mnd.id) {
+        <div class="ref-mnd__body">
+          <p class="ref-mnd__text">{{ mnd.body }}</p>
+          <div class="ref-mnd__pillars">
+            @for (p of mnd.pillars; track p) {
+            <span class="ref-mnd__pillar">{{ p }}</span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ REFORM INITIATIVES ══════════════════════════════════════════════════ -->
+  <section class="ref-initiatives">
+    <div class="ref-section-label">
+      <span class="ref-section-label__line" aria-hidden="true"></span>
+      <span class="ref-section-label__text">Active Reform Initiatives</span>
+      <span class="ref-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="ref-init-grid">
+      @for (init of initiatives; track init.code; let i = $index) {
+      <div class="ref-init" [style.--init-accent]="init.accent" [style.--init-delay]="(i * 70) + 'ms'">
+        <div class="ref-init__head">
+          <span class="ref-init__code">{{ init.code }}</span>
+          <div class="ref-init__badges">
+            <span class="ref-init__status ref-init__status--{{ init.status.toLowerCase() }}">{{ init.status }}</span>
+            <span class="ref-init__domain">{{ init.domain }}</span>
+          </div>
+        </div>
+        <h3 class="ref-init__title">{{ init.title }}</h3>
+        <p class="ref-init__desc">{{ init.descriptor }}</p>
+        <div class="ref-init__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ REFORMERS STATEMENT ═════════════════════════════════════════════════ -->
+  <footer class="ref-statement">
+    <div class="ref-statement__rule" aria-hidden="true"></div>
+    <p class="ref-statement__text">
+      Reformers hold no attachment to the past and no fear of the friction of change.
+      They operate with one criterion: does this system, as currently designed, produce
+      the civilizational outcomes we have committed to? If not, it is redesigned — not defended.
+    </p>
+    <span class="ref-statement__seal" aria-hidden="true">◇ Ceekul Academy · Reformers · Structural Intelligence Division</span>
+  </footer>
+
+</div>

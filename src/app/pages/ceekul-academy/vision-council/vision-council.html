@@ -1,0 +1,113 @@
+<div class="vc-page">
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="vc-header">
+    <div class="vc-header__seal" aria-hidden="true">
+      <div class="vc-seal">
+        <div class="vc-seal__ring vc-seal__ring--outer"></div>
+        <div class="vc-seal__ring vc-seal__ring--inner"></div>
+        <span class="vc-seal__glyph">◎</span>
+      </div>
+    </div>
+
+    <div class="vc-header__body">
+      <span class="vc-header__eyebrow">Office of the</span>
+      <h1 class="vc-header__title">Vision Council</h1>
+      <p class="vc-header__subtitle">Ceekul Academy · Strategic Civilizational Intelligence</p>
+      <span class="vc-header__gov-id">CG100000000001</span>
+    </div>
+
+    <div class="vc-header__rule" aria-hidden="true">
+      <div class="vc-header__rule-line"></div>
+      <span class="vc-header__rule-glyph">◈</span>
+      <div class="vc-header__rule-line"></div>
+    </div>
+
+    <blockquote class="vc-mission">
+      <p class="vc-mission__text">
+        "Civilization is not inherited — it is computed. Every generation must
+        choose whether to extend the arc of human intelligence or allow it to collapse
+        back into the noise of history."
+      </p>
+      <footer class="vc-mission__attr">— Vision Council Charter, Founding Directive</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ STRATEGIC MANDATES ══════════════════════════════════════════════════ -->
+  <section class="vc-mandates">
+    <div class="vc-section-label">
+      <span class="vc-section-label__line" aria-hidden="true"></span>
+      <span class="vc-section-label__text">Strategic Mandates</span>
+      <span class="vc-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="vc-mnd-list">
+      @for (mnd of mandates; track mnd.id; let i = $index) {
+      <div class="vc-mnd"
+        [class.vc-mnd--open]="expandedId() === mnd.id"
+        [style.--mnd-delay]="(i * 60) + 'ms'">
+
+        <button class="vc-mnd__trigger" (click)="toggleMandate(mnd.id)" [attr.aria-expanded]="expandedId() === mnd.id">
+          <span class="vc-mnd__code">{{ mnd.code }}</span>
+          <span class="vc-mnd__title">{{ mnd.title }}</span>
+          <span class="vc-mnd__chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="4 6 8 10 12 6"/>
+            </svg>
+          </span>
+        </button>
+
+        @if (expandedId() === mnd.id) {
+        <div class="vc-mnd__body">
+          <p class="vc-mnd__text">{{ mnd.body }}</p>
+          <div class="vc-mnd__pillars">
+            @for (p of mnd.pillars; track p) {
+            <span class="vc-mnd__pillar">{{ p }}</span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ TEMPORAL HORIZONS ═══════════════════════════════════════════════════ -->
+  <section class="vc-horizons">
+    <div class="vc-section-label">
+      <span class="vc-section-label__line" aria-hidden="true"></span>
+      <span class="vc-section-label__text">Temporal Planning Horizons</span>
+      <span class="vc-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="vc-hz-grid">
+      @for (hz of horizons; track hz.code; let i = $index) {
+      <div class="vc-hz" [style.--hz-accent]="hz.accent" [style.--hz-delay]="(i * 70) + 'ms'">
+        <div class="vc-hz__head">
+          <span class="vc-hz__code">{{ hz.code }}</span>
+          <div class="vc-hz__badges">
+            <span class="vc-hz__era">{{ hz.era }}</span>
+            <span class="vc-hz__span">{{ hz.span }}</span>
+          </div>
+        </div>
+        <h3 class="vc-hz__title">{{ hz.title }}</h3>
+        <p class="vc-hz__desc">{{ hz.descriptor }}</p>
+        <div class="vc-hz__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ COUNCIL STATEMENT ═══════════════════════════════════════════════════ -->
+  <footer class="vc-statement">
+    <div class="vc-statement__rule" aria-hidden="true"></div>
+    <p class="vc-statement__text">
+      The Vision Council operates at the furthest edge of institutional time — holding the long arc
+      of civilizational possibility while every other council executes within it. Its mandate is not
+      to predict the future, but to author the conditions under which a worthy future becomes inevitable.
+    </p>
+    <span class="vc-statement__seal" aria-hidden="true">◎ Ceekul Academy · CG100000000001 · Computable Era</span>
+  </footer>
+
+</div>

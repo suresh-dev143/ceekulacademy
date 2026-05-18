@@ -1,5 +1,65 @@
 // ── Life Orchestrator Dashboard ────────────────────────────────────────────────
 
+.cv-card {
+  margin-bottom: 1rem;
+  background: #0e0e0e;
+  // border: 1px solid #202020;
+  // border-left: 3px solid #202020;
+  padding: 1.5rem;
+  transition:
+    border-left-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+
+  &:hover {
+    border-color: #2e2e2e;
+    border-left-color: #b8922c;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+
+    .cv-card__number {
+      color: #b8922c;
+    }
+
+    .cv-card__title {
+      color: #f0f0f0;
+    }
+
+    .cv-card__descriptor {
+      color: #707070;
+    }
+  }
+
+  &__number {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: #282828;
+    margin-bottom: 0.875rem;
+    transition: color 0.25s ease;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #c0c0c0;
+    margin: 0 0 0.625rem;
+    line-height: 1.4;
+    transition: color 0.25s ease;
+  }
+
+  &__descriptor {
+    font-size: 0.9rem;
+    color: #626262;
+    line-height: 1.75;
+    transition: color 0.25s ease;
+  }
+}
 .orch {
 
   color: #e0e0e0;
@@ -137,6 +197,28 @@
   border-top: 1px solid #141414;
 }
 
+// ── View More Toggle ──────────────────────────────────────────────────────────
+
+.personal__toggle {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+
+  &:hover {
+    color: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
 // ── Life Services ─────────────────────────────────────────────────────────────
 
 .ls-wrap {
@@ -174,6 +256,9 @@
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(4, 1fr);
+     .cv-card {
+    padding: 1.5rem 0.5rem;
+  }
   }
 
   @media (max-width: 480px) {

@@ -1,38 +1,149 @@
 <app-toast></app-toast>
 <div class="ceekul-create-surface">
-  <main class="create-viewport">
 
-    <!-- ── Action bar (top-right utilities) ── -->
-    <div class="create-action-bar">
-      <div class="cab-spacer"></div>
-      <button class="cab-btn" (click)="activeModal.set('conceive')">Conceive</button>
-      <button class="cab-btn" (click)="openIdeas()">Ideas</button>
-      <button class="cab-btn" (click)="activeModal.set('update')">Update</button>
-      <button class="cab-btn" (click)="activeModal.set('upload')">Upload</button>
+  <!-- ══ HORIZONTAL AI TOOLBAR ═══════════════════════════════════════════════ -->
+  <div class="ai-topbar">
+    <div class="ai-topbar__tools">
+      <button class="ai-topbar__btn" [class.ai-topbar__btn--active]="rightPanel() === 'conceive'"
+        (click)="toggleRightPanel('conceive')">Conceive</button>
+      <button class="ai-topbar__btn" [class.ai-topbar__btn--active]="rightPanel() === 'ideas'"
+        (click)="toggleRightPanel('ideas')">Ideas</button>
+      <button class="ai-topbar__btn" [class.ai-topbar__btn--active]="rightPanel() === 'update'"
+        (click)="toggleRightPanel('update')">Update</button>
     </div>
+    <div class="ai-topbar__spacer"></div>
+    @if (syncStatus() === 'saving') {
+    <span class="ai-topbar__sync">saving…</span>
+    } @else if (syncStatus() === 'error') {
+    <span class="ai-topbar__sync ai-topbar__sync--err">save failed</span>
+    }
+  </div>
 
-    <div class="create-canvas" [style.--accent]="categoryAccentColor()">
+  <!-- ══ HORIZONTAL BLOCK PALETTE ════════════════════════════════════════════ -->
+  <div class="block-palette-bar">
+    <span class="bp-label">Blocks</span>
+    @for (bt of BLOCK_TYPES; track bt.type) {
+    <button class="bp-btn" (click)="addBlock(bt.type)" [title]="bt.desc">
+      <span class="bp-icon">{{ bt.icon }}</span>
+      <span>{{ bt.label }}</span>
+    </button>
+    }
+    <div class="bp-sep"></div>
+    <button class="bp-btn bp-btn--upload" (click)="activeModal.set('upload')" title="Upload media">
+      <span class="bp-icon">⬆</span>
+      <span>Upload</span>
+    </button>
+    <div class="bp-sep"></div>
+    <button class="bp-btn bp-btn--save" (click)="save()" title="Save draft">
+      <span class="bp-icon">◎</span>
+      <span>Save</span>
+    </button>
+    @if (syncStatus() === 'saving') {
+    <span class="bp-sync">saving…</span>
+    } @else if (syncStatus() === 'error') {
+    <span class="bp-sync bp-sync--err">save failed</span>
+    }
+  </div>
+
+  <!-- ── Expanded AI Panel (drops below palette) ── -->
+  @if (rightPanel()) {
+  <div class="ai-panel-expanded">
+
+    @if (rightPanel() === 'conceive') {
+    <div class="aip-h-row">
+      <p class="aip-hint aip-h-desc">Start with a core concept. AI drafts the atomic architecture.</p>
+      <textarea class="aip-h-textarea" placeholder="Describe the core concept (e.g. Photosynthesis for age 12)…"></textarea>
+      <button class="aip-btn">Draft Architecture</button>
+    </div>
+    }
+
+    @if (rightPanel() === 'ideas') {
+    <div class="aip-h-row">
+      @if (ideasLoading()) {
+      <div class="aip-loading">
+        <div class="eval-spinner"></div>
+        <p class="aip-loading-text">Fetching from Ceekul Web…</p>
+      </div>
+      } @else if (ideasText()) {
+      <div class="aip-ideas-text aip-ideas-text--h">{{ ideasText() }}</div>
+      } @else {
+      <p class="aip-empty">Add a content title to load research ideas.</p>
+      }
+      @if (title() && !ideasLoading()) {
+      <button class="aip-btn aip-btn--sm" style="align-self:flex-start" (click)="fetchIdeas()">Refresh</button>
+      }
+    </div>
+    }
+
+    @if (rightPanel() === 'update') {
+    <div class="aip-h-row aip-h-row--update">
+      <div class="aip-tabs aip-tabs--h">
+        <button class="aip-tab" [class.active]="updateTab() === 'creator'"
+          (click)="updateTab.set('creator')">Creator</button>
+        <button class="aip-tab" [class.active]="updateTab() === 'ai'"
+          (click)="updateTab.set('ai')">AI Research</button>
+      </div>
+      @if (updateTab() === 'creator') {
+      <div class="aip-h-update">
+        <div class="aip-h-field">
+          <label class="aip-label">Phrase to find</label>
+          <input class="aip-input" [value]="updateSegmentId()"
+            (input)="updateSegmentId.set($any($event.target).value)" placeholder="Exact phrase from content…" />
+        </div>
+        <div class="aip-h-field">
+          <label class="aip-label">Your update</label>
+          <input class="aip-input" [value]="updateContent()"
+            (input)="updateContent.set($any($event.target).value)" placeholder="Replacement text…" />
+        </div>
+        <button class="aip-btn" [disabled]="!updateSegmentId() || !updateContent()"
+          (click)="applyCreatorUpdate()">Apply</button>
+      </div>
+      }
+      @if (updateTab() === 'ai') {
+      <div class="aip-h-update">
+        @if (aiUpdateLoading()) {
+        <div class="aip-loading">
+          <div class="eval-spinner"></div>
+          <p class="aip-loading-text">Scanning Ceekul Web…</p>
+        </div>
+        } @else if (aiUpdateResult()) {
+        <div class="aip-result aip-result--h">{{ aiUpdateResult() }}</div>
+        } @else {
+        <p class="aip-hint" style="align-self:center">AI scans Ceekul Web and annotates your content with
+          research-backed updates.</p>
+        }
+        <button class="aip-btn" style="align-self:flex-end" [disabled]="aiUpdateLoading() || !title()"
+          (click)="fetchAiUpdate()">
+          {{ aiUpdateResult() ? 'Refresh' : 'Fetch from Web' }}
+        </button>
+      </div>
+      }
+    </div>
+    }
+
+  </div>
+  }
+
+  <!-- ══ DOCUMENT CANVAS ══════════════════════════════════════════════════════ -->
+  <div class="create-layout">
+
+    <!-- ── Document Canvas ──────────────────────────────────────────────────── -->
+    <main class="create-canvas" [style.--accent]="categoryAccentColor()">
       <div class="canvas-inner">
 
-        <!-- ── CONTENT TITLE / PROGRAM TITLE / SUBTITLE ── -->
-      
-        <div class="topbar-center topbar-meta-row">
-          <input class="title-ghost-input" [value]="title()" (input)="title.set($any($event.target).value)"
-            (blur)="onIdentityChange()" placeholder="Program Title..." />
-        </div>
-        <div class="topbar-center">
-          <input class="subtitle-ghost-input" [value]="subtitle()" (input)="subtitle.set($any($event.target).value)"
-            (blur)="onIdentityChange()" placeholder="Section Title..." />
-        </div>
-          <div class="topbar-center ">
-          <input class="category-ghost-select" [value]="contentTitle()"
-            (input)="contentTitle.set($any($event.target).value)"
-            (blur)="onIdentityChange()" placeholder="Content Title..." />
-        </div>
+        <!-- Document identity -->
+        <input class="doc-title" [value]="title()" (input)="title.set($any($event.target).value)"
+          (blur)="onIdentityChange()" placeholder="Program Title..." />
+        <input class="doc-section" [value]="subtitle()" (input)="subtitle.set($any($event.target).value)"
+          (blur)="onIdentityChange()" placeholder="Section Title..." />
+        <input class="doc-meta" [value]="contentTitle()" (input)="contentTitle.set($any($event.target).value)"
+          (blur)="onIdentityChange()" placeholder="Content Title..." />
 
-        <!-- ── BLOCKS ── -->
+        <!-- Blocks — chapter style -->
         @for (block of blocks(); track block.id; let idx = $index) {
         <article class="content-block">
+
+          <!-- Floating controls — appear on hover -->
           <div class="block-controls">
             <button class="block-ctrl-btn" (click)="moveBlock(block.id, 'up')" [disabled]="idx === 0"
               title="Move Up">↑</button>
@@ -43,12 +154,17 @@
           </div>
 
           <div class="block-main">
+
             @if (block.type === 'text') {
-            <div class="text-editor-wrap">
-              <textarea class="atomic-textarea" [value]="getBlockHtml(block)"
-                (input)="block.content['html'] = $any($event.target).value; onFieldChange()"
-                placeholder="Start writing atomic segment..."></textarea>
-            </div>
+            <textarea class="doc-text" [value]="getBlockHtml(block)"
+              (input)="block.content['html'] = $any($event.target).value; onFieldChange()"
+              placeholder="Write here…"></textarea>
+            }
+
+            @if (block.type === 'subtitle') {
+            <input class="doc-subtitle-block" [value]="$any(block.content['text']) || ''"
+              (input)="block.content['text'] = $any($event.target).value; onFieldChange()"
+              placeholder="Section heading…" />
             }
 
             @if (block.type === 'code') {
@@ -126,137 +242,28 @@
               </div>
             </div>
             }
+
           </div>
         </article>
         }
 
-
-        <!-- ── TOPBAR ── -->
-        <!-- <div class="create-topbar">
-         <div class="topbar-left">
-            <div class="sync-indicator" [class.saving]="syncStatus() === 'saving'"></div>
-            @if (hybridId()) {
-            <div class="atomic-id">{{ hybridId() }}</div>
-            }
-          </div> 
-       
-          <button class="action-btn action-btn--primary" (click)="save()" title="Save draft">
-            <span>Save</span>
-          </button>
-          <div class="v-divider"></div>
-        </div> -->
-        <div class="save-btn">
-          <button class="action-btn action-btn--primary" (click)="save()" title="Save draft">
-            <span>Save</span>
-          </button>
+        @if (!blocks().length) {
+        <div class="canvas-empty">
+          <span class="canvas-empty__hint">Select a block type from the left panel to begin writing.</span>
         </div>
+        }
 
       </div>
-    </div>
-  </main>
+    </main>
 
-  <!-- ── MODALS ── -->
-  @if (activeModal()) {
+
+  </div>
+
+  <!-- ══ UPLOAD MODAL (kept as modal for drag-drop UX) ════════════════════════ -->
+  @if (activeModal() === 'upload') {
   <div class="modal-overlay" (click)="closeModal()">
-    <div class="modal-card" [class.upload-modal]="activeModal() === 'upload'" (click)="$event.stopPropagation()">
+    <div class="modal-card upload-modal" (click)="$event.stopPropagation()">
 
-      <!-- ── CONCEIVE ── -->
-      @if (activeModal() === 'conceive') {
-      <h3 class="modal-title">Conceive New Content</h3>
-      <p class="modal-subtitle">Start with a biological or structural prompt. AI will draft the atomic architecture.</p>
-      <div class="conceive-form">
-        <textarea class="update-textarea"
-          placeholder="Describe the core concept (e.g., Photosynthesis for age 12)..."></textarea>
-        <div class="eval-actions" style="margin-top:1.5rem">
-          <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Cancel</button>
-          <button class="eval-btn eval-btn--proceed" (click)="closeModal()">Draft Architecture</button>
-        </div>
-      </div>
-      }
-
-      <!-- ── IDEAS ── -->
-      @if (activeModal() === 'ideas') {
-      <h3 class="modal-title">Ideas</h3>
-      <p class="modal-subtitle">Latest research from Ceekul Web for "{{ title() || 'your topic' }}"</p>
-      @if (ideasLoading()) {
-      <div class="eval-loading" style="padding:2rem 0">
-        <div class="eval-spinner"></div>
-        <p class="eval-loading-text">Fetching from Ceekul Web…</p>
-        <p class="eval-loading-sub">Scanning research · Matching topic · Ranking relevance</p>
-      </div>
-      } @else if (ideasText()) {
-      <div class="ideas-content">{{ ideasText() }}</div>
-      } @else {
-      <p class="ideas-empty">Add a title to your content to load relevant research ideas.</p>
-      }
-      <div class="eval-actions" style="margin-top:1.5rem">
-        <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Close</button>
-        @if (title() && !ideasLoading()) {
-        <button class="eval-btn eval-btn--proceed" (click)="fetchIdeas()">Refresh</button>
-        }
-      </div>
-      }
-
-      <!-- ── UPDATE ── -->
-      @if (activeModal() === 'update') {
-      <h3 class="modal-title">Update Content</h3>
-      <div class="update-tabs">
-        <button class="update-tab-btn" [class.active]="updateTab() === 'creator'"
-          (click)="updateTab.set('creator')">Creator</button>
-        <button class="update-tab-btn" [class.active]="updateTab() === 'ai'" (click)="updateTab.set('ai')">AI
-          Research</button>
-      </div>
-
-      @if (updateTab() === 'creator') {
-      <div class="update-section">
-        <p class="update-hint">Find an exact phrase in your content and write your revised version. Your edit appears
-          with an <span class="hint-user">indigo underline</span>.</p>
-        <label class="update-label">Phrase to find</label>
-        <input class="update-input" [value]="updateSegmentId()" (input)="updateSegmentId.set($any($event.target).value)"
-          placeholder="Exact phrase from your content…" />
-        <label class="update-label">Your update</label>
-        <textarea class="update-textarea" [value]="updateContent()"
-          (input)="updateContent.set($any($event.target).value)" placeholder="Replacement text…"></textarea>
-        <div class="eval-actions" style="margin-top:1rem">
-          <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Cancel</button>
-          <button class="eval-btn eval-btn--proceed" [disabled]="!updateSegmentId() || !updateContent()"
-            (click)="applyCreatorUpdate()">Apply</button>
-        </div>
-      </div>
-      }
-
-      @if (updateTab() === 'ai') {
-      <div class="update-section">
-        <p class="update-hint">AI scans the Ceekul Web and annotates your content with research-backed updates, shown in
-          <span class="hint-ai">amber highlight</span>.
-        </p>
-        @if (aiUpdateLoading()) {
-        <div class="eval-loading" style="padding:1.5rem 0">
-          <div class="eval-spinner"></div>
-          <p class="eval-loading-text">Scanning Ceekul Web…</p>
-          <p class="eval-loading-sub">Researching · Comparing · Annotating</p>
-        </div>
-        } @else if (aiUpdateResult()) {
-        <div class="ai-update-result">{{ aiUpdateResult() }}</div>
-        }
-        <div class="eval-actions" style="margin-top:1rem">
-          <button class="eval-btn eval-btn--cancel" (click)="closeModal()">Close</button>
-          <button class="eval-btn eval-btn--proceed" [disabled]="aiUpdateLoading() || !title()"
-            (click)="fetchAiUpdate()">
-            {{ aiUpdateResult() ? 'Refresh' : 'Fetch from Web' }}
-          </button>
-        </div>
-      </div>
-      }
-      }
-
-      <!-- ── ADAPT ── -->
-      @if (activeModal() === 'adapt') {
-      <h3 class="modal-title">Adaptation Context</h3>
-      }
-
-      <!-- ── UPLOAD ── -->
-      @if (activeModal() === 'upload') {
       <div class="upload-header">
         <div>
           <h3 class="modal-title" style="margin-bottom:4px">Upload Content</h3>
@@ -266,10 +273,10 @@
       </div>
 
       <div class="upload-tabs">
-        <button class="upload-tab-btn" [class.active]="uploadTab() === 'file'" (click)="uploadTab.set('file')">📁 Upload
-          File</button>
-        <button class="upload-tab-btn" [class.active]="uploadTab() === 'embed'" (click)="uploadTab.set('embed')">🔗
-          Embed URL</button>
+        <button class="upload-tab-btn" [class.active]="uploadTab() === 'file'"
+          (click)="uploadTab.set('file')">📁 Upload File</button>
+        <button class="upload-tab-btn" [class.active]="uploadTab() === 'embed'"
+          (click)="uploadTab.set('embed')">🔗 Embed URL</button>
       </div>
 
       @if (uploadTab() === 'file') {
@@ -283,7 +290,8 @@
       @if (uploadFiles().length > 0) {
       <div class="upload-file-list">
         @for (uf of uploadFiles(); track uf.id) {
-        <div class="upload-file-item" [class.is-error]="uf.status === 'error'" [class.is-done]="uf.status === 'done'">
+        <div class="upload-file-item" [class.is-error]="uf.status === 'error'"
+          [class.is-done]="uf.status === 'done'">
           <div class="file-thumb">
             @if (uf.mediaType === 'image' && uf.preview) {
             <img [src]="uf.preview" alt="" />
@@ -317,8 +325,8 @@
       @if (uploadTab() === 'embed') {
       <div class="embed-section">
         <label class="embed-label">Media URL</label>
-        <input class="embed-input" type="url" [value]="embedUrl()" (input)="embedUrl.set($any($event.target).value)"
-          placeholder="https://example.com/media.jpg" />
+        <input class="embed-input" type="url" [value]="embedUrl()"
+          (input)="embedUrl.set($any($event.target).value)" placeholder="https://example.com/media.jpg" />
         @if (embedUrl()) {
         <div class="embed-preview-wrap">
           <img [src]="embedUrl()" alt="Preview" class="embed-preview-img" />
@@ -329,12 +337,12 @@
 
       <div class="upload-actions">
         <button class="cancel-btn" (click)="closeModal()">Cancel</button>
-        <button class="submit-upload-btn" [disabled]="uploadTab() === 'file' ? uploadFiles().length === 0 : !embedUrl()"
+        <button class="submit-upload-btn"
+          [disabled]="uploadTab() === 'file' ? uploadFiles().length === 0 : !embedUrl()"
           (click)="submitUpload()">
           {{ uploadTab() === 'embed' ? 'Insert' : 'Upload' }}
         </button>
       </div>
-      }
 
     </div>
   </div>

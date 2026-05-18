@@ -36,12 +36,23 @@ export class SetMyContent implements OnInit {
   private readonly route = inject(ActivatedRoute);
 
   ngOnInit(): void {
-    const h = this.route.snapshot.queryParamMap.get('hour');
+    const qp = this.route.snapshot.queryParamMap;
+    const h  = qp.get('hour');
     if (h !== null) {
       const hour = parseInt(h, 10);
       if (!isNaN(hour)) {
         this.editHour.set(hour);
-        this.editMode.set('curated');
+        const pt = qp.get('programTitle');
+        const ct = qp.get('contentTitle');
+        const eu = qp.get('externalUrl');
+        if (pt || ct || eu) {
+          this.editMode.set('work');
+          if (pt) this.workTitle.set(pt);
+          else if (ct) this.workTitle.set(ct);
+          if (eu) this.workExternalUrl.set(eu);
+        } else {
+          this.editMode.set('curated');
+        }
       }
     }
   }
@@ -57,8 +68,9 @@ export class SetMyContent implements OnInit {
   readonly selectedCeekulItem = signal<CeekulContentItem | null>(null);
 
   // My Work state
-  readonly workTitle = signal('');
-  readonly workBody  = signal('');
+  readonly workTitle       = signal('');
+  readonly workBody        = signal('');
+  readonly workExternalUrl = signal('');
 
   readonly filteredCeekulItems = computed(() => {
     const q = this.ceekulSearch().trim().toLowerCase();
@@ -87,11 +99,13 @@ export class SetMyContent implements OnInit {
     this.ceekulSearch.set('');
     this.workTitle.set('');
     this.workBody.set('');
+    this.workExternalUrl.set('');
   }
 
   closeEdit(): void {
     this.editHour.set(null);
     this.editMode.set(null);
+    this.workExternalUrl.set('');
   }
 
   selectCeekulItem(item: CeekulContentItem): void {
@@ -109,7 +123,13 @@ export class SetMyContent implements OnInit {
       content = { title: item.title, subtitles: item.subtitles, body: item.body, source: 'ceekul', contentId: item.id };
     } else {
       if (!this.workTitle().trim()) return;
-      content = { title: this.workTitle().trim(), subtitles: [], body: this.workBody().trim(), source: 'upload' };
+      content = {
+        title: this.workTitle().trim(),
+        subtitles: [],
+        body: this.workBody().trim(),
+        source: 'upload',
+        externalUrl: this.workExternalUrl().trim() || undefined,
+      };
     }
     this.orc.setCustomContent([hour], content);
     this.closeEdit();

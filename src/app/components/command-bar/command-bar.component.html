@@ -1,0 +1,58 @@
+@if (cmd.isOpen()) {
+  <!-- Backdrop -->
+  <div class="cb-backdrop" (click)="cmd.close()"></div>
+
+  <!-- Palette -->
+  <div class="cb-palette" role="dialog" aria-modal="true" aria-label="Command palette">
+
+    <!-- Search row -->
+    <div class="cb-search">
+      <span class="cb-search-icon">⌘</span>
+      <input
+        #searchInput
+        class="cb-input"
+        type="text"
+        placeholder="Search commands…"
+        autocomplete="off"
+        [ngModel]="cmd.query()"
+        (ngModelChange)="onQueryChange($event)"
+        aria-label="Command search"
+      />
+      <kbd class="cb-esc" (click)="cmd.close()">ESC</kbd>
+    </div>
+
+    <!-- Results -->
+    <div class="cb-results" role="listbox">
+      @if (cmd.filtered().length === 0) {
+        <div class="cb-empty">No commands match "{{ cmd.query() }}"</div>
+      }
+
+      @for (item of cmd.filtered(); track item.id; let i = $index) {
+        @if (isNewCategory(cmd.filtered(), i)) {
+          <div class="cb-category-label">{{ categoryLabel(item.category) }}</div>
+        }
+        <button
+          class="cb-item"
+          [class.cb-item--focused]="cmd.focused() === i"
+          role="option"
+          [attr.aria-selected]="cmd.focused() === i"
+          (mouseenter)="cmd.focused.set(i)"
+          (click)="execute(i)"
+        >
+          <span class="cb-item-label">{{ item.label }}</span>
+          <span class="cb-item-desc">{{ item.description }}</span>
+          @if (item.shortcut) {
+            <kbd class="cb-shortcut">{{ item.shortcut }}</kbd>
+          }
+        </button>
+      }
+    </div>
+
+    <!-- Footer hint -->
+    <div class="cb-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> execute</span>
+      <span><kbd>ESC</kbd> dismiss</span>
+    </div>
+  </div>
+}

@@ -1,0 +1,38 @@
+<div class="tl-root">
+  <div class="tl-header">
+    <span class="tl-title">TEMPORAL TRAIL</span>
+    <span class="tl-sub">your path through the knowledge space</span>
+    <button class="tl-reload" (click)="reload()">↻</button>
+  </div>
+
+  @if (loading()) {
+    <div class="tl-empty">Loading trail…</div>
+  } @else if (points().length === 0) {
+    <div class="tl-empty">No trail yet. Start navigating to build your history.</div>
+  } @else {
+    <div class="tl-scroll">
+      <div class="tl-axis"></div>
+      @for (p of points(); track p.cid) {
+        <div class="tl-point" (click)="select(p)">
+          <div class="tl-dot" [style.background]="typeColor(p.contentType)"></div>
+          <div class="tl-info">
+            <span class="tl-label">{{ p.label }}</span>
+            <span class="tl-time">{{ formatTime(p.ts) }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (selected(); as pt) {
+    <div class="tl-detail">
+      <div class="tl-detail-label">{{ pt.label }}</div>
+      <div class="tl-detail-meta">{{ pt.contentType }} · {{ formatTime(pt.ts) }}</div>
+      <div class="tl-detail-cid">{{ pt.cid.slice(0, 20) }}…</div>
+      <div class="tl-detail-actions">
+        <button class="tl-btn tl-btn--nav" (click)="navigateTo(pt)">Return here</button>
+        <button class="tl-btn" (click)="selected.set(null)">Dismiss</button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,113 @@
+<div class="civ-page">
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="civ-header">
+    <div class="civ-header__seal" aria-hidden="true">
+      <div class="civ-seal">
+        <div class="civ-seal__ring civ-seal__ring--outer"></div>
+        <div class="civ-seal__ring civ-seal__ring--inner"></div>
+        <span class="civ-seal__glyph">◬</span>
+      </div>
+    </div>
+
+    <div class="civ-header__body">
+      <span class="civ-header__eyebrow">Office of the</span>
+      <h1 class="civ-header__title">Civilizer</h1>
+      <p class="civ-header__subtitle">Ceekul Academy · Cultural Advancement & Ethical Transformation</p>
+    </div>
+
+    <div class="civ-header__rule" aria-hidden="true">
+      <div class="civ-header__rule-line"></div>
+      <span class="civ-header__rule-glyph">◈</span>
+      <div class="civ-header__rule-line"></div>
+    </div>
+
+    <blockquote class="civ-mission">
+      <p class="civ-mission__text">
+        "Culture is not the background of civilization — it is the operating system.
+        Every institution, every law, every act of creation runs on the values
+        that a people have chosen, consciously or not, to embed in their way of life."
+      </p>
+      <footer class="civ-mission__attr">— Civilizer Charter, Cultural Mandate I</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ CULTURAL MANDATES ═══════════════════════════════════════════════════ -->
+  <section class="civ-mandates">
+    <div class="civ-section-label">
+      <span class="civ-section-label__line" aria-hidden="true"></span>
+      <span class="civ-section-label__text">Cultural Mandates</span>
+      <span class="civ-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="civ-mnd-list">
+      @for (mnd of mandates; track mnd.id; let i = $index) {
+      <div class="civ-mnd"
+        [class.civ-mnd--open]="expandedId() === mnd.id"
+        [style.--mnd-delay]="(i * 60) + 'ms'">
+
+        <button class="civ-mnd__trigger" (click)="toggleMandate(mnd.id)" [attr.aria-expanded]="expandedId() === mnd.id">
+          <span class="civ-mnd__code">{{ mnd.code }}</span>
+          <span class="civ-mnd__title">{{ mnd.title }}</span>
+          <span class="civ-mnd__chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="4 6 8 10 12 6"/>
+            </svg>
+          </span>
+        </button>
+
+        @if (expandedId() === mnd.id) {
+        <div class="civ-mnd__body">
+          <p class="civ-mnd__text">{{ mnd.body }}</p>
+          <div class="civ-mnd__pillars">
+            @for (p of mnd.pillars; track p) {
+            <span class="civ-mnd__pillar">{{ p }}</span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ TRANSFORMATION MODELS ═══════════════════════════════════════════════ -->
+  <section class="civ-models">
+    <div class="civ-section-label">
+      <span class="civ-section-label__line" aria-hidden="true"></span>
+      <span class="civ-section-label__text">Transformation Models</span>
+      <span class="civ-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="civ-model-grid">
+      @for (model of models; track model.code; let i = $index) {
+      <div class="civ-model" [style.--model-accent]="model.accent" [style.--model-delay]="(i * 70) + 'ms'">
+        <div class="civ-model__head">
+          <span class="civ-model__code">{{ model.code }}</span>
+          <div class="civ-model__badges">
+            <span class="civ-model__phase civ-model__phase--{{ model.phase.toLowerCase() }}">{{ model.phase }}</span>
+            <span class="civ-model__scope">{{ model.scope }}</span>
+          </div>
+        </div>
+        <h3 class="civ-model__title">{{ model.title }}</h3>
+        <p class="civ-model__desc">{{ model.descriptor }}</p>
+        <div class="civ-model__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ CIVILIZER STATEMENT ═════════════════════════════════════════════════ -->
+  <footer class="civ-statement">
+    <div class="civ-statement__rule" aria-hidden="true"></div>
+    <p class="civ-statement__text">
+      The Civilizer holds a singular conviction: that culture is the ultimate technology.
+      All hardware, all governance, all economy eventually bends to the values that a people
+      have chosen to live by. The Civilizer's mandate is to make that choice conscious,
+      deliberate, and worthy of the civilization we are building.
+    </p>
+    <span class="civ-statement__seal" aria-hidden="true">◬ Ceekul Academy · Civilizer · Cultural Intelligence Division</span>
+  </footer>
+
+</div>

@@ -120,6 +120,157 @@
   flex-wrap: wrap;
 }
 
+// ── Content TOC Box ───────────────────────────────────────────────────────────
+
+.content-toc {
+  height: 105px;
+  background: #080808;
+  border: 1px solid #181818;
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem 0.75rem;
+  margin-bottom: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.content-toc__title {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #707070;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.content-toc__chips {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  flex-shrink: 0;
+
+  &::-webkit-scrollbar { height: 2px; }
+  &::-webkit-scrollbar-thumb { background: #1e1e1e; border-radius: 2px; }
+}
+
+.toc-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  background: transparent;
+  border: 1px solid #1e1e1e;
+  border-radius: 100px;
+  color: #484848;
+  font-size: 0.68rem;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: #303030;
+    color: #787878;
+    background: #101010;
+  }
+}
+
+// ── External Watch Row ────────────────────────────────────────────────────────
+
+.ext-watch-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0 0.25rem;
+}
+
+.ext-timer {
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: #484848;
+  font-variant-numeric: tabular-nums;
+}
+
+.ext-watch-btn {
+  background: transparent;
+  border: 1px solid #282828;
+  border-radius: 6px;
+  color: #707070;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+
+  &:hover {
+    border-color: #444;
+    color: #aaa;
+  }
+}
+
+// ── Ad Overlay ────────────────────────────────────────────────────────────────
+
+.ad-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+}
+
+.ad-overlay__card {
+  background: #0e0e0e;
+  border: 1px solid #1e1e1e;
+  border-radius: 0.75rem;
+  padding: 2rem 2.5rem;
+  max-width: 420px;
+  text-align: center;
+}
+
+.ad-overlay__msg {
+  font-size: 0.85rem;
+  color: #808080;
+  line-height: 1.65;
+  margin: 0 0 1.5rem;
+}
+
+.ad-overlay__actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.ad-overlay__btn {
+  border-radius: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 0.45rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &--skip {
+    background: transparent;
+    border: 1px solid #282828;
+    color: #606060;
+
+    &:hover { border-color: #444; color: #aaa; }
+  }
+
+  &--continue {
+    background: #1a1a1a;
+    border: 1px solid #303030;
+    color: #b0b0b0;
+
+    &:hover { background: #222; border-color: #484848; color: #d0d0d0; }
+  }
+}
+
 // ── Empty State ───────────────────────────────────────────────────────────────
 
 .now-empty {

@@ -1,0 +1,160 @@
+<div class="academy">
+  <div class="academy-grid">
+
+    <!-- ══ LEFT SIDEBAR — GOVERNANCE HIERARCHY ════════════════════════════════ -->
+    <aside class="academy-grid__left" [class.mobile-active]="activeTab() === 'gov'">
+      <div class="gov-panel">
+
+        <div class="gov-panel__header">
+          <span class="gov-panel__eyebrow">Digital Self Governance</span>
+          <span class="gov-panel__gov-id">CG100000000000</span>
+          <div class="gov-panel__rule"></div>
+        </div>
+
+        <!-- CG Pool — distinguished entry above governance sections -->
+        <div class="gov-pool-entry">
+          <button class="gov-pool-btn"
+            [class.gov-pool-btn--active]="selectedId() === 'cg-pool'"
+            (click)="selectSection('cg-pool')">
+            <span class="gov-pool-btn__glyph" aria-hidden="true">⬡</span>
+            <div class="gov-pool-btn__body">
+              <span class="gov-pool-btn__label">Collective Governance Pool</span>
+              <span class="gov-pool-btn__id">CG100000000000</span>
+            </div>
+            <span class="gov-pool-btn__tag">1% Commons</span>
+          </button>
+          <div class="gov-pool-divider" aria-hidden="true">
+            <span class="gov-pool-divider__line"></span>
+            <span class="gov-pool-divider__text">Governance Hierarchy</span>
+            <span class="gov-pool-divider__line"></span>
+          </div>
+        </div>
+
+        <nav class="gov-nav" role="navigation" aria-label="Academy governance">
+          @for (section of sections; track section.id; let i = $index) {
+          <button
+            class="gov-nav__item"
+            [class.gov-nav__item--active]="selectedId() === section.id"
+            (click)="selectSection(section.id)"
+            [attr.aria-current]="selectedId() === section.id ? 'page' : null">
+            <span class="gov-nav__index">{{ (i + 1).toString().padStart(2, '0') }}</span>
+            <span class="gov-nav__label">{{ section.title }}</span>
+            @if (section.govId) {
+            <span class="gov-nav__gov-id">{{ section.govId }}</span>
+            }
+            <span class="gov-nav__indicator" aria-hidden="true"></span>
+          </button>
+          }
+        </nav>
+
+        <div class="gov-panel__footer">
+          <span class="gov-panel__footer-text">Ceekul Academy · Computable Vision</span>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ══ CENTER COLUMN — DYNAMIC CONTENT RENDERER ═══════════════════════════ -->
+    <main class="academy-grid__center" [class.mobile-active]="activeTab() === 'content'">
+      <div class="academy-canvas">
+
+        @if (activePageComponent(); as cmp) {
+        <ng-container [ngComponentOutlet]="cmp"></ng-container>
+        } @else if (displayContent(); as sec) {
+        <div class="ac-section" [attr.data-section-id]="sec.id">
+
+          <!-- Section Header -->
+          <header class="ac-header">
+            <div class="ac-header__meta">
+              <span class="ac-header__tag">Ceekul Academy</span>
+              <span class="ac-header__sep">·</span>
+              <span class="ac-header__role">{{ sec.title }}</span>
+              @if (sec.govId) {
+              <span class="ac-header__gov-id">{{ sec.govId }}</span>
+              }
+            </div>
+            <h2 class="ac-header__heading">{{ sec.heading }}</h2>
+            <p class="ac-header__tagline">{{ sec.tagline }}</p>
+            <div class="ac-header__rule"></div>
+          </header>
+
+          <!-- Pillar Grid -->
+          <div class="ac-grid">
+            @for (pillar of sec.pillars; track pillar.title; let idx = $index) {
+            <div class="ac-card" [style.--card-delay]="(idx * 55) + 'ms'">
+              <div class="ac-card__glyph" aria-hidden="true">{{ (idx + 1).toString().padStart(2, '0') }}</div>
+              <h3 class="ac-card__title">{{ pillar.title }}</h3>
+              <p class="ac-card__descriptor">{{ pillar.descriptor }}</p>
+              <div class="ac-card__shimmer" aria-hidden="true"></div>
+            </div>
+            }
+          </div>
+
+          <!-- Footer Note -->
+          @if (sec.note) {
+          <footer class="ac-footer">
+            <div class="ac-footer__line"></div>
+            <p class="ac-footer__note">{{ sec.note }}</p>
+          </footer>
+          }
+
+        </div>
+        }
+
+      </div>
+    </main>
+
+    <!-- ══ RIGHT SIDEBAR — RESERVED ══════════════════════════════════════════ -->
+    <aside class="academy-grid__right" [class.mobile-active]="activeTab() === 'right'">
+      <div class="academy-right">
+        <div class="academy-right__placeholder">
+          <div class="arp-glyph" aria-hidden="true">◈</div>
+          <p class="arp-label">Strategic Intelligence</p>
+          <p class="arp-hint">AI tools, governance analytics, and council decision support — coming soon.</p>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ══ MOBILE TAB BAR ══════════════════════════════════════════════════════ -->
+  <nav class="academy-tab-bar" role="tablist" aria-label="Academy navigation">
+
+    <button class="academy-tab-bar__tab"
+      role="tab"
+      [class.academy-tab-bar__tab--active]="activeTab() === 'gov'"
+      (click)="setActiveTab('gov')"
+      aria-label="Governance hierarchy">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Hierarchy</span>
+    </button>
+
+    <button class="academy-tab-bar__tab"
+      role="tab"
+      [class.academy-tab-bar__tab--active]="activeTab() === 'content'"
+      (click)="setActiveTab('content')"
+      aria-label="Academy content">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <path d="M9 9h6M9 13h6M9 17h4"/>
+      </svg>
+      <span>Vision</span>
+    </button>
+
+    <button class="academy-tab-bar__tab"
+      role="tab"
+      [class.academy-tab-bar__tab--active]="activeTab() === 'right'"
+      (click)="setActiveTab('right')"
+      aria-label="Intelligence tools">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+      </svg>
+      <span>Intel</span>
+    </button>
+
+  </nav>
+</div>

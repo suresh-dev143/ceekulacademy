@@ -13,6 +13,8 @@ import {
 import { ToastService } from '../../core/services/toast.service';
 import { ToastComponent } from '../../components/toast/toast';
 import { FacilityDiscoveryComponent } from '../../components/workshops/facility-discovery/facility-discovery.component';
+import { AdPlatformService } from '../../services/ad-platform.service';
+import { UcrsService } from '../../services/ucrs.service';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -89,6 +91,9 @@ interface LocalSession {
   facilityId?: string;
   location?: string;
   fee?: number;
+  workshopHour?: number;
+  streamingPlatform?: string;
+  streamingFee?: number;
 }
 
 const DEFAULT_SESSION_FLOW: SessionBlock[] = [
@@ -108,6 +113,19 @@ export const TEACHING_STYLES: { id: string; label: string }[] = [
   { id: 'hybrid',        label: 'Hybrid'        },
 ];
 
+export const STREAMING_PLATFORMS: { id: string; label: string }[] = [
+  { id: '',           label: '— No streaming platform —' },
+  { id: 'youtube',    label: 'YouTube Live'             },
+  { id: 'zoom',       label: 'Zoom'                     },
+  { id: 'gmeet',      label: 'Google Meet'              },
+  { id: 'msteams',    label: 'Microsoft Teams'          },
+  { id: 'jitsi',      label: 'Jitsi Meet (Free)'        },
+  { id: 'webex',      label: 'Cisco Webex'              },
+  { id: 'streamyard', label: 'StreamYard'               },
+  { id: 'twitch',     label: 'Twitch'                   },
+  { id: 'other',      label: 'Other'                    },
+];
+
 // ── Component ──────────────────────────────────────────────────────────────────
 
 @Component({
@@ -120,6 +138,8 @@ export const TEACHING_STYLES: { id: string; label: string }[] = [
 })
 export class Schedule implements OnInit, OnDestroy {
   private readonly schedSvc = inject(UCRSScheduleService);
+  private readonly adSvc    = inject(AdPlatformService);
+  private readonly ucrsSvc  = inject(UcrsService);
   private readonly toast    = inject(ToastService);
   private readonly router   = inject(Router);
   private readonly fb       = inject(FormBuilder);
@@ -151,6 +171,8 @@ export class Schedule implements OnInit, OnDestroy {
     { key: 'AEST', label: 'AEST — Australian Eastern Time (UTC+10)' },
   ];
   readonly selectedContentRef = signal<{ baseId?: string; hybridId?: string } | null>(null);
+  readonly fieldLookupRef    = signal<{ baseId?: string; hybridId?: string } | null>(null);
+  private readonly fieldLookup$ = new Subject<string>();
 
   // ── Content Description Fields ──────────────────────────────────────────────
   readonly cdExpanded          = signal(false);
@@ -200,12 +222,19 @@ export class Schedule implements OnInit, OnDestroy {
 
   readonly accentColor = computed(() => this.selectedCat().color);
 
-  readonly canSubmit = computed(() =>
-    !!this.category() &&
-    !!this.programTitle().trim() &&
-    this.localSchedules().length > 0 &&
-    !this.submitting()
-  );
+  readonly canSubmit = computed(() => {
+    if (this.isAdvertisementCategory()) {
+      return !!this.adTitle().trim() && !!this.adMediaUrl() &&
+        !!this.adExpiryDate() && this.adBudget() > 0 &&
+        !this.submitting() && !this.adIsCommitting();
+    }
+    return !!this.category() &&
+      !!this.programTitle().trim() &&
+      this.hasContentLink() &&
+      !this.fieldLookupPending() &&
+      this.localSchedules().length > 0 &&
+      !this.submitting();
+  });
 
   readonly cdSummary = computed(() => {
     const parts: string[] = [];
@@ -223,9 +252,63 @@ export class Schedule implements OnInit, OnDestroy {
     return parts.length ? parts.join(' · ') : 'Add trust lineage and expertise';
   });
 
+  // ── Workshop / streaming ────────────────────────────────────────────────────
+  readonly isWorkshopCategory      = computed(() => this.category() === 'workshop');
+  readonly isAdvertisementCategory = computed(() => this.category() === 'advertisement');
+
+  readonly contentViewUrl = computed(() => {
+    const ref = this.selectedContentRef() ?? this.fieldLookupRef();
+    return ref?.baseId ? `/lectures/${ref.baseId}/watch` : null;
+  });
+
+  readonly hasContentFields  = computed(() => !!this.programTitle().trim());
+  readonly hasContentLink    = computed(() => !!(this.selectedContentRef() || this.fieldLookupRef()));
+  readonly contentLinkBlocks = computed(() =>
+    !this.isAdvertisementCategory() &&
+    !!this.programTitle().trim() &&
+    !this.hasContentLink() &&
+    !this.fieldLookupPending()
+  );
+
+  readonly fieldLookupPending = signal(false);
+
   // ── Constants exposed to template ──────────────────────────────────────────
-  readonly CATEGORIES      = SCHEDULE_CATEGORIES;
-  readonly TEACHING_STYLES = TEACHING_STYLES;
+  readonly CATEGORIES          = SCHEDULE_CATEGORIES;
+  readonly TEACHING_STYLES     = TEACHING_STYLES;
+  readonly STREAMING_PLATFORMS = STREAMING_PLATFORMS;
+
+  readonly AD_CATEGORIES: string[] = [
+    'Singing', 'Dancing', 'Acting', 'Modeling', 'Film Making',
+    'Entertainment', 'Technology', 'Finance', 'Health', 'Education',
+    'Fitness', 'Travel', 'Food', 'Fashion', 'Sports', 'Other',
+  ];
+  readonly AD_DURATIONS = [10, 20, 30, 40, 50, 60];
+  readonly AD_AGE_GROUPS: { id: 'all' | 'children' | 'teen' | 'adult'; label: string }[] = [
+    { id: 'all',      label: 'All Ages'        },
+    { id: 'children', label: 'Children (< 13)' },
+    { id: 'teen',     label: 'Teen (13–17)'    },
+    { id: 'adult',    label: 'Adult (18+)'     },
+  ];
+  readonly today = new Date().toISOString().split('T')[0];
+
+  // ── Advertisement signals ───────────────────────────────────────────────────
+  readonly adTitle               = signal('');
+  readonly adDescription         = signal('');
+  readonly adClickThrough        = signal('');
+  readonly adDuration            = signal(30);
+  readonly adRate                = signal(5);
+  readonly adBudget              = signal(1000);
+  readonly adExpiryDate          = signal('');
+  readonly adAgeGroup            = signal<'all' | 'children' | 'teen' | 'adult'>('all');
+  readonly adMandatoryCategories = signal<string[]>([]);
+  readonly adInterestTagInput    = signal('');
+  readonly adInterestTags        = signal<string[]>([]);
+  readonly adMediaUrl            = signal('');
+  readonly adAdType              = signal<'image' | 'video' | null>(null);
+  readonly adCommittedCid        = signal<string | null>(null);
+  readonly adIsCommitting        = signal(false);
+  readonly adCommitStage         = signal('Uploading...');
+  readonly adUploadError         = signal<string | null>(null);
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
 
@@ -233,6 +316,9 @@ export class Schedule implements OnInit, OnDestroy {
     this.search$
       .pipe(debounceTime(320), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(q => this._doContentSearch(q));
+    this.fieldLookup$
+      .pipe(debounceTime(500), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(q => this._doFieldLookup(q));
     this.buildAddForm();
     this.loadMySchedules();
   }
@@ -257,19 +343,22 @@ export class Schedule implements OnInit, OnDestroy {
   buildAddForm(): void {
     const getTz = () => this.addForm?.get('timezone')?.value ?? 'IST';
     this.addForm = this.fb.group({
-      date:            ['', [Validators.required, pastDateValidator(getTz)]],
-      startTime:       ['', Validators.required],
-      endTime:         ['', Validators.required],
-      timezone:        ['IST', Validators.required],
-      mode:            ['online', Validators.required],
-      capacity:        [null],
-      facilityId:      [''],
-      facilityType:    [''],
-      partnerId:       [''],
-      partnerName:     [''],
-      location:        [''],
-      facilityDetails: [null],
-      fee:             [null],
+      date:              ['', [Validators.required, pastDateValidator(getTz)]],
+      startTime:         ['', Validators.required],
+      endTime:           ['', Validators.required],
+      timezone:          ['IST', Validators.required],
+      mode:              ['online', Validators.required],
+      capacity:          [null],
+      facilityId:        [''],
+      facilityType:      [''],
+      partnerId:         [''],
+      partnerName:       [''],
+      location:          [''],
+      facilityDetails:   [null],
+      fee:               [null],
+      workshopHour:      [null],
+      streamingPlatform: [''],
+      streamingFee:      [null],
     }, { validators: [sessionConstraintsValidator(getTz)] });
 
     this.addForm.get('mode')!.valueChanges.subscribe(m => this._syncFacilityValidator(m ?? 'offline'));
@@ -278,7 +367,7 @@ export class Schedule implements OnInit, OnDestroy {
   private _syncFacilityValidator(mode: string): void {
     const loc   = this.addForm.get('location')!;
     const facId = this.addForm.get('facilityId')!;
-    if (mode === 'in-person') {
+    if (mode === 'offline') {
       loc.setValidators(Validators.required);
       facId.setValidators(Validators.required);
     } else {
@@ -301,22 +390,36 @@ export class Schedule implements OnInit, OnDestroy {
     this.addForm.markAllAsTouched();
     if (this.addForm.invalid) return;
     const v = this.addForm.getRawValue();
-    const rawCap = parseInt(v.capacity, 10);
-    const rawFee = parseFloat(v.fee);
+    const rawCap      = parseInt(v.capacity, 10);
+    const rawFee      = parseFloat(v.fee);
+    const rawHour     = parseInt(v.workshopHour, 10);
+    const rawStreamFee = parseFloat(v.streamingFee);
     const session: LocalSession = {
-      date:       v.date,
-      startTime:  v.startTime,
-      endTime:    v.endTime,
-      timezone:   v.timezone,
-      mode:       v.mode as DeliveryMode,
-      capacity:   isNaN(rawCap) ? null : Math.max(1, rawCap),
-      facilityId: v.facilityId || undefined,
-      location:   v.location  || undefined,
-      fee:        isNaN(rawFee) ? undefined : Math.max(0, rawFee),
+      date:              v.date,
+      startTime:         v.startTime,
+      endTime:           v.endTime,
+      timezone:          v.timezone,
+      mode:              v.mode as DeliveryMode,
+      capacity:          isNaN(rawCap) ? null : Math.max(1, rawCap),
+      facilityId:        v.facilityId || undefined,
+      location:          v.location   || undefined,
+      fee:               isNaN(rawFee)       ? undefined : Math.max(0, rawFee),
+      workshopHour:      isNaN(rawHour)      ? undefined : rawHour,
+      streamingPlatform: v.streamingPlatform || undefined,
+      streamingFee:      isNaN(rawStreamFee) ? undefined : Math.max(0, rawStreamFee),
     };
     this.localSchedules.update(list => [...list, session]);
     this.cancelAddForm();
   }
+
+  getStreamingPlatformLabel(id: string): string {
+    return STREAMING_PLATFORMS.find(p => p.id === id)?.label ?? id;
+  }
+
+  get currentSessionFee(): number    { return parseFloat(this.addForm?.get('fee')?.value)              || 0; }
+  get currentStreamFee(): number     { return parseFloat(this.addForm?.get('streamingFee')?.value)     || 0; }
+  get currentSessionTotal(): number  { return this.currentSessionFee + this.currentStreamFee; }
+  get hasStreamingPlatform(): boolean { return !!this.addForm?.get('streamingPlatform')?.value; }
 
   removeSchedule(idx: number): void {
     this.localSchedules.update(list => list.filter((_, i) => i !== idx));
@@ -354,7 +457,7 @@ export class Schedule implements OnInit, OnDestroy {
     this.addForm.patchValue({ facilityId: '', location: '', facilityDetails: null });
   }
 
-  get isOfflineMode(): boolean { return this.addForm?.get('mode')?.value === 'in-person'; }
+  get isOfflineMode(): boolean { return this.addForm?.get('mode')?.value === 'offline'; }
   get todayStr(): string { return nowInTz(this.addForm?.get('timezone')?.value || 'IST').dateStr; }
 
   // ── Content search & selection ──────────────────────────────────────────────
@@ -384,6 +487,7 @@ export class Schedule implements OnInit, OnDestroy {
     this.sectionTitle.set(item.subtitle || '');
     this.contentTitle.set(item.contentTitle || '');
     this.selectedContentRef.set({ baseId: item.baseId, hybridId: item.hybridId });
+    this.fieldLookupRef.set(null);
     this.contentSearchQ.set(item.title);
     this.showResults.set(false);
     this.contentResults.set([]);
@@ -391,12 +495,53 @@ export class Schedule implements OnInit, OnDestroy {
 
   clearContentSelection(): void {
     this.selectedContentRef.set(null);
+    this.fieldLookupRef.set(null);
+    this.fieldLookupPending.set(false);
     this.contentSearchQ.set('');
     this.contentResults.set([]);
     this.showResults.set(false);
   }
 
   closeResults(): void { this.showResults.set(false); }
+
+  onProgramTitleInput(e: Event): void {
+    this.programTitle.set((e.target as HTMLInputElement).value);
+    this._triggerFieldLookup();
+  }
+
+  onSectionTitleInput(e: Event): void {
+    this.sectionTitle.set((e.target as HTMLInputElement).value);
+    this._triggerFieldLookup();
+  }
+
+  onContentTitleInput(e: Event): void {
+    this.contentTitle.set((e.target as HTMLInputElement).value);
+    this._triggerFieldLookup();
+  }
+
+  private _triggerFieldLookup(): void {
+    if (this.selectedContentRef()) return;
+    const q = [this.programTitle(), this.sectionTitle(), this.contentTitle()]
+      .filter(Boolean).join(' ');
+    if (q.trim().length >= 3) {
+      this.fieldLookupPending.set(true);
+      this.fieldLookup$.next(q.trim());
+    } else {
+      this.fieldLookupRef.set(null);
+      this.fieldLookupPending.set(false);
+    }
+  }
+
+  private _doFieldLookup(q: string): void {
+    if (this.selectedContentRef()) return;
+    this.schedSvc.searchContent(q, 1).subscribe({
+      next: ({ data }) => {
+        this.fieldLookupRef.set(data.length ? { baseId: data[0].baseId, hybridId: data[0].hybridId } : null);
+        this.fieldLookupPending.set(false);
+      },
+      error: () => { this.fieldLookupPending.set(false); },
+    });
+  }
 
   // ── Content Description ─────────────────────────────────────────────────────
 
@@ -462,11 +607,49 @@ export class Schedule implements OnInit, OnDestroy {
 
   // ── Submit ──────────────────────────────────────────────────────────────────
 
+  private _submitAdvertisement(): void {
+    this.submitting.set(true);
+    this.adSvc.createAd({
+      title:                   this.adTitle().trim(),
+      description:             this.adDescription().trim(),
+      category:                this.adMandatoryCategories()[0] || 'Other',
+      adType:                  this.adAdType()!,
+      mediaUrl:                this.adMediaUrl(),
+      duration:                this.adDuration(),
+      clickThroughUrl:         this.adClickThrough().trim() || undefined,
+      ratePerSecondPerStudent: this.adRate() / 100,
+      totalBudget:             this.adBudget(),
+      expiryDate:              this.adExpiryDate(),
+      contentCid:              this.adCommittedCid() || undefined,
+      mandatoryCriteria: {
+        categories:       this.adMandatoryCategories(),
+        ageGroup:         this.adAgeGroup(),
+        minRatePerSecond: 0,
+      },
+      optionalCriteria: {
+        engagementScoreTarget: 0,
+        preferredLanguage:     '',
+        interestTags:          this.adInterestTags(),
+      },
+    } as any).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.toast.success('Ad campaign submitted for review!');
+        this._resetAdForm();
+      },
+      error: (err: any) => {
+        this.submitting.set(false);
+        this.toast.error(err?.error?.message ?? 'Ad submission failed.');
+      },
+    });
+  }
+
   submit(): void {
     if (!this.canSubmit()) return;
+    if (this.isAdvertisementCategory()) { this._submitAdvertisement(); return; }
     this.submitting.set(true);
 
-    const ref = this.selectedContentRef();
+    const ref = this.selectedContentRef() ?? this.fieldLookupRef();
 
     const contentDescription: ContentDescription = {
       overview:          this.cdOverview().trim(),
@@ -523,6 +706,10 @@ export class Schedule implements OnInit, OnDestroy {
         timezone:      s.timezone,
         deliveryMode:  s.mode,
         capacity:      s.capacity,
+        fee:               s.fee,
+        streamingFee:      s.streamingFee,
+        streamingPlatform: s.streamingPlatform,
+        workshopHour:      s.workshopHour,
         contentDescription,
         expertProfile,
       };
@@ -562,7 +749,98 @@ export class Schedule implements OnInit, OnDestroy {
     });
   }
 
-  navigateToEnrol(): void { this.router.navigate(['/personal/enrol']); }
+  navigateToEnrol():  void { this.router.navigate(['/personal/enrol']); }
+  navigateToCreate(): void {
+    this.router.navigate(['/personal/create'], {
+      queryParams: {
+        programTitle: this.programTitle() || undefined,
+        sectionTitle: this.sectionTitle()  || undefined,
+        contentTitle: this.contentTitle()  || undefined,
+      },
+    });
+  }
+
+  // ── Advertisement ────────────────────────────────────────────────────────────
+
+  onAdMediaSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.adUploadError.set(null);
+    this.adIsCommitting.set(true);
+    this.adCommitStage.set('Uploading media...');
+    this.adSvc.uploadAdMedia(file).subscribe({
+      next: (res) => {
+        this.adMediaUrl.set(res.data.mediaUrl);
+        this.adAdType.set(res.data.adType);
+        this.adCommitStage.set('Processing through UCE...');
+        this.ucrsSvc.commit({
+          source: 'advertiser', contentType: 'ad',
+          payload: {
+            title:    this.adTitle() || file.name,
+            subtitle: this.adDescription(),
+            body:     this.adDescription(),
+            mediaUrl: this.adMediaUrl(),
+            keywords: this.adMandatoryCategories().map((c: string) => c.toLowerCase()),
+            category: this.adMandatoryCategories()[0] || '',
+          },
+        }).subscribe({
+          next: (commit: any) => { this.adCommittedCid.set(commit.cid); this.adIsCommitting.set(false); },
+          error: ()            => { this.adCommittedCid.set(null);       this.adIsCommitting.set(false); },
+        });
+      },
+      error: (err: any) => {
+        const status = err?.status;
+        let msg = 'Upload failed. Please try again.';
+        if (status === 413) msg = 'File too large (max 20 MB).';
+        else if (status === 400) msg = 'Invalid file type.';
+        else if (status === 0)   msg = 'Network error. Check connection.';
+        this.adUploadError.set(msg);
+        this.adIsCommitting.set(false);
+      },
+    });
+  }
+
+  resetAdMedia(): void {
+    this.adMediaUrl.set('');
+    this.adAdType.set(null);
+    this.adCommittedCid.set(null);
+    this.adUploadError.set(null);
+  }
+
+  toggleAdCategory(cat: string): void {
+    this.adMandatoryCategories.update(list => {
+      const idx = list.indexOf(cat);
+      return idx === -1 ? [...list, cat] : list.filter((_, i) => i !== idx);
+    });
+  }
+
+  addAdInterestTag(): void {
+    const v = this.adInterestTagInput().trim().toLowerCase();
+    if (v) { this.adInterestTags.update(a => a.includes(v) ? a : [...a, v]); this.adInterestTagInput.set(''); }
+  }
+
+  removeAdInterestTag(i: number): void {
+    this.adInterestTags.update(a => a.filter((_, idx) => idx !== i));
+  }
+
+  private _resetAdForm(): void {
+    this.adTitle.set('');
+    this.adDescription.set('');
+    this.adClickThrough.set('');
+    this.adDuration.set(30);
+    this.adRate.set(5);
+    this.adBudget.set(1000);
+    this.adExpiryDate.set('');
+    this.adAgeGroup.set('all');
+    this.adMandatoryCategories.set([]);
+    this.adInterestTags.set([]);
+    this.adInterestTagInput.set('');
+    this.adMediaUrl.set('');
+    this.adAdType.set(null);
+    this.adCommittedCid.set(null);
+    this.adIsCommitting.set(false);
+    this.adUploadError.set(null);
+  }
 
   formatDate(dateStr: string): string {
     if (!dateStr) return '';
@@ -588,6 +866,8 @@ export class Schedule implements OnInit, OnDestroy {
     this.localSchedules.set([]);
     this.showAddForm.set(false);
     this.selectedContentRef.set(null);
+    this.fieldLookupRef.set(null);
+    this.fieldLookupPending.set(false);
     this.contentSearchQ.set('');
     // content description
     this.cdOverview.set('');
@@ -615,5 +895,6 @@ export class Schedule implements OnInit, OnDestroy {
     this.epAvailability.set('on-demand');
     this.epPortfolioLinks.set([]);
     this.epPortfolioInput.set('');
+    this._resetAdForm();
   }
 }

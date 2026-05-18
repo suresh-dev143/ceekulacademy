@@ -1,0 +1,302 @@
+<div class="welfare-surface">
+
+  <!-- ── Top Bar ── -->
+  <header class="welfare-topbar">
+    <div class="topbar-left">
+      <span class="brand-icon">◈</span>
+      <span class="brand-label">Welfare Support</span>
+      <span class="brand-sub">CG100000000000</span>
+    </div>
+    <div class="topbar-tabs">
+      <button class="tab-btn" [class.active]="activeTab() === 'my-applications'" (click)="setTab('my-applications')">
+        My Applications
+        @if (activeApplications().length) {
+          <span class="tab-count">{{ activeApplications().length }}</span>
+        }
+      </button>
+      <button class="tab-btn" [class.active]="activeTab() === 'apply'" (click)="setTab('apply')">
+        Apply for Support
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Info Banner ── -->
+  <div class="welfare-banner">
+    <div class="banner-grid">
+      <div class="banner-card fun">
+        <div class="fund-tag">FUN</div>
+        <div class="fund-desc">Basic facilities — food, shelter, daily needs</div>
+      </div>
+      <div class="banner-card cun">
+        <div class="fund-tag">CUN</div>
+        <div class="fund-desc">Cognitive upgradation via Ceekul expert programs</div>
+      </div>
+      <div class="banner-card sun">
+        <div class="fund-tag">SUN</div>
+        <div class="fund-desc">Emergency care — health &amp; safety (repayable)</div>
+      </div>
+    </div>
+    <p class="banner-note">
+      Support from CG100000000000 flows to the most needy Ceebrain member first, globally.
+      Priority is set by the Executive Council based on your current neuron activity.
+      All support must be repaid once your CB balance recovers above the EC-set threshold.
+    </p>
+  </div>
+
+  <!-- ─────────────────── MY APPLICATIONS TAB ─────────────────── -->
+  @if (activeTab() === 'my-applications') {
+    <div class="welfare-canvas">
+
+      @if (loading()) {
+        <div class="state-msg">Loading your applications…</div>
+      } @else if (myApplications().length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon">◎</div>
+          <div class="empty-title">No applications yet</div>
+          <div class="empty-sub">When you need support, submit an application from the Apply tab.</div>
+          <button class="action-btn" (click)="setTab('apply')">Apply for Support</button>
+        </div>
+      } @else {
+
+        <!-- Active Applications -->
+        @if (activeApplications().length) {
+          <div class="section-heading">Active Applications</div>
+          @for (app of activeApplications(); track app.applicationId) {
+            <div class="app-card" [class.expanded]="expandedId() === app.applicationId">
+
+              <div class="app-header" (click)="toggleExpand(app.applicationId)">
+                <div class="app-meta">
+                  <span class="fund-chip" [class]="app.fundType">{{ app.fundType.toUpperCase() }}</span>
+                  <span class="goal-label">{{ goalLabel(app.goalCategory) }}</span>
+                  @if (app.isEmergency) { <span class="emergency-tag">Emergency</span> }
+                </div>
+                <div class="app-amounts">
+                  <span class="amount-need">{{ app.outstandingNeed | number }} needed</span>
+                  <span class="amount-req">of {{ app.requestedAmount | number }} requested</span>
+                </div>
+                <div class="app-status">
+                  <span class="status-pill" [class]="app.status">{{ statusLabel(app.status) }}</span>
+                  <span class="chevron">{{ expandedId() === app.applicationId ? '▲' : '▼' }}</span>
+                </div>
+              </div>
+
+              <!-- Progress bar -->
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="progressPct(app)"></div>
+              </div>
+              <div class="progress-label">{{ progressPct(app) }}% arranged</div>
+
+              @if (expandedId() === app.applicationId) {
+                <div class="app-detail">
+
+                  <div class="detail-row">
+                    <span class="detail-label">Description</span>
+                    <span class="detail-val">{{ app.goalDescription }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Application ID</span>
+                    <span class="detail-val mono">{{ app.applicationId }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Submitted</span>
+                    <span class="detail-val">{{ formatDate(app.createdAt) }}</span>
+                  </div>
+                  @if (app.serviceProviderId) {
+                    <div class="detail-row">
+                      <span class="detail-label">Service Provider</span>
+                      <span class="detail-val mono">{{ app.serviceProviderId }}</span>
+                      <span class="confirm-status" [class.confirmed]="app.serviceProviderConfirmed">
+                        {{ app.serviceProviderConfirmed ? '✓ Confirmed' : 'Awaiting confirmation' }}
+                      </span>
+                    </div>
+                  }
+
+                  <!-- Support Ledger -->
+                  @if (app.supportLedger.length) {
+                    <div class="ledger-heading">Support Received So Far</div>
+                    <div class="ledger-list">
+                      @for (entry of app.supportLedger; track entry._id) {
+                        <div class="ledger-entry">
+                          <span class="ledger-source mono">{{ entry.sourceId }}</span>
+                          <span class="ledger-type">{{ entry.sourceType.replace(/_/g, ' ') }}</span>
+                          <span class="ledger-amount">{{ entry.amount | number }} neurons</span>
+                          <span class="ledger-date">{{ formatDate(entry.confirmedAt) }}</span>
+                          @if (entry.description) {
+                            <span class="ledger-desc">{{ entry.description }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- Repayment status (if disbursed) -->
+                  @if (app.disbursedAmount > 0) {
+                    <div class="repay-section">
+                      <div class="repay-heading">Repayment</div>
+                      <div class="repay-bar">
+                        <div class="repay-fill" [style.width.%]="repaidPct(app)"></div>
+                      </div>
+                      <div class="repay-label">
+                        {{ app.repaidAmount | number }} of {{ app.disbursedAmount | number }} neurons repaid ({{ repaidPct(app) }}%)
+                      </div>
+                      @if (!app.fullyRepaidAt) {
+                        <p class="repay-note">
+                          Repayment is automatic. Once your CB neuron balance exceeds the EC-set threshold,
+                          the system will deduct the outstanding amount and return it to the welfare fund.
+                        </p>
+                      } @else {
+                        <div class="repay-done">Fully repaid on {{ formatDate(app.fullyRepaidAt) }}</div>
+                      }
+                    </div>
+                  }
+
+                  <div class="app-actions">
+                    <button class="close-btn" (click)="closeApplication(app.applicationId)">
+                      Close Application
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        <!-- Past Applications -->
+        @if (pastApplications().length) {
+          <div class="section-heading past">Past Applications</div>
+          @for (app of pastApplications(); track app.applicationId) {
+            <div class="app-card past" (click)="toggleExpand(app.applicationId)">
+              <div class="app-header">
+                <div class="app-meta">
+                  <span class="fund-chip" [class]="app.fundType">{{ app.fundType.toUpperCase() }}</span>
+                  <span class="goal-label">{{ goalLabel(app.goalCategory) }}</span>
+                </div>
+                <div class="app-status">
+                  <span class="status-pill" [class]="app.status">{{ statusLabel(app.status) }}</span>
+                </div>
+              </div>
+              @if (expandedId() === app.applicationId) {
+                <div class="app-detail">
+                  <div class="detail-row">
+                    <span class="detail-label">Requested</span>
+                    <span class="detail-val">{{ app.requestedAmount | number }} neurons</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Disbursed</span>
+                    <span class="detail-val">{{ app.disbursedAmount | number }} neurons</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Submitted</span>
+                    <span class="detail-val">{{ formatDate(app.createdAt) }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+      }
+    </div>
+  }
+
+  <!-- ─────────────────── APPLY TAB ─────────────────── -->
+  @if (activeTab() === 'apply') {
+    <div class="welfare-canvas">
+      <div class="form-card">
+        <div class="form-title">Submit Welfare Support Application</div>
+        <p class="form-note">
+          Your application stays in the queue until your need is fully met.
+          You do not need to reapply. Any support you receive from other sources
+          will automatically be reflected in your application.
+        </p>
+
+        <!-- Fund Type -->
+        <div class="form-field">
+          <label class="field-label">Support Type *</label>
+          <div class="fund-selector">
+            @for (ft of FUND_TYPES; track ft.id) {
+              <button class="fund-option"
+                [class.selected]="formFundType() === ft.id"
+                (click)="onFundTypeChange(ft.id)">
+                <span class="fund-opt-tag">{{ ft.id.toUpperCase() }}</span>
+                <span class="fund-opt-label">{{ ft.label }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Goal Category -->
+        <div class="form-field">
+          <label class="field-label">Specific Need *</label>
+          <select class="field-select"
+            [value]="formGoalCategory()"
+            (change)="formGoalCategory.set($any($event.target).value)">
+            @for (g of GOAL_CATEGORIES; track g.id) {
+              @if (validGoals().includes(g.id)) {
+                <option [value]="g.id">{{ g.label }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <!-- Description -->
+        <div class="form-field">
+          <label class="field-label">Describe your situation *</label>
+          <textarea class="field-textarea" rows="4"
+            [value]="formGoalDescription()"
+            (input)="formGoalDescription.set($any($event.target).value)"
+            placeholder="Explain your current situation and why you need this support…"></textarea>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-field">
+          <label class="field-label">Neurons Requested *</label>
+          <input class="field-input" type="number" min="1"
+            [value]="formRequestedAmount() ?? ''"
+            (input)="formRequestedAmount.set(+$any($event.target).value || null)"
+            placeholder="e.g. 10000" />
+          <span class="field-hint">
+            The actual amount disbursed depends on fund availability and your priority rank.
+          </span>
+        </div>
+
+        <!-- Service Provider -->
+        <div class="form-field">
+          <label class="field-label">Service Provider CB/CG ID <span class="optional">(optional)</span></label>
+          <input class="field-input"
+            [value]="formServiceProvider()"
+            (input)="formServiceProvider.set($any($event.target).value)"
+            placeholder="e.g. 123456789012 or 100000000000001" />
+          <span class="field-hint">
+            If you have already arranged a service provider inside Ceekul portal, enter their ID.
+            Neurons disburse only after the provider confirms delivery.
+          </span>
+        </div>
+
+        <!-- Emergency Toggle -->
+        <div class="form-field emergency-toggle">
+          <label class="toggle-label">
+            <input type="checkbox"
+              [checked]="formIsEmergency()"
+              (change)="formIsEmergency.set($any($event.target).checked)" />
+            <span class="toggle-text">
+              This is an emergency — I need support immediately, not at month-end
+            </span>
+          </label>
+          @if (formIsEmergency()) {
+            <p class="emergency-note">
+              Emergency applications are reviewed for immediate disbursement once the service provider confirms.
+            </p>
+          }
+        </div>
+
+        <button class="submit-btn"
+          [disabled]="!canSubmit() || submitting()"
+          (click)="submit()">
+          {{ submitting() ? 'Submitting…' : 'Submit Application' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <app-toast />
+</div>

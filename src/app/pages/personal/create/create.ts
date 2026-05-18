@@ -9,7 +9,7 @@ import { Subject, takeUntil } from 'rxjs';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-export type BlockType = 'text' | 'code' | 'image' | 'video' | 'audio' | 'divider' | 'columns';
+export type BlockType = 'text' | 'subtitle' | 'code' | 'image' | 'video' | 'audio' | 'divider' | 'columns';
 
 export interface Block {
   id: string;
@@ -137,6 +137,7 @@ export class Create implements OnInit, OnDestroy {
 
   // ── UI ─────────────────────────────────────────────────────────────────────
   readonly activeModal = signal<string | null>(null);
+  readonly rightPanel = signal<'conceive' | 'ideas' | 'update' | null>(null);
 
   // ── Upload ─────────────────────────────────────────────────────────────────
   readonly uploadTab = signal<'file' | 'embed'>('file');
@@ -169,8 +170,9 @@ export class Create implements OnInit, OnDestroy {
   };
 
   readonly BLOCK_TYPES: { type: BlockType; label: string; icon: string; desc: string }[] = [
-    { type: 'text', label: 'Text', icon: '✍', desc: 'Atomic text segment' },
-    { type: 'code', label: 'Code', icon: '⌨', desc: 'Code architecture' },
+    { type: 'text',     label: 'Text',     icon: '✍',  desc: 'Atomic text segment' },
+    { type: 'subtitle', label: 'Subtitle', icon: 'H₂', desc: 'Section heading' },
+    { type: 'code',     label: 'Code',     icon: '⌨',  desc: 'Code architecture' },
     { type: 'image', label: 'Image', icon: '📸', desc: 'Visual media' },
     { type: 'video', label: 'Video', icon: '🎬', desc: 'Motion content' },
     { type: 'audio', label: 'Audio', icon: '🎵', desc: 'Sonic data' },
@@ -190,6 +192,14 @@ export class Create implements OnInit, OnDestroy {
       this.baseId.set(paramId);
       this._loadFromServer(paramId);
     }
+    const qp = this.route.snapshot.queryParamMap;
+    const pt = qp.get('programTitle');
+    const st = qp.get('sectionTitle');
+    const ct = qp.get('contentTitle');
+    if (pt && !this.title())        this.title.set(pt);
+    if (st && !this.subtitle())     this.subtitle.set(st);
+    if (ct && !this.contentTitle()) this.contentTitle.set(ct);
+
     this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const blockParam = params.get('block') as BlockType | null;
       if (blockParam && this.BLOCK_TYPES.some(bt => bt.type === blockParam)) {
@@ -229,6 +239,12 @@ export class Create implements OnInit, OnDestroy {
     this.fetchIdeas();
   }
 
+  toggleRightPanel(panel: 'conceive' | 'ideas' | 'update'): void {
+    if (this.rightPanel() === panel) { this.rightPanel.set(null); return; }
+    this.rightPanel.set(panel);
+    if (panel === 'ideas' && this.title() && !this.ideasText()) this.fetchIdeas();
+  }
+
   fetchIdeas(): void {
     this.ideasLoading.set(true);
     this.claudeService.askCoTeacher({
@@ -257,7 +273,6 @@ export class Create implements OnInit, OnDestroy {
     this.updateContent.set('');
     this.onFieldChange();
     this.toast.success('Update applied.');
-    this.closeModal();
   }
 
   fetchAiUpdate(): void {
@@ -423,13 +438,14 @@ export class Create implements OnInit, OnDestroy {
 
   private _defaultContent(type: BlockType): Record<string, unknown> {
     switch (type) {
-      case 'text': return { html: '' };
-      case 'code': return { code: '', language: 'javascript' };
-      case 'image': return { src: '', alt: '', caption: '' };
-      case 'video': return { src: '', caption: '' };
-      case 'audio': return { src: '', title: '' };
-      case 'divider': return { style: 'line' };
-      case 'columns': return { left: '', right: '' };
+      case 'text':     return { html: '' };
+      case 'subtitle': return { text: '' };
+      case 'code':     return { code: '', language: 'javascript' };
+      case 'image':    return { src: '', alt: '', caption: '' };
+      case 'video':    return { src: '', caption: '' };
+      case 'audio':    return { src: '', title: '' };
+      case 'divider':  return { style: 'line' };
+      case 'columns':  return { left: '', right: '' };
     }
   }
 

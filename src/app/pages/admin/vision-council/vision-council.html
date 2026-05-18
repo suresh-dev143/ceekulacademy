@@ -1,0 +1,152 @@
+<div class="vc-root">
+
+  <!-- ── Identity Banner ─────────────────────────────────────────────────── -->
+  <div class="vc-banner">
+    <div class="vc-banner__left">
+      <div class="vc-banner__emblem">◈</div>
+      <div class="vc-banner__identity">
+        <div class="vc-banner__cg-id">{{ cgId }}</div>
+        <h1 class="vc-banner__name">Vision Council</h1>
+        <p class="vc-banner__subtitle">Long-term Civilization Vision · Civilisers & Members</p>
+      </div>
+    </div>
+    <div class="vc-banner__right">
+      <div class="vc-banner__tag">Civilization Group</div>
+      <div class="vc-banner__version">C-OS v1.0</div>
+    </div>
+  </div>
+
+  <!-- ── Tabs ────────────────────────────────────────────────────────────── -->
+  <nav class="vc-tabs">
+    @for (tab of tabs; track tab.id) {
+    <button class="vc-tab" [class.vc-tab--active]="activeTab() === tab.id" (click)="activeTab.set(tab.id)">
+      {{ tab.label }}
+    </button>
+    }
+  </nav>
+
+  <div class="vc-body">
+
+    <!-- ════════════════════════════ OVERVIEW ════════════════════════════════ -->
+    @if (activeTab() === 'overview') {
+
+    <div class="vc-pulse-row">
+      @for (p of pulse; track p.label) {
+      <div class="vc-pulse-card">
+        <div class="vc-pulse-card__value" [style.color]="p.accent">{{ p.value }}</div>
+        <div class="vc-pulse-card__label">{{ p.label }}</div>
+      </div>
+      }
+    </div>
+
+    <section class="vc-section">
+      <h2 class="vc-section__title">CG Workspaces</h2>
+      <p class="vc-section__subtitle">
+        Role-based workspaces within CG100000000001. Each role carries specific participation rights and responsibilities.
+      </p>
+      <div class="vc-role-grid">
+        @for (r of roleLinks; track r.role) {
+        <a class="vc-role-card" [href]="cgWorkspaceUrl(r.cgPath)" target="_blank" rel="noopener">
+          <span class="vc-role-card__glyph">{{ r.glyph }}</span>
+          <div class="vc-role-card__body">
+            <div class="vc-role-card__role">{{ r.role }}</div>
+            <div class="vc-role-card__path">{{ r.cgPath }}</div>
+            <div class="vc-role-card__desc">{{ r.description }}</div>
+          </div>
+          <span class="vc-role-card__arrow">↗</span>
+        </a>
+        }
+      </div>
+    </section>
+
+    <section class="vc-section">
+      <h2 class="vc-section__title">Recent Decisions</h2>
+      <div class="vc-events">
+        @for (e of decisions; track e.text) {
+        <div class="vc-event">
+          <span class="vc-event__tag vc-event__tag--{{ e.tag.toLowerCase() }}">{{ e.tag }}</span>
+          <span class="vc-event__text">{{ e.text }}</span>
+          <span class="vc-event__date">{{ e.date }}</span>
+        </div>
+        }
+      </div>
+    </section>
+
+    }
+
+    <!-- ════════════════════════════ CIVILISERS ══════════════════════════════ -->
+    @if (activeTab() === 'civilisers') {
+
+    <section class="vc-section">
+      <h2 class="vc-section__title">Civilisers</h2>
+      <p class="vc-section__subtitle">
+        Civilisers hold the vision space open — guiding through contribution, not command.
+        Elected through D Score-weighted participation. Terms are bounded and renewable.
+      </p>
+      <a class="vc-workspace-link" [href]="cgWorkspaceUrl('CG100000000001/Civiliser')" target="_blank" rel="noopener">
+        <div>
+          <div class="vc-workspace-link__path">CG100000000001/Civiliser</div>
+          <div class="vc-workspace-link__label">Civiliser Workspace</div>
+        </div>
+        <span class="vc-workspace-link__action">Open ↗</span>
+      </a>
+      @if (civilisers.length === 0) {
+      <div class="vc-empty-state">
+        <span class="vc-empty-state__glyph">◈</span>
+        <span class="vc-empty-state__text">Civiliser roster will be fetched via UCRS when civilizers reach participation threshold.</span>
+      </div>
+      }
+    </section>
+
+    }
+
+    <!-- ════════════════════════════ MEMBERS ═════════════════════════════════ -->
+    @if (activeTab() === 'members') {
+
+    <section class="vc-section">
+      <h2 class="vc-section__title">Members</h2>
+      <p class="vc-section__subtitle">
+        Members contribute to vision formation through active participation in Emerging Shared Ideals.
+        Membership is open to all registered civilizers.
+      </p>
+      <a class="vc-workspace-link" [href]="cgWorkspaceUrl('CG100000000001/Member')" target="_blank" rel="noopener">
+        <div>
+          <div class="vc-workspace-link__path">CG100000000001/Member</div>
+          <div class="vc-workspace-link__label">Member Workspace</div>
+        </div>
+        <span class="vc-workspace-link__action">Open ↗</span>
+      </a>
+      @if (members.length === 0) {
+      <div class="vc-empty-state">
+        <span class="vc-empty-state__glyph">○</span>
+        <span class="vc-empty-state__text">Member roster will be fetched via UCRS when first civilizers register.</span>
+      </div>
+      }
+    </section>
+
+    }
+
+    <!-- ════════════════════════════ DECISIONS ═══════════════════════════════ -->
+    @if (activeTab() === 'decisions') {
+
+    <section class="vc-section">
+      <h2 class="vc-section__title">Decisions & Emerging Shared Ideals</h2>
+      <p class="vc-section__subtitle">
+        Decisions emerge through distributed synthesis — not majority vote or institutional decree.
+        Each decision is recorded as an Emerging Shared Ideal when validated by sufficient civilizer coherence.
+      </p>
+      <div class="vc-events">
+        @for (e of decisions; track e.text) {
+        <div class="vc-event">
+          <span class="vc-event__tag vc-event__tag--{{ e.tag.toLowerCase() }}">{{ e.tag }}</span>
+          <span class="vc-event__text">{{ e.text }}</span>
+          <span class="vc-event__date">{{ e.date }}</span>
+        </div>
+        }
+      </div>
+    </section>
+
+    }
+
+  </div>
+</div>

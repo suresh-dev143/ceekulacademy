@@ -1,0 +1,66 @@
+<div class="ws-root">
+
+  <!-- Top bar -->
+  <header class="ws-topbar">
+    <button class="ws-back" title="Back" (click)="router.navigate(['/home'])">← CEEKUL OS</button>
+
+    <span class="ws-title">WORKSPACE</span>
+
+    <!-- Layout presets -->
+    <div class="ws-presets">
+      @for (p of presets; track p.id) {
+        <button
+          class="ws-preset-btn"
+          [title]="p.label"
+          (click)="applyPreset(p.id)"
+        >{{ p.icon }}</button>
+      }
+    </div>
+
+    <div class="ws-spacer"></div>
+
+    <!-- Sync status badge -->
+    <div class="ws-sync-badge" [class.ws-sync-badge--live]="sync.connected()">
+      <span class="ws-sync-dot"></span>
+      {{ syncStatus() }}
+      <span class="ws-sync-device">{{ sync.deviceId }}</span>
+    </div>
+
+    <!-- Prefetch hint -->
+    @if (sync.prefetchCids().length > 0) {
+      <div class="ws-prefetch" title="Prefetched panels ready">
+        ⚡ {{ sync.prefetchCids().length }} prefetched
+      </div>
+    }
+
+    <!-- Command bar trigger -->
+    <button class="ws-cmd-btn" (click)="openCommand()" title="Command palette (Ctrl+K)">
+      ⌘K
+    </button>
+  </header>
+
+  @if (morphSuggestion(); as suggestion) {
+    <div class="ws-morph-banner">
+      <span class="ws-morph-icon">⟳</span>
+      <span class="ws-morph-text">Context shifted to <strong>{{ suggestion.context }}</strong> — suggest <strong>{{ suggestion.label }}</strong> layout</span>
+      <button class="ws-morph-accept" (click)="acceptMorph()">Apply</button>
+      <button class="ws-morph-dismiss" (click)="dismissMorph()">✕</button>
+    </div>
+  }
+
+  <!-- Panel count indicator -->
+  <div class="ws-meta">
+    <span>{{ panelCount() }} panel{{ panelCount() === 1 ? '' : 's' }}</span>
+    @if (sync.lastSync()) {
+      <span class="ws-last-sync">
+        last sync · {{ sync.lastSync()!.context }}
+      </span>
+    }
+  </div>
+
+  <!-- Partition workspace -->
+  <div class="ws-canvas">
+    <app-multi-panel [partition]="partition.root()" />
+  </div>
+
+</div>

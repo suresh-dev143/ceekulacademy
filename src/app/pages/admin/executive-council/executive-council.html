@@ -1,0 +1,383 @@
+<div class="ec-root">
+
+  <!-- ── Identity Banner ─────────────────────────────────────────────────── -->
+  <div class="ec-banner">
+    <div class="ec-banner__left">
+      <div class="ec-banner__emblem">◊</div>
+      <div class="ec-banner__identity">
+        <div class="ec-banner__cg-id">{{ cgId }}</div>
+        <h1 class="ec-banner__name">Executive Council</h1>
+        <p class="ec-banner__subtitle">Operational Coordination & Execution · Chancellors</p>
+      </div>
+    </div>
+    <div class="ec-banner__right">
+      <div class="ec-banner__tag">Civilization Group</div>
+      <div class="ec-banner__version">C-OS v1.0</div>
+    </div>
+  </div>
+
+  <!-- ── Tabs ────────────────────────────────────────────────────────────── -->
+  <nav class="ec-tabs">
+    @for (tab of tabs; track tab.id) {
+    <button class="ec-tab" [class.ec-tab--active]="activeTab() === tab.id" (click)="setTab(tab.id)">
+      {{ tab.label }}
+    </button>
+    }
+  </nav>
+
+  <div class="ec-body">
+
+    <!-- ════════════════════════════ OVERVIEW ════════════════════════════════ -->
+    @if (activeTab() === 'overview') {
+
+    <div class="ec-pulse-row">
+      @for (p of pulse; track p.label) {
+      <div class="ec-pulse-card">
+        <div class="ec-pulse-card__value" [style.color]="p.accent">{{ p.value }}</div>
+        <div class="ec-pulse-card__label">{{ p.label }}</div>
+      </div>
+      }
+    </div>
+
+    <section class="ec-section">
+      <h2 class="ec-section__title">CG Workspaces</h2>
+      <p class="ec-section__subtitle">
+        Role-based workspaces within CG100000000002. Chancellors coordinate execution across all civilization domains.
+      </p>
+      <div class="ec-role-grid">
+        @for (r of roleLinks; track r.role) {
+        <a class="ec-role-card" [href]="cgWorkspaceUrl(r.cgPath)" target="_blank" rel="noopener">
+          <span class="ec-role-card__glyph">{{ r.glyph }}</span>
+          <div class="ec-role-card__body">
+            <div class="ec-role-card__role">{{ r.role }}</div>
+            <div class="ec-role-card__path">{{ r.cgPath }}</div>
+            <div class="ec-role-card__desc">{{ r.description }}</div>
+          </div>
+          <span class="ec-role-card__arrow">↗</span>
+        </a>
+        }
+      </div>
+    </section>
+
+    <section class="ec-section">
+      <h2 class="ec-section__title">Recent Operations</h2>
+      <div class="ec-events">
+        @for (e of operations; track e.text) {
+        <div class="ec-event">
+          <span class="ec-event__tag ec-event__tag--{{ e.tag.toLowerCase() }}">{{ e.tag }}</span>
+          <span class="ec-event__text">{{ e.text }}</span>
+          <span class="ec-event__date">{{ e.date }}</span>
+        </div>
+        }
+      </div>
+    </section>
+
+    }
+
+    <!-- ════════════════════════════ CHANCELLORS ═════════════════════════════ -->
+    @if (activeTab() === 'chancellors') {
+
+    <section class="ec-section">
+      <h2 class="ec-section__title">Chancellors</h2>
+      <p class="ec-section__subtitle">
+        Chancellors coordinate operational execution across all civilization domains, bridging the Vision Council's direction
+        with grounded, measurable action. Appointed through D Score-weighted participation.
+      </p>
+      <a class="ec-workspace-link" [href]="cgWorkspaceUrl('CG100000000002/Chancellor')" target="_blank" rel="noopener">
+        <div>
+          <div class="ec-workspace-link__path">CG100000000002/Chancellor</div>
+          <div class="ec-workspace-link__label">Chancellor Workspace</div>
+        </div>
+        <span class="ec-workspace-link__action">Open ↗</span>
+      </a>
+      @if (chancellors.length === 0) {
+      <div class="ec-empty-state">
+        <span class="ec-empty-state__glyph">◊</span>
+        <span class="ec-empty-state__text">Chancellor roster will be fetched via UCRS when chancellors are appointed through the governance engine.</span>
+      </div>
+      }
+    </section>
+
+    }
+
+    <!-- ════════════════════════════ OPERATIONS ══════════════════════════════ -->
+    @if (activeTab() === 'operations') {
+
+    <section class="ec-section">
+      <h2 class="ec-section__title">Active Operations</h2>
+      <p class="ec-section__subtitle">
+        Operational initiatives coordinated by the Executive Council across all civilization domains.
+      </p>
+      <div class="ec-events">
+        @for (e of operations; track e.text) {
+        <div class="ec-event">
+          <span class="ec-event__tag ec-event__tag--{{ e.tag.toLowerCase() }}">{{ e.tag }}</span>
+          <span class="ec-event__text">{{ e.text }}</span>
+          <span class="ec-event__date">{{ e.date }}</span>
+        </div>
+        }
+      </div>
+    </section>
+
+    }
+
+    <!-- ══════════════════════════════ WELFARE ══════════════════════════════ -->
+    @if (activeTab() === 'welfare') {
+
+    <div class="welfare-admin">
+
+      <!-- Sub-tabs -->
+      <div class="w-subtabs">
+        <button class="w-stab" [class.active]="welfareSubTab() === 'applications'" (click)="setWelfareSubTab('applications')">
+          Applications
+          @if (allTotal()) { <span class="stab-count">{{ allTotal() }}</span> }
+        </button>
+        <button class="w-stab" [class.active]="welfareSubTab() === 'policy'" (click)="setWelfareSubTab('policy')">
+          EC Policy
+        </button>
+      </div>
+
+      <!-- ── Applications sub-tab ── -->
+      @if (welfareSubTab() === 'applications') {
+
+        <!-- Filters -->
+        <div class="w-filters">
+          <select class="w-select" [value]="filterFundType()" (change)="filterFundType.set($any($event.target).value); applyFilters()">
+            <option value="">All Funds</option>
+            @for (ft of FUND_TYPES.slice(1); track ft) {
+              <option [value]="ft">{{ ft.toUpperCase() }}</option>
+            }
+          </select>
+          <select class="w-select" [value]="filterStatus()" (change)="filterStatus.set($any($event.target).value); applyFilters()">
+            <option value="">All Statuses</option>
+            @for (s of STATUS_OPTIONS.slice(1); track s) {
+              <option [value]="s">{{ statusLabel(s) }}</option>
+            }
+          </select>
+          <select class="w-select" [value]="filterGoalCategory()" (change)="filterGoalCategory.set($any($event.target).value); applyFilters()">
+            <option value="">All Goals</option>
+            @for (g of GOAL_OPTIONS.slice(1); track g) {
+              <option [value]="g">{{ goalLabel(g) }}</option>
+            }
+          </select>
+          <select class="w-select" [value]="filterEmergency()" (change)="filterEmergency.set($any($event.target).value); applyFilters()">
+            <option value="">All Types</option>
+            <option value="true">Emergency Only</option>
+            <option value="false">Non-Emergency</option>
+          </select>
+          <button class="w-action-btn secondary" [disabled]="actionLoading()" (click)="runRepaymentCheck()">
+            {{ actionLoading() ? 'Running…' : '⟳ Run Repayment Check' }}
+          </button>
+        </div>
+
+        <!-- Emergency Disburse Modal -->
+        @if (selectedAppId()) {
+          <div class="w-modal-overlay" (click)="selectedAppId.set(null)">
+            <div class="w-modal" (click)="$event.stopPropagation()">
+              <div class="w-modal-title">Emergency Disbursement</div>
+              <div class="w-modal-sub">Application: <span class="mono">{{ selectedAppId() }}</span></div>
+              <input class="w-input" type="number" min="1"
+                [value]="emergencyDisburseAmount()"
+                (input)="emergencyDisburseAmount.set(+$any($event.target).value)"
+                placeholder="Neurons to disburse" />
+              <div class="w-modal-actions">
+                <button class="w-action-btn" [disabled]="!emergencyDisburseAmount() || actionLoading()" (click)="confirmEmergencyDisburse()">
+                  {{ actionLoading() ? 'Processing…' : 'Confirm Disbursement' }}
+                </button>
+                <button class="w-action-btn secondary" (click)="selectedAppId.set(null)">Cancel</button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Application list -->
+        @if (welfareLoading()) {
+          <div class="w-state-msg">Loading…</div>
+        } @else if (allApplications().length === 0) {
+          <div class="w-state-msg">No applications match the current filters.</div>
+        } @else {
+          @for (app of allApplications(); track app.applicationId) {
+            <div class="w-app-row">
+              <div class="w-app-left">
+                <span class="w-fund-chip" [class]="app.fundType">{{ app.fundType.toUpperCase() }}</span>
+                <div class="w-app-info">
+                  <div class="w-app-cb mono">{{ app.applicantCBId }}</div>
+                  <div class="w-app-goal">{{ goalLabel(app.goalCategory) }}</div>
+                  <div class="w-app-desc">{{ app.goalDescription }}</div>
+                </div>
+              </div>
+              <div class="w-app-mid">
+                <div class="w-app-amounts">
+                  <span class="w-amount-out">{{ app.outstandingNeed | number }}</span>
+                  <span class="w-amount-label">/ {{ app.requestedAmount | number }} requested</span>
+                </div>
+                <div class="w-progress">
+                  <div class="w-progress-fill" [style.width.%]="progressPct(app)"></div>
+                </div>
+                @if (app.isEmergency) { <span class="w-emerg-tag">EMERGENCY</span> }
+                <div class="w-provider-status">
+                  @if (app.serviceProviderConfirmed) {
+                    <span class="w-confirmed">✓ Provider confirmed</span>
+                  } @else if (app.serviceProviderId) {
+                    <span class="w-pending-confirm">Provider: awaiting confirmation</span>
+                  } @else {
+                    <span class="w-no-provider">No provider assigned</span>
+                  }
+                </div>
+              </div>
+              <div class="w-app-right">
+                <span class="w-status-pill" [class]="app.status">{{ statusLabel(app.status) }}</span>
+                <div class="w-app-date">{{ formatDate(app.createdAt) }}</div>
+                <div class="w-row-actions">
+                  @if (app.isEmergency && app.serviceProviderConfirmed && app.status !== 'fulfilled') {
+                    <button class="w-action-btn small" (click)="openEmergencyDisburse(app.applicationId)">
+                      Disburse
+                    </button>
+                  }
+                  @if (app.status === 'pending' || app.status === 'partially_funded') {
+                    <button class="w-action-btn small secondary" (click)="closeApplication(app.applicationId)">
+                      Close
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Pagination -->
+          <div class="w-pagination">
+            <button class="w-page-btn" [disabled]="filterOffset() === 0" (click)="prevPage()">← Prev</button>
+            <span class="w-page-info">
+              {{ filterOffset() + 1 }}–{{ filterOffset() + allApplications().length }} of {{ allTotal() }}
+            </span>
+            <button class="w-page-btn" [disabled]="filterOffset() + filterLimit >= allTotal()" (click)="nextPage()">Next →</button>
+          </div>
+        }
+      }
+
+      <!-- ── Policy sub-tab ── -->
+      @if (welfareSubTab() === 'policy') {
+
+        <!-- Active Policy Display -->
+        @if (activePolicy()) {
+          <div class="w-policy-card active">
+            <div class="w-policy-header">
+              <div class="w-policy-id mono">{{ activePolicy()!.policyId }}</div>
+              <span class="w-active-badge">Active</span>
+            </div>
+            <div class="w-policy-grid">
+              <div class="w-policy-row">
+                <span class="w-policy-label">Repayment Threshold</span>
+                <span class="w-policy-val">{{ activePolicy()!.repaymentThreshold | number }} neurons</span>
+              </div>
+              @if (activePolicy()!.maxDisbursementPerApplicantPerCycle) {
+                <div class="w-policy-row">
+                  <span class="w-policy-label">Max per Applicant / Cycle</span>
+                  <span class="w-policy-val">{{ activePolicy()!.maxDisbursementPerApplicantPerCycle | number }} neurons</span>
+                </div>
+              }
+              <div class="w-policy-row">
+                <span class="w-policy-label">Created By</span>
+                <span class="w-policy-val mono">{{ activePolicy()!.createdBy }}</span>
+              </div>
+              <div class="w-policy-row">
+                <span class="w-policy-label">Activated</span>
+                <span class="w-policy-val">{{ formatDate(activePolicy()!.createdAt) }}</span>
+              </div>
+            </div>
+
+            <div class="w-criteria-heading">Priority Criteria</div>
+            <div class="w-criteria-list">
+              @for (c of activePolicy()!.priorityCriteria; track c.field) {
+                <div class="w-criterion">
+                  <span class="w-crit-field">{{ c.field.replace(/_/g, ' ') }}</span>
+                  <span class="w-crit-weight">weight {{ c.weight }}</span>
+                  <span class="w-crit-dir" [class]="c.direction">{{ c.direction === 'asc' ? '↑ lower = needier' : '↓ higher = needier' }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="w-criteria-heading">Goal Category Weights</div>
+            <div class="w-goal-weights">
+              @for (key of objectKeys(activePolicy()!.goalCategoryWeights); track key) {
+                <div class="w-goal-weight-row">
+                  <span class="w-goal-key">{{ goalLabel(key) }}</span>
+                  <span class="w-goal-wval">{{ $any(activePolicy()!.goalCategoryWeights)[key] }}</span>
+                </div>
+              }
+            </div>
+
+            @if (activePolicy()!.notes) {
+              <div class="w-policy-notes">{{ activePolicy()!.notes }}</div>
+            }
+          </div>
+        } @else {
+          <div class="w-state-msg">No active policy. Create the first one below.</div>
+        }
+
+        <button class="w-action-btn" (click)="showPolicyForm.set(!showPolicyForm())">
+          {{ showPolicyForm() ? 'Cancel' : 'Create New Policy Version' }}
+        </button>
+
+        @if (showPolicyForm()) {
+          <div class="w-policy-form">
+            <div class="w-form-title">New Policy Version</div>
+            <p class="w-form-note">
+              Creating a new policy deactivates the previous one. The algorithm will use
+              this policy at next month-end disbursement run. Priority criteria weights
+              are currently fixed at the recommended defaults; a future EC update will
+              allow full customisation per criterion.
+            </p>
+
+            <div class="w-form-field">
+              <label class="w-field-label">Repayment Threshold (neurons)</label>
+              <input class="w-input" type="number" min="0"
+                [value]="policyThreshold()"
+                (input)="policyThreshold.set(+$any($event.target).value)" />
+              <span class="w-field-hint">Auto-repayment triggers when a borrower's CB balance exceeds this.</span>
+            </div>
+
+            <div class="w-form-field">
+              <label class="w-field-label">Max Disbursement per Applicant per Cycle <span class="optional">(leave blank = no cap)</span></label>
+              <input class="w-input" type="number" min="0"
+                [value]="policyMaxPerCycle() ?? ''"
+                (input)="policyMaxPerCycle.set(+$any($event.target).value || null)" />
+            </div>
+
+            <div class="w-criteria-heading">Goal Category Weights</div>
+            <div class="w-goal-weight-editor">
+              @for (key of objectKeys(policyGoalWeights()); track key) {
+                <div class="w-weight-row">
+                  <label class="w-weight-label">{{ goalLabel(key) }}</label>
+                  <input class="w-input small" type="number" min="0" max="100"
+                    [value]="$any(policyGoalWeights())[key]"
+                    (input)="updateWeight(key, $event)" />
+                </div>
+              }
+            </div>
+
+            <div class="w-form-field">
+              <label class="w-field-label">Notes (for EC record)</label>
+              <textarea class="w-input" rows="3"
+                [value]="policyNotes()"
+                (input)="policyNotes.set($any($event.target).value)"
+                placeholder="Reason for this policy update…"></textarea>
+            </div>
+
+            <button class="w-action-btn"
+              [disabled]="policySubmitting()"
+              (click)="submitPolicy()">
+              {{ policySubmitting() ? 'Saving…' : 'Activate New Policy' }}
+            </button>
+          </div>
+        }
+      }
+
+    </div>
+
+    }
+
+  </div>
+</div>
+
+<app-toast />

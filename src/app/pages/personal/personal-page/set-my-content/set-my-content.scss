@@ -123,6 +123,49 @@
   }
 }
 
+.smc-tbl__vf-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  padding-right: 1.5rem;
+}
+
+.smc-tbl__vf-badge {
+  font-size: 0.48rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #a78bfa;
+  margin-bottom: 0.08rem;
+}
+
+.smc-tbl__vf-title {
+  font-size: 0.78rem;
+  color: #c8b8ff;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.smc-tbl__vf-sub {
+  font-size: 0.63rem;
+  color: #7c6faa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.smc-tbl__vf-body {
+  font-size: 0.6rem;
+  color: #5a5070;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 // ── Editable cell content ─────────────────────────────────────────────────────
 
 .smc-tbl__set-title {

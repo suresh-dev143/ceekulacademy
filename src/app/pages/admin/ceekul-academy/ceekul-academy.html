@@ -1,0 +1,252 @@
+<div class="ca-root">
+
+  <!-- ── Identity Banner ─────────────────────────────────────────────────── -->
+  <div class="ca-banner">
+    <div class="ca-banner__left">
+      <div class="ca-banner__emblem">C</div>
+      <div class="ca-banner__identity">
+        <div class="ca-banner__cg-id">{{ cgId }}</div>
+        <h1 class="ca-banner__name">Ceekul Academy</h1>
+        <p class="ca-banner__subtitle">Root Civilization Organism · Self-Evolving · Post-Hierarchical</p>
+      </div>
+    </div>
+    <div class="ca-banner__right">
+      <div class="ca-banner__tag">Civilization Operating System</div>
+      <div class="ca-banner__version">C-OS v1.0</div>
+    </div>
+  </div>
+
+  <!-- ── Tabs ────────────────────────────────────────────────────────────── -->
+  <nav class="ca-tabs">
+    @for (tab of tabs; track tab.id) {
+    <button class="ca-tab" [class.ca-tab--active]="activeTab() === tab.id" (click)="activeTab.set(tab.id)">
+      {{ tab.label }}
+    </button>
+    }
+  </nav>
+
+  <div class="ca-body">
+
+    <!-- ════════════════════════════════ OVERVIEW ════════════════════════════ -->
+    @if (activeTab() === 'overview') {
+
+    <!-- Civilization Pulse -->
+    <div class="ca-pulse-row">
+      @for (p of pulse; track p.label) {
+      <div class="ca-pulse-card">
+        <div class="ca-pulse-card__value" [style.color]="p.accent">{{ p.value }}</div>
+        <div class="ca-pulse-card__label">{{ p.label }}</div>
+      </div>
+      }
+    </div>
+
+    <!-- Founding Stewards preview -->
+    <section class="ca-section">
+      <div class="ca-section__header">
+        <h2 class="ca-section__title">Founding Stewards</h2>
+        <button class="ca-link" (click)="activeTab.set('stewardship')">View Stewardship →</button>
+      </div>
+      <div class="ca-steward-row">
+        @for (m of foundingMembers; track m.name) {
+        <div class="ca-steward-card ca-steward-card--compact">
+          <div class="ca-steward-card__avatar">{{ m.initial }}</div>
+          <div class="ca-steward-card__info">
+            <div class="ca-steward-card__name">{{ m.name }}</div>
+            <div class="ca-steward-card__role">{{ m.role }}</div>
+            <div class="ca-steward-card__domain">{{ m.domain }}</div>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <!-- CG Constellation preview -->
+    <section class="ca-section">
+      <div class="ca-section__header">
+        <h2 class="ca-section__title">CG Constellation</h2>
+        <button class="ca-link" (click)="activeTab.set('constellation')">View All →</button>
+      </div>
+      <div class="ca-cg-grid">
+        @for (cg of cgConstellation; track cg.cgId) {
+        <a class="ca-cg-card" [routerLink]="cg.adminRoute">
+          <span class="ca-cg-card__glyph">{{ cg.glyph }}</span>
+          <div class="ca-cg-card__body">
+            <div class="ca-cg-card__name">{{ cg.name }}</div>
+            <div class="ca-cg-card__id">{{ cg.cgId }}</div>
+            <div class="ca-cg-card__desc">{{ cg.description }}</div>
+          </div>
+          <span class="ca-cg-card__arrow">◎</span>
+        </a>
+        }
+      </div>
+    </section>
+
+    <!-- Civilization Events -->
+    <section class="ca-section">
+      <h2 class="ca-section__title">Civilization Events</h2>
+      <div class="ca-events">
+        @for (e of civilizationEvents; track e.text) {
+        <div class="ca-event">
+          <span class="ca-event__tag ca-event__tag--{{ e.tag.toLowerCase() }}">{{ e.tag }}</span>
+          <span class="ca-event__text">{{ e.text }}</span>
+          <span class="ca-event__date">{{ e.date }}</span>
+        </div>
+        }
+      </div>
+    </section>
+
+    }
+
+    <!-- ════════════════════════════ STEWARDSHIP ════════════════════════════ -->
+    @if (activeTab() === 'stewardship') {
+
+    <section class="ca-section">
+      <h2 class="ca-section__title">Founding Stewards</h2>
+      <p class="ca-section__subtitle">
+        Founders are Stewards, not rulers. Their role is to hold civilization space open — not to close it.
+      </p>
+      <div class="ca-steward-grid">
+        @for (m of foundingMembers; track m.name) {
+        <div class="ca-steward-card ca-steward-card--full">
+          <div class="ca-steward-card__avatar ca-steward-card__avatar--large">{{ m.initial }}</div>
+          <div class="ca-steward-card__info">
+            <div class="ca-steward-card__name ca-steward-card__name--large">{{ m.name }}</div>
+            <div class="ca-steward-card__role">{{ m.role }}</div>
+            <div class="ca-steward-card__domain">{{ m.domain }}</div>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <section class="ca-section">
+      <h2 class="ca-section__title">Elected Trustees</h2>
+      <p class="ca-section__subtitle">
+        Trustees are elected by civilizers through D Score-weighted participation. Terms are bounded. No permanent tenure.
+      </p>
+      <div class="ca-trustees-placeholder">
+        <span class="ca-trustees-placeholder__glyph">○</span>
+        <span class="ca-trustees-placeholder__text">Trustee election system active when first civilizers reach governance threshold.</span>
+      </div>
+    </section>
+
+    <section class="ca-section">
+      <h2 class="ca-section__title">CG Workspaces</h2>
+      <p class="ca-section__subtitle">
+        Role-based workspaces within CG100000000000. Each role carries specific governance rights and responsibilities.
+      </p>
+      <div class="ca-role-grid">
+        @for (r of roleLinks; track r.role) {
+        <a class="ca-role-card" [href]="'/cg/' + r.cgPath" target="_blank" rel="noopener">
+          <span class="ca-role-card__glyph">{{ r.glyph }}</span>
+          <div class="ca-role-card__body">
+            <div class="ca-role-card__role">{{ r.role }}</div>
+            <div class="ca-role-card__path">{{ r.cgPath }}</div>
+            <div class="ca-role-card__desc">{{ r.description }}</div>
+          </div>
+          <span class="ca-role-card__arrow">↗</span>
+        </a>
+        }
+      </div>
+    </section>
+
+    <section class="ca-section">
+      <div class="ca-principle-note">
+        <span class="ca-principle-note__glyph">◎</span>
+        <div>
+          <div class="ca-principle-note__title">What Stewards Cannot Do</div>
+          <div class="ca-principle-note__body">
+            Override any civilizer's autonomous choices · Appoint successors without D Score-weighted election ·
+            Freeze the civilization's philosophical evolution · Block any emerging ideal from entering deliberation ·
+            Concentrate governance influence beyond their own CG domain
+          </div>
+        </div>
+      </div>
+    </section>
+
+    }
+
+    <!-- ══════════════════════════ CG CONSTELLATION ══════════════════════════ -->
+    @if (activeTab() === 'constellation') {
+
+    <section class="ca-section">
+      <h2 class="ca-section__title">CG Constellation</h2>
+      <p class="ca-section__subtitle">
+        Every CG is an autonomous civilization ecosystem. None is superior to another.
+        Ceekul Academy (CG100000000000) is the root organism — not the headquarters.
+      </p>
+
+      <!-- Root CG -->
+      <div class="ca-root-cg-card">
+        <span class="ca-root-cg-card__glyph">⬡</span>
+        <div class="ca-root-cg-card__body">
+          <div class="ca-root-cg-card__name">Ceekul Academy</div>
+          <div class="ca-root-cg-card__id">CG100000000000</div>
+          <div class="ca-root-cg-card__desc">Root civilization organism · Founders & elected Trustees</div>
+        </div>
+        <span class="ca-root-cg-card__badge">Root CG · You are here</span>
+      </div>
+
+      <!-- Child CGs -->
+      <div class="ca-cg-grid ca-cg-grid--full">
+        @for (cg of cgConstellation; track cg.cgId) {
+        <a class="ca-cg-card ca-cg-card--full" [routerLink]="cg.adminRoute">
+          <span class="ca-cg-card__glyph">{{ cg.glyph }}</span>
+          <div class="ca-cg-card__body">
+            <div class="ca-cg-card__name">{{ cg.name }}</div>
+            <div class="ca-cg-card__id">{{ cg.cgId }}</div>
+            <div class="ca-cg-card__desc">{{ cg.description }}</div>
+          </div>
+          <span class="ca-cg-card__arrow">◎ Open Page</span>
+        </a>
+        }
+      </div>
+
+      <div class="ca-constellation-note">
+        <span>More CGs will emerge as civilization grows. CGs form through distributed resonance — not administrative creation.</span>
+      </div>
+
+    </section>
+
+    }
+
+    <!-- ════════════════════════════ PHILOSOPHY ══════════════════════════════ -->
+    @if (activeTab() === 'philosophy') {
+
+    <section class="ca-section">
+      <h2 class="ca-section__title">Civilization Philosophy</h2>
+      <p class="ca-section__subtitle">
+        These principles are not rules. They are the civilization's living commitments —
+        subject to evolution through Emerging Shared Ideals, never frozen by institutional authority.
+      </p>
+      <div class="ca-principles-grid">
+        @for (p of principles; track p.title) {
+        <div class="ca-principle-card">
+          <span class="ca-principle-card__glyph">{{ p.glyph }}</span>
+          <div>
+            <div class="ca-principle-card__title">{{ p.title }}</div>
+            <div class="ca-principle-card__body">{{ p.body }}</div>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <section class="ca-section">
+      <div class="ca-principle-note">
+        <span class="ca-principle-note__glyph">⬡</span>
+        <div>
+          <div class="ca-principle-note__title">How Philosophy Evolves</div>
+          <div class="ca-principle-note__body">
+            These principles can be proposed for evolution through the Governance Engine.
+            Proposals require a coherence-weighted supermajority among active civilizers.
+            No individual — including founders — can unilaterally change them.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    }
+
+  </div>
+</div>

@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../../.."
+		},
+		{
+			"path": "../../../../../ceekulacademyapi"
+		},
+		{
+			"path": "../../../../../ceekul_app"
+		}
+	],
+	"settings": {}
+}

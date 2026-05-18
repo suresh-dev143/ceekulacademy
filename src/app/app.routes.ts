@@ -23,7 +23,7 @@ export const routes: Routes = [
   { path: 'dashboard/advisor', loadComponent: () => import('./pages/advisor-dashboard/advisor-dashboard').then(m => m.AdvisorDashboardComponent) },
   { path: 'dashboard/director', loadComponent: () => import('./pages/director-dashboard/director-dashboard').then(m => m.DirectorDashboardComponent) },
   { path: 'dashboard/manager', loadComponent: () => import('./pages/manager-dashboard/manager-dashboard').then(m => m.ManagerDashboardComponent) },
-  
+
   { path: 'cg/:cgId', loadComponent: () => import('./pages/cg-page/cg-page').then(m => m.CgPageComponent) },
   { path: 'dashboard/volunteer', loadComponent: () => import('./pages/volunteer-dashboard/volunteer-dashboard').then(m => m.VolunteerDashboardComponent) },
   { path: 'dashboard/partner', loadComponent: () => import('./pages/partner-dashboard/partner-dashboard').then(m => m.PartnerDashboardComponent) },
@@ -37,6 +37,7 @@ export const routes: Routes = [
   { path: 'issues', loadComponent: () => import('./pages/issues/issues').then(m => m.IssuesPageComponent) },
   { path: 'donate', loadComponent: () => import('./pages/donate/donate').then(m => m.DonatePageComponent) },
   { path: 'invest', loadComponent: () => import('./pages/invest/invest').then(m => m.InvestPageComponent) },
+  { path: 'contribute', loadComponent: () => import('./pages/contribute/contribute').then(m => m.Contribute) },
   { path: 'innovative', loadComponent: () => import('./pages/innovative/innovative').then(m => m.InnovativeComponent) },
   { path: 'courses', loadComponent: () => import('./pages/innovative/innovative').then(m => m.InnovativeComponent) },
 
@@ -63,7 +64,7 @@ export const routes: Routes = [
   { path: 'neurons', loadComponent: () => import('./pages/neuron-hub/neuron-hub').then(m => m.NeuronHubComponent) },
 
   // ==================== CEEKUL MISSION ====================
-  { path: 'mission', loadComponent: () => import('./pages/mission/mission').then(m => m.MissionComponent) },
+ 
 
   // ==================== PAYMENT RETURN (Cramib redirect-back) ====================
   { path: 'payment/return', loadComponent: () => import('./pages/payment-return/payment-return').then(m => m.PaymentReturn) },
@@ -76,7 +77,9 @@ export const routes: Routes = [
     path: '',
     component: LandingLayout,
     children: [
-      { path: '', component: Landing }
+      { path: '', component: Landing },
+      { path: 'academy', loadComponent: () => import('./pages/ceekul-academy/ceekul-academy').then(m => m.CeekulAcademy) },
+      { path: 'CG100000000000', loadComponent: () => import('./pages/ceekul-academy/cg-pool/cg-pool').then(m => m.CGPool) },
     ]
   },
   {
@@ -130,6 +133,7 @@ export const routes: Routes = [
       { path: 'local-news', loadComponent: () => import('./pages/personal/local-news/local-news').then(m => m.LocalNewsPage) },
       { path: 'ai-tools', loadComponent: () => import('./pages/personal/ai-tools/ai-tools').then(m => m.AiToolsPage) },
       { path: 'library', loadComponent: () => import('./pages/personal/library/library').then(m => m.LibraryComponent), data: { leftSidebar: 'contextual' } },
+      { path: 'welfare', loadComponent: () => import('./pages/personal/welfare/welfare').then(m => m.Welfare) },
     ]
   },
 
@@ -140,6 +144,9 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'command', pathMatch: 'full' },
       { path: 'command', loadComponent: () => import('./pages/admin/command-center/command-center').then(m => m.CommandCenter) },
+      { path: 'ceekul-academy', loadComponent: () => import('./pages/admin/ceekul-academy/ceekul-academy').then(m => m.CeekulAcademy) },
+      { path: 'vision-council', loadComponent: () => import('./pages/admin/vision-council/vision-council').then(m => m.VisionCouncil) },
+      { path: 'executive-council', loadComponent: () => import('./pages/admin/executive-council/executive-council').then(m => m.ExecutiveCouncil) },
       { path: 'homepage', loadComponent: () => import('./pages/admin/homepage-engine/homepage-engine').then(m => m.HomepageEngine) },
       { path: 'content', loadComponent: () => import('./pages/admin/content-mod/content-mod').then(m => m.ContentMod) },
       { path: 'cid', loadComponent: () => import('./pages/admin/cid-explorer/cid-explorer').then(m => m.CidExplorer) },
@@ -151,6 +158,9 @@ export const routes: Routes = [
       { path: 'settings', loadComponent: () => import('./pages/admin/settings/settings').then(m => m.Settings) },
     ]
   },
+
+  // ==================== PHASE 3 — WORKSPACE ====================
+  { path: 'workspace', loadComponent: () => import('./pages/workspace/workspace.component').then(m => m.WorkspaceComponent) },
 
   { path: '**', redirectTo: '' },
 ];

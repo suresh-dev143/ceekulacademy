@@ -1,0 +1,112 @@
+<div class="exc-page">
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="exc-header">
+    <div class="exc-header__seal" aria-hidden="true">
+      <div class="exc-seal">
+        <div class="exc-seal__ring exc-seal__ring--outer"></div>
+        <div class="exc-seal__ring exc-seal__ring--inner"></div>
+        <span class="exc-seal__glyph">◆</span>
+      </div>
+    </div>
+
+    <div class="exc-header__body">
+      <span class="exc-header__eyebrow">Office of the</span>
+      <h1 class="exc-header__title">Executive Council</h1>
+      <p class="exc-header__subtitle">Ceekul Academy · Operational Governance & Strategic Execution</p>
+    </div>
+
+    <div class="exc-header__rule" aria-hidden="true">
+      <div class="exc-header__rule-line"></div>
+      <span class="exc-header__rule-glyph">◈</span>
+      <div class="exc-header__rule-line"></div>
+    </div>
+
+    <blockquote class="exc-mission">
+      <p class="exc-mission__text">
+        "Vision is the destination. Execution is the vehicle. The Executive Council
+        is the engine — ensuring that every directive of this institution arrives
+        at reality with the precision and force it deserves."
+      </p>
+      <footer class="exc-mission__attr">— Executive Council Charter, Operational Mandate</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ EXECUTIVE DIRECTIVES ════════════════════════════════════════════════ -->
+  <section class="exc-directives">
+    <div class="exc-section-label">
+      <span class="exc-section-label__line" aria-hidden="true"></span>
+      <span class="exc-section-label__text">Executive Directives</span>
+      <span class="exc-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="exc-dir-list">
+      @for (dir of directives; track dir.id; let i = $index) {
+      <div class="exc-dir"
+        [class.exc-dir--open]="expandedId() === dir.id"
+        [style.--dir-delay]="(i * 60) + 'ms'">
+
+        <button class="exc-dir__trigger" (click)="toggleDirective(dir.id)" [attr.aria-expanded]="expandedId() === dir.id">
+          <span class="exc-dir__code">{{ dir.code }}</span>
+          <span class="exc-dir__title">{{ dir.title }}</span>
+          <span class="exc-dir__chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="4 6 8 10 12 6"/>
+            </svg>
+          </span>
+        </button>
+
+        @if (expandedId() === dir.id) {
+        <div class="exc-dir__body">
+          <p class="exc-dir__text">{{ dir.body }}</p>
+          <div class="exc-dir__pillars">
+            @for (p of dir.pillars; track p) {
+            <span class="exc-dir__pillar">{{ p }}</span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ OPERATIONAL PROGRAMS ════════════════════════════════════════════════ -->
+  <section class="exc-programs">
+    <div class="exc-section-label">
+      <span class="exc-section-label__line" aria-hidden="true"></span>
+      <span class="exc-section-label__text">Operational Programs</span>
+      <span class="exc-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="exc-prog-grid">
+      @for (prog of programs; track prog.code; let i = $index) {
+      <div class="exc-prog" [style.--prog-accent]="prog.accent" [style.--prog-delay]="(i * 70) + 'ms'">
+        <div class="exc-prog__head">
+          <span class="exc-prog__code">{{ prog.code }}</span>
+          <div class="exc-prog__badges">
+            <span class="exc-prog__status exc-prog__status--{{ prog.status.toLowerCase() }}">{{ prog.status }}</span>
+            <span class="exc-prog__function">{{ prog.function }}</span>
+          </div>
+        </div>
+        <h3 class="exc-prog__title">{{ prog.title }}</h3>
+        <p class="exc-prog__desc">{{ prog.descriptor }}</p>
+        <div class="exc-prog__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ COUNCIL STATEMENT ═══════════════════════════════════════════════════ -->
+  <footer class="exc-statement">
+    <div class="exc-statement__rule" aria-hidden="true"></div>
+    <p class="exc-statement__text">
+      The Executive Council does not deliberate — it executes. It does not manage —
+      it orchestrates. Every function of this council exists to close the distance
+      between what Ceekul Academy has committed to and what the world actually experiences.
+    </p>
+    <span class="exc-statement__seal" aria-hidden="true">◆ Ceekul Academy · Executive Council · Operational Intelligence Division</span>
+  </footer>
+
+</div>

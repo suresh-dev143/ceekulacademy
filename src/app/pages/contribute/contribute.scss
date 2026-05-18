@@ -1,0 +1,78 @@
+$bg:       #0a0f1e;
+$surface:  #111827;
+$surface2: #1a2235;
+$border:   #1f2d44;
+$text:     #e2e8f0;
+$muted:    #64748b;
+$accent:   #3b82f6;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: $bg;
+  color: $text;
+  padding: 1.5rem;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.panel-form {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 1.5rem;
+ 
+}
+
+.panel__heading    { font-size: 1rem; font-weight: 600; margin: 0 0 1rem; color: $text; }
+.panel__subheading { font-size: 0.9rem; font-weight: 600; color: $text; margin: 1.5rem 0 0.75rem; }
+.panel__note       { font-size: 0.82rem; color: #94a3b8; margin-bottom: 1rem; line-height: 1.6; b { color: $text; } }
+.panel__compliance {
+  background: #1a0f0a;
+  border: 1px solid #7c2d12;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  color: #fb923c;
+  margin-bottom: 1.25rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__field    { display: flex; flex-direction: column; gap: 0.3rem; }
+  &__label    { font-size: 0.78rem; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; }
+  &__input    {
+    background: $surface2; border: 1px solid $border; border-radius: 6px;
+    color: $text; padding: 0.55rem 0.75rem; font-size: 0.88rem; width: 100%; box-sizing: border-box;
+    &:focus { outline: none; border-color: $accent; }
+  }
+  &__select   { appearance: auto; cursor: pointer; }
+  &__textarea { resize: vertical; min-height: 80px; }
+  &__hint     { font-size: 0.74rem; color: #34d399; margin-top: 0.2rem; }
+  &__error    { background: #2d0a0a; border: 1px solid #7f1d1d; border-radius: 6px; color: #fca5a5; padding: 0.6rem 0.75rem; font-size: 0.82rem; }
+  &__submit   {
+    background: $accent; color: #fff; border: none; border-radius: 7px;
+    padding: 0.65rem 1.5rem; font-size: 0.88rem; font-weight: 600; cursor: pointer; align-self: flex-start;
+    &:hover:not(:disabled) { background: #2563eb; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+}
+
+.record-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.record-item {
+  background: $surface2; border: 1px solid $border; border-radius: 8px; padding: 0.75rem 1rem;
+
+  &__row       { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; &--meta { margin-top: 0.35rem; flex-wrap: wrap; gap: 0.4rem; } }
+  &__name      { font-size: 0.88rem; font-weight: 600; color: $text; }
+  &__amount    { font-size: 0.88rem; font-weight: 600; color: $accent; }
+  &__type      { font-size: 0.72rem; color: $muted; }
+  &__neurons   { font-size: 0.72rem; color: #34d399; font-weight: 600; }
+  &__status    { font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 4px; text-transform: capitalize; }
+}
+
+.status--pending   { background: #1c1a08; color: #fbbf24; border: 1px solid #92400e; }
+.status--confirmed { background: #052e16; color: #86efac; border: 1px solid #166534; }
+.status--rejected  { background: #2d0a0a; color: #fca5a5; border: 1px solid #7f1d1d; }

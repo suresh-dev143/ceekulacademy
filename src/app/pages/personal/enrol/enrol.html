@@ -8,7 +8,6 @@
         <span class="brand-label">Enrol</span>
       </div>
     </div>
-
     <div class="topbar-tabs">
       <button class="tab-btn" [class.active]="activeTab() === 'search'" (click)="setTab('search')">
         Discover
@@ -20,11 +19,8 @@
         }
       </button>
     </div>
-
     <div class="topbar-right">
-      <button class="action-btn" (click)="navigateToSchedule()">
-        ← Schedule
-      </button>
+      <button class="action-btn" (click)="navigateToSchedule()">← Schedule</button>
     </div>
   </header>
 
@@ -35,8 +31,7 @@
 
         <!-- ── Search Filters ── -->
         <div class="filter-card">
-          <div class="filter-label">Find a Schedule</div>
-
+          <div class="filter-label">Find a Knowledge Session</div>
           <div class="filter-grid">
             <div class="filter-field">
               <label class="field-label">Category</label>
@@ -48,7 +43,6 @@
                 }
               </select>
             </div>
-
             <div class="filter-field">
               <label class="field-label">Program Title</label>
               <input class="filter-input"
@@ -56,7 +50,6 @@
                 (input)="searchProgramTitle.set($any($event.target).value); onFieldInput()"
                 placeholder="e.g. Quantum Physics..." />
             </div>
-
             <div class="filter-field">
               <label class="field-label">Section Title</label>
               <input class="filter-input"
@@ -64,7 +57,6 @@
                 (input)="searchSectionTitle.set($any($event.target).value); onFieldInput()"
                 placeholder="e.g. Module 2..." />
             </div>
-
             <div class="filter-field">
               <label class="field-label">Content Title</label>
               <input class="filter-input"
@@ -73,28 +65,22 @@
                 placeholder="e.g. Wave equations..." />
             </div>
           </div>
-
-          <!-- Creator CB-ID filter -->
           <div class="cbid-row">
-            <div class="cbid-field">
-              <label class="field-label">CB-ID of Content Creator <span class="label-hint">(optional — filter by creator when titles overlap)</span></label>
-              <input class="filter-input mono-input"
-                [value]="selfCbId()"
-                (input)="selfCbId.set($any($event.target).value)"
-                placeholder="CB0000000000000..." />
-            </div>
+            <label class="field-label">
+              Creator CB-ID <span class="label-hint">(optional — filter by specific creator)</span>
+            </label>
+            <input class="filter-input mono-input"
+              [value]="selfCbId()"
+              (input)="selfCbId.set($any($event.target).value)"
+              placeholder="CB0000000000000..." />
           </div>
-
           <div class="filter-actions">
             @if (hasSearched()) {
               <button class="clear-btn" (click)="clearSearch()">Clear</button>
             }
             <button class="search-btn" [disabled]="!canSearch() || searching()" (click)="search()">
-              @if (searching()) {
-                <span class="btn-spinner"></span> Searching...
-              } @else {
-                Search
-              }
+              @if (searching()) { <span class="btn-spinner"></span> Searching... }
+              @else { Search }
             </button>
           </div>
         </div>
@@ -103,64 +89,304 @@
         @if (searching()) {
           <div class="loading-state">
             <div class="load-spinner"></div>
-            <span>Finding schedules...</span>
+            <span>Finding sessions...</span>
           </div>
         } @else if (hasSearched() && !results().length) {
           <div class="empty-state">
-            <div class="empty-icon">🔍</div>
-            <div class="empty-title">No schedules found</div>
+            <div class="empty-title">No sessions found</div>
             <div class="empty-hint">Try different search terms or a broader category.</div>
           </div>
         } @else if (results().length) {
           <div class="results-header">
-            <span class="results-count">{{ results().length }} schedule{{ results().length !== 1 ? 's' : '' }} found</span>
+            <span class="results-count">{{ results().length }} session{{ results().length !== 1 ? 's' : '' }} found</span>
           </div>
           <div class="results-list">
             @for (s of results(); track s.scheduleId) {
-              <div class="result-card" [style.border-left-color]="getCatMeta(s.category).color">
-                <div class="rc-header">
-                  <div class="rc-category">
-                    <span class="rc-cat-icon">{{ getCatMeta(s.category).icon }}</span>
-                    <span class="rc-cat-label" [style.color]="getCatMeta(s.category).color">
-                      {{ s.category }}
+              <div class="result-card" [class.expanded]="expandedId() === s.scheduleId"
+                [style.border-left-color]="getCatMeta(s.category).color">
+
+                <!-- ── Card Summary Row (always visible) ── -->
+                <div class="rc-summary">
+                  <div class="rc-badges">
+                    <span class="rc-cat-badge" [style.background]="getCatMeta(s.category).color + '22'"
+                      [style.color]="getCatMeta(s.category).color">
+                      {{ getCatMeta(s.category).label }}
                     </span>
-                  </div>
-                  <div class="rc-capacity" [class.full]="isFull(s)">
-                    {{ capacityLabel(s) }}
-                  </div>
-                </div>
-
-                <div class="rc-title">{{ s.programTitle }}</div>
-                @if (s.sectionTitle) {
-                  <div class="rc-sub">{{ s.sectionTitle }}</div>
-                }
-                @if (s.contentTitle) {
-                  <div class="rc-content">{{ s.contentTitle }}</div>
-                }
-
-                <div class="rc-meta">
-                  <span>📅 {{ formatDate(s.scheduledDate) }}</span>
-                  <span>⏰ {{ s.startTime }} – {{ s.endTime }}</span>
-                  <span>{{ s.timezone }}</span>
-                  <span>{{ s.deliveryMode === 'online' ? '🌐' : s.deliveryMode === 'in-person' ? '🏫' : '⚡' }} {{ s.deliveryMode }}</span>
-                </div>
-
-                <div class="rc-footer">
-                  <div class="rc-id">{{ s.scheduleId }}</div>
-                  <div class="rc-enrol-count">{{ s.enrolmentCount }} enrolled</div>
-                  <button class="enrol-btn"
-                    [disabled]="isFull(s) || enrollingId() === s.scheduleId"
-                    [style.background]="isFull(s) ? '' : getCatMeta(s.category).color"
-                    (click)="enrol(s.scheduleId)">
-                    @if (enrollingId() === s.scheduleId) {
-                      <span class="btn-spinner white"></span>
-                    } @else if (isFull(s)) {
-                      Full
-                    } @else {
-                      Enrol
+                    @if (s.workshopHour) {
+                      <span class="rc-badge rc-badge--hour">Hour {{ s.workshopHour }}</span>
                     }
+                    @if (s.streamingPlatform) {
+                      <span class="rc-badge rc-badge--stream">{{ streamingLabel(s.streamingPlatform) }}</span>
+                    }
+                    <span class="rc-fee-badge" [class.free]="totalFee(s) === 0">
+                      {{ feeLabel(s) }}
+                    </span>
+                    <span class="rc-cap-badge" [class.full]="isFull(s)">{{ capacityLabel(s) }}</span>
+                  </div>
+
+                  <div class="rc-title">{{ s.programTitle }}</div>
+                  @if (s.sectionTitle) {
+                    <div class="rc-path">
+                      <span class="rc-sub">{{ s.sectionTitle }}</span>
+                      @if (s.contentTitle) {
+                        <span class="rc-sep">›</span>
+                        <span class="rc-content-title">{{ s.contentTitle }}</span>
+                      }
+                    </div>
+                  }
+
+                  <div class="rc-meta">
+                    <span>📅 {{ formatDate(s.scheduledDate) }}</span>
+                    <span>⏰ {{ s.startTime }} – {{ s.endTime }} {{ s.timezone }}</span>
+                    <span>{{ s.deliveryMode === 'online' ? '🌐' : '🏫' }} {{ s.deliveryMode }}</span>
+                    <span class="rc-enrol-count">{{ s.enrolmentCount }} enrolled</span>
+                  </div>
+
+                  <button class="rc-expand-btn" (click)="toggleExpand(s.scheduleId)">
+                    @if (expandedId() === s.scheduleId) { Hide Details ▴ }
+                    @else { View Full Details & Enrol ▾ }
                   </button>
                 </div>
+
+                <!-- ── Expanded Detail Panel ── -->
+                @if (expandedId() === s.scheduleId) {
+                  <div class="rc-detail">
+
+                    <!-- Content Preview Link -->
+                    @if (contentViewUrl(s)) {
+                      <a class="detail-preview-link" [href]="contentViewUrl(s)!" target="_blank" rel="noopener noreferrer">
+                        <span class="preview-link-icon">◈</span>
+                        <span class="preview-link-text">Watch Full Content Before Enrolling</span>
+                        <span class="preview-link-path">
+                          {{ s.programTitle }}
+                          @if (s.sectionTitle) { › {{ s.sectionTitle }} }
+                          @if (s.contentTitle) { › {{ s.contentTitle }} }
+                        </span>
+                        <span class="preview-link-arrow">↗</span>
+                      </a>
+                    }
+
+                    <!-- Content Description -->
+                    @if (hasContentDesc(s)) {
+                      <div class="detail-section">
+                        <div class="detail-section-title">
+                          <span class="ds-icon" [style.color]="getCatMeta(s.category).color">◈</span>
+                          Content Description
+                        </div>
+
+                        @if (cd(s).overview) {
+                          <div class="ds-field">
+                            <div class="ds-label">Session Overview</div>
+                            <div class="ds-text">{{ cd(s).overview }}</div>
+                          </div>
+                        }
+
+                        @if (cd(s).outcomes?.length) {
+                          <div class="ds-field">
+                            <div class="ds-label">Learning Outcomes</div>
+                            <div class="ds-chips">
+                              @for (o of cd(s).outcomes; track $index) {
+                                <span class="ds-chip outcome-chip">{{ o }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+
+                        @if (cd(s).keyTopics?.length) {
+                          <div class="ds-field">
+                            <div class="ds-label">Key Topics</div>
+                            <div class="ds-chips">
+                              @for (t of cd(s).keyTopics; track $index) {
+                                <span class="ds-chip topic-chip">{{ t }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+
+                        @if (cd(s).sessionFlow?.length) {
+                          <div class="ds-field">
+                            <div class="ds-label">Session Flow</div>
+                            <div class="ds-timeline">
+                              @for (block of cd(s).sessionFlow; track $index) {
+                                <div class="ds-timeline-row">
+                                  <span class="ds-slot">{{ block.slot }}</span>
+                                  <span class="ds-slot-label">{{ block.label }}</span>
+                                  @if (block.activity) {
+                                    <span class="ds-slot-activity">{{ block.activity }}</span>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          </div>
+                        }
+
+                        @if (cd(s).activities) {
+                          <div class="ds-field">
+                            <div class="ds-label">Practical Activities</div>
+                            <div class="ds-text">{{ cd(s).activities }}</div>
+                          </div>
+                        }
+
+                        @if (cd(s).transformGoals) {
+                          <div class="ds-field">
+                            <div class="ds-label">Transformation Goals</div>
+                            <div class="ds-text">{{ cd(s).transformGoals }}</div>
+                          </div>
+                        }
+
+                        @if (cd(s).tools?.length) {
+                          <div class="ds-field">
+                            <div class="ds-label">Methods & Tools</div>
+                            <div class="ds-chips">
+                              @for (tool of cd(s).tools; track $index) {
+                                <span class="ds-chip tool-chip">{{ tool }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+
+                        @if (cd(s).participationMode) {
+                          <div class="ds-field ds-field--inline">
+                            <div class="ds-label">Participation Mode</div>
+                            <span class="ds-mode-badge">{{ cd(s).participationMode }}</span>
+                          </div>
+                        }
+
+                        @if (cd(s).audienceTags?.length) {
+                          <div class="ds-field">
+                            <div class="ds-label">Audience</div>
+                            <div class="ds-chips">
+                              @for (a of cd(s).audienceTags; track $index) {
+                                <span class="ds-chip audience-chip">{{ a }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+
+                    <!-- Expert Profile -->
+                    @if (hasExpertProfile(s)) {
+                      <div class="detail-section">
+                        <div class="detail-section-title">
+                          <span class="ds-icon" style="color:#10b981">◉</span>
+                          Expert Profile
+                        </div>
+
+                        @if (ep(s).trustLineage) {
+                          <div class="ds-field">
+                            <div class="ds-label">Trust Lineage</div>
+                            <div class="ds-text">{{ ep(s).trustLineage }}</div>
+                          </div>
+                        }
+
+                        @if (ep(s).expertise?.length) {
+                          <div class="ds-field">
+                            <div class="ds-label">Expertise Areas</div>
+                            <div class="ds-chips">
+                              @for (e of ep(s).expertise; track $index) {
+                                <span class="ds-chip expertise-chip">{{ e }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+
+                        <div class="ds-field ds-field--row">
+                          @if (ep(s).teachingStyle) {
+                            <div class="ds-inline-item">
+                              <div class="ds-label">Teaching Style</div>
+                              <span class="ds-mode-badge">{{ ep(s).teachingStyle }}</span>
+                            </div>
+                          }
+                          @if (ep(s).experience != null) {
+                            <div class="ds-inline-item">
+                              <div class="ds-label">Experience</div>
+                              <span class="ds-value">{{ ep(s).experience }} yrs</span>
+                            </div>
+                          }
+                          @if (ep(s).availability) {
+                            <div class="ds-inline-item">
+                              <div class="ds-label">Availability</div>
+                              <span class="ds-mode-badge">{{ ep(s).availability }}</span>
+                            </div>
+                          }
+                        </div>
+
+                        @if (ep(s).mission) {
+                          <div class="ds-field">
+                            <div class="ds-label">Mission</div>
+                            <div class="ds-text">{{ ep(s).mission }}</div>
+                          </div>
+                        }
+
+                        @if (ep(s).audienceFocus?.length) {
+                          <div class="ds-field">
+                            <div class="ds-label">Audience Focus</div>
+                            <div class="ds-chips">
+                              @for (a of ep(s).audienceFocus; track $index) {
+                                <span class="ds-chip audience-chip">{{ a }}</span>
+                              }
+                            </div>
+                          </div>
+                        }
+
+                        @if (ep(s).portfolioLinks?.length) {
+                          <div class="ds-field">
+                            <div class="ds-label">Portfolio</div>
+                            <div class="ds-portfolio">
+                              @for (link of ep(s).portfolioLinks; track $index) {
+                                <a class="ds-portfolio-link" [href]="link" target="_blank" rel="noopener noreferrer">{{ link }}</a>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+
+                    <!-- Fee Breakdown + Enrol Action -->
+                    <div class="detail-enrol-footer">
+                      <div class="detail-fee-table">
+                        <div class="dft-title">Fee Breakdown <span class="dft-sub">per student · per session</span></div>
+                        <div class="dft-row">
+                          <span class="dft-label">Expert / Content Fee</span>
+                          <span class="dft-val">{{ (s.fee ?? 0) > 0 ? '₹' + s.fee : 'Free' }}</span>
+                        </div>
+                        <div class="dft-row">
+                          <span class="dft-label">
+                            {{ s.streamingPlatform ? streamingLabel(s.streamingPlatform) + ' Streaming' : 'Streaming' }}
+                          </span>
+                          <span class="dft-val dft-val--stream">{{ (s.streamingFee ?? 0) > 0 ? '₹' + s.streamingFee : 'Free' }}</span>
+                        </div>
+                        <div class="dft-row dft-total">
+                          <span class="dft-label">Total per Session</span>
+                          <span class="dft-val dft-val--total">{{ totalFee(s) > 0 ? '₹' + totalFee(s) : 'Free' }}</span>
+                        </div>
+                      </div>
+
+                      <div class="detail-enrol-actions">
+                        <div class="detail-seat-info" [class.full]="isFull(s)">{{ capacityLabel(s) }}</div>
+                        <button class="open-create-btn" (click)="openInCreate(s)" title="Autofill Create page with this content's titles">
+                          Open in Create
+                        </button>
+                        <button class="enrol-action-btn"
+                          [disabled]="isFull(s) || enrollingId() === s.scheduleId"
+                          [style.background]="isFull(s) ? '' : getCatMeta(s.category).color"
+                          (click)="initiateEnrol(s)">
+                          @if (enrollingId() === s.scheduleId) {
+                            <span class="btn-spinner white"></span>
+                          } @else if (isFull(s)) {
+                            Session Full
+                          } @else if (totalFee(s) > 0) {
+                            Pay {{ feeLabel(s) }} & Enrol
+                          } @else {
+                            Enrol Free
+                          }
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+                }
               </div>
             }
           </div>
@@ -168,7 +394,7 @@
           <div class="start-prompt">
             <div class="prompt-icon">🌐</div>
             <div class="prompt-title">Discover Knowledge Sessions</div>
-            <div class="prompt-hint">Search for courses, workshops, webinars, research sessions and more. Use any combination of filters above.</div>
+            <div class="prompt-hint">Search courses, workshops, webinars and more. Expand any result to see full content description, expert profile, and fee breakdown before enrolling.</div>
           </div>
         }
 
@@ -188,7 +414,6 @@
           </div>
         } @else if (!myEnrolments().length) {
           <div class="empty-state">
-            <div class="empty-icon">📋</div>
             <div class="empty-title">No active enrolments</div>
             <div class="empty-hint">Discover and enrol in knowledge sessions to see them here.</div>
             <button class="action-btn primary" (click)="setTab('search')">Discover Sessions</button>
@@ -196,41 +421,168 @@
         } @else {
           <div class="enrolment-list">
             @for (e of myEnrolments(); track e.scheduleId) {
-              <div class="enrolment-card"
-                [style.border-left-color]="e.schedule ? getCatMeta(e.schedule.category).color : '#6366f1'">
-                @if (e.schedule) {
-                  <div class="ec-header">
-                    <div class="ec-category">
-                      <span class="ec-cat-icon">{{ getCatMeta(e.schedule.category).icon }}</span>
-                      <span class="ec-cat-label" [style.color]="getCatMeta(e.schedule.category).color">
-                        {{ e.schedule.category }}
+              @if (e.schedule) {
+                <div class="enrolment-card"
+                  [class.expanded]="myExpandedId() === e.scheduleId"
+                  [style.border-left-color]="getCatMeta(e.schedule.category).color">
+
+                  <div class="ec-summary">
+                    <div class="ec-badges">
+                      <span class="ec-status-badge">Active</span>
+                      <span class="rc-cat-badge"
+                        [style.background]="getCatMeta(e.schedule.category).color + '22'"
+                        [style.color]="getCatMeta(e.schedule.category).color">
+                        {{ getCatMeta(e.schedule.category).label }}
                       </span>
+                      @if (e.schedule.workshopHour) {
+                        <span class="rc-badge rc-badge--hour">Hour {{ e.schedule.workshopHour }}</span>
+                      }
+                      @if (e.schedule.streamingPlatform) {
+                        <span class="rc-badge rc-badge--stream">{{ streamingLabel(e.schedule.streamingPlatform) }}</span>
+                      }
                     </div>
-                    <div class="ec-status">Active</div>
+
+                    <div class="ec-title">{{ e.schedule.programTitle }}</div>
+                    @if (e.schedule.sectionTitle) {
+                      <div class="rc-path">
+                        <span class="rc-sub">{{ e.schedule.sectionTitle }}</span>
+                        @if (e.schedule.contentTitle) {
+                          <span class="rc-sep">›</span>
+                          <span class="rc-content-title">{{ e.schedule.contentTitle }}</span>
+                        }
+                      </div>
+                    }
+
+                    <div class="rc-meta">
+                      <span>📅 {{ formatDate(e.schedule.scheduledDate) }}</span>
+                      <span>⏰ {{ e.schedule.startTime }} – {{ e.schedule.endTime }} {{ e.schedule.timezone }}</span>
+                      <span>{{ e.schedule.deliveryMode === 'online' ? '🌐' : '🏫' }} {{ e.schedule.deliveryMode }}</span>
+                    </div>
+
+                    <!-- Streaming join hint (always visible if platform set) -->
+                    @if (e.schedule.streamingPlatform) {
+                      <div class="ec-join-hint">
+                        <span class="join-icon">📡</span>
+                        Join via <strong>{{ streamingLabel(e.schedule.streamingPlatform) }}</strong> at session time
+                      </div>
+                    }
+
+                    <button class="rc-expand-btn" (click)="toggleMyExpand(e.scheduleId)">
+                      @if (myExpandedId() === e.scheduleId) { Hide Details ▴ }
+                      @else { View Session Details ▾ }
+                    </button>
                   </div>
-                  <div class="ec-title">{{ e.schedule.programTitle }}</div>
-                  @if (e.schedule.sectionTitle) {
-                    <div class="ec-sub">{{ e.schedule.sectionTitle }}</div>
+
+                  <!-- Expanded detail for enrolled session -->
+                  @if (myExpandedId() === e.scheduleId) {
+                    <div class="rc-detail">
+
+                      @if (contentViewUrl(e.schedule)) {
+                        <a class="detail-preview-link" [href]="contentViewUrl(e.schedule)!" target="_blank" rel="noopener noreferrer">
+                          <span class="preview-link-icon">◈</span>
+                          <span class="preview-link-text">Watch Full Content</span>
+                          <span class="preview-link-path">
+                            {{ e.schedule.programTitle }}
+                            @if (e.schedule.sectionTitle) { › {{ e.schedule.sectionTitle }} }
+                          </span>
+                          <span class="preview-link-arrow">↗</span>
+                        </a>
+                      }
+
+                      @if (hasContentDesc(e.schedule)) {
+                        <div class="detail-section">
+                          <div class="detail-section-title">
+                            <span class="ds-icon" [style.color]="getCatMeta(e.schedule.category).color">◈</span>
+                            Session Overview
+                          </div>
+                          @if (cd(e.schedule).overview) {
+                            <div class="ds-field"><div class="ds-text">{{ cd(e.schedule).overview }}</div></div>
+                          }
+                          @if (cd(e.schedule).keyTopics?.length) {
+                            <div class="ds-field">
+                              <div class="ds-label">Key Topics</div>
+                              <div class="ds-chips">
+                                @for (t of cd(e.schedule).keyTopics; track $index) {
+                                  <span class="ds-chip topic-chip">{{ t }}</span>
+                                }
+                              </div>
+                            </div>
+                          }
+                        </div>
+                      }
+
+                      <div class="ec-footer">
+                        <div class="ec-schedule-id">{{ e.scheduleId }}</div>
+                        <button class="cancel-enrol-btn" (click)="cancelEnrolment(e.scheduleId)">
+                          Cancel Enrolment
+                        </button>
+                      </div>
+                    </div>
                   }
-                  <div class="ec-meta">
-                    <span>📅 {{ formatDate(e.schedule.scheduledDate) }}</span>
-                    <span>⏰ {{ e.schedule.startTime }} – {{ e.schedule.endTime }}</span>
-                    <span>{{ e.schedule.deliveryMode === 'online' ? '🌐' : '🏫' }} {{ e.schedule.deliveryMode }}</span>
-                  </div>
-                } @else {
-                  <div class="ec-title">{{ e.scheduleId }}</div>
-                }
-                <div class="ec-footer">
-                  <div class="ec-schedule-id">{{ e.scheduleId }}</div>
-                  <button class="cancel-enrol-btn" (click)="cancelEnrolment(e.scheduleId)">
-                    Cancel Enrolment
-                  </button>
+
                 </div>
-              </div>
+              }
             }
           </div>
         }
 
+      </div>
+    </div>
+  }
+
+  <!-- ── Payment Gate Modal ── -->
+  @if (paymentGateSchedule()) {
+    <div class="payment-gate-backdrop" (click)="closePaymentGate()">
+      <div class="payment-gate-modal" (click)="$event.stopPropagation()">
+        <div class="pgm-header">
+          <div class="pgm-title">Confirm Enrolment</div>
+          <button class="pgm-close" (click)="closePaymentGate()">✕</button>
+        </div>
+
+        <div class="pgm-session-info">
+          <span class="pgm-cat-badge"
+            [style.background]="getCatMeta(paymentGateSchedule()!.category).color + '22'"
+            [style.color]="getCatMeta(paymentGateSchedule()!.category).color">
+            {{ getCatMeta(paymentGateSchedule()!.category).label }}
+          </span>
+          <div class="pgm-session-title">{{ paymentGateSchedule()!.programTitle }}</div>
+          @if (paymentGateSchedule()!.sectionTitle) {
+            <div class="pgm-session-sub">{{ paymentGateSchedule()!.sectionTitle }}</div>
+          }
+          <div class="pgm-session-time">
+            📅 {{ formatDate(paymentGateSchedule()!.scheduledDate) }}
+            &nbsp;⏰ {{ paymentGateSchedule()!.startTime }} – {{ paymentGateSchedule()!.endTime }}
+          </div>
+        </div>
+
+        <div class="pgm-fee-table">
+          <div class="pgm-fee-title">Fee Breakdown</div>
+          <div class="pgm-fee-row">
+            <span>Expert / Content Fee</span>
+            <span>{{ (paymentGateSchedule()!.fee ?? 0) > 0 ? '₹' + paymentGateSchedule()!.fee : 'Free' }}</span>
+          </div>
+          <div class="pgm-fee-row">
+            <span>
+              {{ paymentGateSchedule()!.streamingPlatform
+                ? streamingLabel(paymentGateSchedule()!.streamingPlatform!) + ' Streaming'
+                : 'Streaming' }}
+            </span>
+            <span class="stream-val">{{ (paymentGateSchedule()!.streamingFee ?? 0) > 0 ? '₹' + paymentGateSchedule()!.streamingFee : 'Free' }}</span>
+          </div>
+          <div class="pgm-fee-row pgm-fee-total">
+            <span>Total</span>
+            <span>₹{{ totalFee(paymentGateSchedule()!) }}</span>
+          </div>
+        </div>
+
+        <div class="pgm-actions">
+          <button class="pgm-cancel-btn" (click)="closePaymentGate()">Cancel</button>
+          <button class="pgm-pay-btn"
+            [style.background]="getCatMeta(paymentGateSchedule()!.category).color"
+            (click)="confirmPayAndEnrol()">
+            Pay ₹{{ totalFee(paymentGateSchedule()!) }} & Enrol
+          </button>
+        </div>
       </div>
     </div>
   }

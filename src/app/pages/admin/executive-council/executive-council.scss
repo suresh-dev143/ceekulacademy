@@ -1,0 +1,725 @@
+// ── Tokens ────────────────────────────────────────────────────────────────────
+$bg:        #03050a;
+$surface:   #080c15;
+$border:    rgba(0, 245, 255, 0.07);
+$border2:   rgba(0, 245, 255, 0.12);
+$accent:    #22c55e;
+$accent-bg: rgba(34, 197, 94, 0.07);
+$accent-bd: rgba(34, 197, 94, 0.18);
+$gold:      #f59e0b;
+$cyan:      #00f5ff;
+$text:      #c8d8f0;
+$muted:     #3a4a6a;
+
+// ── Root ──────────────────────────────────────────────────────────────────────
+.ec-root {
+  min-height: 100%;
+  background: $bg;
+  color: $text;
+  font-family: 'Inter', 'Courier New', monospace;
+}
+
+// ── Banner ────────────────────────────────────────────────────────────────────
+.ec-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.75rem;
+  background: linear-gradient(135deg, #030810, #080c15);
+  border-bottom: 1px solid $accent-bd;
+  gap: 1rem;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  &__emblem {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, $accent, darken($accent, 14%));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #000;
+    flex-shrink: 0;
+    box-shadow: 0 0 24px rgba(34, 197, 94, 0.25);
+  }
+
+  &__cg-id {
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    color: $accent;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0.25rem;
+  }
+
+  &__name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 0.2rem;
+    letter-spacing: -0.01em;
+  }
+
+  &__subtitle {
+    font-size: 0.7rem;
+    color: $muted;
+    margin: 0;
+    letter-spacing: 0.04em;
+  }
+
+  &__right {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  &__tag {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: $muted;
+    margin-bottom: 0.25rem;
+  }
+
+  &__version {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: $accent;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.08em;
+  }
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+.ec-tabs {
+  display: flex;
+  gap: 0;
+  background: $surface;
+  border-bottom: 1px solid $border;
+  padding: 0 1.25rem;
+  overflow-x: auto;
+}
+
+.ec-tab {
+  padding: 0.8rem 1.2rem;
+  border: none;
+  background: transparent;
+  color: $muted;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+
+  &:hover { color: $text; }
+
+  &--active {
+    color: $accent;
+    border-bottom-color: $accent;
+  }
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+.ec-body {
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+// ── Section ───────────────────────────────────────────────────────────────────
+.ec-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: $accent;
+    margin: 0;
+  }
+
+  &__subtitle {
+    font-size: 0.75rem;
+    color: $muted;
+    line-height: 1.6;
+    margin: -0.4rem 0 0;
+  }
+}
+
+// ── Pulse ─────────────────────────────────────────────────────────────────────
+.ec-pulse-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.875rem;
+}
+
+.ec-pulse-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  &__value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: 'Courier New', monospace;
+    line-height: 1;
+  }
+
+  &__label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $muted;
+  }
+}
+
+// ── Role Cards ────────────────────────────────────────────────────────────────
+.ec-role-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.875rem;
+}
+
+.ec-role-card {
+  background: $surface;
+  border: 1px solid $accent-bd;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    background: $accent-bg;
+    .ec-role-card__arrow { opacity: 1; color: $accent; }
+    .ec-role-card__role  { color: $accent; }
+  }
+
+  &__glyph {
+    font-size: 1.25rem;
+    color: $accent;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  &__body { flex: 1; min-width: 0; }
+
+  &__role {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: rgba(34, 197, 94, 0.85);
+    transition: color 0.15s;
+    letter-spacing: 0.04em;
+  }
+
+  &__path {
+    font-size: 0.58rem;
+    font-family: 'Courier New', monospace;
+    color: $muted;
+    margin-top: 0.15rem;
+    letter-spacing: 0.06em;
+  }
+
+  &__desc {
+    font-size: 0.65rem;
+    color: $muted;
+    margin-top: 0.3rem;
+    line-height: 1.5;
+  }
+
+  &__arrow {
+    font-size: 0.6rem;
+    color: $muted;
+    opacity: 0.4;
+    transition: opacity 0.15s, color 0.15s;
+    white-space: nowrap;
+    align-self: center;
+    flex-shrink: 0;
+  }
+}
+
+// ── Workspace Link ────────────────────────────────────────────────────────────
+.ec-workspace-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1.25rem;
+  background: $accent-bg;
+  border: 1px solid $accent-bd;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(34, 197, 94, 0.12); }
+
+  &__path {
+    font-size: 0.72rem;
+    font-family: 'Courier New', monospace;
+    color: $accent;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  &__label {
+    font-size: 0.58rem;
+    color: $muted;
+    margin-top: 0.15rem;
+    letter-spacing: 0.06em;
+  }
+
+  &__action {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: $accent;
+    white-space: nowrap;
+    letter-spacing: 0.08em;
+  }
+}
+
+// ── Empty State ───────────────────────────────────────────────────────────────
+.ec-empty-state {
+  background: $surface;
+  border: 1px dashed $border;
+  border-radius: 10px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  color: $muted;
+
+  &__glyph {
+    font-size: 1.25rem;
+    color: $accent;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    font-size: 0.7rem;
+    line-height: 1.6;
+    font-style: italic;
+  }
+}
+
+// ── Events ────────────────────────────────────────────────────────────────────
+.ec-events {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ec-event {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid $border;
+
+  &:last-child { border-bottom: none; }
+
+  &__tag {
+    font-size: 0.52rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+
+    &--c-os { background: rgba(0,245,255,0.12);  color: #00f5ff; }
+    &--cg   { background: rgba(245,158,11,0.12); color: #f59e0b; }
+    &--esi  { background: rgba(34,197,94,0.12);  color: #22c55e; }
+  }
+
+  &__text {
+    flex: 1;
+    font-size: 0.72rem;
+    color: $text;
+    line-height: 1.6;
+  }
+
+  &__date {
+    font-size: 0.6rem;
+    color: $muted;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+// ── Welfare Admin Panel ────────────────────────────────────────────────────────
+.welfare-admin { display: flex; flex-direction: column; gap: 1rem; }
+
+.w-subtabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid $border;
+  padding-bottom: 0.5rem;
+}
+
+.w-stab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.9rem;
+  background: transparent;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $muted;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &.active { border-color: $accent; color: $accent; background: $accent-bg; }
+  &:hover:not(.active) { border-color: $border2; color: $text; }
+}
+
+.stab-count {
+  background: $accent;
+  color: #000;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 10px;
+}
+
+.w-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.w-select {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $text;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.6rem;
+  outline: none;
+  cursor: pointer;
+  &:focus { border-color: $accent; }
+}
+
+.w-action-btn {
+  padding: 0.4rem 0.9rem;
+  background: $accent;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) { background: darken($accent, 10%); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &.secondary { background: transparent; border: 1px solid $border; color: $muted; &:hover:not(:disabled) { border-color: $border2; color: $text; } }
+  &.small { font-size: 0.7rem; padding: 0.25rem 0.6rem; }
+}
+
+.w-state-msg { text-align: center; color: $muted; padding: 2rem; font-size: 0.8rem; }
+
+.mono { font-family: 'Courier New', monospace; }
+
+// ── App Row ───────────────────────────────────────────────────────────────────
+.w-app-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.w-app-left { display: flex; gap: 0.6rem; align-items: flex-start; flex: 1; min-width: 200px; }
+
+.w-fund-chip {
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  letter-spacing: 0.06em;
+  &.fun { background: #022c22; color: #10b981; border: 1px solid #065f46; }
+  &.cun { background: #0a1929; color: #60a5fa; border: 1px solid #1e3a5f; }
+  &.sun { background: #2d0f00; color: #fb923c; border: 1px solid #7c2d12; }
+}
+
+.w-app-info { flex: 1; min-width: 0; }
+.w-app-cb   { font-size: 0.72rem; color: $accent; margin-bottom: 0.15rem; }
+.w-app-goal { font-size: 0.8rem; color: $text; font-weight: 500; }
+.w-app-desc { font-size: 0.72rem; color: $muted; margin-top: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+
+.w-app-mid  { flex: 1; min-width: 180px; }
+.w-app-amounts { margin-bottom: 0.3rem; }
+.w-amount-out   { font-size: 0.9rem; font-weight: 700; color: $text; }
+.w-amount-label { font-size: 0.72rem; color: $muted; }
+
+.w-progress {
+  height: 3px;
+  background: $border;
+  border-radius: 2px;
+  margin-bottom: 0.4rem;
+  .w-progress-fill { height: 100%; background: $accent; border-radius: 2px; }
+}
+
+.w-emerg-tag {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: #7f1d1d;
+  color: #fca5a5;
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
+}
+
+.w-confirmed        { font-size: 0.7rem; color: $accent; }
+.w-pending-confirm  { font-size: 0.7rem; color: $gold; }
+.w-no-provider      { font-size: 0.7rem; color: $muted; }
+
+.w-app-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; min-width: 120px; }
+
+.w-status-pill {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  &.pending          { background: #1f2937; color: #9ca3af; }
+  &.partially_funded { background: #1e3a5f; color: #60a5fa; }
+  &.fulfilled        { background: #064e3b; color: #10b981; }
+  &.closed           { background: #111827; color: #4b5563; }
+}
+
+.w-app-date   { font-size: 0.68rem; color: $muted; }
+.w-row-actions { display: flex; gap: 0.3rem; flex-wrap: wrap; justify-content: flex-end; }
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+.w-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.75rem;
+}
+
+.w-page-btn {
+  padding: 0.3rem 0.7rem;
+  background: transparent;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $muted;
+  font-size: 0.75rem;
+  cursor: pointer;
+  &:hover:not(:disabled) { border-color: $accent; color: $accent; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.w-page-info { font-size: 0.72rem; color: $muted; }
+
+// ── Emergency Modal ───────────────────────────────────────────────────────────
+.w-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.w-modal {
+  background: $surface;
+  border: 1px solid $border2;
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.w-modal-title { font-size: 1rem; font-weight: 600; color: #fff; }
+.w-modal-sub   { font-size: 0.78rem; color: $muted; }
+.w-modal-actions { display: flex; gap: 0.5rem; }
+
+.w-input {
+  width: 100%;
+  background: #111827;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $text;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+  &:focus { border-color: $accent; }
+  &::placeholder { color: $muted; }
+  &.small { width: 80px; }
+}
+
+// ── Policy Card ───────────────────────────────────────────────────────────────
+.w-policy-card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 1.25rem;
+
+  &.active { border-color: $accent-bd; }
+}
+
+.w-policy-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.w-policy-id { font-size: 0.75rem; color: $accent; }
+
+.w-active-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  background: $accent-bg;
+  border: 1px solid $accent-bd;
+  color: $accent;
+  border-radius: 10px;
+}
+
+.w-policy-grid  { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+.w-policy-row   { display: flex; gap: 1rem; align-items: baseline; font-size: 0.8rem; }
+.w-policy-label { color: $muted; min-width: 220px; }
+.w-policy-val   { color: $text; }
+
+.w-criteria-heading {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: $muted;
+  margin: 0.75rem 0 0.4rem;
+}
+
+.w-criteria-list { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.w-criterion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.5rem;
+  background: rgba(0,0,0,0.3);
+  border-radius: 5px;
+}
+
+.w-crit-field  { color: $text; flex: 1; text-transform: capitalize; }
+.w-crit-weight { color: $muted; font-size: 0.72rem; }
+.w-crit-dir    { font-size: 0.68rem; &.asc { color: $accent; } &.desc { color: $gold; } }
+
+.w-goal-weights { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.w-goal-weight-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(0,0,0,0.3);
+  border-radius: 5px;
+
+  .w-goal-key  { color: $muted; }
+  .w-goal-wval { color: $accent; font-weight: 700; }
+}
+
+.w-policy-notes {
+  font-size: 0.75rem;
+  color: $muted;
+  font-style: italic;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 2px solid $border2;
+}
+
+// ── Policy Form ───────────────────────────────────────────────────────────────
+.w-policy-form {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.w-form-title { font-size: 0.9rem; font-weight: 600; color: #fff; }
+
+.w-form-note {
+  font-size: 0.75rem;
+  color: $muted;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.w-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.w-field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9ca3af;
+  .optional { font-weight: 400; color: $muted; }
+}
+
+.w-field-hint { font-size: 0.68rem; color: $muted; }
+
+.w-goal-weight-editor {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+.w-weight-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  .w-weight-label { flex: 1; color: $muted; }
+}

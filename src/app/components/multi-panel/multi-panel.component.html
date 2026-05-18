@@ -1,0 +1,77 @@
+<!-- Node: split container — recurse into children -->
+@if (isNode(partition())) {
+  <div
+    class="mp-node"
+    [class.mp-node--h]="asNode(partition()).dir === 'h'"
+    [class.mp-node--v]="asNode(partition()).dir === 'v'"
+  >
+    @for (child of asNode(partition()).children; track child.id; let last = $last; let i = $index) {
+      <div class="mp-child" [style.flex]="child.flex">
+        <app-multi-panel [partition]="child" />
+      </div>
+      @if (!last) {
+        <div class="mp-divider"
+             [class.mp-divider--v]="asNode(partition()).dir === 'v'"
+             [class.mp-divider--h]="asNode(partition()).dir === 'h'"
+             (mousedown)="startDrag($event, asNode(partition()).id, i, asNode(partition()).dir)">
+        </div>
+      }
+    }
+  </div>
+}
+
+<!-- Leaf: actual content panel -->
+@if (isLeaf(partition())) {
+  <div class="mp-leaf">
+    <!-- Panel header -->
+    <div class="mp-header">
+      <select
+        class="mp-content-select"
+        [value]="asLeaf(partition()).content"
+        (change)="changeContent(asLeaf(partition()).id, $event)"
+        title="Change panel content"
+      >
+        @for (opt of contentOptions; track opt.value) {
+          <option [value]="opt.value" [selected]="opt.value === asLeaf(partition()).content">
+            {{ opt.label }}
+          </option>
+        }
+      </select>
+
+      <span class="mp-header-title">{{ asLeaf(partition()).title }}</span>
+
+      <div class="mp-actions">
+        <button class="mp-btn" title="Split right" (click)="splitV(asLeaf(partition()).id)">⊞</button>
+        <button class="mp-btn" title="Split down"  (click)="splitH(asLeaf(partition()).id)">⊟</button>
+        <button class="mp-btn mp-btn--close" title="Close panel" (click)="close(asLeaf(partition()).id)">✕</button>
+      </div>
+    </div>
+
+    <!-- Panel body — real component for routable content, stub for utilities -->
+    <div class="mp-body">
+      @if (['home','academy','research','personal','kb'].includes(asLeaf(partition()).content)) {
+        <!-- Dynamic component loader: lazy-imports the real Angular page -->
+        <app-panel-content [content]="asLeaf(partition()).content" />
+      } @else if (asLeaf(partition()).content === 'sync') {
+        <div class="mp-embed mp-embed--sync">
+          <div class="mp-embed-label">⟳ DEVICE SYNC</div>
+          <p class="mp-embed-sub">Real-time cross-device state is managed by the parent workspace.</p>
+        </div>
+      } @else if (asLeaf(partition()).content === 'chat') {
+        <div class="mp-embed">
+          <div class="mp-embed-label">💬 CHAT</div>
+          <p class="mp-embed-sub">Semantic chat panel.</p>
+        </div>
+      } @else if (asLeaf(partition()).content === 'ai') {
+        <app-claude-panel />
+      } @else if (asLeaf(partition()).content === 'graph') {
+        <app-reference-graph-panel />
+      } @else {
+        <div class="mp-embed mp-embed--blank">
+          <div class="mp-embed-label">NEW PANEL</div>
+          <p class="mp-embed-sub">Select content above.</p>
+        </div>
+      }
+    </div>
+  </div>
+}

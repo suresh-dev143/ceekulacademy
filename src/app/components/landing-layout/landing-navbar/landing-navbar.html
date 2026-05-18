@@ -5,8 +5,12 @@
       <a routerLink="/" class="navbar__logo-link">
       </a>
     </div>
-    <!-- Ceekul Civilisation Title (Landing page only) -->
-    @if (isLandingPage()) {
+    <!-- Title — varies by route -->
+    @if (isAcademyPage()) {
+    <div class="navbar__brand-title navbar__brand-title--academy">
+      <h1 aria-label="Ceekul Academy">Ceekul Academy</h1>
+    </div>
+    } @else if (isLandingPage()) {
     <div class="navbar__brand-title">
       <h1 aria-label="CEEKUL CIVILISATION">CEEKUL CIVILISATION</h1>
     </div>

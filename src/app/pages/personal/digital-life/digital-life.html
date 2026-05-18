@@ -1,27 +1,6 @@
 <div class="dl-container">
 
-  <!-- ── CB ID Header ──────────────────────────────────────────────────── -->
-  <div class="dl-identity">
-    <div class="dl-avatar">{{ initials() }}</div>
-    <div class="dl-identity-info">
-      <div class="dl-name">{{ userName() }}</div>
-      @if (cbId()) {
-        <div class="dl-cbid">
-          <span class="dl-cbid-label">CB ID</span>
-          <span class="dl-cbid-value">{{ cbId() }}</span>
-        </div>
-      } @else {
-        <div class="dl-cbid dl-cbid--pending">
-          <span class="dl-cbid-label">CB ID</span>
-          <span class="dl-cbid-value dl-cbid-value--muted">Not generated yet</span>
-        </div>
-      }
-    </div>
-    <div class="dl-identity-badge">
-      <i class="fas fa-shield-alt"></i>
-      Digital Life
-    </div>
-  </div>
+
 
   <!-- ── Section Cards ─────────────────────────────────────────────────── -->
   <div class="dl-sections">

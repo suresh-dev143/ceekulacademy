@@ -1,0 +1,242 @@
+<div class="chancellor-page">
+
+  <!-- ══ VISION FLOW BUTTON ══════════════════════════════════════════════════ -->
+  <div class="ch-vf-trigger-row">
+    <button class="ch-vf-trigger" (click)="openVisionFlow()" [disabled]="showVisionFlow()">
+      <span class="ch-vf-trigger__glyph" aria-hidden="true">◈</span>
+      Vision Flow
+      <span class="ch-vf-trigger__arrow" aria-hidden="true">↗</span>
+    </button>
+    <p class="ch-vf-trigger__hint">Assign content to your daily schedule from the library.</p>
+  </div>
+
+  <!-- ══ VISION FLOW PANEL ═══════════════════════════════════════════════════ -->
+  @if (showVisionFlow()) {
+  <div class="vf-panel">
+
+    <div class="vf-panel__head">
+      <div class="vf-panel__title-row">
+        <span class="vf-panel__glyph" aria-hidden="true">◈</span>
+        <h3 class="vf-panel__title">Vision Flow</h3>
+      </div>
+      <button class="vf-panel__close" (click)="closeVisionFlow()" aria-label="Close">✕</button>
+    </div>
+
+    <div class="vf-panel__body">
+
+      <!-- ── Left: Form ── -->
+      <div class="vf-form">
+
+        <div class="vf-field">
+          <label class="vf-label">Hour Slot</label>
+          <select class="vf-select"
+            [value]="vfHour()"
+            (change)="vfHour.set(+$any($event.target).value)">
+            @for (h of DAY_HOURS; track h) {
+            <option [value]="h">{{ formatHour(h) }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="vf-field">
+          <label class="vf-label">Program Title <span class="vf-req">*</span></label>
+          <input class="vf-input" type="text"
+            placeholder="e.g. Quantum Physics…"
+            [value]="vfProgramTitle()"
+            (input)="vfProgramTitle.set($any($event.target).value)" />
+        </div>
+
+        <div class="vf-field">
+          <label class="vf-label">Section Title</label>
+          <input class="vf-input" type="text"
+            placeholder="e.g. Module 2 — Wave Equations…"
+            [value]="vfSectionTitle()"
+            (input)="vfSectionTitle.set($any($event.target).value)" />
+        </div>
+
+        <div class="vf-field">
+          <label class="vf-label">Content Title</label>
+          <input class="vf-input" type="text"
+            placeholder="e.g. Schrödinger's Equation…"
+            [value]="vfContentTitle()"
+            (input)="vfContentTitle.set($any($event.target).value)" />
+        </div>
+
+        @if (selectedItem()) {
+        <div class="vf-selected-item">
+          <span class="vf-selected-item__label">From library</span>
+          <span class="vf-selected-item__name">{{ selectedItem()!.title }}</span>
+          <button class="vf-selected-item__clear" (click)="clearLibraryItem()" aria-label="Remove">✕</button>
+        </div>
+        }
+
+        <div class="vf-actions">
+          <button class="vf-btn vf-btn--cancel" (click)="closeVisionFlow()">Cancel</button>
+          <button class="vf-btn vf-btn--save"
+            [disabled]="!canSave() || vfSaved()"
+            (click)="saveToVisionFlow()">
+            @if (vfSaved()) { ✓ Saved to Flow }
+            @else            { Save to Vision Flow }
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ── Right: Library Picker ── -->
+      <div class="vf-library">
+        <div class="vf-library__head">
+          <span class="vf-library__title">From Library</span>
+          <input class="vf-library__search" type="text"
+            placeholder="Search your content…"
+            [value]="librarySearch()"
+            (input)="librarySearch.set($any($event.target).value)" />
+        </div>
+
+        <div class="vf-library__list">
+          @if (libraryLoading()) {
+          <div class="vf-lib-skeleton">
+            @for (i of [1,2,3]; track i) {
+            <div class="vf-lib-skel-item">
+              <div class="vf-lib-skel-item__title"></div>
+              <div class="vf-lib-skel-item__meta"></div>
+            </div>
+            }
+          </div>
+          } @else if (!filteredLibrary().length) {
+          <div class="vf-lib-empty">
+            <span class="vf-lib-empty__glyph">◌</span>
+            <p class="vf-lib-empty__text">No content found.</p>
+          </div>
+          } @else {
+          @for (item of filteredLibrary(); track item.baseId) {
+          <button class="vf-lib-item"
+            [class.vf-lib-item--selected]="selectedItem()?.baseId === item.baseId"
+            (click)="selectLibraryItem(item)">
+            <div class="vf-lib-item__top">
+              <span class="vf-lib-item__state vf-lib-item__state--{{ item.state }}">{{ item.state }}</span>
+              <span class="vf-lib-item__id">{{ item.hybridId }}</span>
+            </div>
+            <p class="vf-lib-item__title">{{ item.title }}</p>
+            @if (item.contentTitle) {
+            <p class="vf-lib-item__sub">{{ item.contentTitle }}</p>
+            }
+          </button>
+          }
+          }
+        </div>
+      </div>
+
+    </div>
+  </div>
+  }
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="ch-header">
+    <div class="ch-header__seal" aria-hidden="true">
+      <div class="ch-seal">
+        <div class="ch-seal__ring ch-seal__ring--outer"></div>
+        <div class="ch-seal__ring ch-seal__ring--inner"></div>
+        <span class="ch-seal__glyph">◉</span>
+      </div>
+    </div>
+
+    <div class="ch-header__body">
+      <span class="ch-header__eyebrow">Office of the</span>
+      <h1 class="ch-header__title">Chancellor</h1>
+      <p class="ch-header__subtitle">Ceekul Academy · Academic Leadership</p>
+      <span class="ch-header__gov-id">CG100000000002</span>
+    </div>
+
+    <div class="ch-header__rule" aria-hidden="true">
+      <div class="ch-header__rule-line"></div>
+      <span class="ch-header__rule-glyph">◈</span>
+      <div class="ch-header__rule-line"></div>
+    </div>
+
+    <blockquote class="ch-mission">
+      <p class="ch-mission__text">
+        "The purpose of education is not to fill a vessel but to ignite a civilization —
+        to produce humans who can architect the future they inhabit."
+      </p>
+      <footer class="ch-mission__attr">— Ceekul Academy Charter, Article I</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ ACADEMIC DIRECTIVES ══════════════════════════════════════════════════ -->
+  <section class="ch-directives">
+    <div class="ch-section-label">
+      <span class="ch-section-label__line" aria-hidden="true"></span>
+      <span class="ch-section-label__text">Academic Directives</span>
+      <span class="ch-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="ch-dir-list">
+      @for (dir of directives; track dir.id; let i = $index) {
+      <div class="ch-dir"
+        [class.ch-dir--open]="expandedId() === dir.id"
+        [style.--dir-delay]="(i * 60) + 'ms'">
+
+        <button class="ch-dir__trigger" (click)="toggleDirective(dir.id)" [attr.aria-expanded]="expandedId() === dir.id">
+          <span class="ch-dir__code">{{ dir.code }}</span>
+          <span class="ch-dir__title">{{ dir.title }}</span>
+          <span class="ch-dir__chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="4 6 8 10 12 6"/>
+            </svg>
+          </span>
+        </button>
+
+        @if (expandedId() === dir.id) {
+        <div class="ch-dir__body">
+          <p class="ch-dir__text">{{ dir.body }}</p>
+          <div class="ch-dir__pillars">
+            @for (p of dir.pillars; track p) {
+            <span class="ch-dir__pillar">{{ p }}</span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ ACADEMIC PROGRAMS ════════════════════════════════════════════════════ -->
+  <section class="ch-programs">
+    <div class="ch-section-label">
+      <span class="ch-section-label__line" aria-hidden="true"></span>
+      <span class="ch-section-label__text">Academic Programs</span>
+      <span class="ch-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="ch-prog-grid">
+      @for (prog of programs; track prog.code; let i = $index) {
+      <div class="ch-prog" [style.--prog-accent]="prog.accent" [style.--prog-delay]="(i * 70) + 'ms'">
+        <div class="ch-prog__head">
+          <span class="ch-prog__code">{{ prog.code }}</span>
+          <div class="ch-prog__badges">
+            <span class="ch-prog__level">{{ prog.level }}</span>
+            <span class="ch-prog__duration">{{ prog.duration }}</span>
+          </div>
+        </div>
+        <h3 class="ch-prog__title">{{ prog.title }}</h3>
+        <p class="ch-prog__desc">{{ prog.descriptor }}</p>
+        <div class="ch-prog__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ OFFICE STATEMENT ═════════════════════════════════════════════════════ -->
+  <footer class="ch-statement">
+    <div class="ch-statement__rule" aria-hidden="true"></div>
+    <p class="ch-statement__text">
+      The Chancellor's Office operates with a singular commitment: that every decision made within
+      Ceekul Academy advances the long arc of human civilizational intelligence.
+      Academic excellence is not a destination — it is the permanent orientation of this institution.
+    </p>
+    <span class="ch-statement__seal" aria-hidden="true">◉ Ceekul Academy · Est. Computable Era</span>
+  </footer>
+
+</div>

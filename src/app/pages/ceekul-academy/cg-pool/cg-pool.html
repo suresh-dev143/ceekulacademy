@@ -1,0 +1,456 @@
+<div class="cgp-page">
+
+  <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
+  <header class="cgp-header">
+    <div class="cgp-header__seal" aria-hidden="true">
+      <div class="cgp-seal">
+        <div class="cgp-seal__ring cgp-seal__ring--outer"></div>
+        <div class="cgp-seal__ring cgp-seal__ring--mid"></div>
+        <div class="cgp-seal__ring cgp-seal__ring--inner"></div>
+        <span class="cgp-seal__glyph">⬡</span>
+      </div>
+    </div>
+
+    <div class="cgp-header__body">
+      <span class="cgp-header__eyebrow">Collective Governance Pool</span>
+      <h1 class="cgp-header__title">Digital Self Governance</h1>
+      <p class="cgp-header__subtitle">Ceekul Academy · Community Neuron Commons</p>
+      <span class="cgp-header__gov-id">CG100000000000</span>
+    </div>
+
+    <div class="cgp-header__rule" aria-hidden="true">
+      <div class="cgp-header__rule-line"></div>
+      <span class="cgp-header__rule-glyph">⬡</span>
+      <div class="cgp-header__rule-line"></div>
+    </div>
+
+    <blockquote class="cgp-mission">
+      <p class="cgp-mission__text">
+        "Every member gives a little. The collective gains a lot.
+        The 1% that flows into the commons is not a tax — it is the civilizational
+        investment that makes every individual more secure, more capable, and more connected
+        than they could ever be alone."
+      </p>
+      <footer class="cgp-mission__attr">— Digital Self Governance Charter, Founding Principle</footer>
+    </blockquote>
+  </header>
+
+  <!-- ══ CONSTITUTIONAL PRINCIPLES ══════════════════════════════════════════ -->
+  <section class="cgp-constitution">
+
+    <div class="cgp-constitution__banner">
+      <span class="cgp-constitution__banner-glyph" aria-hidden="true">⬡</span>
+      <div class="cgp-constitution__banner-body">
+        <span class="cgp-constitution__banner-title">Governance Constitution</span>
+        <span class="cgp-constitution__banner-sub">
+          No founder, trustee, or authority can transfer neurons manually.
+          Members apply. Algorithms decide. Transfers execute automatically.
+        </span>
+      </div>
+      <span class="cgp-constitution__banner-tag">Non-negotiable</span>
+    </div>
+
+    <div class="cgp-constitution__articles">
+      @for (p of constitutionalPrinciples; track p.code) {
+      <div class="cgp-article">
+        <span class="cgp-article__code">{{ p.code }}</span>
+        <div class="cgp-article__body">
+          <h4 class="cgp-article__title">{{ p.title }}</h4>
+          <p class="cgp-article__text">{{ p.body }}</p>
+        </div>
+      </div>
+      }
+    </div>
+
+  </section>
+
+  <!-- ══ THE 33·1 PROTOCOL ════════════════════════════════════════════════════ -->
+  <section class="cgp-protocol">
+    <div class="cgp-section-label">
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+      <span class="cgp-section-label__text">The 33·1 Protocol</span>
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="cgp-protocol__body">
+      <p class="cgp-protocol__intro">
+        Every member's neurons are distributed across three personal streams — each receiving 33% —
+        with approximately 1% flowing automatically into the Collective Governance Pool
+        (CG100000000000). This 1% is the civilizational commons: collectively owned, collectively
+        governed, and automatically deployed in service of the extended community.
+      </p>
+
+      <div class="cgp-formula">
+
+        <div class="cgp-formula__member">
+          <span class="cgp-formula__member-label">Your Neurons</span>
+          <div class="cgp-formula__member-streams">
+            <div class="cgp-formula__stream cgp-formula__stream--fun">
+              <span class="cgp-formula__stream-pct">33%</span>
+              <span class="cgp-formula__stream-name">FUN</span>
+              <span class="cgp-formula__stream-sub">Your personal family stream</span>
+            </div>
+            <div class="cgp-formula__stream cgp-formula__stream--cun">
+              <span class="cgp-formula__stream-pct">33%</span>
+              <span class="cgp-formula__stream-name">CUN</span>
+              <span class="cgp-formula__stream-sub">Your personal cognitive stream</span>
+            </div>
+            <div class="cgp-formula__stream cgp-formula__stream--sun">
+              <span class="cgp-formula__stream-pct">33%</span>
+              <span class="cgp-formula__stream-name">SUN</span>
+              <span class="cgp-formula__stream-sub">Your personal social stream</span>
+            </div>
+            <div class="cgp-formula__stream cgp-formula__stream--cg">
+              <span class="cgp-formula__stream-pct">~1%</span>
+              <span class="cgp-formula__stream-name">CG Pool</span>
+              <span class="cgp-formula__stream-sub">Collective commons</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cgp-formula__arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 40" fill="none">
+            <path d="M12 2 L12 30 M6 24 L12 32 L18 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>1% of all members</span>
+        </div>
+
+        <div class="cgp-formula__pool">
+          <div class="cgp-formula__pool-id">CG100000000000</div>
+          <div class="cgp-formula__pool-label">Collective Governance Pool</div>
+          <div class="cgp-formula__pool-streams">
+            <div class="cgp-formula__pool-stream cgp-formula__pool-stream--fun">
+              <span>33% FUN·CG</span>
+              <span class="cgp-formula__pool-stream-sub">Social family transformation</span>
+            </div>
+            <div class="cgp-formula__pool-stream cgp-formula__pool-stream--cun">
+              <span>33% CUN·CG</span>
+              <span class="cgp-formula__pool-stream-sub">Cognitive upgradation</span>
+            </div>
+            <div class="cgp-formula__pool-stream cgp-formula__pool-stream--sun">
+              <span>34% SUN·CG</span>
+              <span class="cgp-formula__pool-stream-sub">Solidarity Advance</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CG STREAMS ══════════════════════════════════════════════════════════ -->
+  <section class="cgp-streams">
+    <div class="cgp-section-label">
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+      <span class="cgp-section-label__text">CG Pool Streams</span>
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="cgp-stream-list">
+      @for (stream of streams; track stream.id) {
+      <div class="cgp-stream"
+           [class.cgp-stream--open]="expandedStream() === stream.id"
+           [style.--stream-accent]="stream.accent">
+
+        <button class="cgp-stream__trigger" (click)="toggleStream(stream.id)">
+          <div class="cgp-stream__trigger-left">
+            <span class="cgp-stream__code">{{ stream.code }}</span>
+            <div class="cgp-stream__meta">
+              <span class="cgp-stream__title">{{ stream.title }}</span>
+              <span class="cgp-stream__label">{{ stream.label }}</span>
+            </div>
+          </div>
+          <div class="cgp-stream__trigger-right">
+            <span class="cgp-stream__share">{{ stream.share }}</span>
+            <span class="cgp-stream__purpose cgp-stream__purpose--{{ stream.id }}">{{ stream.purpose }}</span>
+            <span class="cgp-stream__chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="4 6 8 10 12 6"/>
+              </svg>
+            </span>
+          </div>
+        </button>
+
+        @if (expandedStream() === stream.id) {
+        <div class="cgp-stream__body">
+          <p class="cgp-stream__desc">{{ stream.descriptor }}</p>
+          <div class="cgp-stream__auto">
+            <div class="cgp-stream__auto-label">
+              <span class="cgp-stream__auto-icon" aria-hidden="true">⚡</span>
+              Automation Logic
+            </div>
+            <p class="cgp-stream__auto-text">{{ stream.automation }}</p>
+          </div>
+        </div>
+        }
+
+        <div class="cgp-stream__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ STREAM USAGE PRINCIPLES ════════════════════════════════════════════════ -->
+  <section class="cgp-usage">
+    <div class="cgp-section-label">
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+      <span class="cgp-section-label__text">Stream Usage Principles</span>
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="cgp-usage__grid">
+      @for (rule of usageRules; track rule.code) {
+      <div class="cgp-usage-card" [style.--usage-accent]="rule.accent">
+        <div class="cgp-usage-card__head">
+          <span class="cgp-usage-card__code">{{ rule.code }}</span>
+          <span class="cgp-usage-card__title">{{ rule.title }}</span>
+        </div>
+        <p class="cgp-usage-card__primary">{{ rule.primary }}</p>
+        <ul class="cgp-usage-card__conditions">
+          @for (cond of rule.conditions; track cond) {
+          <li>{{ cond }}</li>
+          }
+        </ul>
+        @if (rule.guardNote) {
+        <div class="cgp-usage-card__guard">
+          <span class="cgp-usage-card__guard-icon" aria-hidden="true">⚡</span>
+          <p>{{ rule.guardNote }}</p>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ AUTOMATION FLOW ══════════════════════════════════════════════════════ -->
+  <section class="cgp-autoflow">
+    <div class="cgp-section-label">
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+      <span class="cgp-section-label__text">Automated Neuron Flow Engine</span>
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="cgp-autoflow__steps">
+      @for (step of autoFlowSteps; track step.step) {
+      <div class="cgp-step">
+        <div class="cgp-step__num">{{ step.step.toString().padStart(2, '0') }}</div>
+        <div class="cgp-step__body">
+          <h4 class="cgp-step__label">{{ step.label }}</h4>
+          <p class="cgp-step__desc">{{ step.descriptor }}</p>
+        </div>
+        @if (step.step < autoFlowSteps.length) {
+        <div class="cgp-step__connector" aria-hidden="true"></div>
+        }
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- ══ LEGACY DISTRIBUTION PROTOCOL ════════════════════════════════════════ -->
+  <section class="cgp-legacy">
+    <div class="cgp-section-label">
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+      <span class="cgp-section-label__text">Legacy Distribution Protocol</span>
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="cgp-legacy__intro">
+      <p>
+        The process begins only when the deceased member's information is filed by their spouse,
+        any biological child, or either parent — each through their own CB ID. Once the algorithm
+        verifies the filer's eligibility, the member's CB ID initiates distribution automatically
+        — first splitting MY Neurons into the member's own FUN, CUN, and SUN streams, then
+        transferring those balances to the registered spouse. If the spouse has also passed, the
+        balances flow to biological children. If neither is available, everything flows to
+        CG100000000000.
+      </p>
+      <p>
+        Any investment returns that arrive after the member's passing continue to accumulate in
+        the member's CB ID. Every 6 months, the same protocol activates on the accumulated balance
+        — following the same spouse → children → CG100000000000 priority chain.
+      </p>
+    </div>
+
+    <div class="cgp-legacy__flow">
+      @for (phase of legacyPhases; track phase.step) {
+      <div class="cgp-legacy-phase">
+        <div class="cgp-legacy-phase__left">
+          <div class="cgp-legacy-phase__num">{{ phase.step.toString().padStart(2,'0') }}</div>
+          @if (phase.step < legacyPhases.length) {
+          <div class="cgp-legacy-phase__line" aria-hidden="true"></div>
+          }
+        </div>
+        <div class="cgp-legacy-phase__body">
+          <span class="cgp-legacy-phase__phase">{{ phase.phase }}</span>
+          <h4 class="cgp-legacy-phase__label">{{ phase.label }}</h4>
+          <p class="cgp-legacy-phase__desc">{{ phase.descriptor }}</p>
+        </div>
+      </div>
+      }
+    </div>
+
+    <div class="cgp-legacy__streams">
+      <div class="cgp-legacy__stream cgp-legacy__stream--fun">
+        <span class="cgp-legacy__stream-label">FUN → Spouse's FUN</span>
+        <span class="cgp-legacy__stream-sub">Children's FUN equally if spouse also passed</span>
+      </div>
+      <div class="cgp-legacy__stream cgp-legacy__stream--cun">
+        <span class="cgp-legacy__stream-label">CUN → Spouse's CUN</span>
+        <span class="cgp-legacy__stream-sub">Children's CUN equally if spouse also passed</span>
+      </div>
+      <div class="cgp-legacy__stream cgp-legacy__stream--sun">
+        <span class="cgp-legacy__stream-label">SUN → Spouse's SUN</span>
+        <span class="cgp-legacy__stream-sub">Children's SUN equally if spouse also passed</span>
+      </div>
+    </div>
+
+    <div class="cgp-legacy__fallback">
+      <span class="cgp-legacy__fallback-glyph" aria-hidden="true">⬡</span>
+      <div class="cgp-legacy__fallback-body">
+        <span class="cgp-legacy__fallback-label">No spouse · No children → CG100000000000</span>
+        <span class="cgp-legacy__fallback-sub">
+          If the spouse has also passed and there are no biological children, all stream balances
+          flow to CG100000000000. The same applies to recurring post-transition investment returns,
+          redistributed every 6 months using the same priority chain.
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SOLIDARITY ADVANCE CALLOUT ═══════════════════════════════════════════ -->
+  <section class="cgp-solidarity">
+    <div class="cgp-solidarity__card">
+      <div class="cgp-solidarity__head">
+        <span class="cgp-solidarity__icon" aria-hidden="true">◎</span>
+        <h3 class="cgp-solidarity__title">Solidarity Advance</h3>
+        <span class="cgp-solidarity__badge">SUN · CG · 34%</span>
+      </div>
+      <p class="cgp-solidarity__body">
+        A Solidarity Advance is the community's automatic compassionate response to a member in
+        acute need. It carries no interest, no penalty, and no social record visible to other
+        members. The advance is recovered silently and automatically from the member's CB account
+        the moment sufficient neurons accumulate — defined by the member at request time.
+      </p>
+      <div class="cgp-solidarity__principles">
+        <div class="cgp-solidarity__principle">
+          <span class="cgp-solidarity__principle-icon">◈</span>
+          <span>Zero interest. Zero penalty.</span>
+        </div>
+        <div class="cgp-solidarity__principle">
+          <span class="cgp-solidarity__principle-icon">◈</span>
+          <span>Fully automated disbursement and recovery.</span>
+        </div>
+        <div class="cgp-solidarity__principle">
+          <span class="cgp-solidarity__principle-icon">◈</span>
+          <span>Recovery deducted from CB ID when neurons are sufficient.</span>
+        </div>
+        <div class="cgp-solidarity__principle">
+          <span class="cgp-solidarity__principle-icon">◈</span>
+          <span>No social record. No shame. No friction.</span>
+        </div>
+        <div class="cgp-solidarity__principle">
+          <span class="cgp-solidarity__principle-icon">◈</span>
+          <span>Member chooses: full recovery or tranched recovery.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ UPLIFT PATHWAY PROGRAM ══════════════════════════════════════════════ -->
+  <section class="cgp-uplift">
+    <div class="cgp-section-label">
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+      <span class="cgp-section-label__text">Uplift Pathway — SUN · CG Program</span>
+      <span class="cgp-section-label__line" aria-hidden="true"></span>
+    </div>
+
+    <div class="cgp-uplift__intro">
+      <p>
+        Any person holding a CB ID may register for any level of educational content —
+        from watching a dance video to learning the alphabet — and upload their condition
+        for community support. If community support is insufficient, the SUN stream of
+        CG100000000000 activates as a fallback. Progress is tracked daily. Monthly Uplift
+        Allocation flows only when improvement is confirmed.
+      </p>
+      <div class="cgp-uplift__mobile-note">
+        <span class="cgp-uplift__mobile-icon" aria-hidden="true">◌</span>
+        <span>No mobile device? Registration and condition upload can be completed through any other member's device on behalf of the applicant.</span>
+      </div>
+    </div>
+
+    <!-- ── 5-step flow ── -->
+    <div class="cgp-uplift__flow">
+      @for (stage of upliftStages; track stage.step) {
+      <div class="cgp-uplift-stage">
+        <div class="cgp-uplift-stage__left">
+          <div class="cgp-uplift-stage__num">{{ stage.step.toString().padStart(2,'0') }}</div>
+          @if (stage.step < upliftStages.length) {
+          <div class="cgp-uplift-stage__line" aria-hidden="true"></div>
+          }
+        </div>
+        <div class="cgp-uplift-stage__body">
+          <div class="cgp-uplift-stage__head">
+            <span class="cgp-uplift-stage__phase">{{ stage.phase }}</span>
+            @if (stage.tag) {
+            <span class="cgp-uplift-stage__tag cgp-uplift-stage__tag--{{ stage.step }}">{{ stage.tag }}</span>
+            }
+          </div>
+          <h4 class="cgp-uplift-stage__label">{{ stage.label }}</h4>
+          <p class="cgp-uplift-stage__desc">{{ stage.descriptor }}</p>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- ── Daily tracking ── -->
+    <div class="cgp-uplift__tracking">
+      <div class="cgp-tracking-head">
+        <span class="cgp-tracking-head__icon" aria-hidden="true">⚡</span>
+        <span class="cgp-tracking-head__label">Daily Tracking — Three Dimensions</span>
+      </div>
+      <div class="cgp-tracking-grid">
+        @for (metric of trackingMetrics; track metric.domain) {
+        <div class="cgp-tracking-card">
+          <div class="cgp-tracking-card__top">
+            <span class="cgp-tracking-card__icon">{{ metric.icon }}</span>
+            <span class="cgp-tracking-card__domain">{{ metric.domain }}</span>
+          </div>
+          <ul class="cgp-tracking-card__signals">
+            @for (signal of metric.signals; track signal) {
+            <li>{{ signal }}</li>
+            }
+          </ul>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- ── Support tiers ── -->
+    <div class="cgp-uplift__tiers">
+      @for (tier of supportTiers; track tier.label) {
+      <div class="cgp-tier" [style.--tier-accent]="tier.accent">
+        <div class="cgp-tier__head">
+          <span class="cgp-tier__label">{{ tier.label }}</span>
+          <span class="cgp-tier__duration">{{ tier.duration }}</span>
+        </div>
+        <p class="cgp-tier__condition">{{ tier.condition }}</p>
+        <div class="cgp-tier__bar" aria-hidden="true"></div>
+      </div>
+      }
+    </div>
+
+  </section>
+
+  <!-- ══ FOOTER ═══════════════════════════════════════════════════════════════ -->
+  <footer class="cgp-statement">
+    <div class="cgp-statement__rule" aria-hidden="true"></div>
+    <p class="cgp-statement__text">
+      CG100000000000 is the civilizational commons — the quiet pool that makes
+      every member's journey less precarious, every family more capable, and every
+      community more coherent. It does not ask. It does not judge. It simply flows
+      where it is needed, when it is needed, silently and automatically.
+    </p>
+    <span class="cgp-statement__seal" aria-hidden="true">⬡ CG100000000000 · Digital Self Governance · Ceekul Academy</span>
+  </footer>
+
+</div>
