@@ -1,0 +1,308 @@
+<div class="ktb-page">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="ktb-header">
+    <div class="ktb-header__seal">
+      <div class="ktb-seal">
+        <div class="ktb-seal__ring ktb-seal__ring--outer"></div>
+        <div class="ktb-seal__ring ktb-seal__ring--inner"></div>
+        <span class="ktb-seal__glyph">⬡</span>
+      </div>
+    </div>
+    <div class="ktb-header__body">
+      <span class="ktb-header__eyebrow">Personal · Kutumb</span>
+      <h1 class="ktb-header__title">My Kutumb</h1>
+      <p class="ktb-header__subtitle">Family &amp; Community Network</p>
+    </div>
+    <div class="ktb-header__stats">
+      <div class="ktb-stat">
+        <span class="ktb-stat__value">{{ activeMembers() }}</span>
+        <span class="ktb-stat__label">Active</span>
+      </div>
+      <div class="ktb-stat ktb-stat--divider"></div>
+      <div class="ktb-stat">
+        <span class="ktb-stat__value">{{ totalFunFlow() }}</span>
+        <span class="ktb-stat__label">FUN Flow</span>
+      </div>
+      <div class="ktb-stat ktb-stat--divider"></div>
+      <div class="ktb-stat">
+        <span class="ktb-stat__value">{{ familyScore() }}%</span>
+        <span class="ktb-stat__label">Health</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tabs ────────────────────────────────────────────────────────────── -->
+  <div class="ktb-tabs">
+    <button class="ktb-tab" [class.ktb-tab--active]="activeTab() === 'family'"    (click)="setTab('family')">Family</button>
+    <button class="ktb-tab" [class.ktb-tab--active]="activeTab() === 'community'" (click)="setTab('community')">Community</button>
+    <button class="ktb-tab" [class.ktb-tab--active]="activeTab() === 'vitals'"    (click)="setTab('vitals')">Vitals</button>
+    <button class="ktb-tab" [class.ktb-tab--active]="activeTab() === 'future'"    (click)="setTab('future')">Future</button>
+  </div>
+
+  <!-- ══ FAMILY TAB ════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'family') {
+  <div class="ktb-section">
+
+    <div class="ktb-section-label">
+      <div class="ktb-section-label__line"></div>
+      <span class="ktb-section-label__text">Kutumb Members</span>
+      <div class="ktb-section-label__line"></div>
+    </div>
+
+    @if (pendingInvites() > 0) {
+    <div class="ktb-notice">
+      <span class="ktb-notice__icon">◈</span>
+      <span class="ktb-notice__text">{{ pendingInvites() }} family member{{ pendingInvites() === 1 ? '' : 's' }} invited — awaiting Ceekul registration</span>
+    </div>
+    }
+
+    <div class="ktb-member-list">
+      @for (member of members(); track member.id; let i = $index) {
+      <div class="ktb-member" [class.ktb-member--open]="expandedMemberId() === member.id"
+           [style.--m-delay]="(i * 60) + 'ms'">
+        <button class="ktb-member__trigger" (click)="toggleMember(member.id)">
+          <div class="ktb-member__avatar" [class.ktb-member__avatar--active]="member.status === 'active'"
+               [class.ktb-member__avatar--invited]="member.status === 'invited'">
+            {{ member.name.split(' ')[0][0] }}{{ member.name.split(' ')[1]?.[0] ?? '' }}
+          </div>
+          <div class="ktb-member__info">
+            <span class="ktb-member__name">{{ member.name }}</span>
+            <span class="ktb-member__role">{{ member.role }}</span>
+          </div>
+          <div class="ktb-member__meta">
+            @if (member.status === 'active' && member.funFlow > 0) {
+            <span class="ktb-member__fun">{{ member.funFlow }} FUN</span>
+            }
+            <span class="ktb-member__badge" [class.ktb-member__badge--active]="member.status === 'active'"
+                  [class.ktb-member__badge--invited]="member.status === 'invited'"
+                  [class.ktb-member__badge--offline]="member.status === 'offline'">
+              {{ member.status }}
+            </span>
+          </div>
+          <svg class="ktb-member__chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4,6 8,10 12,6"/>
+          </svg>
+        </button>
+        @if (expandedMemberId() === member.id) {
+        <div class="ktb-member__body">
+          <div class="ktb-member__detail-row">
+            <span class="ktb-member__detail-label">Ceebrain ID</span>
+            <span class="ktb-member__detail-val">{{ member.cbId ?? '— Not registered' }}</span>
+          </div>
+          <div class="ktb-member__detail-row">
+            <span class="ktb-member__detail-label">Monthly FUN</span>
+            <span class="ktb-member__detail-val">{{ member.funFlow > 0 ? member.funFlow + ' neurons' : '— Pending' }}</span>
+          </div>
+          <div class="ktb-member__detail-row">
+            <span class="ktb-member__detail-label">Network Status</span>
+            <span class="ktb-member__detail-val">{{ member.status === 'invited' ? 'Invitation sent — not yet on Ceekul' : member.status === 'active' ? 'Active Ceebrain member' : 'Registered, not active' }}</span>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <button class="ktb-action-btn">
+      <span class="ktb-action-btn__icon">＋</span>
+      Invite a Family Member
+    </button>
+
+  </div>
+  }
+
+  <!-- ══ COMMUNITY TAB ══════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'community') {
+  <div class="ktb-section">
+
+    <div class="ktb-section-label">
+      <div class="ktb-section-label__line"></div>
+      <span class="ktb-section-label__text">Your Community Nodes</span>
+      <div class="ktb-section-label__line"></div>
+    </div>
+
+    <div class="ktb-community-grid">
+      @for (node of communityNodes(); track node.id; let i = $index) {
+      <div class="ktb-cnode" [class.ktb-cnode--inactive]="!node.active" [style.--cn-delay]="(i * 70) + 'ms'">
+        <div class="ktb-cnode__head">
+          <span class="ktb-cnode__glyph">{{ communityTypeIcon(node.type) }}</span>
+          <div class="ktb-cnode__badges">
+            <span class="ktb-cnode__type">{{ node.type }}</span>
+            <span class="ktb-cnode__status" [class.ktb-cnode__status--active]="node.active">
+              {{ node.active ? 'active' : 'inactive' }}
+            </span>
+          </div>
+        </div>
+        <h3 class="ktb-cnode__name">{{ node.name }}</h3>
+        <div class="ktb-cnode__footer">
+          <span class="ktb-cnode__role">{{ node.role }}</span>
+          <span class="ktb-cnode__members">{{ node.members | number }} members</span>
+        </div>
+        <div class="ktb-cnode__bar"></div>
+      </div>
+      }
+    </div>
+
+    <button class="ktb-action-btn">
+      <span class="ktb-action-btn__icon">◎</span>
+      Join a Community Group
+    </button>
+
+  </div>
+  }
+
+  <!-- ══ VITALS TAB ═════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'vitals') {
+  <div class="ktb-section">
+
+    <div class="ktb-section-label">
+      <div class="ktb-section-label__line"></div>
+      <span class="ktb-section-label__text">Kutumb Health Score</span>
+      <div class="ktb-section-label__line"></div>
+    </div>
+
+    <div class="ktb-score-card">
+      <div class="ktb-score-card__ring-wrap">
+        <svg class="ktb-score-ring" viewBox="0 0 80 80">
+          <circle class="ktb-score-ring__track" cx="40" cy="40" r="34" />
+          <circle class="ktb-score-ring__fill"  cx="40" cy="40" r="34"
+            [style.stroke-dasharray]="'213.63'"
+            [style.stroke-dashoffset]="213.63 * (1 - familyScore() / 100)" />
+        </svg>
+        <div class="ktb-score-ring__label">
+          <span class="ktb-score-ring__value">{{ familyScore() }}</span>
+          <span class="ktb-score-ring__unit">/ 100</span>
+        </div>
+      </div>
+      <div class="ktb-score-card__details">
+        <div class="ktb-vital">
+          <span class="ktb-vital__label">Total FUN Flow</span>
+          <span class="ktb-vital__value">{{ totalFunFlow() }} <span class="ktb-vital__unit">neurons / mo</span></span>
+        </div>
+        <div class="ktb-vital">
+          <span class="ktb-vital__label">Active Members</span>
+          <span class="ktb-vital__value">{{ activeMembers() }} <span class="ktb-vital__unit">of {{ members().length }}</span></span>
+        </div>
+        <div class="ktb-vital">
+          <span class="ktb-vital__label">Pending Invites</span>
+          <span class="ktb-vital__value">{{ pendingInvites() }} <span class="ktb-vital__unit">awaiting</span></span>
+        </div>
+        <div class="ktb-vital">
+          <span class="ktb-vital__label">Community Nodes</span>
+          <span class="ktb-vital__value">{{ communityNodes().length }} <span class="ktb-vital__unit">connected</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ktb-section-label ktb-section-label--mt">
+      <div class="ktb-section-label__line"></div>
+      <span class="ktb-section-label__text">Family FUN Distribution</span>
+      <div class="ktb-section-label__line"></div>
+    </div>
+
+    <div class="ktb-fun-bars">
+      @for (member of members(); track member.id) {
+      @if (member.funFlow > 0) {
+      <div class="ktb-fun-bar">
+        <span class="ktb-fun-bar__name">{{ member.name.split(' ')[0] }}</span>
+        <div class="ktb-fun-bar__track">
+          <div class="ktb-fun-bar__fill" [style.width.%]="(member.funFlow / totalFunFlow()) * 100"></div>
+        </div>
+        <span class="ktb-fun-bar__val">{{ member.funFlow }}</span>
+      </div>
+      }
+      }
+    </div>
+
+  </div>
+  }
+
+  <!-- ══ FUTURE TAB ═════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'future') {
+  <div class="ktb-section">
+
+    <div class="ktb-section-label">
+      <div class="ktb-section-label__line"></div>
+      <span class="ktb-section-label__text">Family Goals</span>
+      <div class="ktb-section-label__line"></div>
+    </div>
+
+    <div class="ktb-goal-meta">
+      <span class="ktb-goal-meta__item">{{ activeGoals() }} active</span>
+      <span class="ktb-goal-meta__sep">·</span>
+      <span class="ktb-goal-meta__item">{{ completedGoals() }} complete</span>
+      <span class="ktb-goal-meta__sep">·</span>
+      <span class="ktb-goal-meta__item">{{ goals().length - activeGoals() - completedGoals() }} planned</span>
+    </div>
+
+    <div class="ktb-goal-list">
+      @for (goal of goals(); track goal.id; let i = $index) {
+      <div class="ktb-goal" [class.ktb-goal--open]="expandedGoalId() === goal.id"
+           [style.--g-delay]="(i * 55) + 'ms'">
+        <button class="ktb-goal__trigger" (click)="toggleGoal(goal.id)">
+          <div class="ktb-goal__progress-ring">
+            <svg viewBox="0 0 28 28">
+              <circle class="ktb-goal__ring-track" cx="14" cy="14" r="11"/>
+              <circle class="ktb-goal__ring-fill"  cx="14" cy="14" r="11"
+                [style.stroke-dasharray]="'69.12'"
+                [style.stroke-dashoffset]="69.12 * (1 - goal.progress / 100)"/>
+            </svg>
+            <span class="ktb-goal__pct">{{ goal.progress }}</span>
+          </div>
+          <div class="ktb-goal__info">
+            <span class="ktb-goal__title">{{ goal.title }}</span>
+            <span class="ktb-goal__owner">{{ goal.owner }}</span>
+          </div>
+          <div class="ktb-goal__badges">
+            <span class="ktb-goal__horizon">{{ horizonLabel(goal.horizon) }}</span>
+            <span class="ktb-goal__status"
+              [class.ktb-goal__status--active]="goal.status === 'active'"
+              [class.ktb-goal__status--planned]="goal.status === 'planned'"
+              [class.ktb-goal__status--complete]="goal.status === 'complete'">
+              {{ goal.status }}
+            </span>
+          </div>
+          <svg class="ktb-goal__chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4,6 8,10 12,6"/>
+          </svg>
+        </button>
+        @if (expandedGoalId() === goal.id) {
+        <div class="ktb-goal__body">
+          <div class="ktb-goal__bar-wrap">
+            <div class="ktb-goal__bar" [style.width.%]="goal.progress"></div>
+          </div>
+          <div class="ktb-goal__detail-row">
+            <span class="ktb-goal__detail-label">Progress</span>
+            <span class="ktb-goal__detail-val">{{ goal.progress }}% complete</span>
+          </div>
+          <div class="ktb-goal__detail-row">
+            <span class="ktb-goal__detail-label">Horizon</span>
+            <span class="ktb-goal__detail-val">{{ horizonLabel(goal.horizon) }}</span>
+          </div>
+          <div class="ktb-goal__detail-row">
+            <span class="ktb-goal__detail-label">Owner</span>
+            <span class="ktb-goal__detail-val">{{ goal.owner }}</span>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <button class="ktb-action-btn">
+      <span class="ktb-action-btn__icon">＋</span>
+      Add a Family Goal
+    </button>
+
+  </div>
+  }
+
+  <!-- ── Footer ────────────────────────────────────────────────────────── -->
+  <div class="ktb-statement">
+    <div class="ktb-statement__rule"></div>
+    <p class="ktb-statement__text">The Kutumb is the living unit of civilisation — when families thrive, communities transform.</p>
+    <span class="ktb-statement__seal">CEEKUL · KUTUMB · NETWORK</span>
+  </div>
+
+</div>

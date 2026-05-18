@@ -1,0 +1,217 @@
+<div class="fut-page">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="fut-header">
+    <div class="fut-header__seal">
+      <div class="fut-seal">
+        <div class="fut-seal__ring fut-seal__ring--outer"></div>
+        <div class="fut-seal__ring fut-seal__ring--inner"></div>
+        <span class="fut-seal__glyph">◬</span>
+      </div>
+    </div>
+    <div class="fut-header__body">
+      <span class="fut-header__eyebrow">Personal · Future</span>
+      <h1 class="fut-header__title">My Future</h1>
+      <p class="fut-header__subtitle">Goals, Aspirations &amp; Life Plan</p>
+    </div>
+    <div class="fut-header__stats">
+      <div class="fut-stat">
+        <span class="fut-stat__value">{{ activeGoalsCount() }}</span>
+        <span class="fut-stat__label">Active Goals</span>
+      </div>
+      <div class="fut-stat fut-stat--divider"></div>
+      <div class="fut-stat">
+        <span class="fut-stat__value">{{ overallProgress() }}%</span>
+        <span class="fut-stat__label">Avg Progress</span>
+      </div>
+      <div class="fut-stat fut-stat--divider"></div>
+      <div class="fut-stat">
+        <span class="fut-stat__value">{{ blueprintScore() }}</span>
+        <span class="fut-stat__label">Life Score</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tabs ────────────────────────────────────────────────────────────── -->
+  <div class="fut-tabs">
+    <button class="fut-tab" [class.fut-tab--active]="activeTab() === 'goals'"        (click)="setTab('goals')">Goals</button>
+    <button class="fut-tab" [class.fut-tab--active]="activeTab() === 'aspirations'"  (click)="setTab('aspirations')">Aspirations</button>
+    <button class="fut-tab" [class.fut-tab--active]="activeTab() === 'blueprint'"    (click)="setTab('blueprint')">Blueprint</button>
+    <button class="fut-tab" [class.fut-tab--active]="activeTab() === 'timeline'"     (click)="setTab('timeline')">Timeline</button>
+  </div>
+
+  <!-- ══ GOALS TAB ══════════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'goals') {
+  <div class="fut-section">
+
+    <div class="fut-section-label">
+      <div class="fut-section-label__line"></div>
+      <span class="fut-section-label__text">Life Goals</span>
+      <div class="fut-section-label__line"></div>
+    </div>
+
+    <div class="fut-goal-list">
+      @for (goal of goals(); track goal.id; let i = $index) {
+      <div class="fut-goal" [class.fut-goal--open]="expandedGoalId() === goal.id"
+           [style.--g-delay]="(i * 55) + 'ms'">
+        <button class="fut-goal__trigger" (click)="toggleGoal(goal.id)">
+          <div class="fut-goal__ring-wrap">
+            <svg viewBox="0 0 28 28">
+              <circle class="fut-goal__ring-track" cx="14" cy="14" r="11"/>
+              <circle class="fut-goal__ring-fill"  cx="14" cy="14" r="11"
+                [style.stroke]="categoryColor(goal.category)"
+                [style.stroke-dasharray]="'69.12'"
+                [style.stroke-dashoffset]="69.12 * (1 - goal.progress / 100)"/>
+            </svg>
+            <span class="fut-goal__pct">{{ goal.progress }}</span>
+          </div>
+          <div class="fut-goal__info">
+            <span class="fut-goal__title">{{ goal.title }}</span>
+            <span class="fut-goal__category" [style.color]="categoryColor(goal.category)">{{ goal.category }}</span>
+          </div>
+          <div class="fut-goal__badges">
+            <span class="fut-goal__horizon">{{ horizonLabel(goal.horizon) }}</span>
+            <span class="fut-goal__status"
+              [class.fut-goal__status--active]="goal.status === 'active'"
+              [class.fut-goal__status--planned]="goal.status === 'planned'"
+              [class.fut-goal__status--complete]="goal.status === 'complete'">
+              {{ goal.status }}
+            </span>
+          </div>
+          <svg class="fut-goal__chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="4,6 8,10 12,6"/>
+          </svg>
+        </button>
+        @if (expandedGoalId() === goal.id) {
+        <div class="fut-goal__body">
+          <div class="fut-goal__bar-wrap">
+            <div class="fut-goal__bar" [style.width.%]="goal.progress" [style.background]="categoryColor(goal.category)"></div>
+          </div>
+          <div class="fut-goal__detail-row">
+            <span class="fut-goal__detail-label">Horizon</span>
+            <span class="fut-goal__detail-val">{{ horizonLabel(goal.horizon) }}</span>
+          </div>
+          <div class="fut-goal__detail-row">
+            <span class="fut-goal__detail-label">Category</span>
+            <span class="fut-goal__detail-val" [style.color]="categoryColor(goal.category)">{{ goal.category }}</span>
+          </div>
+          <div class="fut-goal__detail-row">
+            <span class="fut-goal__detail-label">Progress</span>
+            <span class="fut-goal__detail-val">{{ goal.progress }}% complete</span>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <button class="fut-action-btn">
+      <span class="fut-action-btn__icon">＋</span>
+      Add a Life Goal
+    </button>
+
+  </div>
+  }
+
+  <!-- ══ ASPIRATIONS TAB ════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'aspirations') {
+  <div class="fut-section">
+
+    <div class="fut-section-label">
+      <div class="fut-section-label__line"></div>
+      <span class="fut-section-label__text">Domain Visions</span>
+      <div class="fut-section-label__line"></div>
+    </div>
+
+    <div class="fut-asp-list">
+      @for (asp of aspirations(); track asp.id; let i = $index) {
+      <div class="fut-asp" [style.--asp-delay]="(i * 65) + 'ms'">
+        <div class="fut-asp__glyph">{{ asp.glyph }}</div>
+        <div class="fut-asp__body">
+          <span class="fut-asp__domain">{{ asp.domain }}</span>
+          <p class="fut-asp__vision">{{ asp.vision }}</p>
+          <div class="fut-asp__now">
+            <span class="fut-asp__now-label">Now</span>
+            <span class="fut-asp__now-text">{{ asp.current }}</span>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+  </div>
+  }
+
+  <!-- ══ BLUEPRINT TAB ══════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'blueprint') {
+  <div class="fut-section">
+
+    <div class="fut-section-label">
+      <div class="fut-section-label__line"></div>
+      <span class="fut-section-label__text">Life Blueprint Score — {{ blueprintScore() }} / 100</span>
+      <div class="fut-section-label__line"></div>
+    </div>
+
+    <div class="fut-pillar-grid">
+      @for (pillar of pillars(); track pillar.id; let i = $index) {
+      <div class="fut-pillar" [style.--p-delay]="(i * 60) + 'ms'">
+        <div class="fut-pillar__head">
+          <span class="fut-pillar__title">{{ pillar.title }}</span>
+          <span class="fut-pillar__score">{{ pillar.score }}</span>
+        </div>
+        <div class="fut-pillar__bar-wrap">
+          <div class="fut-pillar__bar" [style.width.%]="pillar.score"></div>
+        </div>
+        <p class="fut-pillar__desc">{{ pillar.description }}</p>
+      </div>
+      }
+    </div>
+
+  </div>
+  }
+
+  <!-- ══ TIMELINE TAB ═══════════════════════════════════════════════════════ -->
+  @if (activeTab() === 'timeline') {
+  <div class="fut-section">
+
+    <div class="fut-section-label">
+      <div class="fut-section-label__line"></div>
+      <span class="fut-section-label__text">Life Timeline</span>
+      <div class="fut-section-label__line"></div>
+    </div>
+
+    <div class="fut-timeline">
+      @for (event of timeline(); track event.year; let i = $index) {
+      <div class="fut-tl-item" [class.fut-tl-item--done]="event.done"
+           [class.fut-tl-item--milestone]="event.type === 'milestone'"
+           [class.fut-tl-item--vision]="event.type === 'vision'"
+           [style.--tl-delay]="(i * 70) + 'ms'">
+        <div class="fut-tl-item__spine">
+          <div class="fut-tl-item__dot"></div>
+          <div class="fut-tl-item__line"></div>
+        </div>
+        <div class="fut-tl-item__body">
+          <span class="fut-tl-item__year">{{ event.year }}</span>
+          <span class="fut-tl-item__title">{{ event.title }}</span>
+          <span class="fut-tl-item__type">{{ event.type }}</span>
+        </div>
+      </div>
+      }
+    </div>
+
+    <button class="fut-action-btn">
+      <span class="fut-action-btn__icon">＋</span>
+      Add a Timeline Event
+    </button>
+
+  </div>
+  }
+
+  <!-- ── Footer ────────────────────────────────────────────────────────── -->
+  <div class="fut-statement">
+    <div class="fut-statement__rule"></div>
+    <p class="fut-statement__text">The future is not something that happens to you — it is a civilisation you design, one deliberate act at a time.</p>
+    <span class="fut-statement__seal">CEEKUL · MY FUTURE · LIFE DESIGN</span>
+  </div>
+
+</div>
