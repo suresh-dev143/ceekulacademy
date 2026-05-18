@@ -19,15 +19,6 @@
     }
 }
 
-.snav-district {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    padding-bottom: 0.85rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    margin-bottom: 1rem;
-}
-
 .snav-cg-link {
     display: inline-flex;
     align-items: center;
@@ -52,13 +43,6 @@
     }
 }
 
-.snav-district-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #12650f;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
 
 .snav-body {
     flex: 1;

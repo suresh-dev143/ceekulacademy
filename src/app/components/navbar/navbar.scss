@@ -3,12 +3,13 @@
   top: 0;
   z-index: 1000;
   background: color-mix(in srgb, #000, transparent 20%);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
   padding: 0;
-  height: 93px;
+  height: 9rem;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid color-mix(in srgb, #fff, transparent 95%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 4px 32px rgba(0,0,0,0.6);
 }
 
 .navbar-container {
@@ -263,10 +264,10 @@
 
   .navbar-menu {
     position: fixed;
-    top: 64px;
+    top: 9rem;
     right: -100%;
     width: 100%;
-    height: calc(100vh - 64px);
+    height: calc(100vh - 9rem);
     background: var(--bg-primary);
     flex-direction: column;
     justify-content: flex-start;

@@ -3,63 +3,70 @@
 
     <div class="layout-columns">
 
-
-        <!-- Left Column (Sidebar) -->
+        <!-- ── Left Column ─────────────────────────────────────────────── -->
         @if (showLeftSidebar) {
         <aside class="col-left" [class.active]="mobileSidebarOpen()" [class.collapsed]="leftCollapsed()">
-            @if (!leftCollapsed()) {
-            <button class="toggle-sidebar-btn left" (click)="toggleLeft()">
-                ◀
-            </button>
-            }
-            @if (leftCollapsed()) {
-            <button class="expand-sidebar-btn left" (click)="expandLeft()">
-                ▶
-            </button>
-            }
 
-            <div class="sidebar-content">
+            @if (leftCollapsed()) {
+            <!-- Collapsed: expand button only -->
+            <button class="col-expand-btn" (click)="expandLeft()" aria-label="Expand sidebar">▶</button>
+            } @else {
+            <!-- Label box -->
+            <div class="col-panel-label">
+                <span class="col-panel-label__text">{{ leftLabel }}</span>
+                <button class="col-panel-label__collapse" (click)="toggleLeft()" aria-label="Collapse sidebar">◀</button>
+            </div>
+            <!-- Scrollable content -->
+            <div class="col-content">
                 @if (customLeftSidebar) {
                 <ng-content select="[slot=left-panel]"></ng-content>
                 } @else {
                 <app-sidebar-left [collapsed]="leftCollapsed()"></app-sidebar-left>
                 }
             </div>
+            }
+
         </aside>
         }
 
-        <!-- Center Column (Main Content) -->
+        <!-- ── Center Column ───────────────────────────────────────────── -->
         <main class="col-center" [class.left-collapsed]="leftCollapsed()" [class.right-collapsed]="rightCollapsed()">
+
             @if (showSearch) {
             <div class="center-search-bar">
+                <div class="csb-rule csb-rule--top"></div>
                 <app-global-search [localPlaceholder]="localPlaceholder"></app-global-search>
+                <div class="csb-rule csb-rule--bottom"></div>
             </div>
             }
+
             <ng-content></ng-content>
         </main>
 
-        <!-- Right Column (Chat/Info) -->
+        <!-- ── Right Column ────────────────────────────────────────────── -->
         @if (showRightSidebar) {
         <aside class="col-right" [class.collapsed]="rightCollapsed()" [class.active]="mobileRightSidebarOpen()">
-            @if (!rightCollapsed()) {
-            <button class="toggle-sidebar-btn right" (click)="toggleRight()">
-                ▶
-            </button>
-            }
-            @if (rightCollapsed()) {
-            <button class="expand-sidebar-btn right" (click)="expandRight()">
-                ◀
-            </button>
-            }
 
-            <div class="sidebar-content" [class.hidden]="rightCollapsed()">
+            @if (rightCollapsed()) {
+            <!-- Collapsed: expand button only -->
+            <button class="col-expand-btn col-expand-btn--right" (click)="expandRight()" aria-label="Expand sidebar">◀</button>
+            } @else {
+            <!-- Label box -->
+            <div class="col-panel-label col-panel-label--right">
+                <button class="col-panel-label__collapse col-panel-label__collapse--right" (click)="toggleRight()" aria-label="Collapse sidebar">▶</button>
+                <span class="col-panel-label__text">{{ rightLabel }}</span>
+            </div>
+            <!-- Scrollable content -->
+            <div class="col-content" [class.hidden]="rightCollapsed()">
                 <ng-content select="[slot=right-panel]"></ng-content>
                 <app-chat-panel (closeChat)="toggleMobileRightSidebar()"></app-chat-panel>
             </div>
+            }
+
         </aside>
         }
 
-        <!-- Overlay for mobile sidebar -->
+        <!-- Mobile overlays -->
         @if (mobileSidebarOpen()) {
         <div class="sidebar-overlay" (click)="toggleMobileSidebar()"></div>
         }
@@ -67,28 +74,23 @@
         <div class="sidebar-overlay" (click)="toggleMobileRightSidebar()"></div>
         }
 
-        <!-- Global toast notifications -->
         <app-toast></app-toast>
 
         <!-- Mobile Bottom Navigation -->
         <div class="mobile-bottom-nav">
             <button class="nav-item" (click)="navbar.toggleMenu()">
-
                 <span>&#x2B24;</span>
             </button>
             <button class="nav-item" (click)="toggleMobileSidebar()">
-
                 <span>&#x2B24;</span>
             </button>
-
             <button class="nav-item">
-
                 <span>&#x2B24;</span>
             </button>
             <button class="nav-item" (click)="toggleMobileRightSidebar()">
-
                 <span>&#x2B24;</span>
             </button>
         </div>
+
     </div>
 </div>

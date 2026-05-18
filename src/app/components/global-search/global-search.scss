@@ -16,7 +16,7 @@
     height: 3rem;
     padding: 0 0.5rem 0 0.9rem;
     transition: border-color 0.2s, box-shadow 0.2s;
-    margin: 0.5rem 0rem;
+    margin: 0;
     &:focus-within {
         border-color: var(--accent-primary);
         box-shadow: 0 0 0 2px rgba(239, 157, 87, 0.08);
