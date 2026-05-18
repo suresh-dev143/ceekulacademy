@@ -1,7 +1,11 @@
-<app-layout [customLeftSidebar]="true" [showRightSidebar]="true">
-  <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left>
+<app-layout [showLeftSidebar]="false" [showRightSidebar]="true">
+ 
+  <header class="cv-header">
+            <h2 class="cv-header__title">Contribute</h2>
+         
+          </header>
 <div class="panel-form">
-  <h2 class="panel__heading">Contribute via Cramib</h2>
+  
   <p class="panel__note">
     Select the entity you want to contribute to and enter the amount.
     You will be redirected to <b>Cramib</b> to complete the payment securely.
@@ -49,7 +53,7 @@
     }
 
     <button type="submit" class="form__submit" [disabled]="contributionLoading()">
-      {{ contributionLoading() ? 'Processing…' : 'Pay via Cramib' }}
+      {{ contributionLoading() ? 'Processing…' : 'Pay' }}
     </button>
   </form>
 

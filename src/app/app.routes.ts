@@ -17,7 +17,8 @@ import { Personal } from './pages/personal/personal-page/personal';
 import { MyActivities } from './pages/personal/my-activities/my-activities';
 
 export const routes: Routes = [
-  { path: 'home', loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent) },
+  // { path: 'home', loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent) },
+    { path: 'mission', redirectTo: 'dashboard/director', pathMatch: 'full' },
   { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard-home').then(m => m.DashboardHomeComponent) },
   { path: 'dashboard/courses', loadComponent: () => import('./pages/courses/courses').then(m => m.CoursesComponent) },
   { path: 'dashboard/advisor', loadComponent: () => import('./pages/advisor-dashboard/advisor-dashboard').then(m => m.AdvisorDashboardComponent) },

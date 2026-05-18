@@ -14,17 +14,17 @@
             }
 
             <!-- 4rem label box — only when a label is supplied -->
-            @if (leftLabel && !leftCollapsed()) {
+            <!-- @if (leftLabel && !leftCollapsed()) {
             <div class="col-panel-label">
                 <span class="col-panel-label__text">{{ leftLabel }}</span>
             </div>
-            }
+            } -->
 
             <div class="sidebar-content">
                 @if (customLeftSidebar) {
                 <ng-content select="[slot=left-panel]"></ng-content>
                 } @else {
-                <app-sidebar-left [collapsed]="leftCollapsed()"></app-sidebar-left>
+                <!-- <app-sidebar-left [collapsed]="leftCollapsed()"></app-sidebar-left> -->
                 }
             </div>
         </aside>

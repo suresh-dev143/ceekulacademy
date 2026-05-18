@@ -18,7 +18,7 @@
             (click)="selectSection('cg-pool')">
             <span class="gov-pool-btn__glyph" aria-hidden="true">⬡</span>
             <div class="gov-pool-btn__body">
-              <span class="gov-pool-btn__label">Collective Governance Pool</span>
+              <span class="gov-pool-btn__label">Collective Consciousness</span>
               <span class="gov-pool-btn__id">CG100000000000</span>
             </div>
             <span class="gov-pool-btn__tag">1% Commons</span>
@@ -57,6 +57,8 @@
     <!-- ══ CENTER COLUMN — DYNAMIC CONTENT RENDERER ═══════════════════════════ -->
     <main class="academy-grid__center" [class.mobile-active]="activeTab() === 'content'">
       <div class="academy-canvas">
+        
+        <app-global-search></app-global-search>
 
         @if (activePageComponent(); as cmp) {
         <ng-container [ngComponentOutlet]="cmp"></ng-container>
@@ -65,14 +67,14 @@
 
           <!-- Section Header -->
           <header class="ac-header">
-            <div class="ac-header__meta">
+            <!-- <div class="ac-header__meta">
               <span class="ac-header__tag">Ceekul Academy</span>
               <span class="ac-header__sep">·</span>
               <span class="ac-header__role">{{ sec.title }}</span>
               @if (sec.govId) {
               <span class="ac-header__gov-id">{{ sec.govId }}</span>
               }
-            </div>
+            </div> -->
             <h2 class="ac-header__heading">{{ sec.heading }}</h2>
             <p class="ac-header__tagline">{{ sec.tagline }}</p>
             <div class="ac-header__rule"></div>

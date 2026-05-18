@@ -10,6 +10,7 @@ import { Planners } from './planners/planners';
 import { Transformers } from './transformers/transformers';
 import { Directors } from './directors/directors';
 import { Managers } from './managers/managers';
+import { GlobalSearchComponent } from '../../components/global-search/global-search';
 
 interface AcademyPillar {
   title: string;
@@ -29,7 +30,7 @@ interface AcademySection {
 @Component({
   selector: 'app-ceekul-academy',
   standalone: true,
-  imports: [CommonModule, NgComponentOutlet],
+  imports: [CommonModule, NgComponentOutlet,GlobalSearchComponent],
   templateUrl: './ceekul-academy.html',
   styleUrl: './ceekul-academy.scss',
 })

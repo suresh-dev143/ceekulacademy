@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LayoutComponent } from '../../components/layout/layout';
+import { HomeSidebarLeftComponent } from '../home/home-sidebar-left/home-sidebar-left';
 import { AssetInvestmentService, AssetInvestment, InvestmentArea, AssetType, ScopeType } from '../../services/asset-investment.service';
 
 @Component({
     selector: 'app-invest-page',
     standalone: true,
-    imports: [FormsModule, LayoutComponent],
+    imports: [FormsModule, LayoutComponent, HomeSidebarLeftComponent],
     templateUrl: './invest.html',
     styleUrl: './invest.scss'
 })

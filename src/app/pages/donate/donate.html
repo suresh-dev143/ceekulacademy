@@ -2,7 +2,7 @@
     <div class="donate-container">
         <!-- Success State -->
         @if (submissionSuccess()) {
-        <div class="success-card glass-card animated-fade-in">
+        <div class="success-card animated-fade-in">
             <div class="icon-circle">
                 <i class="fas fa-check"></i>
             </div>
@@ -32,11 +32,12 @@
 
         <!-- Donation Form -->
         @if (!submissionSuccess()) {
-        <div class="donation-form glass-card animated-fade-in">
-            <header class="form-header">
-                <h1>Make a Difference</h1>
-                <p>Empower communities through direct, transparent contribution.</p>
+             <header class="cv-header">
+                <h2 class="cv-header__title">Donate</h2>
             </header>
+        <div class="donation-form animated-fade-in">
+           
+            <p class="panel__note">Empower communities through direct, transparent contribution. Every rupee goes to your chosen cause.</p>
 
             <form (ngSubmit)="submitDonation()">
 

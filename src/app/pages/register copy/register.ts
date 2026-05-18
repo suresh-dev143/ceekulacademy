@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { CeebrainIdService } from '../../services/ceebrain-id.service';
 import { LifeOrchestratorService } from '../../services/life-orchestrator.service';
 import { Navbar } from '../../components/landing-layout/landing-navbar/landing-navbar';
+import {GlobalSearchComponent} from '../../components/global-search/global-search';
 
 type Step =
   | 'entry'
@@ -24,7 +25,7 @@ type DisagreementCategory = 'confusion' | 'suggestion' | 'concern' | 'rejection'
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, Navbar],
+  imports: [ReactiveFormsModule, RouterLink, Navbar, GlobalSearchComponent],
   templateUrl: './register.html',
   styleUrl: './register.scss'
 })

@@ -75,7 +75,7 @@ $font: 'Inter', 'Satoshi', -apple-system, sans-serif;
   backdrop-filter: blur(12px);
   border: 1px solid $border;
  
-  padding: 2rem;
+  padding: 1.63rem 2rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   height: 100%;
 }
@@ -252,10 +252,16 @@ $font: 'Inter', 'Satoshi', -apple-system, sans-serif;
   pointer-events: none;
   overflow: hidden;
   z-index: 0;
+  
 }
+.search-container{
+  padding: 0 2.5rem;
+ border-bottom: 1px solid #2a2a2a;
 
+}
 // Central radial glow (nucleus)
 .reg-glow {
+
   position: absolute;
   top: 42%;
   left: 50%;
@@ -722,7 +728,7 @@ $font: 'Inter', 'Satoshi', -apple-system, sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: $accent;
-    margin: 0 0 1rem;
+    margin: 0.1rem;
     text-align: center;
   }
 

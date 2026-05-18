@@ -4,13 +4,12 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { NeuronService } from '../../services/neuron.service';
 import { PaymentService } from '../../services/payment.service';
 import { environment } from '../../../environments/environment';
-import { HomeSidebarLeftComponent } from '../home/home-sidebar-left/home-sidebar-left';
 import { LayoutComponent } from '../../components/layout/layout';
 
 @Component({
   selector: 'app-contribute',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule,LayoutComponent, HomeSidebarLeftComponent],
+  imports: [DecimalPipe, ReactiveFormsModule,LayoutComponent],
   templateUrl: './contribute.html',
   styleUrl: './contribute.scss',
 })

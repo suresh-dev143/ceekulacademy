@@ -6,78 +6,30 @@
       </div>
     </a>
     <button class="menu-toggle" (click)="toggleMenu()" [class.active]="isMenuOpen">
-      <span>&#x2B24;</span>
-
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
-
-    <div class="navbar-menu" [class.active]="isMenuOpen">
-      <div class="close-btn">
-        <button class="close-menu-btn" (click)="closeMenu()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link"
-        (click)="closeMenu()">
-        Home
-      </a>
-      <a routerLink="/about" routerLinkActive="active" class="nav-link" (click)="closeMenu()">
-        About
-      </a>
-      <a routerLink="/programs" routerLinkActive="active" class="nav-link dropdown-toggle"
-        (click)="togglePrograms($event)">
-        Projects
-      </a>
-      <!-- Programs Dropdown (Hover-based/Click for mobile) -->
-      <!-- <div class="nav-dropdown" [class.active]="isProgramsOpen">
-        <a routerLink="/programs" routerLinkActive="active" class="nav-link dropdown-toggle"
-          (click)="togglePrograms($event)">
-          Programs
-        </a>
-        <div class="dropdown-menu">
-          <div class="dropdown-submenu">
-            <a class="dropdown-item" routerLink="/innovative" (click)="closeMenu()">
-              Innovative Courses
-            </a>
-          </div>
-          <a class="dropdown-item" (click)="closeMenu()">Futuristic Research</a>
-          <a class="dropdown-item" (click)="closeMenu()">Project Development</a>
-          <a class="dropdown-item" (click)="closeMenu()">Online Services</a>
-          <a class="dropdown-item" (click)="closeMenu()">Webinars &
-            Workshops</a>
-          <a routerLink="/transformation" class="dropdown-item" (click)="closeMenu()">
-            Socio-Economic Transformation
-          </a>
-          <a href="#" class="dropdown-item" (click)="closeMenu()">Global Harmony & Peace</a>
-        </div>
-      </div> -->
-
-    <a routerLink="/donate" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
-        Donate
-      </a>
-      <a routerLink="/contribute" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
-        Contribute
-      </a>
-   
-     
-         <a routerLink="/invest" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
-        Construct
-      </a> <a routerLink="/" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
-        Collaborate
-      </a>
-      <a routerLink="/contact" routerLinkActive="active" class="nav-link " (click)="closeMenu()">
-        Contact
-      </a>
-      <!-- Search Bar -->
-      <!-- <div class="nav-search">
-        <input type="text" [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search..."
-          class="search-input">
-        <button (click)="onSearch()" class="search-btn">
-          <i class="fas fa-search"></i>
-        </button>
-      </div> -->
-
-     
-    </div>
   </div>
 </nav>
+
+<!-- Drawn outside <nav> so backdrop-filter doesn't trap position:fixed -->
+<div class="navbar-menu" [class.active]="isMenuOpen">
+  <div class="close-btn">
+    <button class="close-menu-btn" (click)="closeMenu()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" (click)="closeMenu()">Home</a>
+  <a routerLink="/about" routerLinkActive="active" class="nav-link" (click)="closeMenu()">About</a>
+  <a routerLink="/programs" routerLinkActive="active" class="nav-link" (click)="togglePrograms($event)">Projects</a>
+  <a routerLink="/contribute" routerLinkActive="active" class="nav-link" (click)="closeMenu()">Contribute</a>
+  <a routerLink="/activate" routerLinkActive="active" class="nav-link" (click)="closeMenu()">Activate</a>
+  <a routerLink="/invest" routerLinkActive="active" class="nav-link" (click)="closeMenu()">Allocate</a>
+  <a routerLink="/donate" routerLinkActive="active" class="nav-link" (click)="closeMenu()">Donate</a>
+  <a routerLink="/contact" routerLinkActive="active" class="nav-link" (click)="closeMenu()">Contact</a>
+</div>
+
+<!-- Backdrop overlay -->
+<div class="menu-backdrop" [class.active]="isMenuOpen" (click)="closeMenu()"></div>
