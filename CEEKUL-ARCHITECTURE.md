@@ -78,8 +78,8 @@ semantic workflows · contextual orchestration · lineage-aware memory · sparse
 | 6 | Multi-Scale AI Orchestration | ✅ Foundation built | 1 | `SemanticContextService.assistanceMode` + full-app route inference |
 | 7 | Semantic Delta Networking | ⬜ Medium-term | 2 | — |
 | 8 | Planetary Resource Orchestration | ⬜ Medium-term | 2 | — |
-| 9 | Distributed Human Coherence | 🔶 Foundation | 1 | Dinner workflow lifecycle; full-app intent routing (30+ routes) |
-| 10 | Adaptive UI/UX | 🔶 Foundation | 1 | `SemanticContextService`, 3-panel layout |
+| 9 | Distributed Human Coherence | 🔶 Partial | 1 | Dinner workflow; village OS (`/village`); 30+ route intent inference |
+| 10 | Adaptive UI/UX | ✅ Foundation built | 1 | `SemanticIntelligencePanelComponent`; `SemanticContextService`; 3-panel layout |
 | 11 | Reality Reconstruction / XR | ⬜ Long-term | 3 | — |
 | 12 | Self-Evolving Infrastructure | ⬜ Near-term | 1 | — |
 | 13 | Distributed Local-First | ⬜ Medium-term | 2 | — |
@@ -249,11 +249,13 @@ temporalConsistency:      5%
 - ✅ SemanticContextService (Layer 6/10 foundation)
 - ✅ Layer 2: VA avatar reads `assistanceMode` — 5 persona modes (mentor/navigator/advocate/collaborator/coordinator)
 - ✅ Layer 9 foundation: full-app route → intent inference (30+ routes); dinner workflow lifecycle wired to `beginWorkflow`/`endWorkflow`
+- ✅ Layer 9 village: Village Welfare Orchestration OS (`/village`) — issues, welfare board, volunteers, coordination, resources
+- ✅ Layer 10: `SemanticIntelligencePanelComponent` in layout right column — 5 persona modes, workflow strip, semantic neighbors
 
 **Next (Phase 1 continuation):**
-- Layer 9: Village welfare orchestration UI (collective issue tracking, village coordination board)
 - Layer 12: Self-optimizing workflow engine (detect and restructure inefficient patterns)
-- Layer 10: Panel emergence — panels adapt content to active semantic intent
+- Layer 10 deep: panels adapt left-column content to semantic intent (not just right-panel)
+- Layer 2 deep: AI avatar sends semantic context as part of every `/api/va/interact` call
 
 ### Phase 2 — Infrastructure Patterns (18 months–5 years)
 - Layer 4: Dormant computation fabric (temporary task-specific modules)
