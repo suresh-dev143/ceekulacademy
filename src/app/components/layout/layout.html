@@ -60,6 +60,7 @@
             }
 
             <div class="sidebar-content" [class.hidden]="rightCollapsed()">
+                <app-semantic-panel></app-semantic-panel>
                 <ng-content select="[slot=right-panel]"></ng-content>
                 <app-chat-panel (closeChat)="toggleMobileRightSidebar()"></app-chat-panel>
             </div>
