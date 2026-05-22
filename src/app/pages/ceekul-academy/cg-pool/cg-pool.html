@@ -1,14 +1,22 @@
 <div class="cgp-page">
 
-  <!-- ══ TAB NAV ══════════════════════════════════════════════════════════════ -->
-  <nav class="cgp-tab-nav">
-    <button class="cgp-tab-btn" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
-      ⬡ Overview
-    </button>
-    <button class="cgp-tab-btn cgp-tab-btn--apply" [class.active]="activeTab() === 'apply'" (click)="activeTab.set('apply')">
-      ◎ Apply for Support
-    </button>
-  </nav>
+  <!-- ══ PAGE HEADER — 105px sticky ══════════════════════════════════════════ -->
+  <header class="cgp-page-head">
+    <div class="cgp-page-head__top">
+      <span class="cgp-page-head__glyph" aria-hidden="true">⬡</span>
+      <h1 class="cgp-page-head__title">Collective Consciousness</h1>
+      <span class="cgp-page-head__id">CG100000000000</span>
+    </div>
+    <nav class="cgp-page-head__nav">
+      <button class="cgp-phn-link" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">Overview</button>
+      <span class="cgp-phn-divider" aria-hidden="true"></span>
+      @for (sec of navSections; track sec.id) {
+        <button class="cgp-phn-section" (click)="scrollToSection(sec.id)">{{ sec.label }}</button>
+      }
+      <span class="cgp-phn-spacer"></span>
+      <button class="cgp-phn-apply" [class.active]="activeTab() === 'apply'" (click)="activeTab.set('apply')">◎ Apply</button>
+    </nav>
+  </header>
 
   @if (activeTab() === 'apply') {
     <!-- ══ WELFARE APPLICATION ════════════════════════════════════════════════ -->
@@ -70,7 +78,7 @@
   </header>
 
   <!-- ══ CONSTITUTIONAL PRINCIPLES ══════════════════════════════════════════ -->
-  <section class="cgp-constitution">
+  <section class="cgp-constitution" id="cgp-constitution">
 
     <div class="cgp-constitution__banner">
       <span class="cgp-constitution__banner-glyph" aria-hidden="true">⬡</span>
@@ -99,7 +107,7 @@
   </section>
 
   <!-- ══ THE 33·1 PROTOCOL ════════════════════════════════════════════════════ -->
-  <section class="cgp-protocol">
+  <section class="cgp-protocol" id="cgp-protocol">
     <div class="cgp-section-label">
       <span class="cgp-section-label__line" aria-hidden="true"></span>
       <span class="cgp-section-label__text">The 33·1 Protocol</span>
@@ -173,7 +181,7 @@
   </section>
 
   <!-- ══ CG STREAMS ══════════════════════════════════════════════════════════ -->
-  <section class="cgp-streams">
+  <section class="cgp-streams" id="cgp-streams">
     <div class="cgp-section-label">
       <span class="cgp-section-label__line" aria-hidden="true"></span>
       <span class="cgp-section-label__text">CG Pool Streams</span>
@@ -225,7 +233,7 @@
   </section>
 
   <!-- ══ STREAM USAGE PRINCIPLES ════════════════════════════════════════════════ -->
-  <section class="cgp-usage">
+  <section class="cgp-usage" id="cgp-usage">
     <div class="cgp-section-label">
       <span class="cgp-section-label__line" aria-hidden="true"></span>
       <span class="cgp-section-label__text">Stream Usage Principles</span>
@@ -257,7 +265,7 @@
   </section>
 
   <!-- ══ AUTOMATION FLOW ══════════════════════════════════════════════════════ -->
-  <section class="cgp-autoflow">
+  <section class="cgp-autoflow" id="cgp-autoflow">
     <div class="cgp-section-label">
       <span class="cgp-section-label__line" aria-hidden="true"></span>
       <span class="cgp-section-label__text">Automated Neuron Flow Engine</span>
@@ -281,7 +289,7 @@
   </section>
 
   <!-- ══ LEGACY DISTRIBUTION PROTOCOL ════════════════════════════════════════ -->
-  <section class="cgp-legacy">
+  <section class="cgp-legacy" id="cgp-legacy">
     <div class="cgp-section-label">
       <span class="cgp-section-label__line" aria-hidden="true"></span>
       <span class="cgp-section-label__text">Legacy Distribution Protocol</span>
@@ -352,7 +360,7 @@
   </section>
 
   <!-- ══ SOLIDARITY ADVANCE CALLOUT ═══════════════════════════════════════════ -->
-  <section class="cgp-solidarity">
+  <section class="cgp-solidarity" id="cgp-solidarity">
     <div class="cgp-solidarity__card">
       <div class="cgp-solidarity__head">
         <span class="cgp-solidarity__icon" aria-hidden="true">◎</span>
@@ -391,7 +399,7 @@
   </section>
 
   <!-- ══ UPLIFT PATHWAY PROGRAM ══════════════════════════════════════════════ -->
-  <section class="cgp-uplift">
+  <section class="cgp-uplift" id="cgp-uplift">
     <div class="cgp-section-label">
       <span class="cgp-section-label__line" aria-hidden="true"></span>
       <span class="cgp-section-label__text">Uplift Pathway — SUN · CG Program</span>

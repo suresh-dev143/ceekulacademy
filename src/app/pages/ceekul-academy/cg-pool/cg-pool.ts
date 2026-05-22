@@ -72,11 +72,29 @@ interface NeuronUsageRule {
   styleUrl: './cg-pool.scss',
 })
 export class CGPool {
-  readonly activeTab     = signal<'overview' | 'apply'>('overview');
+  readonly activeTab      = signal<'overview' | 'apply'>('overview');
   readonly expandedStream = signal<string | null>(null);
+
+  readonly navSections = [
+    { label: 'Governance',   id: 'cgp-constitution' },
+    { label: '33·1 Protocol', id: 'cgp-protocol' },
+    { label: 'Streams',      id: 'cgp-streams' },
+    { label: 'Usage',        id: 'cgp-usage' },
+    { label: 'Auto-flow',    id: 'cgp-autoflow' },
+    { label: 'Legacy',       id: 'cgp-legacy' },
+    { label: 'Solidarity',   id: 'cgp-solidarity' },
+    { label: 'Uplift',       id: 'cgp-uplift' },
+  ];
 
   toggleStream(id: string): void {
     this.expandedStream.update(v => v === id ? null : id);
+  }
+
+  scrollToSection(id: string): void {
+    this.activeTab.set('overview');
+    setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 
   readonly constitutionalPrinciples: ConstitutionalPrinciple[] = [

@@ -1407,38 +1407,135 @@ $text-bright: #ccd8f8;
   }
 }
 
-// ── Tab Nav ───────────────────────────────────────────────────────────────────
-.cgp-tab-nav {
-  display: flex;
-  border-bottom: 1px solid rgba($indigo, 0.12);
-  background: $bg-card;
+// ── Page Header (105px sticky) ────────────────────────────────────────────────
+.cgp-page-head {
   position: sticky;
   top: 0;
   z-index: 10;
-  overflow-x: auto;
-  &::-webkit-scrollbar { display: none; }
+  height: 105px;
+  background: $bg-card;
+  border-bottom: 1px solid rgba($indigo, 0.14);
+  display: flex;
+  flex-direction: column;
+  margin: -2rem -2.5rem 2rem;
+
+  @media (max-width: 600px) { margin: -1.5rem -1.25rem 1.5rem; }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.5rem 0.45rem;
+    flex-shrink: 0;
+  }
+
+  &__glyph {
+    font-size: 1rem;
+    color: $indigo;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $text-bright;
+    flex: 1;
+  }
+
+  &__id {
+    font-size: 0.48rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: $indigo;
+    font-family: 'Courier New', monospace;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid rgba($indigo, 0.25);
+    border-radius: 2rem;
+    background: $indigo-soft;
+    flex-shrink: 0;
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding: 0 1rem;
+    border-top: 1px solid rgba($indigo, 0.07);
+    overflow-x: auto;
+    gap: 0;
+    &::-webkit-scrollbar { display: none; }
+  }
 }
 
-.cgp-tab-btn {
+.cgp-phn-link {
   flex-shrink: 0;
-  padding: 0.9rem 1.6rem;
+  padding: 0 0.875rem;
+  height: 100%;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
   color: $text-dim;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s;
+  white-space: nowrap;
+
+  &:hover { color: $text-body; }
+  &.active { color: $indigo; border-bottom-color: $indigo; }
+}
+
+.cgp-phn-divider {
+  width: 1px;
+  height: 1rem;
+  background: rgba($indigo, 0.15);
+  flex-shrink: 0;
+  margin: 0 0.25rem;
+}
+
+.cgp-phn-section {
+  flex-shrink: 0;
+  padding: 0 0.6rem;
+  height: 100%;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: $text-mid;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.15s;
+  white-space: nowrap;
+
+  &:hover { color: $indigo; }
+}
+
+.cgp-phn-spacer { flex: 1; }
+
+.cgp-phn-apply {
+  flex-shrink: 0;
+  padding: 0.3rem 0.875rem;
+  margin: auto 0;
+  background: rgba($violet, 0.08);
+  border: 1px solid rgba($violet, 0.22);
+  border-radius: 2rem;
+  color: $violet;
+  font-size: 0.62rem;
+  font-weight: 700;
   letter-spacing: 0.06em;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
 
-  &:hover { color: $text-body; }
-  &.active { color: $indigo; border-bottom-color: $indigo; }
-
-  &--apply {
-    &.active { color: $violet; border-bottom-color: $violet; }
-  }
+  &:hover { background: rgba($violet, 0.14); }
+  &.active { background: rgba($violet, 0.16); border-color: rgba($violet, 0.45); }
 }
 
 // ── Apply wrapper ─────────────────────────────────────────────────────────────
