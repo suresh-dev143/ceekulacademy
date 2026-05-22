@@ -271,11 +271,17 @@
 }
 
 .vm-cell {
+  display: block;
+  text-decoration: none;
+  color: inherit;
   background: #06090f;
   border: 1px solid #0f172a;
   padding: 0.75rem;
   position: relative;
+  transition: border-color 0.15s, background 0.15s;
+  cursor: pointer;
 
+  &:hover { border-color: #1e293b; background: #080c14; }
   &.vm-alert { border-color: #ef444433; background: #ef444408; }
   &.vm-monitor { border-color: #fb923c33; background: #fb923c05; }
 }
@@ -672,6 +678,54 @@
 
 // ── Villages Panel ────────────────────────────────────────────────────────────
 
+.village-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.village-search-input {
+  flex: 1;
+  min-width: 180px;
+  background: #06090f;
+  border: 1px solid #0f172a;
+  color: #e2e8f0;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.8rem;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus { border-color: #1e293b; }
+  &::placeholder { color: #334155; }
+}
+
+.village-filter-pills {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.vfp {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  background: transparent;
+  border: 1px solid #0f172a;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { border-color: #1e293b; color: #94a3b8; }
+
+  &--active {
+    border-color: #00d2ff44;
+    color: #00d2ff;
+    background: #00d2ff08;
+  }
+}
+
 .village-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -680,14 +734,30 @@
 }
 
 .village-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
   background: #06090f;
   border: 1px solid #0f172a;
   padding: 1.25rem;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
+  cursor: pointer;
+  position: relative;
 
-  &:hover { border-color: #1e293b; }
+  &:hover { border-color: #1e293b; background: #080c14; }
   &.vc-alert   { border-color: #ef444433; background: #ef444406; }
   &.vc-monitor { border-color: #fb923c33; background: #fb923c04; }
+}
+
+.vc-open-link {
+  font-size: 0.65rem;
+  color: #00d2ff;
+  letter-spacing: 0.06em;
+  margin-top: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+
+  .village-card:hover & { opacity: 1; }
 }
 
 .vc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; }

@@ -73,7 +73,7 @@
             <div class="card-title">Village Health Matrix</div>
             <div class="village-matrix">
               @for (v of villages; track v.id) {
-                <div class="vm-cell" [class.vm-alert]="v.status === 'alert'" [class.vm-monitor]="v.status === 'monitoring'">
+                <a class="vm-cell" [routerLink]="['/cg', v.id]" [class.vm-alert]="v.status === 'alert'" [class.vm-monitor]="v.status === 'monitoring'">
                   <div class="vm-name">{{ v.name }}</div>
                   <div class="vm-bars">
                     <div class="vm-bar-row">
@@ -94,7 +94,7 @@
                   @if (v.alerts > 0) {
                     <div class="vm-alerts">⚠ {{ v.alerts }}</div>
                   }
-                </div>
+                </a>
               }
             </div>
           </div>
@@ -372,10 +372,27 @@
           <p>128 village managers streaming real-time ecological and community intelligence</p>
         </div>
 
+        <!-- Search + filter -->
+        <div class="village-search-bar">
+          <input class="village-search-input"
+                 [value]="villageSearch()"
+                 (input)="villageSearch.set($any($event.target).value)"
+                 placeholder="Search villages…" />
+          <div class="village-filter-pills">
+            @for (s of ['all','active','monitoring','alert']; track s) {
+              <button class="vfp" [class.vfp--active]="villageStatusFilter() === s"
+                      (click)="villageStatusFilter.set(s)">
+                {{ s === 'all' ? 'All' : s | uppercase }}
+              </button>
+            }
+          </div>
+        </div>
+
         <!-- Village Cards -->
         <div class="village-grid">
-          @for (v of villages; track v.id) {
-            <div class="village-card" [class.vc-alert]="v.status === 'alert'" [class.vc-monitor]="v.status === 'monitoring'">
+          @for (v of filteredVillages(); track v.id) {
+            <a class="village-card" [routerLink]="['/cg', v.id]"
+               [class.vc-alert]="v.status === 'alert'" [class.vc-monitor]="v.status === 'monitoring'">
               <div class="vc-header">
                 <div class="vc-name">{{ v.name }}</div>
                 <div class="vc-status-badge" [class.vsb-active]="v.status === 'active'" [class.vsb-alert]="v.status === 'alert'" [class.vsb-monitor]="v.status === 'monitoring'">
@@ -406,7 +423,8 @@
               @if (v.alerts > 0) {
                 <div class="vc-alerts">⚠ {{ v.alerts }} active alert{{ v.alerts > 1 ? 's' : '' }}</div>
               }
-            </div>
+              <div class="vc-open-link">Open CG Page →</div>
+            </a>
           }
         </div>
 

@@ -52,8 +52,10 @@ export interface EvolutionPhase {
 })
 export class DistrictComponent {
 
-  readonly activeTab   = signal<DistrictTab>('overview');
-  readonly expandedRec = signal<number | null>(null);
+  readonly activeTab          = signal<DistrictTab>('overview');
+  readonly expandedRec        = signal<number | null>(null);
+  readonly villageSearch      = signal('');
+  readonly villageStatusFilter = signal<'all' | 'active' | 'monitoring' | 'alert'>('all');
 
   readonly districtName  = 'TIRUVANNAMALAI';
   readonly districtState = 'Tamil Nadu';
@@ -278,6 +280,15 @@ export class DistrictComponent {
   ];
 
   // ── Computed district summary ──────────────────────────────────────────────
+
+  readonly filteredVillages = computed(() => {
+    const q = this.villageSearch().toLowerCase();
+    const sf = this.villageStatusFilter();
+    return this.villages.filter(v =>
+      (sf === 'all' || v.status === sf) &&
+      (!q || v.name.toLowerCase().includes(q) || v.manager.toLowerCase().includes(q))
+    );
+  });
 
   readonly avgEcoScore    = computed(() =>
     Math.round(this.villages.reduce((s, v) => s + v.ecoScore, 0) / this.villages.length));
