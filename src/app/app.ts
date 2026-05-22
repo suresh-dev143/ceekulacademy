@@ -1,11 +1,13 @@
 import { Component, signal, inject, effect } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
 import { FooterComponent } from './components/footer/footer';
 import { ToastComponent } from './components/toast/toast';
 import { CommandBarComponent } from './components/command-bar/command-bar.component';
 import { VaOverlayComponent } from './components/va-overlay/va-overlay';
 import { AuthService } from './services/auth.service';
 import { ScreenSyncService } from './services/screen-sync.service';
+import { SemanticContextService } from './services/semantic-context.service';
 
 @Component({
   selector: 'app-root',
@@ -16,12 +18,13 @@ import { ScreenSyncService } from './services/screen-sync.service';
 export class App {
   protected readonly title = signal('hsacedamy1');
 
-  private readonly _auth      = inject(AuthService);
-  private readonly _screenSync = inject(ScreenSyncService);
+  private readonly _auth          = inject(AuthService);
+  private readonly _screenSync    = inject(ScreenSyncService);
+  private readonly _semanticCtx   = inject(SemanticContextService);
+  private readonly _router        = inject(Router);
 
   constructor() {
-    // Connect screen sync whenever the user is authenticated;
-    // disconnect on logout. Runs once on load for session-restored users.
+    // Connect screen sync whenever the user is authenticated.
     effect(() => {
       const user  = this._auth.currentUserProfile();
       const token = this._auth.getToken();
@@ -30,6 +33,13 @@ export class App {
       } else {
         this._screenSync.disconnect();
       }
+    });
+
+    // Keep semantic context in sync with every navigation.
+    this._router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe(e => {
+      this._semanticCtx.syncPagePath((e as NavigationEnd).urlAfterRedirects);
     });
   }
 }
