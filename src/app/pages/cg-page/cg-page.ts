@@ -99,8 +99,7 @@ type CgTab = 'sabha' | 'issues' | 'future' | 'nyaya' | 'knowledge';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, LayoutComponent, HomeSidebarLeftComponent],
   template: `
-<app-layout [customLeftSidebar]="true" [showRightSidebar]="true">
-  <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left>
+<app-layout [customLeftSidebar]="false" [showRightSidebar]="true">
 
   <div class="cg-root">
 

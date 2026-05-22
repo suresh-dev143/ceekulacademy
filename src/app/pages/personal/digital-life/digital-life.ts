@@ -23,10 +23,10 @@ export class DigitalLife {
   });
 
   readonly sections = [
-    { title: 'My Ceevolution', icon: 'fa-seedling', route: '/personal/digital-life', description: 'Your growth journey & milestones' },
-    { title: 'My Activities', icon: 'fa-bolt', route: '/personal/my-activities', description: 'Contributions & participation log' },
-    { title: 'My Neurons', icon: 'fa-brain', route: '/personal/neurons', description: 'FUN · CUN · SUN neuron workspace' },
-    { title: 'My Kutumb', icon: 'fa-users', route: '/personal/kutumb', description: 'Family & community network' },
-    { title: 'My Future', icon: 'fa-rocket', route: '/personal/future', description: 'Goals, aspirations & life plan' },
+    { title: 'My Ceevolution', route: '/personal/digital-life', description: 'Your growth journey & milestones' },
+    { title: 'My Activities',  route: '/personal/my-activities', description: 'Contributions & participation log' },
+    { title: 'My Neurons',  route: '/personal/neurons', description: 'FUN · CUN · SUN neuron workspace' },
+    { title: 'My Kutumb',  route: '/personal/kutumb', description: 'Family & community network' },
+    { title: 'My Future',  route: '/personal/future', description: 'Goals, aspirations & life plan' },
   ];
 }

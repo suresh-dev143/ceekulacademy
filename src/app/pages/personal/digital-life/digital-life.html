@@ -1,14 +1,34 @@
 <div class="dl-container">
 
-
+  <!-- ── Marquee Box ───────────────────────────────────────────────────── -->
+  <div class="dl-marquee-box">
+    <div class="dl-marquee">
+      <div class="dl-marquee-track dl-marquee-track--ltr">
+        @for (section of sections; track section.route) {
+          <span class="dl-marquee-item">{{ section.title }}</span>
+        }
+        @for (section of sections; track section.route) {
+          <span class="dl-marquee-item">{{ section.title }}</span>
+        }
+      </div>
+    </div>
+    <div class="dl-marquee">
+      <div class="dl-marquee-track dl-marquee-track--rtl">
+        @for (section of sections; track section.route) {
+          <span class="dl-marquee-item">{{ section.title }}</span>
+        }
+        @for (section of sections; track section.route) {
+          <span class="dl-marquee-item">{{ section.title }}</span>
+        }
+      </div>
+    </div>
+  </div>
 
   <!-- ── Section Cards ─────────────────────────────────────────────────── -->
   <div class="dl-sections">
     @for (section of sections; track section.route) {
       <a [routerLink]="section.route" class="dl-card">
-        <div class="dl-card-icon">
-          <i class="fas {{ section.icon }}"></i>
-        </div>
+       
         <div class="dl-card-body">
           <div class="dl-card-title">{{ section.title }}</div>
           <div class="dl-card-desc">{{ section.description }}</div>

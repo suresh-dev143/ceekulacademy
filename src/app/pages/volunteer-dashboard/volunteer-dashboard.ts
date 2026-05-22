@@ -1,10 +1,11 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { LayoutComponent } from '../../components/layout/layout';
 import { HomeSidebarLeftComponent } from '../../pages/home/home-sidebar-left/home-sidebar-left';
 import { AuthService } from '../../services/auth.service';
+import { VolunteerProfileService, VolunteerProfileData } from '../../services/volunteer-profile.service';
 
 export interface VolunteerArea {
   id: string;
@@ -42,15 +43,22 @@ export interface DScoreDimension {
   color: string;
 }
 
-type VolTab = 'overview' | 'villages' | 'cgpages' | 'activities' | 'dscore';
+type VolTab = 'overview' | 'villages' | 'cgpages' | 'activities' | 'dscore' | 'support';
+
+const SUPPORT_DOMAINS = [
+  'mental_health','grief_loss','addiction_recovery','family_conflict','academic_stress',
+  'career_crisis','loneliness','spiritual','crisis_intervention','domestic_violence',
+  'financial_stress','chronic_illness','trauma','youth_support','elder_care'
+];
+const SUPPORT_LANGS = ['English','Hindi','Tamil','Telugu','Kannada','Malayalam','Marathi','Bengali','Gujarati','Spanish','French','Arabic','Mandarin'];
 
 @Component({
   selector: 'app-volunteer-dashboard',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, LayoutComponent, HomeSidebarLeftComponent],
   template: `
-<app-layout [customLeftSidebar]="true" [showRightSidebar]="true">
-  <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left>
+<app-layout [customLeftSidebar]="false" [showRightSidebar]="true">
+  <!-- <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left> -->
 
   <div class="vol-root">
 
@@ -59,7 +67,7 @@ type VolTab = 'overview' | 'villages' | 'cgpages' | 'activities' | 'dscore';
       <div class="vol-header-left">
         <div class="vol-avatar">{{ initials() }}</div>
         <div>
-          <h1 class="vol-title">Volunteer Dashboard</h1>
+          <h1 class="vol-title">Volunteer</h1>
           <p class="vol-subtitle">Grassroots Action Agent · CB#{{ ceebrainId() }}</p>
         </div>
       </div>
@@ -75,7 +83,7 @@ type VolTab = 'overview' | 'villages' | 'cgpages' | 'activities' | 'dscore';
     <!-- Tabs -->
     <nav class="vol-tabs">
       @for (t of tabs; track t.id) {
-        <button class="vol-tab" [class.active]="activeTab() === t.id" (click)="activeTab.set(t.id)">
+        <button class="vol-tab" [class.active]="activeTab() === t.id" (click)="selectTab(t.id)">
           <span>{{ t.icon }}</span> {{ t.label }}
           @if (t.badge && t.badge() > 0) {
             <span class="vol-tab-badge">{{ t.badge() }}</span>
@@ -464,6 +472,102 @@ type VolTab = 'overview' | 'villages' | 'cgpages' | 'activities' | 'dscore';
               }
             </div>
           </div>
+        </div>
+      }
+
+      <!-- ── SUPPORT NETWORK ───────────────────────────────────────────────── -->
+      @if (activeTab() === 'support') {
+        <div class="vol-section">
+          @if (supportProfile()) {
+            <!-- Enrolled view -->
+            <div class="vol-card" style="border-color:rgba(124,77,255,0.25)">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                <h3 class="vol-card-title" style="color:#7c4dff;margin:0">◈ Support Volunteer Profile</h3>
+                <span class="vol-badge" style="background:rgba(124,77,255,0.1);border-color:rgba(124,77,255,0.35);color:#7c4dff">
+                  {{ supportProfile()!.verificationStatus | titlecase }}
+                </span>
+              </div>
+              <div class="vol-stat-row" style="grid-template-columns:repeat(3,1fr)">
+                <div class="vol-stat-card"><div class="vol-stat-val" style="color:#7c4dff">{{ supportProfile()!.stats.totalSessions }}</div><div class="vol-stat-lbl">Sessions</div></div>
+                <div class="vol-stat-card"><div class="vol-stat-val" style="color:#00d2ff">{{ supportProfile()!.stats.totalHours | number:'1.1-1' }}</div><div class="vol-stat-lbl">Hours</div></div>
+                <div class="vol-stat-card"><div class="vol-stat-val" style="color:#ffab40">{{ supportProfile()!.rating > 0 ? (supportProfile()!.rating | number:'1.1-1') : '—' }}</div><div class="vol-stat-lbl">Rating</div></div>
+              </div>
+              <div style="margin-top:14px">
+                <div style="font-size:11px;color:#888;margin-bottom:8px">DOMAINS</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  @for (d of supportProfile()!.domains; track d) {
+                    <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(124,77,255,0.1);color:#7c4dff;border:1px solid rgba(124,77,255,0.3)">{{ d.replace('_',' ') }}</span>
+                  }
+                </div>
+              </div>
+              <div style="margin-top:14px">
+                <div style="font-size:11px;color:#888;margin-bottom:8px">LANGUAGES</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  @for (l of supportProfile()!.languages; track l) {
+                    <span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(0,210,255,0.1);color:#00d2ff;border:1px solid rgba(0,210,255,0.3)">{{ l }}</span>
+                  }
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:18px">
+                <div style="font-size:12px;color:#888">Go online to accept support requests:</div>
+                <button class="vol-btn" [style.background]="supportOnline() ? 'rgba(0,255,163,0.15)' : 'transparent'"
+                  [style.border]="supportOnline() ? '1px solid rgba(0,255,163,0.4)' : '1px solid #0a2a14'"
+                  [style.color]="supportOnline() ? '#00ffa3' : '#888'"
+                  (click)="toggleSupportOnline()">
+                  {{ supportOnline() ? '● ONLINE' : '◌ OFFLINE' }}
+                </button>
+              </div>
+            </div>
+          } @else if (supportLoading()) {
+            <div class="empty-state">Loading support profile...</div>
+          } @else {
+            <!-- Enroll view -->
+            <div class="vol-card" style="border-color:rgba(124,77,255,0.15)">
+              <div style="font-size:20px;color:#7c4dff;margin-bottom:10px">◈</div>
+              <h3 class="vol-card-title">Join the Emotional Support Network</h3>
+              <p style="font-size:13px;color:#888;line-height:1.6;margin:0 0 18px">
+                Offer one-on-one emotional support to people in distress. You'll be matched based on your domains and availability.
+              </p>
+              <div class="form-row">
+                <label>SUPPORT DOMAINS</label>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+                  @for (d of supportDomains; track d) {
+                    <button class="vol-chip" [class.active]="selectedSupportDomains().includes(d)"
+                      (click)="toggleSupportDomain(d)" style="font-size:11px">
+                      {{ d.replace('_',' ') }}
+                    </button>
+                  }
+                </div>
+              </div>
+              <div class="form-row">
+                <label>LANGUAGES</label>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+                  @for (l of supportLangs; track l) {
+                    <button class="vol-chip" [class.active]="selectedSupportLangs().includes(l)"
+                      (click)="toggleSupportLang(l)" style="font-size:11px">{{ l }}</button>
+                  }
+                </div>
+              </div>
+              <div class="form-row">
+                <label>MAX SIMULTANEOUS SESSIONS</label>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  @for (n of [1,2,3,5,10]; track n) {
+                    <button class="vol-chip" [class.active]="supportMaxCap() === n" (click)="supportMaxCap.set(n)">{{ n }}</button>
+                  }
+                </div>
+              </div>
+              <div class="form-row">
+                <label>BIO (optional)</label>
+                <textarea [(ngModel)]="supportBio" class="vol-textarea" placeholder="Describe your approach..."></textarea>
+              </div>
+              @if (supportError()) {
+                <div style="font-size:12px;color:#ef4444;padding:8px;background:rgba(239,68,68,0.08);border-radius:8px">{{ supportError() }}</div>
+              }
+              <button class="vol-btn green" style="margin-top:14px" [disabled]="supportLoading()" (click)="enrollSupport()">
+                {{ supportLoading() ? 'Enrolling...' : 'Enroll as Support Volunteer' }}
+              </button>
+            </div>
+          }
         </div>
       }
 
@@ -900,7 +1004,21 @@ export class VolunteerDashboardComponent {
     { id: 'cgpages'    as VolTab, icon: '⬡',  label: 'CG Pages',     badge: null },
     { id: 'activities' as VolTab, icon: '📋',  label: 'Activities',   badge: null },
     { id: 'dscore'     as VolTab, icon: '⭐',  label: 'D Score',      badge: null },
+    { id: 'support'    as VolTab, icon: '◈',  label: 'Support Net',  badge: null },
   ];
+
+  // ── Support Network (emotional support volunteer profile) ──────────────────
+  private readonly _profileSvc = inject(VolunteerProfileService);
+  readonly supportProfile = signal<VolunteerProfileData | null>(null);
+  readonly supportLoading = signal(false);
+  readonly supportOnline  = signal(false);
+  readonly supportError   = signal<string | null>(null);
+  readonly selectedSupportDomains = signal<string[]>([]);
+  readonly selectedSupportLangs   = signal<string[]>([]);
+  readonly supportMaxCap  = signal(3);
+  supportBio = '';
+  readonly supportDomains = SUPPORT_DOMAINS;
+  readonly supportLangs   = SUPPORT_LANGS;
 
   readonly areas = signal<VolunteerArea[]>([
     { id: 'A001', cgId: 'CG100000100001', villageName: 'Vandavasi',  district: 'Tiruvannamalai', state: 'Tamil Nadu',    population: 12400, openGrievances: 7, activeSince: 'Mar 2026', isJoined: true,  category: 'village' },
@@ -963,6 +1081,13 @@ export class VolunteerDashboardComponent {
 
   newAct: Partial<VolunteerActivity & { cgId: string }> = { title: '', type: 'social', cgId: '', description: '', impact: '' };
 
+  selectTab(id: VolTab): void {
+    this.activeTab.set(id);
+    if (id === 'support' && !this.supportProfile() && !this.supportLoading()) {
+      this.loadSupportProfile();
+    }
+  }
+
   joinArea(id: string): void {
     this.areas.update(list => list.map(a => a.id === id ? { ...a, isJoined: true, activeSince: 'May 2026' } : a));
   }
@@ -994,5 +1119,73 @@ export class VolunteerDashboardComponent {
 
   getActivityColor(type: string): string {
     return ({ individual: '#3b82f6', family: '#22c55e', social: '#00ffa3', system: '#f97316', external: '#a855f7' } as Record<string,string>)[type] ?? '#94a3b8';
+  }
+
+  // ── Support Network methods ────────────────────────────────────────────────
+
+  async loadSupportProfile(): Promise<void> {
+    this.supportLoading.set(true);
+    try {
+      const profile = await this._profileSvc.getProfile();
+      this.supportProfile.set(profile);
+    } catch (e: any) {
+      if (!e?.status || e.status !== 404) {
+        this.supportError.set(e?.error?.message ?? 'Could not load profile.');
+      }
+    }
+    this.supportLoading.set(false);
+  }
+
+  async enrollSupport(): Promise<void> {
+    if (!this.selectedSupportDomains().length || !this.selectedSupportLangs().length) {
+      this.supportError.set('Select at least one domain and one language.');
+      return;
+    }
+    this.supportLoading.set(true);
+    this.supportError.set(null);
+    try {
+      const profile = await this._profileSvc.enroll({
+        domains: this.selectedSupportDomains(),
+        languages: this.selectedSupportLangs(),
+        bio: this.supportBio.trim() || undefined,
+        maxCapacity: this.supportMaxCap(),
+        availability: {
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          weekdays: ['Mon','Tue','Wed','Thu','Fri'],
+          hoursStart: 8,
+          hoursEnd: 20,
+        },
+      });
+      this.supportProfile.set(profile);
+    } catch (e: any) {
+      this.supportError.set(e?.error?.message ?? 'Enrollment failed.');
+    }
+    this.supportLoading.set(false);
+  }
+
+  toggleSupportDomain(d: string): void {
+    this.selectedSupportDomains.update(list =>
+      list.includes(d) ? list.filter(x => x !== d) : [...list, d]
+    );
+  }
+
+  toggleSupportLang(l: string): void {
+    this.selectedSupportLangs.update(list =>
+      list.includes(l) ? list.filter(x => x !== l) : [...list, l]
+    );
+  }
+
+  toggleSupportOnline(): void {
+    const next = !this.supportOnline();
+    this.supportOnline.set(next);
+    const profile = this.supportProfile();
+    if (!profile) return;
+    this._profileSvc.heartbeat({
+      userId: (this._auth() as any)?.id ?? '',
+      domains: profile.domains,
+      languages: profile.languages,
+      maxCapacity: profile.maxCapacity,
+      isOnline: next,
+    }).catch(() => { });
   }
 }

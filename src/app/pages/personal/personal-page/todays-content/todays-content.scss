@@ -7,12 +7,12 @@
 // ── Content Card ──────────────────────────────────────────────────────────────
 
 .now-card {
-  border: 1px solid #161616;
-  border-radius: 0.5rem;
+ text-align: center;
+ min-height: 52vh;
   padding: 1.25rem 1.25rem 1rem;
   margin-bottom: 0.25rem;
-  background: #0c0c0c;
-  border-left: 3px solid var(--phase-accent, #ff9900);
+  background: #0e0e0e;
+ 
   transition: border-color 0.3s;
 
   &--expanded {
@@ -81,6 +81,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  text-align: center;
 }
 
 .now-card__toggle {

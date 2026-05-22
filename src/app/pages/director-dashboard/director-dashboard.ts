@@ -68,8 +68,8 @@ type DirectorTab = 'overview' | 'cgpages' | 'managers' | 'guidance' | 'advisors'
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, LayoutComponent, HomeSidebarLeftComponent],
   template: `
-<app-layout [customLeftSidebar]="true" [showRightSidebar]="true">
-  <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left>
+<app-layout [customLeftSidebar]="false" [showRightSidebar]="true">
+  <!-- <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left> -->
 
   <div class="dir-root">
 
@@ -78,7 +78,7 @@ type DirectorTab = 'overview' | 'cgpages' | 'managers' | 'guidance' | 'advisors'
       <div class="dir-header-left">
         <div class="dir-avatar">{{ initials() }}</div>
         <div>
-          <h1 class="dir-title">Director Dashboard</h1>
+          <h1 class="dir-title">Director</h1>
           <p class="dir-subtitle">{{ districtLabel() }} · District Mission Integrator</p>
         </div>
       </div>

@@ -3,12 +3,13 @@ import { RouterOutlet } from '@angular/router';
 import { FooterComponent } from './components/footer/footer';
 import { ToastComponent } from './components/toast/toast';
 import { CommandBarComponent } from './components/command-bar/command-bar.component';
+import { VaOverlayComponent } from './components/va-overlay/va-overlay';
 import { AuthService } from './services/auth.service';
 import { ScreenSyncService } from './services/screen-sync.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FooterComponent, ToastComponent, CommandBarComponent],
+  imports: [RouterOutlet, FooterComponent, ToastComponent, CommandBarComponent, VaOverlayComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

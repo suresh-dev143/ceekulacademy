@@ -1,43 +1,687 @@
 <app-layout>
-    <div class="district-page">
-        <h1 class="center-heading">DIRECTORS</h1>
+<div class="district-os">
 
-        <section class="goal-box">
-            <h2 class="goal-title">The primary goal of any Director is to</h2>
-
-            <div class="goal-item">
-                <div class="goal-number">1</div>
-                <p>Organize regular seminars and workshops on the automation of services and infrastructure on the
-                    chosen area.</p>
-            </div>
-
-            <div class="goal-item">
-                <div class="goal-number">2</div>
-                <p>Explore the technological solutions to the problems raised by the Ceebrain members with the Vice
-                    Chancellor.</p>
-            </div>
-
-            <div class="goal-item">
-                <div class="goal-number">3</div>
-                <p>Discuss ways to implement the plans finalized by the Executive Council during regular online or
-                    offline meetings of the respective assembly.</p>
-            </div>
-        </section>
-
-        <div class="director-types">
-            There are 2 types of Directors: (1) Director of a particular discipline at a particular Regional Ceekul
-            Center (2) Director of Local Ceekul Center to guide all the disciplines.
-        </div>
-
-        <h3 class="disciplines-heading">The Director will be elected for the term of 4 years for the following
-            disciplines:</h3>
-
-        <div class="directors-list">
-            @for (role of directorRoles; track role) {
-            <div class="director-role" [class.highlighted]="role.highlighted">{{ role.title }}</div>
-            }
-        </div>
-
-        <a href="#" class="btn-create-position">You Can Create A New Position and Apply</a>
+  <!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
+  <div class="hero">
+    <div class="hero-badge">CEEKUL DISTRICT ECOSYSTEM</div>
+    <h1 class="hero-title">{{ districtName }}</h1>
+    <p class="hero-sub">{{ districtState }} · {{ districtId }} · District Interdisciplinary Civilizational Evolution Council</p>
+    <div class="hero-pulse">
+      <div class="pulse-ring"></div>
+      <div class="pulse-ring pulse-ring--2"></div>
+      <div class="pulse-orb">◎</div>
     </div>
+  </div>
+
+  <!-- ══ SUMMARY METRICS ════════════════════════════════════════════════ -->
+  <div class="metrics-bar">
+    <div class="metric">
+      <span class="metric-value" [style.color]="ecoColor(avgEcoScore())">{{ avgEcoScore() }}</span>
+      <span class="metric-label">Eco Score</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value" [style.color]="ecoColor(avgHealthScore())">{{ avgHealthScore() }}</span>
+      <span class="metric-label">Health Index</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value warn">{{ totalAlerts() }}</span>
+      <span class="metric-label">Active Alerts</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value crit">{{ criticalRecs() }}</span>
+      <span class="metric-label">Critical Plans</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value blue">{{ advisors.length }}</span>
+      <span class="metric-label">Advisors</span>
+    </div>
+    <div class="metric">
+      <span class="metric-value green">{{ villages.length }}</span>
+      <span class="metric-label">Villages Active</span>
+    </div>
+  </div>
+
+  <!-- ══ TAB NAV ════════════════════════════════════════════════════════ -->
+  <nav class="tab-nav">
+    @for (tab of tabs; track tab.id) {
+      <button class="tab-btn"
+              [class.active]="activeTab() === tab.id"
+              (click)="selectTab(tab.id)">
+        <span class="tab-icon">{{ tab.icon }}</span>
+        <span class="tab-label">{{ tab.label }}</span>
+      </button>
+    }
+  </nav>
+
+  <!-- ══ TAB CONTENT ════════════════════════════════════════════════════ -->
+  <div class="tab-content">
+
+    <!-- ── OVERVIEW ───────────────────────────────────────────────────── -->
+    @if (activeTab() === 'overview') {
+      <div class="panel panel-overview">
+
+        <div class="section-head">
+          <span class="section-icon">◎</span>
+          <h2>District Pulse</h2>
+          <p>Real-time civilisational status of {{ districtName }} District</p>
+        </div>
+
+        <div class="overview-grid">
+
+          <!-- Village Health Matrix -->
+          <div class="card card--wide">
+            <div class="card-title">Village Health Matrix</div>
+            <div class="village-matrix">
+              @for (v of villages; track v.id) {
+                <div class="vm-cell" [class.vm-alert]="v.status === 'alert'" [class.vm-monitor]="v.status === 'monitoring'">
+                  <div class="vm-name">{{ v.name }}</div>
+                  <div class="vm-bars">
+                    <div class="vm-bar-row">
+                      <span class="vm-bar-label">ECO</span>
+                      <div class="vm-bar-track">
+                        <div class="vm-bar-fill" [style.width.%]="v.ecoScore" [style.background]="ecoColor(v.ecoScore)"></div>
+                      </div>
+                      <span class="vm-bar-val" [style.color]="ecoColor(v.ecoScore)">{{ v.ecoScore }}</span>
+                    </div>
+                    <div class="vm-bar-row">
+                      <span class="vm-bar-label">HLT</span>
+                      <div class="vm-bar-track">
+                        <div class="vm-bar-fill" [style.width.%]="v.healthIndex" [style.background]="ecoColor(v.healthIndex)"></div>
+                      </div>
+                      <span class="vm-bar-val" [style.color]="ecoColor(v.healthIndex)">{{ v.healthIndex }}</span>
+                    </div>
+                  </div>
+                  @if (v.alerts > 0) {
+                    <div class="vm-alerts">⚠ {{ v.alerts }}</div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Active Alerts -->
+          <div class="card">
+            <div class="card-title">Active Alerts</div>
+            <div class="alert-list">
+              @for (rec of aiRecs; track rec.domain) {
+                @if (rec.priority === 'critical' || rec.priority === 'high') {
+                  <div class="alert-item" [style.border-left-color]="priorityColor(rec.priority)">
+                    <div class="alert-pri" [style.color]="priorityColor(rec.priority)">{{ rec.priority | uppercase }}</div>
+                    <div class="alert-domain" [style.color]="rec.domainColor">{{ rec.domain }}</div>
+                    <div class="alert-action">{{ rec.action }}</div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- Council Preview -->
+          <div class="card">
+            <div class="card-title">Advisory Council</div>
+            <div class="council-preview">
+              @for (a of advisors; track a.id) {
+                <div class="cp-advisor" [style.border-color]="a.color">
+                  <span class="cp-icon" [style.color]="a.color">{{ a.icon }}</span>
+                  <div class="cp-info">
+                    <div class="cp-name">{{ a.name }}</div>
+                    <div class="cp-lens">{{ a.lens }}</div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Infrastructure Status -->
+          <div class="card">
+            <div class="card-title">Infrastructure Status</div>
+            <div class="infra-status-list">
+              @for (p of infraProjects; track p.id) {
+                <div class="is-row">
+                  <span class="is-dot" [style.background]="infraStatusColor(p.status)" [style.box-shadow]="'0 0 6px ' + infraStatusColor(p.status) + '88'"></span>
+                  <span class="is-label">{{ p.name }}</span>
+                  <span class="is-state" [style.color]="infraStatusColor(p.status)">{{ infraStatusLabel(p.status) }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Evolution Phase -->
+          <div class="card card--accent">
+            <div class="card-title">Current Evolution Phase</div>
+            <div class="evo-current">
+              <div class="evo-phase-num">Phase 1</div>
+              <div class="evo-phase-name">AWAKENING</div>
+              <div class="evo-phase-year">2025 – 2027</div>
+              <p class="evo-phase-desc">District ecological mapping, council formation, community mobilisation, infrastructure groundwork.</p>
+              <div class="evo-progress-track">
+                <div class="evo-progress-fill" style="width: 35%"></div>
+              </div>
+              <div class="evo-progress-label">35% complete</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    }
+
+    <!-- ── COUNCIL ─────────────────────────────────────────────────────── -->
+    @if (activeTab() === 'council') {
+      <div class="panel panel-council">
+
+        <div class="section-head">
+          <span class="section-icon">◈</span>
+          <h2>District Interdisciplinary Civilizational Evolution Council</h2>
+          <p>10 elected futurists and ecosystem architects — no departments, only collaboration</p>
+        </div>
+
+        <!-- Radial Web Visual -->
+        <div class="radial-web">
+          <div class="radial-center">
+            <div class="radial-center-icon">◎</div>
+            <div class="radial-center-label">COUNCIL<br>INTELLIGENCE</div>
+          </div>
+          @for (a of advisors; track a.id; let i = $index) {
+            <div class="radial-node"
+                 [style.transform]="'rotate(' + advisorAngle(i) + ') translateY(-140px) rotate(-' + advisorAngle(i) + ')'"
+                 [style.border-color]="a.color"
+                 [style.box-shadow]="'0 0 12px ' + a.color + '44'">
+              <span [style.color]="a.color">{{ a.icon }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Advisor Grid -->
+        <div class="advisor-grid">
+          @for (a of advisors; track a.id; let i = $index) {
+            <div class="advisor-card"
+                 [class.advisor-card--expanded]="expandedAdvisor() === a.id"
+                 [style.--ac]="a.color"
+                 (click)="toggleAdvisor(a.id)">
+              <div class="ac-header">
+                <div class="ac-icon" [style.color]="a.color">{{ a.icon }}</div>
+                <div class="ac-identity">
+                  <div class="ac-name">{{ a.name }}</div>
+                  <div class="ac-lens">{{ a.lens }}</div>
+                </div>
+                <div class="ac-toggle">{{ expandedAdvisor() === a.id ? '▲' : '▼' }}</div>
+              </div>
+              @if (expandedAdvisor() === a.id) {
+                <div class="ac-body">
+                  <div class="ac-focus-list">
+                    @for (f of a.focus; track f) {
+                      <span class="ac-focus-tag" [style.border-color]="a.color" [style.color]="a.color">{{ f }}</span>
+                    }
+                  </div>
+                  <div class="ac-plan-label">Current Plan</div>
+                  <div class="ac-plan">{{ a.currentPlan }}</div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Director & Manager Roles -->
+        <div class="roles-overview">
+          <div class="role-card role-card--director">
+            <div class="rc-icon">⬡</div>
+            <div class="rc-title">District Director</div>
+            <p class="rc-desc">Mission coordinator converting council intelligence into actionable workflows. Manages inter-advisor collaboration, mission prioritisation, and progress tracking across the entire district ecosystem.</p>
+          </div>
+          <div class="role-card role-card--manager">
+            <div class="rc-icon">⬢</div>
+            <div class="rc-title">Village Managers (128)</div>
+            <p class="rc-desc">Grassroots ecological data collectors and local coordinators. Each village manager streams real-time environmental, health, and community intelligence to the district council.</p>
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ── DIRECTOR ────────────────────────────────────────────────────── -->
+    @if (activeTab() === 'director') {
+      <div class="panel panel-director">
+
+        <div class="section-head">
+          <span class="section-icon">⬡</span>
+          <h2>Director's Mission Control</h2>
+          <p>Converting council intelligence to district-wide civilisational action</p>
+        </div>
+
+        <div class="director-grid">
+
+          <!-- Mandate Cards -->
+          <div class="card card--wide">
+            <div class="card-title">Director Mandate</div>
+            <div class="mandate-list">
+              <div class="mandate-item">
+                <div class="mandate-num">01</div>
+                <div class="mandate-body">
+                  <div class="mandate-title">Council Intelligence Coordination</div>
+                  <p>Facilitate continuous collaboration between all 10 advisors. Synthesise interdisciplinary plans into coherent district-level evolution strategy.</p>
+                </div>
+              </div>
+              <div class="mandate-item">
+                <div class="mandate-num">02</div>
+                <div class="mandate-body">
+                  <div class="mandate-title">Mission Prioritisation & Activation</div>
+                  <p>Translate AI-recommended priorities and council plans into time-bound missions. Deploy village manager task forces for ground-level execution.</p>
+                </div>
+              </div>
+              <div class="mandate-item">
+                <div class="mandate-num">03</div>
+                <div class="mandate-body">
+                  <div class="mandate-title">Ecological Progress Tracking</div>
+                  <p>Monitor real-time ecological indicators across all villages. Escalate critical alerts to relevant advisors. Update evolution phase milestones.</p>
+                </div>
+              </div>
+              <div class="mandate-item">
+                <div class="mandate-num">04</div>
+                <div class="mandate-body">
+                  <div class="mandate-title">Community Intelligence Integration</div>
+                  <p>Ensure village data streams are flowing, validated, and feeding back into the council's planning cycles. Bridge grassroots observations with civilisational strategy.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Missions -->
+          <div class="card">
+            <div class="card-title">Active Missions</div>
+            <div class="mission-list">
+              @for (rec of aiRecs; track rec.domain) {
+                <div class="mission-item">
+                  <div class="mission-priority" [style.color]="priorityColor(rec.priority)">{{ rec.priority | uppercase }}</div>
+                  <div class="mission-name">{{ rec.action }}</div>
+                  <div class="mission-domain" [style.color]="rec.domainColor">{{ rec.domain }}</div>
+                  <div class="mission-villages">
+                    @for (v of rec.villages; track v) {
+                      <span class="mission-village-tag">{{ v }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Intelligence Conversion Flow -->
+          <div class="card card--accent">
+            <div class="card-title">Intelligence → Action Flow</div>
+            <div class="conversion-flow">
+              <div class="cf-step">
+                <div class="cf-icon">◉</div>
+                <div class="cf-label">Village Data Streams</div>
+                <div class="cf-sub">128 managers uploading</div>
+              </div>
+              <div class="cf-arrow">↓</div>
+              <div class="cf-step">
+                <div class="cf-icon">✺</div>
+                <div class="cf-label">AI Pattern Analysis</div>
+                <div class="cf-sub">Ecological intelligence</div>
+              </div>
+              <div class="cf-arrow">↓</div>
+              <div class="cf-step">
+                <div class="cf-icon">◈</div>
+                <div class="cf-label">Council Deliberation</div>
+                <div class="cf-sub">10 advisors planning</div>
+              </div>
+              <div class="cf-arrow">↓</div>
+              <div class="cf-step">
+                <div class="cf-icon">⬡</div>
+                <div class="cf-label">Director Activation</div>
+                <div class="cf-sub">Mission deployment</div>
+              </div>
+              <div class="cf-arrow">↓</div>
+              <div class="cf-step">
+                <div class="cf-icon">⬢</div>
+                <div class="cf-label">Ground Execution</div>
+                <div class="cf-sub">Village-level action</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coordination Metrics -->
+          <div class="card">
+            <div class="card-title">Coordination Metrics</div>
+            <div class="coord-metrics">
+              <div class="cm-item">
+                <span class="cm-val blue">10/10</span>
+                <span class="cm-label">Advisors Active</span>
+              </div>
+              <div class="cm-item">
+                <span class="cm-val green">{{ villages.length }}/128</span>
+                <span class="cm-label">Managers Online</span>
+              </div>
+              <div class="cm-item">
+                <span class="cm-val warn">{{ aiRecs.length }}</span>
+                <span class="cm-label">AI Recommendations</span>
+              </div>
+              <div class="cm-item">
+                <span class="cm-val crit">{{ criticalRecs() }}</span>
+                <span class="cm-label">Critical Actions</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    }
+
+    <!-- ── VILLAGES ────────────────────────────────────────────────────── -->
+    @if (activeTab() === 'villages') {
+      <div class="panel panel-villages">
+
+        <div class="section-head">
+          <span class="section-icon">⬢</span>
+          <h2>Village Intelligence Network</h2>
+          <p>128 village managers streaming real-time ecological and community intelligence</p>
+        </div>
+
+        <!-- Village Cards -->
+        <div class="village-grid">
+          @for (v of villages; track v.id) {
+            <div class="village-card" [class.vc-alert]="v.status === 'alert'" [class.vc-monitor]="v.status === 'monitoring'">
+              <div class="vc-header">
+                <div class="vc-name">{{ v.name }}</div>
+                <div class="vc-status-badge" [class.vsb-active]="v.status === 'active'" [class.vsb-alert]="v.status === 'alert'" [class.vsb-monitor]="v.status === 'monitoring'">
+                  {{ v.status | uppercase }}
+                </div>
+              </div>
+              <div class="vc-manager">Manager: {{ v.manager }}</div>
+              <div class="vc-pop">Population: {{ v.population | number }}</div>
+              <div class="vc-stage">Stage: {{ stageLabel(v.evolutionStage) }}</div>
+
+              <div class="vc-scores">
+                <div class="vcs-row">
+                  <span class="vcs-label">Ecological Score</span>
+                  <div class="vcs-track">
+                    <div class="vcs-fill" [style.width.%]="v.ecoScore" [style.background]="ecoColor(v.ecoScore)"></div>
+                  </div>
+                  <span class="vcs-val" [style.color]="ecoColor(v.ecoScore)">{{ v.ecoScore }}</span>
+                </div>
+                <div class="vcs-row">
+                  <span class="vcs-label">Health Index</span>
+                  <div class="vcs-track">
+                    <div class="vcs-fill" [style.width.%]="v.healthIndex" [style.background]="ecoColor(v.healthIndex)"></div>
+                  </div>
+                  <span class="vcs-val" [style.color]="ecoColor(v.healthIndex)">{{ v.healthIndex }}</span>
+                </div>
+              </div>
+
+              @if (v.alerts > 0) {
+                <div class="vc-alerts">⚠ {{ v.alerts }} active alert{{ v.alerts > 1 ? 's' : '' }}</div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Upload Streams -->
+        <div class="upload-streams-section">
+          <div class="us-title">Village Manager Upload Streams</div>
+          <p class="us-sub">Each village manager continuously feeds the following intelligence streams into the district ecosystem</p>
+          <div class="upload-streams">
+            @for (s of uploadStreams; track s; let i = $index) {
+              <div class="us-stream" [style.animation-delay]="(i * 0.15) + 's'">
+                <div class="us-pulse"></div>
+                <span>{{ s }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+
+    <!-- ── LDA ─────────────────────────────────────────────────────────── -->
+    @if (activeTab() === 'lda') {
+      <div class="panel panel-lda">
+
+        <div class="section-head">
+          <span class="section-icon">✦</span>
+          <h2>Local Development Area (LDA) Ecosystem</h2>
+          <p>Healing, regenerating, and harmonising what already exists — not building anew</p>
+        </div>
+
+        <!-- Philosophy -->
+        <div class="lda-philosophy">
+          <div class="lp-col">
+            <div class="lp-icon">🌿</div>
+            <div class="lp-title">The LDA is NOT new construction</div>
+            <p>Every village, town, forest, river, road, school, and community space already within this district IS the Local Development Area. There is nothing new to build — only to heal, regenerate, upgrade, and harmonise.</p>
+          </div>
+          <div class="lp-col">
+            <div class="lp-icon">🏔</div>
+            <div class="lp-title">Existing geography is the canvas</div>
+            <p>Forests are not obstacles — they are living infrastructure. Rivers are not drainage — they are ecological arteries. Villages are not periphery — they are the civilisational nucleus of this regenerative OS.</p>
+          </div>
+          <div class="lp-col">
+            <div class="lp-icon">⚡</div>
+            <div class="lp-title">Healing, not replacing</div>
+            <p>Ceekul's role is to upgrade existing systems with intelligence, ecological wisdom, and civilisational coherence. We do not demolish — we regenerate. We do not replace — we evolve.</p>
+          </div>
+        </div>
+
+        <!-- LDA Includes -->
+        <div class="lda-includes">
+          <div class="lda-includes-title">This LDA Encompasses</div>
+          <div class="lda-includes-grid">
+            @for (item of ldaIncludes; track item) {
+              <div class="lda-include-item">
+                <span class="lda-include-dot"></span>
+                <span>{{ item }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Ecological Indicators -->
+        <div class="eco-indicators-title">Ecological Indicator Dashboard</div>
+        <div class="eco-indicators">
+          @for (ind of ldaIndicators; track ind.label) {
+            <div class="eco-card" [style.--sc]="statusColor(ind.status)">
+              <div class="eco-header">
+                <span class="eco-icon">{{ ind.icon }}</span>
+                <span class="eco-label">{{ ind.label }}</span>
+                <span class="eco-status" [style.color]="statusColor(ind.status)">{{ ind.status | uppercase }}</span>
+              </div>
+              <div class="eco-value-row">
+                <span class="eco-value" [style.color]="statusColor(ind.status)">{{ ind.value }}</span>
+                <span class="eco-unit">{{ ind.unit }}</span>
+                <span class="eco-trend" [class.trend-up]="ind.trendUp" [class.trend-dn]="!ind.trendUp">
+                  {{ ind.trendUp ? '▲' : '▼' }} {{ ind.trend }}
+                </span>
+              </div>
+              <div class="eco-bar-track">
+                <div class="eco-bar-fill" [style.width.%]="(ind.value / ind.max) * 100" [style.background]="statusColor(ind.status)"></div>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- ── INFRASTRUCTURE ──────────────────────────────────────────────── -->
+    @if (activeTab() === 'infrastructure') {
+      <div class="panel panel-infra">
+
+        <div class="section-head">
+          <span class="section-icon">◆</span>
+          <h2>Ceekul Infrastructure Network</h2>
+          <p>7 civilisational infrastructure systems — from every 10 Km on Earth to Space Habitats beyond</p>
+        </div>
+
+        <div class="infra-projects-grid">
+          @for (p of infraProjects; track p.id) {
+            <div class="ip-card" [style.--pc]="p.color">
+              <div class="ip-header">
+                <div class="ip-num" [style.color]="p.color">{{ p.id }}</div>
+                <div class="ip-icon">{{ p.icon }}</div>
+                <div class="ip-identity">
+                  <div class="ip-name">{{ p.name }}</div>
+                  <div class="ip-tagline" [style.color]="p.color">{{ p.tagline }}</div>
+                </div>
+                <div class="ip-status-badge"
+                     [style.color]="infraStatusColor(p.status)"
+                     [style.border-color]="infraStatusColor(p.status) + '55'">
+                  {{ infraStatusLabel(p.status) }}
+                </div>
+              </div>
+              <div class="ip-specs">{{ p.specs }}</div>
+              <p class="ip-desc">{{ p.desc }}</p>
+              <div class="ip-timeline">
+                <span class="ip-tl-icon" [style.color]="p.color">⏱</span>
+                {{ p.timeline }}
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- ── AI PLANNER ──────────────────────────────────────────────────── -->
+    @if (activeTab() === 'ai') {
+      <div class="panel panel-ai">
+
+        <div class="section-head">
+          <span class="section-icon">✺</span>
+          <h2>AI Civilisational Planning System</h2>
+          <p>Intelligence that sees patterns across ecology, health, economy, and culture — surfacing what humans might miss</p>
+        </div>
+
+        <!-- AI Philosophy -->
+        <div class="ai-philosophy">
+          <div class="ap-title">This AI Does Not Govern. It Illuminates.</div>
+          <p>The district AI planning system continuously analyses ecological data streams from 128 villages, cross-references historical patterns, models future trajectories, and surfaces insights to human advisors and the director. All decisions remain human. The AI's role is to make the invisible visible — to surface the ecological intelligence embedded in the land, water, air, and communities of this district.</p>
+        </div>
+
+        <!-- AI Capabilities -->
+        <div class="ai-capabilities">
+          <div class="ai-cap-title">System Capabilities</div>
+          <div class="ai-caps-grid">
+            <div class="ai-cap">
+              <div class="aic-icon" style="color: #22c55e">◉</div>
+              <div class="aic-label">Ecological Pattern Recognition</div>
+              <p>Identifies degradation and regeneration trends across forest cover, water systems, soil health, and biodiversity corridors</p>
+            </div>
+            <div class="ai-cap">
+              <div class="aic-icon" style="color: #3b82f6">◎</div>
+              <div class="aic-label">Predictive Modelling</div>
+              <p>Projects ecosystem trajectories 5–15 years forward based on current intervention patterns and climate models</p>
+            </div>
+            <div class="ai-cap">
+              <div class="aic-icon" style="color: '#a78bfa'">◈</div>
+              <div class="aic-label">Cross-Domain Correlation</div>
+              <p>Surfaces hidden connections between ecological health, community wellbeing, economic patterns, and cultural vitality</p>
+            </div>
+            <div class="ai-cap">
+              <div class="aic-icon" style="color: #f59e0b">⬡</div>
+              <div class="aic-label">Resource Optimisation</div>
+              <p>Models optimal resource flows for energy, water, food, and knowledge across the village network</p>
+            </div>
+            <div class="ai-cap">
+              <div class="aic-icon" style="color: #00d2ff">✺</div>
+              <div class="aic-label">Real-Time Alert System</div>
+              <p>Continuously monitors thresholds and triggers advisors when critical ecological or social indicators are breached</p>
+            </div>
+            <div class="ai-cap">
+              <div class="aic-icon" style="color: #fb923c">⬢</div>
+              <div class="aic-label">Collective Intelligence Synthesis</div>
+              <p>Aggregates observations from all 128 village managers into coherent district-level intelligence narratives</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="ai-recs-title">Current AI Recommendations</div>
+        <div class="ai-recs-list">
+          @for (rec of aiRecs; track rec.domain; let i = $index) {
+            <div class="ai-rec" [class.ai-rec--expanded]="expandedRec() === i" (click)="toggleRec(i)">
+              <div class="ar-header">
+                <div class="ar-priority" [style.background]="priorityColor(rec.priority) + '22'" [style.color]="priorityColor(rec.priority)" [style.border-color]="priorityColor(rec.priority)">
+                  {{ rec.priority | uppercase }}
+                </div>
+                <div class="ar-domain" [style.color]="rec.domainColor">{{ rec.domain }}</div>
+                <div class="ar-action">{{ rec.action }}</div>
+                <div class="ar-toggle">{{ expandedRec() === i ? '▲' : '▼' }}</div>
+              </div>
+              @if (expandedRec() === i) {
+                <div class="ar-body">
+                  <div class="ar-insight-label">AI Insight</div>
+                  <p class="ar-insight">{{ rec.insight }}</p>
+                  <div class="ar-villages-label">Affected Villages</div>
+                  <div class="ar-villages">
+                    @for (v of rec.villages; track v) {
+                      <span class="ar-village-tag">{{ v }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- ── EVOLUTION ───────────────────────────────────────────────────── -->
+    @if (activeTab() === 'evolution') {
+      <div class="panel panel-evolution">
+
+        <div class="section-head">
+          <span class="section-icon">⬟</span>
+          <h2>Civilisational Evolution Roadmap</h2>
+          <p>A 20-year journey from ecological crisis to planetary regenerative model</p>
+        </div>
+
+        <!-- Vision Statement -->
+        <div class="vision-statement">
+          <div class="vs-label">DISTRICT VISION</div>
+          <p class="vs-text">{{ districtName }} District will become the world's first fully regenerative civilisational ecosystem — a living demonstration that human flourishing and ecological abundance are not opposites, but the same thing.</p>
+        </div>
+
+        <!-- Evolution Timeline -->
+        <div class="evo-timeline">
+          @for (phase of evolutionPhases; track phase.phase) {
+            <div class="evo-phase" [class.ep-active]="phase.status === 'active'" [class.ep-completed]="phase.status === 'completed'" [class.ep-upcoming]="phase.status === 'upcoming'">
+              <div class="ep-connector" [style.background]="phaseColor(phase.status)"></div>
+              <div class="ep-node" [style.border-color]="phaseColor(phase.status)" [style.box-shadow]="'0 0 16px ' + phaseColor(phase.status) + '55'">
+                <span [style.color]="phaseColor(phase.status)">{{ phase.phase }}</span>
+              </div>
+              <div class="ep-content">
+                <div class="ep-header">
+                  <div class="ep-label" [style.color]="phaseColor(phase.status)">{{ phase.label }}</div>
+                  <div class="ep-year">{{ phase.year }}</div>
+                  <div class="ep-status-badge" [style.color]="phaseColor(phase.status)" [style.border-color]="phaseColor(phase.status)">{{ phase.status | uppercase }}</div>
+                </div>
+                <p class="ep-desc">{{ phase.desc }}</p>
+                <div class="ep-milestones">
+                  @for (m of phase.milestones; track m) {
+                    <div class="ep-milestone"><span class="ep-m-dot" [style.background]="phaseColor(phase.status)"></span>{{ m }}</div>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Evolution Drivers -->
+        <div class="evo-drivers-section">
+          <div class="evo-drivers-title">Forces Driving Evolution</div>
+          <div class="evo-drivers-grid">
+            @for (d of evoDrivers; track d.label) {
+              <div class="evo-driver" [style.border-color]="d.color + '44'">
+                <div class="ed-icon" [style.color]="d.color">{{ d.icon }}</div>
+                <div class="ed-label" [style.color]="d.color">{{ d.label }}</div>
+                <p class="ed-desc">{{ d.desc }}</p>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</div>
 </app-layout>

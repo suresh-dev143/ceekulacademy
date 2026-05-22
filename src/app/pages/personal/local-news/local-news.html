@@ -28,15 +28,10 @@
   </nav>
 
   <div class="lnp">
-    <!-- Header + Filter Toggle -->
-
-    <div class="lnp__header">
-      <!-- <span class="lnp__radius-label">10 km zone</span> -->
-
-    </div>
 
     <div class="news-main">
       <!-- Info Card -->
+       @if(hasActiveFilter()){
       <div class="lnp__info-card">
         <p><strong>Fill the filters above</strong> to get customised AI news.</p>
         <ul class="lnp__info-list">
@@ -54,7 +49,7 @@
           </li>
         </ul>
       </div>
-
+    }
       <!-- Collapsible Filters -->
       <div class="lnp__filters" [class.lnp__filters--open]="filtersOpen()">
         <div class="lnp-filter">
@@ -116,18 +111,19 @@
         </div>
         } @else {
         <div class="lnp__placeholder">
-          <p>Search by subject or area to see local news.</p>
+          <!-- <p>Search by subject or area to see local news.</p> -->
         </div>
         }
       </div>
 
       <!-- Ticker -->
       <div class="lnp__ticker">
+        @if(hasActiveFilter()){
         <div class="lnp__ticker-track">
           @for (msg of localNews.tickerMessages; track $index) {
           <span class="lnp__ticker-msg">{{ msg }}</span>
           }
-        </div>
+        </div>}
       </div>
     </div>
   </div>

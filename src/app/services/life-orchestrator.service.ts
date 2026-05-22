@@ -330,10 +330,10 @@ const BASE_SCHEDULE: Omit<HourBlock, 'user_override' | 'custom_activity' | 'cont
   {
     hour: 17,
     hour_block: "17:00-18:00",
-    intent: "Dinner + social",
+    intent: "Dinner",
     phase: "evening",
     middle_box: {
-      activity: "Dinner & Connection",
+      activity: "",
       guidance: "1. Eat dinner early for metabolic health.\n2. Keep meal lighter than lunch.\n3. Screen-free conversation."
     },
     left_box: {

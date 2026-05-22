@@ -45,8 +45,8 @@ type ManagerTab = 'overview' | 'grievances' | 'campaigns' | 'escalation' | 'dsco
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, LayoutComponent, HomeSidebarLeftComponent],
   template: `
-<app-layout [customLeftSidebar]="true" [showRightSidebar]="true">
-  <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left>
+<app-layout [customLeftSidebar]="false" [showRightSidebar]="true">
+  <!-- <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left> -->
 
   <div class="mgr-root">
 
@@ -55,7 +55,7 @@ type ManagerTab = 'overview' | 'grievances' | 'campaigns' | 'escalation' | 'dsco
       <div class="mgr-header-left">
         <div class="mgr-avatar">{{ initials() }}</div>
         <div>
-          <h1 class="mgr-title">Manager Dashboard</h1>
+          <h1 class="mgr-title">Manager</h1>
           <p class="mgr-subtitle">{{ villageLabel() }} · Village Accountability Node</p>
         </div>
       </div>

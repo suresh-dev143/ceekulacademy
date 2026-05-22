@@ -1,0 +1,212 @@
+$bg:      #0a0f1e;
+$surface: #111827;
+$surface2:#1a2235;
+$border:  #1f2d44;
+$text:    #e2e8f0;
+$muted:   #64748b;
+$accent:  #3b82f6;
+$success: #34d399;
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.ms-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+
+  &__eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: $muted;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  &__title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #ff9900;
+    margin: 0 0 0.75rem;
+  }
+
+  &__tagline {
+    font-size: 0.88rem;
+    color: $muted;
+    font-style: italic;
+    line-height: 1.7;
+    max-width: 40rem;
+    margin: 0 auto;
+  }
+
+  &__rule {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, $border, transparent);
+    margin-top: 1.5rem;
+  }
+}
+
+// ── Principle note ────────────────────────────────────────────────────────────
+.ms-principle {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: #0d1118;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+
+  &__mark {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 0.05rem;
+    color: $muted;
+  }
+
+  strong { color: $text; }
+}
+
+// ── Action hub ────────────────────────────────────────────────────────────────
+.ms-actions {
+  margin-bottom: 2.5rem;
+
+  &__heading {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $muted;
+    margin: 0 0 1rem;
+  }
+}
+
+.ms-action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.85rem;
+}
+
+.ms-action-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 12px;
+  padding: 1.1rem;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    background: $surface2;
+    border-color: $accent;
+    text-decoration: none;
+  }
+
+  &__icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 0.1rem;
+  }
+
+  &__body { flex: 1; display: flex; flex-direction: column; gap: 0.3rem; }
+
+  &__title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $text;
+  }
+
+  &__desc {
+    font-size: 0.78rem;
+    color: $muted;
+    line-height: 1.5;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.4rem;
+
+    span {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+      background: #1e2d42;
+      color: #93c5fd;
+      letter-spacing: 0.04em;
+    }
+  }
+
+  &__arrow {
+    font-size: 1rem;
+    color: $muted;
+    flex-shrink: 0;
+    align-self: center;
+    transition: color 0.15s, transform 0.15s;
+  }
+
+  &:hover &__arrow { color: $accent; transform: translateX(3px); }
+
+  // Card-specific accent borders
+  &--activate   { &:hover { border-color: #15803d; } .ms-action-card__title { color: $success; } }
+  &--contribute { &:hover { border-color: #1d4ed8; } }
+  &--donate     { &:hover { border-color: #b45309; } .ms-action-card__title { color: #fbbf24; } }
+  &--neurons    { &:hover { border-color: #6d28d9; } .ms-action-card__title { color: #a78bfa; } }
+}
+
+// ── Domains ───────────────────────────────────────────────────────────────────
+.ms-domains {
+  &__heading {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $muted;
+    margin: 0 0 0.85rem;
+  }
+}
+
+.ms-domain-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.ms-domain-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+
+  &__icon { font-size: 0.9rem; }
+  &__name { font-size: 0.78rem; color: #94a3b8; font-weight: 500; }
+}
+
+// ── Mobile (≤ 640px) ──────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .ms-header__title { font-size: 1.6rem; letter-spacing: 0.06em; }
+  .ms-header__tagline { font-size: 0.82rem; }
+
+  .ms-action-grid { grid-template-columns: 1fr; }
+
+  .ms-action-card {
+    padding: 0.9rem;
+    &__icon { font-size: 1.15rem; }
+    &__title { font-size: 0.9rem; }
+  }
+
+  .ms-domain-grid { gap: 0.4rem; }
+  .ms-domain-item { padding: 0.35rem 0.6rem; }
+}

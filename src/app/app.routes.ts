@@ -15,10 +15,11 @@ import { Supply } from './pages/personal/supply/supply';
 import { Register } from './pages/register copy/register';
 import { Personal } from './pages/personal/personal-page/personal';
 import { MyActivities } from './pages/personal/my-activities/my-activities';
+import { Mission } from './pages/mission/mission';
 
 export const routes: Routes = [
   // { path: 'home', loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent) },
-    { path: 'mission', redirectTo: 'dashboard/director', pathMatch: 'full' },
+  { path: 'mission', component:Mission },
   { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard-home').then(m => m.DashboardHomeComponent) },
   { path: 'dashboard/courses', loadComponent: () => import('./pages/courses/courses').then(m => m.CoursesComponent) },
   { path: 'dashboard/advisor', loadComponent: () => import('./pages/advisor-dashboard/advisor-dashboard').then(m => m.AdvisorDashboardComponent) },
@@ -65,7 +66,14 @@ export const routes: Routes = [
   { path: 'neurons', loadComponent: () => import('./pages/neuron-hub/neuron-hub').then(m => m.NeuronHubComponent) },
 
   // ==================== CEEKUL MISSION ====================
- 
+  { path: 'activate', loadComponent: () => import('./pages/activate/activate').then(m => m.Activate) },
+
+  // ==================== GUEST SESSION ====================
+  { path: 'guest', loadComponent: () => import('./pages/guest-session/guest-session').then(m => m.GuestSessionComponent) },
+
+  // ==================== FAMILY DINNER EXPERIENCE ====================
+  { path: 'dinner', loadComponent: () => import('./pages/dinner/dinner').then(m => m.DinnerComponent) },
+
 
   // ==================== PAYMENT RETURN (Cramib redirect-back) ====================
   { path: 'payment/return', loadComponent: () => import('./pages/payment-return/payment-return').then(m => m.PaymentReturn) },
@@ -157,6 +165,7 @@ export const routes: Routes = [
       { path: 'infra', loadComponent: () => import('./pages/admin/infra/infra').then(m => m.Infra) },
       { path: 'identity', loadComponent: () => import('./pages/admin/identity/identity').then(m => m.Identity) },
       { path: 'settings', loadComponent: () => import('./pages/admin/settings/settings').then(m => m.Settings) },
+      { path: 'health', loadComponent: () => import('./pages/admin/health/health').then(m => m.HealthMatrix) },
     ]
   },
 

@@ -22,6 +22,7 @@ export class CommandCenter {
     { glyph: '▦', label: 'Analytics',        sub: 'Events + aggregations',     route: '/admin/analytics',accent: '#f59e0b' },
     { glyph: '◌', label: 'Identity',         sub: 'OTP + biometric + scores',  route: '/admin/identity', accent: '#818cf8' },
     { glyph: '⬢', label: 'Infrastructure',   sub: 'Services + health',         route: '/admin/infra',    accent: '#22c55e' },
+    { glyph: '◍', label: 'Health Matrix',    sub: 'Live status · lag · workers', route: '/admin/health',   accent: '#22c55e' },
   ];
 
   formatNumber(n: number): string {

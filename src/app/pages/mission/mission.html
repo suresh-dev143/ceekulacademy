@@ -1,0 +1,129 @@
+<app-layout [customLeftSidebar]="true" [showRightSidebar]="true">
+  <app-home-sidebar-left slot="left-panel"></app-home-sidebar-left>
+
+  <!-- ── Page Header ──────────────────────────────────────────────────────── -->
+  <header class="ms-header">
+    <div class="ms-header__eyebrow">CEEKUL ECOSYSTEM</div>
+    <h1 class="ms-header__title">Ceekul Mission</h1>
+    <p class="ms-header__tagline">
+      A civilizational initiative coordinating family, cognitive, and social upgradation
+      across villages, districts, and nations through participation, contribution, and collaboration.
+    </p>
+    <div class="ms-header__rule"></div>
+  </header>
+
+  <!-- ── Mission Principle ────────────────────────────────────────────────── -->
+  <div class="ms-principle">
+    <span class="ms-principle__mark">◈</span>
+    <span>
+      The Ceekul Mission operates through <strong>non-monetary ecosystem participation</strong>.
+      Neurons (FUN, CUN, SUN) are internal coordination units — not financial instruments.
+      All participation flows are governed by ecosystem principles and coordinated through
+      authorised implementation agencies.
+    </span>
+  </div>
+
+  <!-- ── Action Hub ───────────────────────────────────────────────────────── -->
+  <section class="ms-actions">
+    <h2 class="ms-actions__heading">Mission Actions</h2>
+    <div class="ms-action-grid">
+
+      <!-- Activate -->
+      <a class="ms-action-card ms-action-card--activate" routerLink="/activate">
+        <div class="ms-action-card__icon">🟢</div>
+        <div class="ms-action-card__body">
+          <div class="ms-action-card__title">Activate</div>
+          <div class="ms-action-card__desc">
+            Direct your FUN, CUN, or SUN participation units toward approved ecosystem
+            initiatives coordinated by authorised implementation agencies.
+          </div>
+          <div class="ms-action-card__tags">
+            <span>FUN</span><span>CUN</span><span>SUN</span>
+          </div>
+        </div>
+        <div class="ms-action-card__arrow">→</div>
+      </a>
+
+      <!-- Contribute -->
+      <a class="ms-action-card ms-action-card--contribute" routerLink="/contribute">
+        <div class="ms-action-card__icon">🤝</div>
+        <div class="ms-action-card__body">
+          <div class="ms-action-card__title">Contribute</div>
+          <div class="ms-action-card__desc">
+            Offer your skills, time, and expertise to ecosystem initiatives.
+            Earn neurons through coordinated contribution to civilizational projects.
+          </div>
+          <div class="ms-action-card__tags">
+            <span>Skills</span><span>Time</span><span>Expertise</span>
+          </div>
+        </div>
+        <div class="ms-action-card__arrow">→</div>
+      </a>
+
+      <!-- Donate -->
+      <a class="ms-action-card ms-action-card--donate" routerLink="/donate">
+        <div class="ms-action-card__icon">💛</div>
+        <div class="ms-action-card__body">
+          <div class="ms-action-card__title">Donate</div>
+          <div class="ms-action-card__desc">
+            Support the Ceekul Mission through monetary donation to registered
+            implementation agencies. All donations are governed by trust deed provisions.
+          </div>
+          <div class="ms-action-card__tags">
+            <span>Trust</span><span>Section 8</span>
+          </div>
+        </div>
+        <div class="ms-action-card__arrow">→</div>
+      </a>
+
+      <!-- Neurons (view balances) -->
+      <a class="ms-action-card ms-action-card--neurons" routerLink="/neurons">
+        <div class="ms-action-card__icon">⚡</div>
+        <div class="ms-action-card__body">
+          <div class="ms-action-card__title">My Neurons</div>
+          <div class="ms-action-card__desc">
+            View your FUN, CUN, and SUN participation allocation balances,
+            transaction history, and ecosystem coordination activity.
+          </div>
+          <div class="ms-action-card__tags">
+            <span>FUN</span><span>CUN</span><span>SUN</span><span>History</span>
+          </div>
+        </div>
+        <div class="ms-action-card__arrow">→</div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ── Participation Domains ─────────────────────────────────────────────── -->
+  <section class="ms-domains">
+    <h2 class="ms-domains__heading">Ecosystem Domains</h2>
+    <div class="ms-domain-grid">
+      <div class="ms-domain-item">
+        <span class="ms-domain-item__icon">🏗️</span>
+        <span class="ms-domain-item__name">Infrastructure</span>
+      </div>
+      <div class="ms-domain-item">
+        <span class="ms-domain-item__icon">📚</span>
+        <span class="ms-domain-item__name">Knowledge</span>
+      </div>
+      <div class="ms-domain-item">
+        <span class="ms-domain-item__icon">🔬</span>
+        <span class="ms-domain-item__name">Research</span>
+      </div>
+      <div class="ms-domain-item">
+        <span class="ms-domain-item__icon">💡</span>
+        <span class="ms-domain-item__name">Innovation</span>
+      </div>
+      <div class="ms-domain-item">
+        <span class="ms-domain-item__icon">🤲</span>
+        <span class="ms-domain-item__name">Social</span>
+      </div>
+      <div class="ms-domain-item">
+        <span class="ms-domain-item__icon">🏪</span>
+        <span class="ms-domain-item__name">Business</span>
+      </div>
+    </div>
+  </section>
+
+</app-layout>
