@@ -1,29 +1,239 @@
 <div class="hl-page">
 
-  <!-- <div class="hl-header">
-    <span class="hl-header__label">Life Dimensions</span>
-  </div> -->
+  <!-- ══ SECTION NAV ════════════════════════════════════════════════════════ -->
+  <nav class="hl-nav">
+    <button class="hl-nav-btn" [class.active]="activeSection() === 'cycle'"   (click)="activeSection.set('cycle')">   ◎ Life Cycle</button>
+    <button class="hl-nav-btn" [class.active]="activeSection() === 'digital'" (click)="activeSection.set('digital')"> ⬡ Digital Life</button>
+    <button class="hl-nav-btn" [class.active]="activeSection() === 'cosmic'"  (click)="activeSection.set('cosmic')">  ✦ Cosmic Coherence</button>
+  </nav>
 
-  <div class="hl-grid">
+  <!-- ══ LIFE CYCLE ════════════════════════════════════════════════════════ -->
+  @if (activeSection() === 'cycle') {
+    <section class="hl-section">
 
-    <div class="hl-card">
-    
-      <h2 class="hl-card__title">Human Life Cycle</h2>
-      <p class="hl-card__descriptor">Birth, growth, learning, contribution, legacy — the biological and conscious arc of every human journey.</p>
-    </div>
+      <div class="hl-section-head">
+        <span class="hl-eyebrow">Human Life Architecture</span>
+        <h2 class="hl-section-title">The Four Ashramas</h2>
+        <p class="hl-section-sub">Every life unfolds in phases. Each phase has its own intelligence, its own gifts, its own demands. None is superior — each is necessary.</p>
+      </div>
 
-    <div class="hl-card">
-     
-      <h2 class="hl-card__title">Digital Life At Ceekul</h2>
-      <p class="hl-card__descriptor">Your identity, content, participation, and neuron activity across the Ceekul ecosystem.</p>
-    </div>
+      <!-- Ashrama timeline -->
+      <div class="ashrama-track">
+        @for (a of ashramas; track a.id) {
+          <div class="ashrama-node"
+               [class.ashrama-node--current]="currentAshramaId() === a.id"
+               [class.ashrama-node--open]="selectedAshrama() === a.id"
+               (click)="toggleAshrama(a.id)">
+            <div class="an-glyph" [style.color]="currentAshramaId() === a.id ? '#00d2ff' : '#334155'">{{ a.glyph }}</div>
+            <div class="an-name">{{ a.name }}</div>
+            <div class="an-sub">{{ a.sub }}</div>
+            <div class="an-years">{{ a.years }}</div>
+            @if (currentAshramaId() === a.id) {
+              <div class="an-current-badge">YOU ARE HERE</div>
+            }
+          </div>
+        }
+      </div>
 
-    <div class="hl-card">
-     
-      <h2 class="hl-card__title">Cosmic Coherence</h2>
-      <p class="hl-card__descriptor">Alignment of personal rhythm with planetary cycles, circadian intelligence, and universal patterns.</p>
-    </div>
+      <!-- Expanded ashrama detail -->
+      @if (selectedAshrama() !== null) {
+        @for (a of ashramas; track a.id) {
+          @if (selectedAshrama() === a.id) {
+            <div class="ashrama-detail">
+              <div class="ad-header">
+                <span class="ad-glyph">{{ a.glyph }}</span>
+                <div>
+                  <div class="ad-name">{{ a.name }} <span class="ad-sub">— {{ a.sub }}</span></div>
+                  <div class="ad-years">{{ a.years }}</div>
+                </div>
+              </div>
+              <p class="ad-desc">{{ a.desc }}</p>
+              <div class="ad-practices-label">Practices of this phase</div>
+              <div class="ad-practices">
+                @for (p of a.practices; track p) {
+                  <div class="ad-practice">
+                    <span class="ad-practice-dot"></span>
+                    {{ p }}
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+      }
 
-  </div>
+      <!-- 5 Dimensions -->
+      <div class="hl-dim-header">
+        <span class="hl-eyebrow">Life Dimensions</span>
+        <div class="hl-overall-score" [style.color]="scoreColor(overallLifeScore())">
+          {{ overallLifeScore() }}<span class="hl-overall-label">/100</span>
+        </div>
+      </div>
+
+      <div class="dim-grid">
+        @for (d of dimensions; track d.key) {
+          <div class="dim-card"
+               [class.dim-card--open]="selectedDim() === d.key"
+               [style.--dc]="dimColor(d.key)"
+               (click)="toggleDim(d.key)">
+            <div class="dc-header">
+              <span class="dc-glyph" [style.color]="dimColor(d.key)">{{ d.glyph }}</span>
+              <div class="dc-label-wrap">
+                <div class="dc-label">{{ d.label }}</div>
+                <div class="dc-score" [style.color]="scoreColor(d.score)">{{ d.score }}</div>
+              </div>
+            </div>
+            <div class="dc-bar-track">
+              <div class="dc-bar-fill" [style.width.%]="d.score" [style.background]="dimColor(d.key)"></div>
+            </div>
+            @if (selectedDim() === d.key) {
+              <div class="dc-body">
+                <p class="dc-desc">{{ d.desc }}</p>
+                <div class="dc-actions-label">Practices</div>
+                <div class="dc-actions">
+                  @for (act of d.actions; track act) {
+                    <div class="dc-action">
+                      <span class="dc-action-dot" [style.background]="dimColor(d.key)"></span>
+                      {{ act }}
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+    </section>
+  }
+
+  <!-- ══ DIGITAL LIFE ═══════════════════════════════════════════════════════ -->
+  @if (activeSection() === 'digital') {
+    <section class="hl-section">
+
+      <div class="hl-section-head">
+        <span class="hl-eyebrow">Your Ceekul Footprint</span>
+        <h2 class="hl-section-title">Digital Life</h2>
+        <p class="hl-section-sub">Your identity, learning, participation, and neuron activity across the Ceekul ecosystem — a living record of who you are becoming.</p>
+      </div>
+
+      <!-- Participation streak -->
+      <div class="streak-bar">
+        <span class="streak-glyph">🔥</span>
+        <span class="streak-count">{{ participationStreak }}-day</span>
+        <span class="streak-label">participation streak</span>
+        <div class="streak-dots">
+          @for (i of [1,2,3,4,5,6,7]; track i) {
+            <div class="streak-dot" [class.streak-dot--active]="i <= 7"></div>
+          }
+        </div>
+      </div>
+
+      <!-- Stats grid -->
+      <div class="dl-stats-grid">
+        @for (s of digitalStats; track s.label) {
+          <div class="dl-stat" [style.--sc]="s.color">
+            <div class="dl-stat-glyph" [style.color]="s.color">{{ s.glyph }}</div>
+            <div class="dl-stat-value" [style.color]="s.color">{{ s.value | number }}</div>
+            <div class="dl-stat-label">{{ s.label }}</div>
+            <div class="dl-stat-unit">{{ s.unit }}</div>
+          </div>
+        }
+      </div>
+
+      <!-- Recent activity -->
+      <div class="hl-eyebrow" style="margin-bottom: 0.75rem;">Recent Activity</div>
+      <div class="activity-list">
+        @for (a of recentActivity; track a.detail) {
+          <div class="activity-item">
+            <div class="activity-glyph" [style.color]="a.color">{{ a.glyph }}</div>
+            <div class="activity-body">
+              <div class="activity-action" [style.color]="a.color">{{ a.action }}</div>
+              <div class="activity-detail">{{ a.detail }}</div>
+            </div>
+            <div class="activity-time">{{ a.time }}</div>
+          </div>
+        }
+      </div>
+
+    </section>
+  }
+
+  <!-- ══ COSMIC COHERENCE ═══════════════════════════════════════════════════ -->
+  @if (activeSection() === 'cosmic') {
+    <section class="hl-section">
+
+      <div class="hl-section-head">
+        <span class="hl-eyebrow">Planetary & Circadian Intelligence</span>
+        <h2 class="hl-section-title">Cosmic Coherence</h2>
+        <p class="hl-section-sub">Your body and mind evolved in rhythm with the earth, the sun, and the moon. Coherence is not mysticism — it is ecology applied to personal life.</p>
+      </div>
+
+      <!-- Alignment score -->
+      <div class="alignment-ring">
+        <div class="ar-inner">
+          <div class="ar-score" [style.color]="scoreColor(alignmentScore())">{{ alignmentScore() }}</div>
+          <div class="ar-label">Alignment</div>
+        </div>
+      </div>
+
+      <!-- Current phase highlight -->
+      <div class="cosmic-current-row">
+        <div class="cc-tile" [style.--ct]="ritus[currentRituIdx()].color">
+          <div class="cct-eyebrow">Current Season</div>
+          <div class="cct-glyph">{{ ritus[currentRituIdx()].glyph }}</div>
+          <div class="cct-name" [style.color]="ritus[currentRituIdx()].color">{{ ritus[currentRituIdx()].name }}</div>
+          <div class="cct-sub">{{ ritus[currentRituIdx()].english }} · {{ ritus[currentRituIdx()].months }}</div>
+          <p class="cct-desc">{{ ritus[currentRituIdx()].desc }}</p>
+        </div>
+        <div class="cc-tile" [style.--ct]="circadianPhases[currentPhaseIdx()].color">
+          <div class="cct-eyebrow">Current Phase</div>
+          <div class="cct-glyph">{{ circadianPhases[currentPhaseIdx()].glyph }}</div>
+          <div class="cct-name" [style.color]="circadianPhases[currentPhaseIdx()].color">{{ circadianPhases[currentPhaseIdx()].name }}</div>
+          <div class="cct-sub">{{ circadianPhases[currentPhaseIdx()].hours }}</div>
+          <p class="cct-desc">{{ circadianPhases[currentPhaseIdx()].desc }}</p>
+        </div>
+        <div class="cc-tile cc-tile--paksha" [style.--ct]="'#94a3b8'">
+          <div class="cct-eyebrow">Paksha</div>
+          <div class="cct-glyph">{{ paksha() === 'Shukla' ? '🌕' : '🌑' }}</div>
+          <div class="cct-name" style="color: #94a3b8">{{ paksha() }} Paksha</div>
+          <div class="cct-sub">{{ paksha() === 'Shukla' ? 'Waxing · Light half' : 'Waning · Dark half' }}</div>
+          <p class="cct-desc">{{ paksha() === 'Shukla' ? 'Energy rising. Ideal for beginning new initiatives, outward action, growth.' : 'Energy receding. Ideal for completion, introspection, cleansing, rest.' }}</p>
+        </div>
+      </div>
+
+      <!-- All Ritus -->
+      <div class="hl-eyebrow" style="margin-bottom: 0.75rem;">The Six Seasons (Ritu)</div>
+      <div class="ritu-grid">
+        @for (r of ritus; track r.name; let i = $index) {
+          <div class="ritu-card" [class.ritu-card--current]="i === currentRituIdx()" [style.--rc]="r.color">
+            <div class="rc-glyph">{{ r.glyph }}</div>
+            <div class="rc-name" [style.color]="r.color">{{ r.name }}</div>
+            <div class="rc-en">{{ r.english }}</div>
+            <div class="rc-months">{{ r.months }}</div>
+          </div>
+        }
+      </div>
+
+      <!-- Circadian phases -->
+      <div class="hl-eyebrow" style="margin: 1.5rem 0 0.75rem;">Circadian Rhythm (Kala)</div>
+      <div class="kala-list">
+        @for (p of circadianPhases; track p.name; let i = $index) {
+          <div class="kala-item" [class.kala-item--current]="i === currentPhaseIdx()">
+            <div class="ki-glyph" [style.color]="p.color">{{ p.glyph }}</div>
+            <div class="ki-body">
+              <div class="ki-name" [style.color]="i === currentPhaseIdx() ? p.color : '#94a3b8'">{{ p.name }}</div>
+              <div class="ki-hours">{{ p.hours }}</div>
+              <div class="ki-desc">{{ p.desc }}</div>
+            </div>
+            @if (i === currentPhaseIdx()) {
+              <div class="ki-now">NOW</div>
+            }
+          </div>
+        }
+      </div>
+
+    </section>
+  }
 
 </div>
