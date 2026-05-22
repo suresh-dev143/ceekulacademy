@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 interface ReformMandate {
   id: string;
@@ -21,7 +22,7 @@ interface ReformInitiative {
 @Component({
   selector: 'app-reformers',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './reformers.html',
   styleUrl: './reformers.scss',
 })

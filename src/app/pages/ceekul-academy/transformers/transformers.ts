@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 interface TransformerMandate {
   id: string;
@@ -21,7 +22,7 @@ interface TransformationProgram {
 @Component({
   selector: 'app-transformers',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './transformers.html',
   styleUrl: './transformers.scss',
 })

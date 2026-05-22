@@ -98,7 +98,9 @@
     .sun & { color: #f97316; }
   }
 
-  .fund-desc { font-size: 0.78rem; color: #9ca3af; }
+  .fund-name       { font-size: 0.65rem; font-weight: 600; color: #6b7280; margin-bottom: 0.2rem; }
+  .fund-desc       { font-size: 0.78rem; color: #9ca3af; margin-bottom: 0.3rem; }
+  .fund-categories { font-size: 0.62rem; color: #4b5563; font-style: italic; }
 
   .banner-note {
     font-size: 0.78rem;
@@ -106,6 +108,27 @@
     line-height: 1.5;
     margin: 0;
   }
+}
+
+.priority-row {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid #1e1e2e;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.priority-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 220px;
+  padding: 0.75rem 0.5rem 0;
+
+  .pi-glyph { font-size: 0.9rem; color: #374151; flex-shrink: 0; margin-top: 1px; }
+  .pi-label { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #374151; margin-bottom: 0.15rem; }
+  .pi-val   { font-size: 0.72rem; color: #6b7280; line-height: 1.4; }
 }
 
 // ── Canvas ────────────────────────────────────────────────────────────────────
@@ -125,6 +148,53 @@
   .empty-icon  { font-size: 2.5rem; color: #374151; margin-bottom: 1rem; }
   .empty-title { font-size: 1.1rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.4rem; }
   .empty-sub   { font-size: 0.85rem; color: #6b7280; margin-bottom: 1.5rem; }
+}
+
+.empty-how {
+  margin-top: 2rem;
+  text-align: left;
+  max-width: 380px;
+  border: 1px solid #1e1e2e;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .eh-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #4b5563;
+    padding: 0.6rem 1rem;
+    background: #0f0f1a;
+    border-bottom: 1px solid #1e1e2e;
+  }
+
+  .eh-steps { padding: 0.5rem 0; }
+
+  .eh-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.4;
+  }
+
+  .eh-num {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #1f2937;
+    color: #4b5563;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
 }
 
 .action-btn {

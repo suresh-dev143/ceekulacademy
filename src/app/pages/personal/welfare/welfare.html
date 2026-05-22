@@ -25,22 +25,47 @@
     <div class="banner-grid">
       <div class="banner-card fun">
         <div class="fund-tag">FUN</div>
+        <div class="fund-name">Family Universal Neurons</div>
         <div class="fund-desc">Basic facilities — food, shelter, daily needs</div>
+        <div class="fund-categories">Starving · Shelter · Other</div>
       </div>
       <div class="banner-card cun">
         <div class="fund-tag">CUN</div>
+        <div class="fund-name">Civilisational Universal Neurons</div>
         <div class="fund-desc">Cognitive upgradation via Ceekul expert programs</div>
+        <div class="fund-categories">Learning</div>
       </div>
       <div class="banner-card sun">
         <div class="fund-tag">SUN</div>
+        <div class="fund-name">Social Universal Neurons</div>
         <div class="fund-desc">Emergency care — health &amp; safety (repayable)</div>
+        <div class="fund-categories">Emergency Health · Emergency Safety · Other</div>
       </div>
     </div>
-    <p class="banner-note">
-      Support from CG100000000000 flows to the most needy Ceebrain member first, globally.
-      Priority is set by the Executive Council based on your current neuron activity.
-      All support must be repaid once your CB balance recovers above the EC-set threshold.
-    </p>
+
+    <div class="priority-row">
+      <div class="priority-item">
+        <span class="pi-glyph">◎</span>
+        <div>
+          <div class="pi-label">Priority Basis</div>
+          <div class="pi-val">Lowest monthly neuron inflow globally — most needy first</div>
+        </div>
+      </div>
+      <div class="priority-item">
+        <span class="pi-glyph">◈</span>
+        <div>
+          <div class="pi-label">Disbursement</div>
+          <div class="pi-val">Automatic once service provider confirms delivery</div>
+        </div>
+      </div>
+      <div class="priority-item">
+        <span class="pi-glyph">◆</span>
+        <div>
+          <div class="pi-label">Repayment</div>
+          <div class="pi-val">Auto-deducted when your CB balance exceeds EC threshold</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ─────────────────── MY APPLICATIONS TAB ─────────────────── -->
@@ -53,8 +78,17 @@
         <div class="empty-state">
           <div class="empty-icon">◎</div>
           <div class="empty-title">No applications yet</div>
-          <div class="empty-sub">When you need support, submit an application from the Apply tab.</div>
+          <div class="empty-sub">When you need support, submit an application from the Apply tab. Your application stays active in the queue until fully met — you do not need to reapply.</div>
           <button class="action-btn" (click)="setTab('apply')">Apply for Support</button>
+          <div class="empty-how">
+            <div class="eh-label">How it works</div>
+            <div class="eh-steps">
+              <div class="eh-step"><span class="eh-num">1</span><span>Submit your application with a description and amount needed</span></div>
+              <div class="eh-step"><span class="eh-num">2</span><span>System assigns priority based on your neuron inflow rank globally</span></div>
+              <div class="eh-step"><span class="eh-num">3</span><span>Funds disburse from CG100000000000 once your service provider confirms</span></div>
+              <div class="eh-step"><span class="eh-num">4</span><span>Repayment is automatic when your CB balance recovers above threshold</span></div>
+            </div>
+          </div>
         </div>
       } @else {
 

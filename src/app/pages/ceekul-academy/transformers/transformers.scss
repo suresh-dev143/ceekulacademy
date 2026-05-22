@@ -143,6 +143,45 @@ $text-bright: #c0d8ff;
   &__bar   { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--prog-accent, $blue); opacity: 0.25; transition: opacity 0.2s; }
 }
 
+// ── Pathway to Membership ─────────────────────────────────────────────────────
+.trn-pathway { margin-bottom: 3.5rem; }
+
+.trn-path-note { font-size: 0.82rem; color: $text-body; line-height: 1.65; margin: 0 0 1.75rem; max-width: 38rem; }
+
+.trn-path-grid {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1px solid rgba($blue, 0.1); border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem;
+}
+
+.trn-path-stage {
+  display: flex; align-items: flex-start; gap: 1.25rem; padding: 1.25rem;
+  border-bottom: 1px solid rgba($blue, 0.08); transition: background 0.15s;
+  &:last-child { border-bottom: none; }
+  &:hover { background: $bg-surface; }
+}
+
+.trn-ps-num {
+  font-size: 2rem; font-weight: 900; color: rgba($blue, 0.12); line-height: 1;
+  flex-shrink: 0; font-variant-numeric: tabular-nums; width: 2.5rem; text-align: right;
+}
+
+.trn-ps-body { flex: 1; }
+.trn-ps-title { font-size: 0.88rem; font-weight: 700; color: $text-light; margin-bottom: 0.4rem; }
+.trn-ps-desc  { font-size: 0.78rem; color: $text-body; line-height: 1.65; margin: 0; }
+
+.trn-path-cta { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
+
+.trn-cta-btn {
+  display: inline-block; padding: 0.6rem 1.4rem;
+  border: 1px solid rgba($blue, 0.35); color: $blue;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+  text-decoration: none; transition: all 0.15s; background: rgba($blue, 0.04);
+  &:hover { background: rgba($blue, 0.1); border-color: $blue; }
+}
+
+.trn-cta-note { font-size: 0.68rem; color: $text-dim; }
+
+// ── Statement ─────────────────────────────────────────────────────────────────
 .trn-statement {
   border-top: 1px solid rgba($blue, 0.08); padding-top: 2rem; text-align: center;
   &__rule { width: 3rem; height: 1px; background: linear-gradient(90deg, transparent, $blue-dim, transparent); margin: 0 auto 1.5rem; }

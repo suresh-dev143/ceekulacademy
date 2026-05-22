@@ -410,6 +410,93 @@ $text-bright: #b8d8c8;
   }
 }
 
+// ── Pathway to Membership ─────────────────────────────────────────────────────
+.ref-pathway { margin-bottom: 3.5rem; }
+
+.ref-path-note {
+  font-size: 0.82rem;
+  color: $text-body;
+  line-height: 1.65;
+  margin: 0 0 1.75rem;
+  max-width: 38rem;
+}
+
+.ref-path-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid rgba($green, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.ref-path-stage {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  border-bottom: 1px solid rgba($green, 0.08);
+  transition: background 0.15s;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: $bg-surface; }
+}
+
+.ref-ps-num {
+  font-size: 2rem;
+  font-weight: 900;
+  color: rgba($green, 0.12);
+  line-height: 1;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  width: 2.5rem;
+  text-align: right;
+}
+
+.ref-ps-body { flex: 1; }
+
+.ref-ps-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: $text-light;
+  margin-bottom: 0.4rem;
+}
+
+.ref-ps-desc {
+  font-size: 0.78rem;
+  color: $text-body;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.ref-path-cta {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.ref-cta-btn {
+  display: inline-block;
+  padding: 0.6rem 1.4rem;
+  border: 1px solid rgba($green, 0.35);
+  color: $green;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: all 0.15s;
+  background: rgba($green, 0.04);
+
+  &:hover { background: rgba($green, 0.1); border-color: $green; }
+}
+
+.ref-cta-note {
+  font-size: 0.68rem;
+  color: $text-dim;
+}
+
 // ── Statement ─────────────────────────────────────────────────────────────────
 .ref-statement {
   border-top: 1px solid rgba($green, 0.08);
