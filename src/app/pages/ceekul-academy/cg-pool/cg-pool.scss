@@ -45,12 +45,12 @@ $text-bright: #ccd8f8;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 .cgp-page {
-  padding: 2rem 2.5rem 4rem;
+  padding: 0 2.5rem 4rem;
   max-width: 860px;
   margin: 0 auto;
   animation: fadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-  @media (max-width: 600px) { padding: 1.5rem 1.25rem 3rem; }
+  @media (max-width: 600px) { padding: 0 1.25rem 3rem; }
 }
 
 // ── Seal (three rings) ────────────────────────────────────────────────────────
@@ -1417,9 +1417,9 @@ $text-bright: #ccd8f8;
   border-bottom: 1px solid rgba($indigo, 0.14);
   display: flex;
   flex-direction: column;
-  margin: -2rem -2.5rem 2rem;
+  margin: 0 -2.5rem 2rem;
 
-  @media (max-width: 600px) { margin: -1.5rem -1.25rem 1.5rem; }
+  @media (max-width: 600px) { margin: 0 -1.25rem 1.5rem; }
 
   &__top {
     display: flex;

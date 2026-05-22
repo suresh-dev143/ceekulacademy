@@ -57,8 +57,10 @@
     <!-- ══ CENTER COLUMN — DYNAMIC CONTENT RENDERER ═══════════════════════════ -->
     <main class="academy-grid__center" [class.mobile-active]="activeTab() === 'content'">
       <div class="academy-canvas">
-        
-        <app-global-search></app-global-search>
+
+        @if (selectedId() !== 'cg-pool') {
+          <app-global-search></app-global-search>
+        }
 
         @if (activePageComponent(); as cmp) {
         <ng-container [ngComponentOutlet]="cmp"></ng-container>
