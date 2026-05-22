@@ -30,7 +30,7 @@ export class Welfare implements OnInit {
   private readonly welfareSvc = inject(WelfareService);
   private readonly toast      = inject(ToastService);
 
-  readonly activeTab = signal<WelfareTab>('my-applications');
+  readonly activeTab = signal<WelfareTab>('apply');
 
   // ── Service exposure ──────────────────────────────────────────────────────
   readonly myApplications = this.welfareSvc.myApplications;

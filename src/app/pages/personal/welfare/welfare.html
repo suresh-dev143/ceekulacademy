@@ -2,25 +2,29 @@
 
   <!-- ── Top Bar ── -->
   <header class="welfare-topbar">
-    <div class="topbar-left">
+    <div class="topbar-brand">
       <span class="brand-icon">◈</span>
       <span class="brand-label">Welfare Support</span>
+      <span class="brand-sep">·</span>
       <span class="brand-sub">CG100000000000</span>
     </div>
-    <div class="topbar-tabs">
-      <button class="tab-btn" [class.active]="activeTab() === 'my-applications'" (click)="setTab('my-applications')">
-        My Applications
-        @if (activeApplications().length) {
-          <span class="tab-count">{{ activeApplications().length }}</span>
-        }
-      </button>
-      <button class="tab-btn" [class.active]="activeTab() === 'apply'" (click)="setTab('apply')">
-        Apply for Support
-      </button>
-    </div>
+    <div class="brand-note">Funded by the global Ceekul welfare pool — for Ceebrain members in need</div>
   </header>
 
-  <!-- ── Info Banner ── -->
+  <!-- ── Section Nav ── -->
+  <nav class="welfare-nav">
+    <button class="wn-btn" [class.active]="activeTab() === 'apply'" (click)="setTab('apply')">
+      ◎ Apply for Support
+    </button>
+    <button class="wn-btn" [class.active]="activeTab() === 'my-applications'" (click)="setTab('my-applications')">
+      ◈ My Applications
+      @if (activeApplications().length) {
+        <span class="wn-count">{{ activeApplications().length }}</span>
+      }
+    </button>
+  </nav>
+
+  <!-- ── Fund Type Banner ── -->
   <div class="welfare-banner">
     <div class="banner-grid">
       <div class="banner-card fun">
@@ -42,7 +46,6 @@
         <div class="fund-categories">Emergency Health · Emergency Safety · Other</div>
       </div>
     </div>
-
     <div class="priority-row">
       <div class="priority-item">
         <span class="pi-glyph">◎</span>
@@ -68,28 +71,129 @@
     </div>
   </div>
 
-  <!-- ─────────────────── MY APPLICATIONS TAB ─────────────────── -->
+  <!-- ═══════════════ APPLY TAB ═══════════════ -->
+  @if (activeTab() === 'apply') {
+    <div class="welfare-canvas">
+
+      <div class="form-card">
+        <div class="form-heading">
+          <div class="form-title">Submit a Welfare Support Application</div>
+          <p class="form-note">
+            Your application stays active in the queue until your need is fully met.
+            You do not need to reapply. Support from other sources is automatically reflected.
+          </p>
+        </div>
+
+        <!-- ── Support Type ── -->
+        <div class="form-section-label">Support Type *</div>
+        <div class="fund-selector">
+          @for (ft of FUND_TYPES; track ft.id) {
+            <button class="fund-option" [class.selected]="formFundType() === ft.id" (click)="onFundTypeChange(ft.id)">
+              <span class="fund-opt-tag">{{ ft.id.toUpperCase() }}</span>
+              <span class="fund-opt-label">{{ ft.label }}</span>
+            </button>
+          }
+        </div>
+
+        <!-- ── Specific Need ── -->
+        <div class="form-field">
+          <label class="field-label">Specific Need *</label>
+          <select class="field-select"
+            [value]="formGoalCategory()"
+            (change)="formGoalCategory.set($any($event.target).value)">
+            @for (g of GOAL_CATEGORIES; track g.id) {
+              @if (validGoals().includes(g.id)) {
+                <option [value]="g.id">{{ g.label }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <!-- ── Situation Description ── -->
+        <div class="form-field">
+          <label class="field-label">Describe your situation *</label>
+          <textarea class="field-textarea" rows="5"
+            [value]="formGoalDescription()"
+            (input)="formGoalDescription.set($any($event.target).value)"
+            placeholder="Explain your current situation clearly — what has happened, what you need, and how it will help you. The more specific, the better your priority assessment."></textarea>
+        </div>
+
+        <!-- ── Amount + Service Provider side by side on wide screens ── -->
+        <div class="form-row-2">
+          <div class="form-field">
+            <label class="field-label">Neurons Requested *</label>
+            <input class="field-input" type="number" min="1"
+              [value]="formRequestedAmount() ?? ''"
+              (input)="formRequestedAmount.set(+$any($event.target).value || null)"
+              placeholder="e.g. 10000" />
+            <span class="field-hint">Actual disbursement depends on fund availability and priority rank.</span>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">Service Provider CB/CG ID <span class="optional">(optional)</span></label>
+            <input class="field-input"
+              [value]="formServiceProvider()"
+              (input)="formServiceProvider.set($any($event.target).value)"
+              placeholder="e.g. 123456789012" />
+            <span class="field-hint">Neurons disburse only after the provider confirms delivery.</span>
+          </div>
+        </div>
+
+        <!-- ── Emergency Toggle ── -->
+        <div class="form-field emergency-toggle">
+          <label class="toggle-label">
+            <input type="checkbox"
+              [checked]="formIsEmergency()"
+              (change)="formIsEmergency.set($any($event.target).checked)" />
+            <span class="toggle-text">This is an emergency — I need support immediately, not at month-end</span>
+          </label>
+          @if (formIsEmergency()) {
+            <p class="emergency-note">
+              Emergency applications are reviewed for immediate disbursement once the service provider confirms.
+            </p>
+          }
+        </div>
+
+        <!-- ── Submit ── -->
+        <div class="form-submit-row">
+          <button class="submit-btn"
+            [disabled]="!canSubmit() || submitting()"
+            (click)="submit()">
+            {{ submitting() ? 'Submitting…' : 'Submit Application' }}
+          </button>
+          @if (!canSubmit() && !submitting()) {
+            <span class="submit-hint">Fill in Support Type, Specific Need, Description, and Amount to continue</span>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
+
+  <!-- ═══════════════ MY APPLICATIONS TAB ═══════════════ -->
   @if (activeTab() === 'my-applications') {
     <div class="welfare-canvas">
 
       @if (loading()) {
         <div class="state-msg">Loading your applications…</div>
+
       } @else if (myApplications().length === 0) {
         <div class="empty-state">
           <div class="empty-icon">◎</div>
           <div class="empty-title">No applications yet</div>
-          <div class="empty-sub">When you need support, submit an application from the Apply tab. Your application stays active in the queue until fully met — you do not need to reapply.</div>
-          <button class="action-btn" (click)="setTab('apply')">Apply for Support</button>
+          <div class="empty-sub">When you need support, submit an application. It stays active in the queue until fully met — you never need to reapply.</div>
+          <button class="action-btn" (click)="setTab('apply')">Apply for Support →</button>
           <div class="empty-how">
             <div class="eh-label">How it works</div>
             <div class="eh-steps">
               <div class="eh-step"><span class="eh-num">1</span><span>Submit your application with a description and amount needed</span></div>
-              <div class="eh-step"><span class="eh-num">2</span><span>System assigns priority based on your neuron inflow rank globally</span></div>
+              <div class="eh-step"><span class="eh-num">2</span><span>System assigns priority based on your global neuron inflow rank</span></div>
               <div class="eh-step"><span class="eh-num">3</span><span>Funds disburse from CG100000000000 once your service provider confirms</span></div>
               <div class="eh-step"><span class="eh-num">4</span><span>Repayment is automatic when your CB balance recovers above threshold</span></div>
             </div>
           </div>
         </div>
+
       } @else {
 
         <!-- Active Applications -->
@@ -114,7 +218,6 @@
                 </div>
               </div>
 
-              <!-- Progress bar -->
               <div class="progress-bar">
                 <div class="progress-fill" [style.width.%]="progressPct(app)"></div>
               </div>
@@ -122,7 +225,6 @@
 
               @if (expandedId() === app.applicationId) {
                 <div class="app-detail">
-
                   <div class="detail-row">
                     <span class="detail-label">Description</span>
                     <span class="detail-val">{{ app.goalDescription }}</span>
@@ -145,7 +247,6 @@
                     </div>
                   }
 
-                  <!-- Support Ledger -->
                   @if (app.supportLedger.length) {
                     <div class="ledger-heading">Support Received So Far</div>
                     <div class="ledger-list">
@@ -163,7 +264,6 @@
                     </div>
                   }
 
-                  <!-- Repayment status (if disbursed) -->
                   @if (app.disbursedAmount > 0) {
                     <div class="repay-section">
                       <div class="repay-heading">Repayment</div>
@@ -176,7 +276,7 @@
                       @if (!app.fullyRepaidAt) {
                         <p class="repay-note">
                           Repayment is automatic. Once your CB neuron balance exceeds the EC-set threshold,
-                          the system will deduct the outstanding amount and return it to the welfare fund.
+                          the system deducts the outstanding amount and returns it to the welfare fund.
                         </p>
                       } @else {
                         <div class="repay-done">Fully repaid on {{ formatDate(app.fullyRepaidAt) }}</div>
@@ -228,107 +328,11 @@
             </div>
           }
         }
+
+        <div class="new-app-bar">
+          <button class="action-btn" (click)="setTab('apply')">+ Submit Another Application</button>
+        </div>
       }
-    </div>
-  }
-
-  <!-- ─────────────────── APPLY TAB ─────────────────── -->
-  @if (activeTab() === 'apply') {
-    <div class="welfare-canvas">
-      <div class="form-card">
-        <div class="form-title">Submit Welfare Support Application</div>
-        <p class="form-note">
-          Your application stays in the queue until your need is fully met.
-          You do not need to reapply. Any support you receive from other sources
-          will automatically be reflected in your application.
-        </p>
-
-        <!-- Fund Type -->
-        <div class="form-field">
-          <label class="field-label">Support Type *</label>
-          <div class="fund-selector">
-            @for (ft of FUND_TYPES; track ft.id) {
-              <button class="fund-option"
-                [class.selected]="formFundType() === ft.id"
-                (click)="onFundTypeChange(ft.id)">
-                <span class="fund-opt-tag">{{ ft.id.toUpperCase() }}</span>
-                <span class="fund-opt-label">{{ ft.label }}</span>
-              </button>
-            }
-          </div>
-        </div>
-
-        <!-- Goal Category -->
-        <div class="form-field">
-          <label class="field-label">Specific Need *</label>
-          <select class="field-select"
-            [value]="formGoalCategory()"
-            (change)="formGoalCategory.set($any($event.target).value)">
-            @for (g of GOAL_CATEGORIES; track g.id) {
-              @if (validGoals().includes(g.id)) {
-                <option [value]="g.id">{{ g.label }}</option>
-              }
-            }
-          </select>
-        </div>
-
-        <!-- Description -->
-        <div class="form-field">
-          <label class="field-label">Describe your situation *</label>
-          <textarea class="field-textarea" rows="4"
-            [value]="formGoalDescription()"
-            (input)="formGoalDescription.set($any($event.target).value)"
-            placeholder="Explain your current situation and why you need this support…"></textarea>
-        </div>
-
-        <!-- Amount -->
-        <div class="form-field">
-          <label class="field-label">Neurons Requested *</label>
-          <input class="field-input" type="number" min="1"
-            [value]="formRequestedAmount() ?? ''"
-            (input)="formRequestedAmount.set(+$any($event.target).value || null)"
-            placeholder="e.g. 10000" />
-          <span class="field-hint">
-            The actual amount disbursed depends on fund availability and your priority rank.
-          </span>
-        </div>
-
-        <!-- Service Provider -->
-        <div class="form-field">
-          <label class="field-label">Service Provider CB/CG ID <span class="optional">(optional)</span></label>
-          <input class="field-input"
-            [value]="formServiceProvider()"
-            (input)="formServiceProvider.set($any($event.target).value)"
-            placeholder="e.g. 123456789012 or 100000000000001" />
-          <span class="field-hint">
-            If you have already arranged a service provider inside Ceekul portal, enter their ID.
-            Neurons disburse only after the provider confirms delivery.
-          </span>
-        </div>
-
-        <!-- Emergency Toggle -->
-        <div class="form-field emergency-toggle">
-          <label class="toggle-label">
-            <input type="checkbox"
-              [checked]="formIsEmergency()"
-              (change)="formIsEmergency.set($any($event.target).checked)" />
-            <span class="toggle-text">
-              This is an emergency — I need support immediately, not at month-end
-            </span>
-          </label>
-          @if (formIsEmergency()) {
-            <p class="emergency-note">
-              Emergency applications are reviewed for immediate disbursement once the service provider confirms.
-            </p>
-          }
-        </div>
-
-        <button class="submit-btn"
-          [disabled]="!canSubmit() || submitting()"
-          (click)="submit()">
-          {{ submitting() ? 'Submitting…' : 'Submit Application' }}
-        </button>
-      </div>
     </div>
   }
 

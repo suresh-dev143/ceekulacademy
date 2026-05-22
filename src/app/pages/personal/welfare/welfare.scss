@@ -9,58 +9,62 @@
 
 // ── Top Bar ──────────────────────────────────────────────────────────────────
 .welfare-topbar {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1rem 1.5rem;
-  background: #0f0f1a;
-  border-bottom: 1px solid #1e1e2e;
-  flex-wrap: wrap;
+  padding: 0.9rem 1.5rem;
+  background: #0a0a0f;
+  border-bottom: 1px solid #1a1a2e;
 
-  .topbar-left {
+  .topbar-brand {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin-bottom: 0.2rem;
   }
 
-  .brand-icon  { font-size: 1.2rem; color: #7c3aed; }
-  .brand-label { font-size: 1rem; font-weight: 600; color: #e2e8f0; }
+  .brand-icon  { font-size: 1rem; color: #7c3aed; }
+  .brand-label { font-size: 0.95rem; font-weight: 700; color: #e2e8f0; }
+  .brand-sep   { color: #374151; }
   .brand-sub   { font-size: 0.75rem; color: #4b5563; font-family: monospace; }
-
-  .topbar-tabs {
-    display: flex;
-    gap: 0.25rem;
-    margin: 0 auto;
-  }
+  .brand-note  { font-size: 0.72rem; color: #374151; padding-left: 1.4rem; }
 }
 
-.tab-btn {
+// ── Section Nav ───────────────────────────────────────────────────────────────
+.welfare-nav {
+  display: flex;
+  background: #0a0a0f;
+  border-bottom: 1px solid #1a1a2e;
+  overflow-x: auto;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.wn-btn {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 1rem;
-  border: 1px solid #1e1e2e;
-  border-radius: 6px;
-  background: transparent;
-  color: #6b7280;
-  font-size: 0.85rem;
+  gap: 0.5rem;
+  padding: 0.9rem 1.6rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #374151;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
+  white-space: nowrap;
 
-  &.active {
-    background: #1a1a2e;
-    border-color: #7c3aed;
-    color: #a78bfa;
-  }
-  &:hover:not(.active) { border-color: #374151; color: #9ca3af; }
+  &:hover { color: #6b7280; }
+  &.active { color: #e2e8f0; border-bottom-color: #7c3aed; }
 }
 
-.tab-count {
+.wn-count {
   background: #7c3aed;
   color: #fff;
-  font-size: 0.65rem;
-  padding: 1px 5px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 6px;
   border-radius: 10px;
+  line-height: 1.5;
 }
 
 // ── Banner ────────────────────────────────────────────────────────────────────
@@ -441,18 +445,53 @@
   padding: 1.5rem;
 }
 
+.form-heading { margin-bottom: 1.5rem; }
+
 .form-title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: #e2e8f0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .form-note {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: #6b7280;
   line-height: 1.6;
-  margin-bottom: 1.25rem;
+  margin: 0;
+}
+
+.form-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 0.6rem;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+
+.form-submit-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.submit-hint {
+  font-size: 0.72rem;
+  color: #4b5563;
+}
+
+.new-app-bar {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #1e1e2e;
 }
 
 .form-field {
