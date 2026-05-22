@@ -71,14 +71,14 @@ semantic workflows · contextual orchestration · lineage-aware memory · sparse
 | Layer | Name | Status | Phase | Key Files |
 |-------|------|--------|-------|-----------|
 | 1 | Universal Semantic Memory | ✅ Foundation built | 1 | `semanticGraphModel.js`, UCRS commit system |
-| 2 | Contextual AI Orchestration | 🔶 Partial | 1 | `domains/ai/claude/`, `SemanticContextService` |
+| 2 | Contextual AI Orchestration | ✅ Foundation built | 1 | `VaOverlayComponent` reads `assistanceMode`; 5 persona modes wired |
 | 3 | Event-Driven Resilience | ✅ Mostly built | 1 | `outboxWorkerService.js`, `civilizationEventTypes.js` |
 | 4 | Dormant Computation Fabric | ⬜ Medium-term | 2 | — |
 | 5 | Quantum Orchestration | ⬜ Long-term | 3 | — |
-| 6 | Multi-Scale AI Orchestration | 🔶 Foundation | 1 | `SemanticContextService.assistanceMode` |
+| 6 | Multi-Scale AI Orchestration | ✅ Foundation built | 1 | `SemanticContextService.assistanceMode` + full-app route inference |
 | 7 | Semantic Delta Networking | ⬜ Medium-term | 2 | — |
 | 8 | Planetary Resource Orchestration | ⬜ Medium-term | 2 | — |
-| 9 | Distributed Human Coherence | ⬜ Near-term | 1 | — |
+| 9 | Distributed Human Coherence | 🔶 Foundation | 1 | Dinner workflow lifecycle; full-app intent routing (30+ routes) |
 | 10 | Adaptive UI/UX | 🔶 Foundation | 1 | `SemanticContextService`, 3-panel layout |
 | 11 | Reality Reconstruction / XR | ⬜ Long-term | 3 | — |
 | 12 | Self-Evolving Infrastructure | ⬜ Near-term | 1 | — |
@@ -247,10 +247,11 @@ temporalConsistency:      5%
 - ✅ DScore model + service + API (Layer 14)
 - ✅ civilizationEventTypes.js (Layer 3 extension)
 - ✅ SemanticContextService (Layer 6/10 foundation)
+- ✅ Layer 2: VA avatar reads `assistanceMode` — 5 persona modes (mentor/navigator/advocate/collaborator/coordinator)
+- ✅ Layer 9 foundation: full-app route → intent inference (30+ routes); dinner workflow lifecycle wired to `beginWorkflow`/`endWorkflow`
 
 **Next (Phase 1 continuation):**
-- Layer 2: AI avatar component reading `assistanceMode` from SemanticContextService
-- Layer 9: Family coordination workflow + village welfare orchestration UI
+- Layer 9: Village welfare orchestration UI (collective issue tracking, village coordination board)
 - Layer 12: Self-optimizing workflow engine (detect and restructure inefficient patterns)
 - Layer 10: Panel emergence — panels adapt content to active semantic intent
 
