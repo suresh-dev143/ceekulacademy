@@ -36,6 +36,7 @@ export const routes: Routes = [
   { path: 'profile', loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent) },
   { path: 'contact', loadComponent: () => import('./pages/contact/contact').then(m => m.ContactPageComponent) },
   { path: 'district', loadComponent: () => import('./pages/district/district').then(m => m.DistrictComponent) },
+  { path: 'village', loadComponent: () => import('./pages/village/village').then(m => m.VillageComponent) },
   { path: 'issues', loadComponent: () => import('./pages/issues/issues').then(m => m.IssuesPageComponent) },
   { path: 'donate', loadComponent: () => import('./pages/donate/donate').then(m => m.DonatePageComponent) },
   { path: 'invest', loadComponent: () => import('./pages/invest/invest').then(m => m.InvestPageComponent) },

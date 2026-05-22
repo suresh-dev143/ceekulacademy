@@ -183,7 +183,7 @@ export class SemanticContextService {
     // Governance
     if (path.includes('/governance'))    { this.setIntent('govern',     'governance'); return; }
     if (path.includes('/district'))      { this.setIntent('govern',     'governance'); return; }
-    if (path.includes('/village'))       { this.setIntent('govern',     'governance'); return; }
+    if (path.includes('/village'))       { this.setIntent('coordinate', 'wellness');   return; }
     if (path.includes('/admin'))         { this.setIntent('govern',     'governance'); return; }
     // Research & innovation
     if (path.includes('/research'))      { this.setIntent('research',   'research');   return; }
