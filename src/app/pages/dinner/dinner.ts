@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DinnerService, DinnerTimeCheck, DinnerSession, DinnerMemory } from '../../services/dinner.service';
 import { SocketService } from '../../services/socket.service';
+import { SemanticContextService } from '../../services/semantic-context.service';
 
 type DinnerStep = 'loading' | 'modeSelect' | 'joinForm' | 'active';
 type DinnerTab = 'prompts' | 'memories' | 'family';
@@ -483,10 +484,11 @@ interface Reaction { emoji: string; id: number; x: number; }
   `]
 })
 export class DinnerComponent implements OnDestroy {
-  private readonly svc        = inject(DinnerService);
-  private readonly socketSvc  = inject(SocketService);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly platformId = inject(PLATFORM_ID);
+  private readonly svc         = inject(DinnerService);
+  private readonly socketSvc   = inject(SocketService);
+  private readonly destroyRef  = inject(DestroyRef);
+  private readonly platformId  = inject(PLATFORM_ID);
+  private readonly semanticCtx = inject(SemanticContextService);
 
   step = signal<DinnerStep>('loading');
   timeCheck = signal<DinnerTimeCheck | null>(null);
@@ -578,6 +580,13 @@ export class DinnerComponent implements OnDestroy {
       await this.svc.joinSession(this.sessionId, this.displayName.trim(), this.ageGroup());
       this._connectDinnerSocket(this.sessionId);
       this.step.set('active');
+      this.semanticCtx.beginWorkflow({
+        id: this.sessionId,
+        name: 'Family Dinner',
+        domain: 'wellness',
+        intent: 'coordinate',
+        contentCid: this.sessionId,
+      });
     } catch (e: any) {
       this.error.set(e?.error?.message ?? 'Failed to join session.');
     }
@@ -674,6 +683,7 @@ export class DinnerComponent implements OnDestroy {
     this.participantCount.set(1);
     this.socketReady.set(false);
     this.recentReactions.set([]);
+    this.semanticCtx.endWorkflow();
   }
 
   private _teardownSocket(): void {
@@ -685,6 +695,7 @@ export class DinnerComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (this.sessionId) {
       this.svc.endSession(this.sessionId).catch(() => { });
+      this.semanticCtx.endWorkflow();
     }
     this._teardownSocket();
   }

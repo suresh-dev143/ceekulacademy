@@ -172,13 +172,40 @@ export class SemanticContextService {
   // ── Private ───────────────────────────────────────────────────────────────
 
   private _inferIntentFromPath(path: string): void {
-    if (path.includes('/welfare'))    { this.setIntent('support',    'welfare');    return; }
-    if (path.includes('/academy'))    { this.setIntent('learn',      'education');  return; }
-    if (path.includes('/research'))   { this.setIntent('research',   'research');   return; }
-    if (path.includes('/governance')) { this.setIntent('govern',     'governance'); return; }
-    if (path.includes('/logistics'))  { this.setIntent('coordinate', 'logistics');  return; }
-    if (path.includes('/wellness'))   { this.setIntent('reflect',    'wellness');   return; }
-    if (path.includes('/create'))     { this.setIntent('build',      'education');  return; }
+    // Welfare & solidarity
+    if (path.includes('/welfare'))       { this.setIntent('support',    'welfare');    return; }
+    if (path.includes('/cg-pool'))       { this.setIntent('support',    'welfare');    return; }
+    // Learning
+    if (path.includes('/academy'))       { this.setIntent('learn',      'education');  return; }
+    if (path.includes('/courses'))       { this.setIntent('learn',      'education');  return; }
+    if (path.includes('/lecture'))       { this.setIntent('learn',      'education');  return; }
+    if (path.includes('/dashboard/student')) { this.setIntent('learn',  'education');  return; }
+    // Governance
+    if (path.includes('/governance'))    { this.setIntent('govern',     'governance'); return; }
+    if (path.includes('/district'))      { this.setIntent('govern',     'governance'); return; }
+    if (path.includes('/village'))       { this.setIntent('govern',     'governance'); return; }
+    if (path.includes('/admin'))         { this.setIntent('govern',     'governance'); return; }
+    // Research & innovation
+    if (path.includes('/research'))      { this.setIntent('research',   'research');   return; }
+    if (path.includes('/innovations'))   { this.setIntent('research',   'research');   return; }
+    if (path.includes('/digital-twin'))  { this.setIntent('research',   'research');   return; }
+    // Family & village coordination (wellness domain)
+    if (path.includes('/dinner'))        { this.setIntent('coordinate', 'wellness');   return; }
+    if (path.includes('/kutumb'))        { this.setIntent('coordinate', 'wellness');   return; }
+    if (path.includes('/family'))        { this.setIntent('coordinate', 'wellness');   return; }
+    // Logistics coordination
+    if (path.includes('/logistics'))     { this.setIntent('coordinate', 'logistics');  return; }
+    // Wellness & reflection
+    if (path.includes('/wellness'))      { this.setIntent('reflect',    'wellness');   return; }
+    if (path.includes('/human-life'))    { this.setIntent('reflect',    'wellness');   return; }
+    if (path.includes('/future'))        { this.setIntent('reflect',    'wellness');   return; }
+    // Building / creating
+    if (path.includes('/create'))        { this.setIntent('build',      'education');  return; }
+    if (path.includes('/workshop'))      { this.setIntent('build',      'education');  return; }
+    // Economy / neurons (identity domain)
+    if (path.includes('/neurons'))       { this.setIntent('navigate',   'identity');   return; }
+    if (path.includes('/activate'))      { this.setIntent('navigate',   'identity');   return; }
+    if (path.includes('/mission'))       { this.setIntent('navigate',   'identity');   return; }
     // Default: navigating
     this.setIntent('navigate', this.domain());
   }
