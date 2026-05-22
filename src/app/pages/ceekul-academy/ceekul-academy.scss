@@ -433,6 +433,33 @@ $text-bright: #d0e0f8;
 
 // ── Academy Canvas (Center) ───────────────────────────────────────────────────
 
+@keyframes alSpin { to { transform: rotate(360deg); } }
+
+.academy-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 40vh;
+}
+
+.al-ring {
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid rgba(129, 140, 248, 0.12);
+  border-top-color: rgba(129, 140, 248, 0.7);
+  border-radius: 50%;
+  animation: alSpin 0.7s linear infinite;
+}
+
+.al-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(129, 140, 248, 0.35);
+}
 
 .ac-section {
   animation: fadeUp 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;

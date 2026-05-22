@@ -62,7 +62,12 @@
           <app-global-search></app-global-search>
         }
 
-        @if (activePageComponent(); as cmp) {
+        @if (loading()) {
+        <div class="academy-loading">
+          <div class="al-ring"></div>
+          <span class="al-label">Loading…</span>
+        </div>
+        } @else if (activePageComponent(); as cmp) {
         <ng-container [ngComponentOutlet]="cmp"></ng-container>
         } @else if (displayContent(); as sec) {
         <div class="ac-section" [attr.data-section-id]="sec.id">
