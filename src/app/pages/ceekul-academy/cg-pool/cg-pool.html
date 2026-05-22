@@ -1,5 +1,39 @@
 <div class="cgp-page">
 
+  <!-- ══ TAB NAV ══════════════════════════════════════════════════════════════ -->
+  <nav class="cgp-tab-nav">
+    <button class="cgp-tab-btn" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">
+      ⬡ Overview
+    </button>
+    <button class="cgp-tab-btn cgp-tab-btn--apply" [class.active]="activeTab() === 'apply'" (click)="activeTab.set('apply')">
+      ◎ Apply for Support
+    </button>
+  </nav>
+
+  @if (activeTab() === 'apply') {
+    <!-- ══ WELFARE APPLICATION ════════════════════════════════════════════════ -->
+    <div class="cgp-apply-wrapper">
+      <div class="cgp-apply-intro">
+        <div class="cgp-apply-eyebrow">CG100000000000 · Welfare Pool</div>
+        <h2 class="cgp-apply-title">Apply for Welfare Support</h2>
+        <p class="cgp-apply-body">
+          Support flows from the Collective Consciousness pool to the most needy Ceebrain member first —
+          determined by your global neuron inflow rank. No human reviews your application.
+          The algorithm decides. The transfer executes automatically.
+        </p>
+        <div class="cgp-apply-rules">
+          <div class="cgp-rule"><span class="cgp-rule-glyph">◈</span><span><strong>FUN</strong> — Basic facilities: food, shelter, daily needs</span></div>
+          <div class="cgp-rule"><span class="cgp-rule-glyph">◈</span><span><strong>CUN</strong> — Cognitive upgradation via Ceekul expert programs</span></div>
+          <div class="cgp-rule"><span class="cgp-rule-glyph">◈</span><span><strong>SUN</strong> — Emergency health &amp; safety (repayable, zero interest)</span></div>
+          <div class="cgp-rule"><span class="cgp-rule-glyph">◆</span><span>Repayment is automatic once your CB balance exceeds the EC threshold</span></div>
+        </div>
+      </div>
+      <app-welfare></app-welfare>
+    </div>
+  }
+
+  @if (activeTab() === 'overview') {
+
   <!-- ══ SEAL HEADER ═════════════════════════════════════════════════════════ -->
   <header class="cgp-header">
     <div class="cgp-header__seal" aria-hidden="true">
@@ -441,21 +475,6 @@
 
   </section>
 
-  <!-- ══ WELFARE SUPPORT APPLICATION ═══════════════════════════════════════ -->
-  <section class="cgp-welfare">
-    <div class="cgp-section-label">
-      <span class="cgp-section-label__line" aria-hidden="true"></span>
-      <span class="cgp-section-label__text">Welfare Support Application</span>
-      <span class="cgp-section-label__line" aria-hidden="true"></span>
-    </div>
-    <p class="cgp-welfare__intro">
-      If you are a Ceebrain member in need, submit an application below. Support flows from
-      CG100000000000 to the most needy member first — determined by your global neuron inflow rank.
-      No human reviews your application. The algorithm decides. The transfer executes automatically.
-    </p>
-    <app-welfare></app-welfare>
-  </section>
-
   <!-- ══ FOOTER ═══════════════════════════════════════════════════════════════ -->
   <footer class="cgp-statement">
     <div class="cgp-statement__rule" aria-hidden="true"></div>
@@ -467,5 +486,7 @@
     </p>
     <span class="cgp-statement__seal" aria-hidden="true">⬡ CG100000000000 · Digital Self Governance · Ceekul Academy</span>
   </footer>
+
+  } <!-- end @if overview -->
 
 </div>

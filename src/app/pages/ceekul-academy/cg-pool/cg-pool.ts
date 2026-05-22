@@ -72,6 +72,7 @@ interface NeuronUsageRule {
   styleUrl: './cg-pool.scss',
 })
 export class CGPool {
+  readonly activeTab     = signal<'overview' | 'apply'>('overview');
   readonly expandedStream = signal<string | null>(null);
 
   toggleStream(id: string): void {
