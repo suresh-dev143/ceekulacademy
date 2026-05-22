@@ -48,6 +48,7 @@ export class PersonalLayout implements OnInit {
         { label: 'AI TOOLS', route: '/personal/ai-tools' },
         { label: 'WORKSPACE', route: '/workspace' },
         { label: 'ADVERTISE', route: '/personal/advertise' },
+        { label: 'WELFARE', route: '/personal/welfare' },
         { label: 'DEMAND', route: '/personal/demand' },
         { label: 'SUPPLY', route: '/personal/supply' },
         { label: 'EDIT', route: '/personal/edit' },
