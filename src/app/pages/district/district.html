@@ -193,29 +193,25 @@
         <!-- Advisor Grid -->
         <div class="advisor-grid">
           @for (a of advisors; track a.id; let i = $index) {
-            <div class="advisor-card"
-                 [class.advisor-card--expanded]="expandedAdvisor() === a.id"
-                 [style.--ac]="a.color"
-                 (click)="toggleAdvisor(a.id)">
+            <div class="advisor-card advisor-card--expanded" [style.--ac]="a.color">
               <div class="ac-header">
                 <div class="ac-icon" [style.color]="a.color">{{ a.icon }}</div>
                 <div class="ac-identity">
                   <div class="ac-name">{{ a.name }}</div>
                   <div class="ac-lens">{{ a.lens }}</div>
                 </div>
-                <div class="ac-toggle">{{ expandedAdvisor() === a.id ? '▲' : '▼' }}</div>
+                <div class="ac-num" [style.color]="a.color">0{{ a.id }}</div>
               </div>
-              @if (expandedAdvisor() === a.id) {
-                <div class="ac-body">
-                  <div class="ac-focus-list">
-                    @for (f of a.focus; track f) {
-                      <span class="ac-focus-tag" [style.border-color]="a.color" [style.color]="a.color">{{ f }}</span>
-                    }
-                  </div>
-                  <div class="ac-plan-label">Current Plan</div>
-                  <div class="ac-plan">{{ a.currentPlan }}</div>
+              <div class="ac-body">
+                <div class="ac-focus-label">Focus Areas</div>
+                <div class="ac-focus-list">
+                  @for (f of a.focus; track f) {
+                    <span class="ac-focus-tag" [style.border-color]="a.color" [style.color]="a.color">{{ f }}</span>
+                  }
                 </div>
-              }
+                <div class="ac-plan-label">Current Plan</div>
+                <div class="ac-plan">{{ a.currentPlan }}</div>
+              </div>
             </div>
           }
         </div>

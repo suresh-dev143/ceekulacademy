@@ -52,9 +52,8 @@ export interface EvolutionPhase {
 })
 export class DistrictComponent {
 
-  readonly activeTab        = signal<DistrictTab>('overview');
-  readonly expandedAdvisor  = signal<number | null>(null);
-  readonly expandedRec      = signal<number | null>(null);
+  readonly activeTab   = signal<DistrictTab>('overview');
+  readonly expandedRec = signal<number | null>(null);
 
   readonly districtName  = 'TIRUVANNAMALAI';
   readonly districtState = 'Tamil Nadu';
@@ -292,10 +291,6 @@ export class DistrictComponent {
   // ── Methods ────────────────────────────────────────────────────────────────
 
   selectTab(id: DistrictTab): void { this.activeTab.set(id); }
-
-  toggleAdvisor(id: number): void {
-    this.expandedAdvisor.update(c => c === id ? null : id);
-  }
 
   toggleRec(i: number): void {
     this.expandedRec.update(c => c === i ? null : i);
