@@ -15,6 +15,7 @@
         <div class="gov-pool-entry">
           <button class="gov-pool-btn"
             [class.gov-pool-btn--active]="selectedId() === 'cg-pool'"
+            (mouseenter)="prefetchSection('cg-pool')"
             (click)="selectSection('cg-pool')">
             <span class="gov-pool-btn__glyph" aria-hidden="true">⬡</span>
             <div class="gov-pool-btn__body">
@@ -35,6 +36,7 @@
           <button
             class="gov-nav__item"
             [class.gov-nav__item--active]="selectedId() === section.id"
+            (mouseenter)="prefetchSection(section.id)"
             (click)="selectSection(section.id)"
             [attr.aria-current]="selectedId() === section.id ? 'page' : null">
             <span class="gov-nav__index">{{ (i + 1).toString().padStart(2, '0') }}</span>
