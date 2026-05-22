@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Welfare } from '../../../pages/personal/welfare/welfare';
 
 interface PoolStream {
   id: string;
@@ -66,7 +67,7 @@ interface NeuronUsageRule {
 @Component({
   selector: 'app-cg-pool',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Welfare],
   templateUrl: './cg-pool.html',
   styleUrl: './cg-pool.scss',
 })

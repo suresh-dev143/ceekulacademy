@@ -1407,6 +1407,19 @@ $text-bright: #ccd8f8;
   }
 }
 
+// ── Welfare Section ───────────────────────────────────────────────────────────
+.cgp-welfare {
+  margin-bottom: 3.5rem;
+}
+
+.cgp-welfare__intro {
+  font-size: 0.83rem;
+  color: $text-body;
+  line-height: 1.7;
+  margin: 0 0 1.5rem;
+  max-width: 40rem;
+}
+
 // ── Statement ─────────────────────────────────────────────────────────────────
 .cgp-statement {
   border-top: 1px solid rgba($indigo, 0.08);
