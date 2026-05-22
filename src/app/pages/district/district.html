@@ -384,7 +384,7 @@
           <div class="village-filter-pills">
             @for (s of ['all','active','monitoring','alert']; track s) {
               <button class="vfp" [class.vfp--active]="villageStatusFilter() === s"
-                      (click)="villageStatusFilter.set(s)">
+                      (click)="villageStatusFilter.set($any(s))">
                 {{ s === 'all' ? 'All' : s | uppercase }}
               </button>
             }

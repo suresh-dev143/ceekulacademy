@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { VaService, VaMessage, VolunteerPing, AvatarExpression } from '../../services/va.service';
 import { DeviceContextService } from '../../services/device-context.service';
 import { AuthService } from '../../services/auth.service';
+import { SemanticContextService } from '../../services/semantic-context.service';
 
 type AvatarState = 'idle' | 'listening' | 'speaking' | 'thinking';
 
@@ -23,6 +24,16 @@ const EXPR_LABEL: Record<AvatarExpression, string> = {
   greeting:   'Hello!',
 };
 
+type AssistanceMode = 'mentor' | 'navigator' | 'advocate' | 'collaborator' | 'coordinator';
+
+const PERSONA: Record<AssistanceMode, { name: string; sub: string; expr: AvatarExpression }> = {
+  mentor:      { name: 'MENTOR',      sub: 'Your learning companion',      expr: 'happy'      },
+  navigator:   { name: 'NAVIGATOR',   sub: 'Semantic wayfinder',           expr: 'neutral'    },
+  advocate:    { name: 'ADVOCATE',    sub: 'Welfare & solidarity guide',    expr: 'empathetic' },
+  collaborator:{ name: 'COLLABORATOR',sub: 'Research co-pilot',            expr: 'thinking'   },
+  coordinator: { name: 'COORDINATOR', sub: 'Family & village orchestrator', expr: 'greeting'   },
+};
+
 // ── Component ─────────────────────────────────────────────────────────────────
 
 @Component({
@@ -33,7 +44,7 @@ const EXPR_LABEL: Record<AvatarExpression, string> = {
 <!-- ── FAB ─────────────────────────────────────────────────────────────────── -->
 @if (!isOpen()) {
   <button class="va-fab" (click)="open()" title="Open Ceekul Assistant"
-    [attr.data-expr]="expression()">
+    [attr.data-expr]="idleExpression()">
     <div class="va-orb" [attr.data-state]="avatarState()">
       <div class="va-orb-ring outer"></div>
       <div class="va-orb-ring inner"></div>
@@ -58,7 +69,7 @@ const EXPR_LABEL: Record<AvatarExpression, string> = {
 
     <!-- Header -->
     <div class="va-panel-header">
-      <div class="va-header-avatar" [attr.data-expr]="expression()" [attr.data-state]="avatarState()">
+      <div class="va-header-avatar" [attr.data-expr]="idleExpression()" [attr.data-state]="avatarState()">
         <div class="va-orb small">
           <div class="va-orb-ring outer"></div>
           <div class="va-orb-ring inner"></div>
@@ -74,7 +85,7 @@ const EXPR_LABEL: Record<AvatarExpression, string> = {
       </div>
 
       <div class="va-header-text">
-        <div class="va-h-name">CEEKUL AVATAR</div>
+        <div class="va-h-name">{{ persona().name }}</div>
         <div class="va-h-status">
           {{ socketConnected() ? '● ' : '◌ ' }}{{ statusLabel() }}
         </div>
@@ -136,11 +147,11 @@ const EXPR_LABEL: Record<AvatarExpression, string> = {
     <div class="va-messages" #msgList>
       @if (messages().length === 0) {
         <div class="va-empty">
-          <div class="va-empty-orb" [attr.data-expr]="expression()">
+          <div class="va-empty-orb" [attr.data-expr]="idleExpression()">
             <span class="va-empty-glyph">⬡</span>
           </div>
-          <div class="va-empty-title">{{ EXPR_LABEL[expression()] }}</div>
-          <div class="va-empty-sub">Ask anything about Ceekul.</div>
+          <div class="va-empty-title">{{ persona().name }}</div>
+          <div class="va-empty-sub">{{ persona().sub }}</div>
         </div>
       }
       @for (msg of messages(); track msg.ts) {
@@ -163,9 +174,9 @@ const EXPR_LABEL: Record<AvatarExpression, string> = {
       }
     </div>
 
-    <!-- Expression mood label -->
-    <div class="va-mood-strip" [attr.data-expr]="expression()">
-      {{ EXPR_LABEL[expression()] }}
+    <!-- Mood strip: persona sub-label at idle, expression label when active -->
+    <div class="va-mood-strip" [attr.data-expr]="idleExpression()">
+      {{ avatarState() === 'idle' ? persona().sub : EXPR_LABEL[expression()] }}
     </div>
 
     <!-- Input bar -->
@@ -518,12 +529,23 @@ const EXPR_LABEL: Record<AvatarExpression, string> = {
 export class VaOverlayComponent implements OnInit, AfterViewChecked, OnDestroy {
   protected readonly EXPR_LABEL = EXPR_LABEL;
 
-  private readonly vaService  = inject(VaService);
-  private readonly deviceCtx  = inject(DeviceContextService);
-  private readonly auth       = inject(AuthService);
-  private readonly router     = inject(Router);
-  private readonly platform   = inject(PLATFORM_ID);
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly vaService   = inject(VaService);
+  private readonly deviceCtx   = inject(DeviceContextService);
+  private readonly auth        = inject(AuthService);
+  private readonly router      = inject(Router);
+  private readonly platform    = inject(PLATFORM_ID);
+  private readonly destroyRef  = inject(DestroyRef);
+  private readonly semanticCtx = inject(SemanticContextService);
+
+  // ── Persona — adapts to SemanticContextService.assistanceMode ────────────
+  readonly persona = computed(() => {
+    const mode = this.semanticCtx.assistanceMode();
+    return mode ? PERSONA[mode] : { name: 'CEEKUL AVATAR', sub: 'Ask anything about Ceekul.', expr: 'neutral' as AvatarExpression };
+  });
+
+  readonly idleExpression = computed<AvatarExpression>(() =>
+    this.avatarState() === 'idle' ? this.persona().expr : this.expression()
+  );
 
   @ViewChild('msgList') private msgList?: ElementRef<HTMLElement>;
 
