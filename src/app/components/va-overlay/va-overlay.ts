@@ -651,7 +651,14 @@ export class VaOverlayComponent implements OnInit, AfterViewChecked, OnDestroy {
     this._shouldScroll = true;
 
     try {
-      const res   = await this.vaService.interact(this._sessionId!, text);
+      const res   = await this.vaService.interact(this._sessionId!, text, {
+        intent:         this.semanticCtx.intent(),
+        domain:         this.semanticCtx.domain(),
+        assistanceMode: this.semanticCtx.assistanceMode(),
+        workflowName:   this.semanticCtx.workflowLabel(),
+        contentCid:     this.semanticCtx.contentCid(),
+        depth:          this.semanticCtx.depth(),
+      });
       const reply = this.vaService.extractText(res);
       const expr  = (res.communication?.expression ?? res.avatarState?.expression ?? 'neutral') as AvatarExpression;
 

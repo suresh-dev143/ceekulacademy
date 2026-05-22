@@ -32,6 +32,15 @@ export type RenderTier       = 'rive' | 'lottie' | 'static';
 export type AvatarExpression =
   'neutral' | 'happy' | 'empathetic' | 'thinking' | 'concerned' | 'alert' | 'greeting';
 
+export interface VaSemanticContext {
+  intent?: string | null;
+  domain?: string | null;
+  assistanceMode?: string | null;
+  workflowName?: string | null;
+  contentCid?: string | null;
+  depth?: number;
+}
+
 export interface VolunteerPing {
   escalationId: string;
   sessionId:    string;
@@ -128,11 +137,11 @@ export class VaService {
 
   // ── Interaction ───────────────────────────────────────────────────────────
 
-  async interact(sessionId: string, message: string): Promise<VaInteractResponse> {
+  async interact(sessionId: string, message: string, semanticCtx?: VaSemanticContext): Promise<VaInteractResponse> {
     const res = await firstValueFrom(
       this.http.post<{ data: VaInteractResponse }>(
         `${this.base}/session/${sessionId}/interact`,
-        { message },
+        { message, ...(semanticCtx ? { semanticContext: semanticCtx } : {}) },
       )
     );
     const d = res.data;
