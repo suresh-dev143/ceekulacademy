@@ -73,7 +73,7 @@ semantic workflows · contextual orchestration · lineage-aware memory · sparse
 | 1 | Universal Semantic Memory | ✅ Foundation built | 1 | `semanticGraphModel.js`, UCRS commit system |
 | 2 | Contextual AI Orchestration | ✅ Foundation built | 1 | `VaOverlayComponent` reads `assistanceMode`; 5 persona modes wired |
 | 3 | Event-Driven Resilience | ✅ Foundation built | 1 | `outboxWorkerService.js`, `civilizationEventTypes.js`, `dscoreEventConsumer.js` |
-| 4 | Dormant Computation Fabric | ⬜ Medium-term | 2 | — |
+| 4 | Dormant Computation Fabric | ✅ Foundation built | 2 | `moduleLifecycleService.js`, `containerAdapterService.js`, `moduleRegistrar.js`, `module.route.js`, `dormant-computation.service.ts` |
 | 5 | Quantum Orchestration | ⬜ Long-term | 3 | — |
 | 6 | Multi-Scale AI Orchestration | ✅ Foundation built | 1 | `SemanticContextService.assistanceMode` + full-app route inference |
 | 7 | Semantic Delta Networking | ✅ Foundation built | 2 | `semanticDeltaSubscriptionService.js`, `deltaStream.route.js`, `semantic-delta-subscription.service.ts` |
@@ -414,7 +414,7 @@ GET /api/orchestration/dispatch/:districtId — volunteer→need suggestions
 ---
 
 ### Phase 2 — Infrastructure Patterns (18 months–5 years)
-- Layer 4: Dormant computation fabric (temporary task-specific modules)
+- ✅ Layer 4: Dormant computation fabric — trigger-driven module activation, 7 civilization modules, Docker/K8s adapter (foundation built)
 - ✅ Layer 7: Semantic delta networking — SSE push, Redis subscriber sets, prefetch pre-warming (foundation built)
 - Layer 13: Local-first operation (CRDT sync, Background Sync API)
 - Layer 15: Regenerative hardware metabolism (component lineage tracking)
