@@ -2,6 +2,7 @@ import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SemanticContextService } from '../../services/semantic-context.service';
+import { WorkflowOptimizerService, SuggestionType } from '../../services/workflow-optimizer.service';
 
 // ── Mode configuration ─────────────────────────────────────────────────────────
 
@@ -158,6 +159,34 @@ const DEFAULT_ACTIONS: QuickAction[] = [
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .sp-nb-empty { font-size: 0.55rem; color: #1e293b; font-style: italic; }
+
+    /* ── Flow health ── */
+    .sp-health {
+      background: #0a0f1a; border: 1px solid #0f172a;
+      padding: 0.35rem 0.65rem; display: flex; align-items: center; gap: 0.4rem;
+      animation: sp-fade 0.2s ease;
+    }
+    .sp-health-dot {
+      width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+      background: #22c55e; box-shadow: 0 0 4px #22c55e;
+    }
+    .sp-health--warn .sp-health-dot { background: #f59e0b; box-shadow: 0 0 4px #f59e0b; }
+    .sp-health--crit .sp-health-dot { background: #ef4444; box-shadow: 0 0 4px #ef4444; }
+    .sp-health-label { font-size: 0.52rem; color: #334155; text-transform: uppercase; letter-spacing: 0.08em; flex: 1; }
+    .sp-health-score { font-size: 0.62rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #22c55e; }
+    .sp-health--warn .sp-health-score { color: #f59e0b; }
+    .sp-health--crit .sp-health-score { color: #ef4444; }
+
+    /* ── Optimization suggestions ── */
+    .sp-opts {
+      background: #0a0f1a; border: 1px solid #0f172a; border-left: 2px solid #92400e;
+      padding: 0.35rem 0.55rem; display: flex; flex-direction: column; gap: 0.3rem;
+      animation: sp-fade 0.2s ease;
+    }
+    .sp-opts-label { font-size: 0.5rem; color: #92400e; text-transform: uppercase; letter-spacing: 0.1em; }
+    .sp-opt { display: flex; align-items: flex-start; gap: 0.35rem; }
+    .sp-opt-glyph { font-size: 0.6rem; color: #78350f; flex-shrink: 0; line-height: 1.4; }
+    .sp-opt-text  { font-size: 0.58rem; color: #78716c; line-height: 1.4; }
   `],
   template: `
     <div class="sp-root" [style.--mc]="modeColor()">
@@ -181,6 +210,30 @@ const DEFAULT_ACTIONS: QuickAction[] = [
           <div class="sp-wf-track">
             <div class="sp-wf-fill" [style.width.%]="workflowProgress()"></div>
           </div>
+        </div>
+      }
+
+      <!-- Flow health — live score from WorkflowOptimizerService -->
+      @if (optimizer.healthScore() !== null) {
+        <div class="sp-health"
+             [class.sp-health--warn]="optimizer.healthScore()! < 60"
+             [class.sp-health--crit]="optimizer.healthScore()! < 40">
+          <span class="sp-health-dot"></span>
+          <span class="sp-health-label">Flow health</span>
+          <span class="sp-health-score">{{ optimizer.healthScore() }}</span>
+        </div>
+      }
+
+      <!-- Optimization suggestions -->
+      @if (optimizer.suggestions().length > 0) {
+        <div class="sp-opts">
+          <span class="sp-opts-label">Optimize</span>
+          @for (s of optimizer.suggestions(); track s.label) {
+            <div class="sp-opt">
+              <span class="sp-opt-glyph">{{ suggestionGlyph(s.type) }}</span>
+              <span class="sp-opt-text">{{ s.label }}</span>
+            </div>
+          }
         </div>
       }
 
@@ -209,7 +262,8 @@ const DEFAULT_ACTIONS: QuickAction[] = [
   `,
 })
 export class SemanticIntelligencePanelComponent {
-  readonly ctx = inject(SemanticContextService);
+  readonly ctx       = inject(SemanticContextService);
+  readonly optimizer = inject(WorkflowOptimizerService);
 
   private readonly activeMode = computed<AssistanceMode>(() =>
     this.ctx.assistanceMode() ?? 'navigator'
@@ -230,4 +284,12 @@ export class SemanticIntelligencePanelComponent {
   );
 
   readonly visibleNeighbors = computed(() => this.ctx.neighbors().slice(0, 3));
+
+  suggestionGlyph(type: SuggestionType): string {
+    switch (type) {
+      case 'high_abandonment': return '⚑';
+      case 'slow_run':         return '◉';
+      case 'bottleneck_step':  return '⊘';
+    }
+  }
 }

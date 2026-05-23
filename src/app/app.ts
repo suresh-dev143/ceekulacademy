@@ -8,6 +8,7 @@ import { VaOverlayComponent } from './components/va-overlay/va-overlay';
 import { AuthService } from './services/auth.service';
 import { ScreenSyncService } from './services/screen-sync.service';
 import { SemanticContextService } from './services/semantic-context.service';
+import { WorkflowOptimizerService } from './services/workflow-optimizer.service';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +22,7 @@ export class App {
   private readonly _auth          = inject(AuthService);
   private readonly _screenSync    = inject(ScreenSyncService);
   private readonly _semanticCtx   = inject(SemanticContextService);
+  private readonly _wfOptimizer   = inject(WorkflowOptimizerService);
   private readonly _router        = inject(Router);
 
   constructor() {

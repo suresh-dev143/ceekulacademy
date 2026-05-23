@@ -81,7 +81,7 @@ semantic workflows · contextual orchestration · lineage-aware memory · sparse
 | 9 | Distributed Human Coherence | 🔶 Partial | 1 | Dinner workflow; village OS (`/village`); 30+ route intent inference |
 | 10 | Adaptive UI/UX | ✅ Phase 1 complete | 1 | `SemanticIntelligencePanelComponent` (right); `SemanticLeftPanelComponent` (left); both panels fully semantic |
 | 11 | Reality Reconstruction / XR | ⬜ Long-term | 3 | — |
-| 12 | Self-Evolving Infrastructure | ⬜ Near-term | 1 | — |
+| 12 | Self-Evolving Infrastructure | ✅ Foundation built | 1 | `WorkflowOptimizerService` (frontend); `workflowIntelligenceService.js` (backend) |
 | 13 | Distributed Local-First | ⬜ Medium-term | 2 | — |
 | 14 | Trust + Dignity Computation | ✅ Foundation built | 1 | `dScoreModel.js`, `dScoreService.js` |
 | 15 | Regenerative Device Metabolism | ⬜ Long-term | 3 | — |
@@ -233,6 +233,41 @@ temporalConsistency:      5%
 
 ---
 
+## Layer 12 — Self-Evolving Infrastructure
+
+### Purpose
+Workflows should detect their own inefficiency and restructure. In Phase 1 this means:
+- Recording how users actually move through semantic workflows (step timings, completion vs abandonment)
+- Detecting patterns that indicate friction (bottleneck steps, high abandonment, slow sessions)
+- Surfacing live signals in the UI so the user and the system can adapt
+
+### Current Implementation
+
+**Frontend — `WorkflowOptimizerService`**
+Observes `SemanticContextService.workflow()` via Angular `effect()`. Records each session run (step IDs, per-step duration, abandoned vs completed) to `localStorage` (key: `ck_wf_runs_v1`, capped at 50 runs). From ≥2 historical runs it computes:
+
+```
+healthScore = completionRate × 0.45 + stepEfficiency × 0.35 + depthProgress × 0.20
+```
+
+Three suggestion types, surfaced in the right panel:
+| Type | Trigger | Glyph |
+|------|---------|-------|
+| `high_abandonment` | >40% of runs abandoned | ⚑ |
+| `slow_run` | current session >1.5× historical avg | ◉ |
+| `bottleneck_step` | one step >2.5× per-step avg | ⊘ |
+
+**Backend — `workflowIntelligenceService.js`**
+Analyzes UCRS saga workflows from MongoDB. `analyzeWorkflows(name?)` returns step-level failure rates, avg durations, retry patterns, and text recommendations. `selfHeal({ maxAgeHours, dryRun })` resets recoverable failed workflows to `pending` for automatic retry. Exposed via `GET /api/workflows/stats` and implicitly via the drain cycle.
+
+### Evolution Path (Phase 2)
+- Backend API for cross-user aggregate patterns (replace localStorage with real telemetry)
+- Automatic step restructuring: optimizer calls `advanceWorkflow()` to skip bottleneck steps
+- Workflow templates adapt based on aggregate completion patterns
+- ML-based suggestion ranking as pattern corpus grows
+
+---
+
 ## Implementation Roadmap
 
 ### Phase 1 — Foundation (0–18 months)
@@ -254,8 +289,9 @@ temporalConsistency:      5%
 - ✅ Layer 10 deep: `SemanticLeftPanelComponent` in layout left column — identity strip + mode-specific contextual nav (5 domains: Learning Space / Welfare & Solidarity / Research Space / Coordination Hub / Explore); collapses to glyph-only
 - ✅ Layer 2 deep: AI avatar sends semantic context as part of every `/api/va/interact` call
 
-**Next (Phase 1 continuation):**
-- Layer 12: Self-optimizing workflow engine (detect and restructure inefficient patterns)
+- ✅ Layer 12: `WorkflowOptimizerService` — session telemetry to localStorage, 3-signal pattern detection (abandonment rate / slow run / bottleneck step), health score (0–100) + suggestions surfaced in right panel. Backend: `workflowIntelligenceService.js` (saga-level self-healing, `selfHeal()`, failure rate analysis).
+
+**Phase 1 complete.** All near-term Layer 1 foundation items done.
 
 ### Phase 2 — Infrastructure Patterns (18 months–5 years)
 - Layer 4: Dormant computation fabric (temporary task-specific modules)
