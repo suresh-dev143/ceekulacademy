@@ -72,12 +72,12 @@ semantic workflows · contextual orchestration · lineage-aware memory · sparse
 |-------|------|--------|-------|-----------|
 | 1 | Universal Semantic Memory | ✅ Foundation built | 1 | `semanticGraphModel.js`, UCRS commit system |
 | 2 | Contextual AI Orchestration | ✅ Foundation built | 1 | `VaOverlayComponent` reads `assistanceMode`; 5 persona modes wired |
-| 3 | Event-Driven Resilience | ✅ Mostly built | 1 | `outboxWorkerService.js`, `civilizationEventTypes.js` |
+| 3 | Event-Driven Resilience | ✅ Foundation built | 1 | `outboxWorkerService.js`, `civilizationEventTypes.js`, `dscoreEventConsumer.js` |
 | 4 | Dormant Computation Fabric | ⬜ Medium-term | 2 | — |
 | 5 | Quantum Orchestration | ⬜ Long-term | 3 | — |
 | 6 | Multi-Scale AI Orchestration | ✅ Foundation built | 1 | `SemanticContextService.assistanceMode` + full-app route inference |
 | 7 | Semantic Delta Networking | ⬜ Medium-term | 2 | — |
-| 8 | Planetary Resource Orchestration | ⬜ Medium-term | 2 | — |
+| 8 | Planetary Resource Orchestration | ✅ Foundation built | 2 | `resourceOrchestrationService.js`, `/api/orchestration/demand`, village OS demand strip |
 | 9 | Distributed Human Coherence | ✅ Foundation built | 1 | Dinner workflow; village OS (`/village`); 30+ route intent inference; `coherenceService.js`; coherence strip in right panel |
 | 10 | Adaptive UI/UX | ✅ Phase 1 complete | 1 | `SemanticIntelligencePanelComponent` (right); `SemanticLeftPanelComponent` (left); both panels fully semantic |
 | 11 | Reality Reconstruction / XR | ⬜ Long-term | 3 | — |
@@ -155,6 +155,12 @@ system.*      — graph rebalancing, workflow optimization, self-healing
 
 ### DSCORE_TRIGGERS
 Any civilization event automatically triggers a D-score update if it appears in `DSCORE_TRIGGERS`. Domain services fire events; the D-score layer subscribes — no coupling between domains.
+
+### Layer 3 Depth Pass — D-score automation
+
+**`dscoreEventConsumer.js`** — Starts one `consumeStream()` consumer per mapped civilization event type (12 streams: education.content.committed, governance.vote.cast, welfare.solidarity.granted, etc.). For each message: extracts the actor CB ID from the payload (tries domain-specific field names with fallbacks), calls `dScoreService.recordEvent(cbId, dscoreType, { referenceId })`. Idempotency is guaranteed by `recordEvent`'s existing `referenceId` guard — replayed messages are silently no-ops.
+
+**`civilizationWorkers.js`** — Single startup entry point: starts `outboxWorkerService` (UCE outbox → Redis Streams) and `dscoreEventConsumer` (Redis Streams → D-score updates). Called from `app.js` at boot. Before this, the outbox worker was never started; D-score updates required manual admin API calls. After this, every civilization event automatically keeps D-scores current.
 
 ---
 
@@ -326,6 +332,10 @@ Analyzes UCRS saga workflows from MongoDB. `analyzeWorkflows(name?)` returns ste
 
 - ✅ Layer 9 complete: `coherenceService.js` (member + village coherence from D-score); `GET /api/coherence/me` + `/village/:id`; coherence strip in right panel; `SemanticGraphService` auto-fetches 2-hop semantic neighbors when `contentCid` changes (Layer 1 depth pass bundled)
 
+- ✅ Layer 3 depth: `dscoreEventConsumer.js` — subscribes to 12 civilization event streams (`stream:{civEventType}`); maps to `dScoreService.recordEvent()` automatically; `civilizationWorkers.js` starts outbox worker + D-score consumer at app boot. D-score is now a live reactive signal, not a manually maintained one.
+
+- ✅ Layer 8 foundation: `resourceOrchestrationService.js` — `aggregateDemand(districtId)` queries open welfare applications by fund type + urgency + outstanding need + avg applicant D-score; `suggestDispatch(districtId)` matches highest-urgency pending applications to available volunteers. `GET /api/orchestration/demand/:districtId` + `/dispatch/:districtId`. Village OS welfare tab shows live demand aggregate (SUN/CUN/FUN breakdown + neurons needed + critical count).
+
 - ✅ Layer 12: `WorkflowOptimizerService` — session telemetry to localStorage, 3-signal pattern detection (abandonment rate / slow run / bottleneck step), health score (0–100) + suggestions surfaced in right panel. Backend: `workflowIntelligenceService.js` (saga-level self-healing, `selfHeal()`, failure rate analysis).
 
 **Phase 1 complete.** All near-term Layer 1 foundation items done.
@@ -369,11 +379,44 @@ The app must be resilient to connectivity loss. Users in low-connectivity areas 
 
 ---
 
+## Layer 8 — Planetary Resource Orchestration
+
+### Purpose
+Aggregate welfare demand signals across a district and route available resources (volunteers, neurons, skills) to where they are needed most. Replaces manual matching with algorithm-driven dispatch.
+
+### Current Implementation
+
+**`resourceOrchestrationService.js`**
+
+`aggregateDemand(districtId)`:
+- Resolves CB members by `User.address.district`
+- Queries open welfare applications (`status: pending | approved | partially_funded`)
+- Returns: `totalOpen`, `byFundType` (FUN/CUN/SUN counts), `byUrgency` (critical/high/medium), `totalOutstandingNeed` (sum in neurons), `avgApplicantDscore` (signals collective depth of need)
+
+`suggestDispatch(districtId)`:
+- Selects highest-urgency pending applications (emergency first, then by `outstandingNeed`)
+- Matches each to the best available volunteer by skill/domain overlap
+- Returns up to 10 `{ applicationId, fundType, goalCategory, isEmergency, outstandingNeed, suggestedVolunteer }` tuples
+
+**API:**
+```
+GET /api/orchestration/demand/:districtId   — live demand snapshot
+GET /api/orchestration/dispatch/:districtId — volunteer→need suggestions
+```
+
+**Village OS** — Welfare Board tab now shows a live demand aggregate strip: SUN/CUN/FUN counts, critical count, total neurons needed. WELFARE NEEDS metric in the header bar sources from `aggregateDemand()` with mock fallback while loading.
+
+### Evolution Path (Phase 2 deep)
+- Real-time demand updates via WebSocket push (replace HTTP poll)
+- Cross-district demand routing: surplus volunteers assist adjacent districts
+- Predictive demand: ML model on welfare application patterns → pre-position volunteers
+
+---
+
 ### Phase 2 — Infrastructure Patterns (18 months–5 years)
 - Layer 4: Dormant computation fabric (temporary task-specific modules)
 - Layer 7: Semantic delta networking (transmit only semantic perturbations)
-- Layer 8: Planetary resource orchestration (demand aggregation → adaptive logistics)
-- Layer 13: Local-first operation (offline semantic continuity, CRDT sync)
+- Layer 13: Local-first operation (CRDT sync, Background Sync API)
 - Layer 15: Regenerative hardware metabolism (component lineage tracking)
 
 ### Phase 3 — Long-Term (5–15 years)

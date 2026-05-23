@@ -1,7 +1,8 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LayoutComponent } from '../../components/layout/layout';
+import { ResourceOrchestrationService } from '../../services/resource-orchestration.service';
 
 type VillageTab = 'issues' | 'welfare' | 'volunteers' | 'coordination' | 'resources';
 
@@ -64,7 +65,7 @@ interface Resource {
         <div class="vos-metric-lbl">OPEN ISSUES</div>
       </div>
       <div class="vos-metric">
-        <div class="vos-metric-val" [class.vm-crit]="pendingWelfare() > 2">{{ pendingWelfare() }}</div>
+        <div class="vos-metric-val" [class.vm-crit]="liveWelfareNeeds() > 2">{{ liveWelfareNeeds() }}</div>
         <div class="vos-metric-lbl">WELFARE NEEDS</div>
       </div>
       <div class="vos-metric">
@@ -150,6 +151,43 @@ interface Resource {
       <!-- WELFARE BOARD TAB -->
       @if (activeTab() === 'welfare') {
         <div class="vos-panel">
+
+          <!-- Live demand aggregate from orchestration API -->
+          @if (orchestration.demandAggregate(); as agg) {
+            <div class="vos-demand-agg">
+              <div class="vda-label">LIVE DEMAND · {{ agg.districtId }}</div>
+              <div class="vda-stats">
+                <div class="vda-stat">
+                  <span class="vda-val" [class.vm-crit]="agg.totalOpen > 5">{{ agg.totalOpen }}</span>
+                  <span class="vda-key">Open</span>
+                </div>
+                <div class="vda-stat">
+                  <span class="vda-val vos-sun">{{ agg.byFundType['SUN'] ?? 0 }}</span>
+                  <span class="vda-key">SUN</span>
+                </div>
+                <div class="vda-stat">
+                  <span class="vda-val vos-cun">{{ agg.byFundType['CUN'] ?? 0 }}</span>
+                  <span class="vda-key">CUN</span>
+                </div>
+                <div class="vda-stat">
+                  <span class="vda-val vos-fun">{{ agg.byFundType['FUN'] ?? 0 }}</span>
+                  <span class="vda-key">FUN</span>
+                </div>
+                @if (agg.byUrgency['critical']) {
+                  <div class="vda-stat">
+                    <span class="vda-val vm-crit">{{ agg.byUrgency['critical'] }}</span>
+                    <span class="vda-key">Critical</span>
+                  </div>
+                }
+                @if (agg.totalOutstandingNeed > 0) {
+                  <div class="vda-stat vda-stat--wide">
+                    <span class="vda-val">{{ agg.totalOutstandingNeed | number }}</span>
+                    <span class="vda-key">Neurons needed</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
 
           <div class="vos-panel-head">
             <div>
@@ -602,6 +640,21 @@ interface Resource {
     .vco-bar-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #3b82f6); border-radius: 2px; }
     .vco-sub { font-size: 0.72rem; color: #475569; max-width: 300px; margin: 0 auto; line-height: 1.5; }
 
+    /* ── Demand aggregate strip ── */
+    .vos-demand-agg {
+      background: #06090f; border: 1px solid #0f172a; border-left: 2px solid #22c55e33;
+      padding: 0.9rem 1.2rem; display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .vda-label { font-size: 0.55rem; letter-spacing: 0.18em; color: #22c55e66; text-transform: uppercase; font-weight: 700; }
+    .vda-stats { display: flex; gap: 1.2rem; align-items: center; flex-wrap: wrap; }
+    .vda-stat  { display: flex; flex-direction: column; align-items: center; gap: 0.1rem; }
+    .vda-stat--wide { align-items: flex-start; }
+    .vda-val   { font-size: 1.2rem; font-weight: 800; line-height: 1; color: #e2e8f0; }
+    .vda-key   { font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; color: #334155; }
+    .vos-sun   { color: #fb923c; }
+    .vos-cun   { color: #f59e0b; }
+    .vos-fun   { color: #22c55e; }
+
     /* ── Resources ── */
     .vos-resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; }
     .vrc-card { background: #06090f; border: 1px solid #0f172a; padding: 1.2rem; display: flex; flex-direction: column; gap: 0.5rem; }
@@ -642,8 +695,20 @@ interface Resource {
 export class VillageComponent {
   readonly villageId   = 'VG100000100001';
   readonly villageName = 'Vandavasi North';
+  readonly districtId  = 'Vandavasi';
   readonly memberCount = 847;
   readonly familyCount = 196;
+
+  readonly orchestration = inject(ResourceOrchestrationService);
+
+  constructor() {
+    this.orchestration.fetchDemand(this.districtId);
+  }
+
+  /** Live welfare need total — falls back to mock count while loading. */
+  readonly liveWelfareNeeds = computed(() =>
+    this.orchestration.demandAggregate()?.totalOpen ?? this.pendingWelfare()
+  );
 
   activeTab = signal<VillageTab>('issues');
   issueFilter = signal<string>('all');
