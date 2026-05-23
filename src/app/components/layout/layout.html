@@ -21,10 +21,9 @@
             } -->
 
             <div class="sidebar-content">
+                <app-left-panel [collapsed]="leftCollapsed()"></app-left-panel>
                 @if (customLeftSidebar) {
                 <ng-content select="[slot=left-panel]"></ng-content>
-                } @else {
-                <!-- <app-sidebar-left [collapsed]="leftCollapsed()"></app-sidebar-left> -->
                 }
             </div>
         </aside>

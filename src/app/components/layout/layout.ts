@@ -6,10 +6,11 @@ import { NavbarComponent } from '../navbar/navbar';
 import { GlobalSearchComponent } from '../global-search/global-search';
 import { ToastComponent } from '../toast/toast';
 import { SemanticIntelligencePanelComponent } from '../semantic-panel/semantic-panel';
+import { SemanticLeftPanelComponent } from '../left-panel/left-panel';
 
 @Component({
     selector: 'app-layout',
-    imports: [SidebarLeftComponent, ChatPanelComponent, NavbarComponent, GlobalSearchComponent, ToastComponent, SemanticIntelligencePanelComponent],
+    imports: [SidebarLeftComponent, ChatPanelComponent, NavbarComponent, GlobalSearchComponent, ToastComponent, SemanticIntelligencePanelComponent, SemanticLeftPanelComponent],
     templateUrl: './layout.html',
     styleUrl: './layout.scss'
 })

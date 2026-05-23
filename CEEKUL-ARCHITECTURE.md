@@ -79,7 +79,7 @@ semantic workflows · contextual orchestration · lineage-aware memory · sparse
 | 7 | Semantic Delta Networking | ⬜ Medium-term | 2 | — |
 | 8 | Planetary Resource Orchestration | ⬜ Medium-term | 2 | — |
 | 9 | Distributed Human Coherence | 🔶 Partial | 1 | Dinner workflow; village OS (`/village`); 30+ route intent inference |
-| 10 | Adaptive UI/UX | ✅ Foundation built | 1 | `SemanticIntelligencePanelComponent`; `SemanticContextService`; 3-panel layout |
+| 10 | Adaptive UI/UX | ✅ Phase 1 complete | 1 | `SemanticIntelligencePanelComponent` (right); `SemanticLeftPanelComponent` (left); both panels fully semantic |
 | 11 | Reality Reconstruction / XR | ⬜ Long-term | 3 | — |
 | 12 | Self-Evolving Infrastructure | ⬜ Near-term | 1 | — |
 | 13 | Distributed Local-First | ⬜ Medium-term | 2 | — |
@@ -251,11 +251,11 @@ temporalConsistency:      5%
 - ✅ Layer 9 foundation: full-app route → intent inference (30+ routes); dinner workflow lifecycle wired to `beginWorkflow`/`endWorkflow`
 - ✅ Layer 9 village: Village Welfare Orchestration OS (`/village`) — issues, welfare board, volunteers, coordination, resources
 - ✅ Layer 10: `SemanticIntelligencePanelComponent` in layout right column — 5 persona modes, workflow strip, semantic neighbors
+- ✅ Layer 10 deep: `SemanticLeftPanelComponent` in layout left column — identity strip + mode-specific contextual nav (5 domains: Learning Space / Welfare & Solidarity / Research Space / Coordination Hub / Explore); collapses to glyph-only
+- ✅ Layer 2 deep: AI avatar sends semantic context as part of every `/api/va/interact` call
 
 **Next (Phase 1 continuation):**
 - Layer 12: Self-optimizing workflow engine (detect and restructure inefficient patterns)
-- Layer 10 deep: panels adapt left-column content to semantic intent (not just right-panel)
-- Layer 2 deep: AI avatar sends semantic context as part of every `/api/va/interact` call
 
 ### Phase 2 — Infrastructure Patterns (18 months–5 years)
 - Layer 4: Dormant computation fabric (temporary task-specific modules)
