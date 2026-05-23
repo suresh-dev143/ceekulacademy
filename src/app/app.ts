@@ -14,6 +14,7 @@ import { OfflineQueueService } from './services/offline-queue.service';
 import { SemanticCacheService } from './services/semantic-cache.service';
 import { SemanticGraphService } from './services/semantic-graph.service';
 import { CoherenceService } from './services/coherence.service';
+import { SemanticDeltaSubscriptionService } from './services/semantic-delta-subscription.service';
 
 @Component({
   selector: 'app-root',
@@ -32,8 +33,9 @@ export class App {
   private readonly _offlineQueue  = inject(OfflineQueueService);
   private readonly _semanticCache = inject(SemanticCacheService);
   private readonly _semanticGraph = inject(SemanticGraphService);
-  private readonly _coherence     = inject(CoherenceService);
-  private readonly _router        = inject(Router);
+  private readonly _coherence      = inject(CoherenceService);
+  private readonly _deltaSub       = inject(SemanticDeltaSubscriptionService);
+  private readonly _router         = inject(Router);
 
   constructor() {
     // Connect screen sync whenever the user is authenticated.
