@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SemanticContextService } from '../../services/semantic-context.service';
 import { WorkflowOptimizerService, SuggestionType } from '../../services/workflow-optimizer.service';
+import { CoherenceService, CoherenceLevel } from '../../services/coherence.service';
 
 // ── Mode configuration ─────────────────────────────────────────────────────────
 
@@ -177,6 +178,24 @@ const DEFAULT_ACTIONS: QuickAction[] = [
     .sp-health--warn .sp-health-score { color: #f59e0b; }
     .sp-health--crit .sp-health-score { color: #ef4444; }
 
+    /* ── Coherence strip ── */
+    .sp-coh {
+      background: #0a0f1a; border: 1px solid #0f172a;
+      padding: 0.35rem 0.65rem; display: flex; align-items: center; gap: 0.4rem;
+      animation: sp-fade 0.2s ease;
+    }
+    .sp-coh-dot {
+      width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+      background: #22c55e; box-shadow: 0 0 4px #22c55e;
+    }
+    .sp-coh--emerging  .sp-coh-dot { background: #f59e0b; box-shadow: 0 0 4px #f59e0b; }
+    .sp-coh--divergent .sp-coh-dot { background: #ef4444; box-shadow: 0 0 4px #ef4444; }
+    .sp-coh-label  { font-size: 0.52rem; color: #334155; text-transform: uppercase; letter-spacing: 0.08em; flex: 1; }
+    .sp-coh-score  { font-size: 0.62rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #22c55e; }
+    .sp-coh-level  { font-size: 0.5rem; color: #475569; margin-left: 0.25rem; }
+    .sp-coh--emerging  .sp-coh-score { color: #f59e0b; }
+    .sp-coh--divergent .sp-coh-score { color: #ef4444; }
+
     /* ── Optimization suggestions ── */
     .sp-opts {
       background: #0a0f1a; border: 1px solid #0f172a; border-left: 2px solid #92400e;
@@ -224,6 +243,18 @@ const DEFAULT_ACTIONS: QuickAction[] = [
         </div>
       }
 
+      <!-- Coherence strip — Layer 9 -->
+      @if (coherence.memberCoherence() !== null) {
+        <div class="sp-coh"
+             [class.sp-coh--emerging]="coherence.memberCoherence()!.level === 'emerging'"
+             [class.sp-coh--divergent]="coherence.memberCoherence()!.level === 'divergent'">
+          <span class="sp-coh-dot"></span>
+          <span class="sp-coh-label">Coherence</span>
+          <span class="sp-coh-score">{{ coherence.memberCoherence()!.coherence }}</span>
+          <span class="sp-coh-level">{{ coherence.memberCoherence()!.level }}</span>
+        </div>
+      }
+
       <!-- Optimization suggestions -->
       @if (optimizer.suggestions().length > 0) {
         <div class="sp-opts">
@@ -264,6 +295,7 @@ const DEFAULT_ACTIONS: QuickAction[] = [
 export class SemanticIntelligencePanelComponent {
   readonly ctx       = inject(SemanticContextService);
   readonly optimizer = inject(WorkflowOptimizerService);
+  readonly coherence = inject(CoherenceService);
 
   private readonly activeMode = computed<AssistanceMode>(() =>
     this.ctx.assistanceMode() ?? 'navigator'

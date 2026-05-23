@@ -12,6 +12,8 @@ import { WorkflowOptimizerService } from './services/workflow-optimizer.service'
 import { NetworkStatusService } from './services/network-status.service';
 import { OfflineQueueService } from './services/offline-queue.service';
 import { SemanticCacheService } from './services/semantic-cache.service';
+import { SemanticGraphService } from './services/semantic-graph.service';
+import { CoherenceService } from './services/coherence.service';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +31,8 @@ export class App {
   private readonly _network       = inject(NetworkStatusService);
   private readonly _offlineQueue  = inject(OfflineQueueService);
   private readonly _semanticCache = inject(SemanticCacheService);
+  private readonly _semanticGraph = inject(SemanticGraphService);
+  private readonly _coherence     = inject(CoherenceService);
   private readonly _router        = inject(Router);
 
   constructor() {

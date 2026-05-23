@@ -78,7 +78,7 @@ semantic workflows · contextual orchestration · lineage-aware memory · sparse
 | 6 | Multi-Scale AI Orchestration | ✅ Foundation built | 1 | `SemanticContextService.assistanceMode` + full-app route inference |
 | 7 | Semantic Delta Networking | ⬜ Medium-term | 2 | — |
 | 8 | Planetary Resource Orchestration | ⬜ Medium-term | 2 | — |
-| 9 | Distributed Human Coherence | 🔶 Partial | 1 | Dinner workflow; village OS (`/village`); 30+ route intent inference |
+| 9 | Distributed Human Coherence | ✅ Foundation built | 1 | Dinner workflow; village OS (`/village`); 30+ route intent inference; `coherenceService.js`; coherence strip in right panel |
 | 10 | Adaptive UI/UX | ✅ Phase 1 complete | 1 | `SemanticIntelligencePanelComponent` (right); `SemanticLeftPanelComponent` (left); both panels fully semantic |
 | 11 | Reality Reconstruction / XR | ⬜ Long-term | 3 | — |
 | 12 | Self-Evolving Infrastructure | ✅ Foundation built | 1 | `WorkflowOptimizerService` (frontend); `workflowIntelligenceService.js` (backend) |
@@ -118,6 +118,10 @@ SemanticEdge {
   revokedAt:        Date     // null if active
 }
 ```
+
+### Layer 1 Depth Pass
+
+**Semantic neighbor auto-fetch** — `SemanticGraphService` (Angular, `providedIn: 'root'`). Observes `SemanticContextService.contentCid()` via `effect()`. When a `contentCid` becomes active, fires `GET /api/semantic-graph/neighborhood/:cid` and calls `setNeighbors()` with the deduplicated union of first-hop and second-hop `toCid` values. The right panel's neighbor pills now show live data rather than an empty state. Silently no-ops on error — neighbors are an enhancement, not a requirement.
 
 ### Evolution Path (Phase 2)
 - Graph traversal for semantic search (replace keyword search with graph-walk)
@@ -233,6 +237,37 @@ temporalConsistency:      5%
 
 ---
 
+## Layer 9 — Distributed Human Coherence
+
+### Purpose
+Every village and district has a coherence field — a measure of how aligned its members are with civilization goals. Individual coherence drives welfare priority, governance trust weight, and AI assistance depth. Aggregate coherence surfaces in the village OS so coordinators can see where alignment is strong or breaking down.
+
+### Current Implementation
+
+**`coherenceService.js`** — Pure computation from D-score dimensions. No additional data collection needed. Formula (0–100):
+```
+coherence =
+  communityCoherence  (0–100) × 0.35
+  temporalConsistency (0–100) × 0.25
+  welfareContribution (0–100) × 0.20
+  overallScore (0–1000) / 10  × 0.20
+```
+Levels: ≥ 70 → **aligned** · ≥ 40 → **emerging** · < 40 → **divergent**
+
+**`GET /api/coherence/me`** — authenticated member's coherence score (`{ coherence, level, cbId }`).
+**`GET /api/coherence/village/:id`** — district aggregate: mean coherence, level, memberCount, and `distribution: { aligned, emerging, divergent }`. Members resolved via `User.address.district`.
+
+**Coherence strip in the right panel** — `CoherenceService` (Angular) fetches `/api/coherence/me` on load and exposes `memberCoherence` as a signal. `SemanticIntelligencePanelComponent` displays a dot + score + level label between the workflow health strip and quick actions. Dot color: green (aligned) · amber (emerging) · red (divergent).
+
+**Dinner workflow + village OS** — `beginWorkflow`/`endWorkflow` lifecycle hooked into the family dinner session. Village OS at `/village` coordinates welfare, volunteers, issues, and resources across the district.
+
+### Evolution Path (Phase 2)
+- Coherence drives welfare priority weight (lower coherence → higher solidarity need signal)
+- Village OS shows district coherence heatmap across members
+- Governance deliberation weight proportional to `communityCoherence` dimension
+
+---
+
 ## Layer 12 — Self-Evolving Infrastructure
 
 ### Purpose
@@ -288,6 +323,8 @@ Analyzes UCRS saga workflows from MongoDB. `analyzeWorkflows(name?)` returns ste
 - ✅ Layer 10: `SemanticIntelligencePanelComponent` in layout right column — 5 persona modes, workflow strip, semantic neighbors
 - ✅ Layer 10 deep: `SemanticLeftPanelComponent` in layout left column — identity strip + mode-specific contextual nav (5 domains: Learning Space / Welfare & Solidarity / Research Space / Coordination Hub / Explore); collapses to glyph-only
 - ✅ Layer 2 deep: AI avatar sends semantic context as part of every `/api/va/interact` call
+
+- ✅ Layer 9 complete: `coherenceService.js` (member + village coherence from D-score); `GET /api/coherence/me` + `/village/:id`; coherence strip in right panel; `SemanticGraphService` auto-fetches 2-hop semantic neighbors when `contentCid` changes (Layer 1 depth pass bundled)
 
 - ✅ Layer 12: `WorkflowOptimizerService` — session telemetry to localStorage, 3-signal pattern detection (abandonment rate / slow run / bottleneck step), health score (0–100) + suggestions surfaced in right panel. Backend: `workflowIntelligenceService.js` (saga-level self-healing, `selfHeal()`, failure rate analysis).
 
