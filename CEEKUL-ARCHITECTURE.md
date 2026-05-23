@@ -293,6 +293,9 @@ Analyzes UCRS saga workflows from MongoDB. `analyzeWorkflows(name?)` returns ste
 
 **Phase 1 complete.** All near-term Layer 1 foundation items done.
 
+### Phase 1 Depth Pass (post-completion wiring)
+- ✅ D-score → welfare priority: `composite_dscore` (weight 30%, direction `asc`) and `dscore_welfare_dimension` added as valid policy criteria. Default policy updated to 35/30/20/10/5 split (goal_category / D-score / monthly_inflow / outstanding_need / days_in_queue). Monthly neuron inflows now auto-computed from NeuronTransaction history (`toBucket: 'my_neurons'`) — EC admin no longer needs to pass the map manually. `welfareService._getDScores()` fetches scores lazily only when the active policy references them.
+
 ### Phase 2 — Infrastructure Patterns (18 months–5 years)
 - Layer 4: Dormant computation fabric (temporary task-specific modules)
 - Layer 7: Semantic delta networking (transmit only semantic perturbations)
