@@ -1,4 +1,5 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, effect, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 // ─── Domain types ─────────────────────────────────────────────────────────────
 
@@ -55,8 +56,21 @@ export interface SemanticState {
  * Future: this service will sync with the backend semantic graph, pulling
  * contextual neighbors and emitting civilization events on state transitions.
  */
+const PERSIST_KEY = 'ck_sem_ctx_v1';
+const PERSIST_TTL = 30 * 60 * 1000; // 30 minutes
+
+interface PersistedCtx {
+  intent:     SemanticIntent | null;
+  domain:     CivilizationDomain;
+  contentCid: string | null;
+  depth:      number;
+  workflow:   (Omit<SemanticWorkflow, 'startedAt'> & { startedAt: string }) | null;
+  savedAt:    number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SemanticContextService {
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   // ── Core state signals ────────────────────────────────────────────────────
 
@@ -167,6 +181,52 @@ export class SemanticContextService {
   syncPagePath(path: string): void {
     this.pagePath.set(path);
     this._inferIntentFromPath(path);
+  }
+
+  // ── Persistence ──────────────────────────────────────────────────────────
+
+  constructor() {
+    if (!this.isBrowser) return;
+    this._restore();
+    // Persist on every state change (effect runs in injection context).
+    effect(() => {
+      // Read all persistable signals to register dependencies.
+      const snapshot: PersistedCtx = {
+        intent:     this.intent(),
+        domain:     this.domain(),
+        contentCid: this.contentCid(),
+        depth:      this.depth(),
+        workflow:   this.workflow()
+          ? { ...this.workflow()!, startedAt: this.workflow()!.startedAt.toISOString() }
+          : null,
+        savedAt:    Date.now(),
+      };
+      try {
+        localStorage.setItem(PERSIST_KEY, JSON.stringify(snapshot));
+      } catch { /* storage quota — silently skip */ }
+    });
+  }
+
+  private _restore(): void {
+    try {
+      const raw = localStorage.getItem(PERSIST_KEY);
+      if (!raw) return;
+      const saved: PersistedCtx = JSON.parse(raw);
+      if (Date.now() - saved.savedAt > PERSIST_TTL) {
+        localStorage.removeItem(PERSIST_KEY);
+        return;
+      }
+      if (saved.intent)     this.intent.set(saved.intent);
+      if (saved.domain)     this.domain.set(saved.domain);
+      if (saved.contentCid) this.contentCid.set(saved.contentCid);
+      if (saved.depth)      this.depth.set(saved.depth);
+      if (saved.workflow) {
+        this.workflow.set({
+          ...saved.workflow,
+          startedAt: new Date(saved.workflow.startedAt),
+        });
+      }
+    } catch { /* corrupt storage — start fresh */ }
   }
 
   // ── Private ───────────────────────────────────────────────────────────────

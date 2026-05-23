@@ -82,7 +82,7 @@ semantic workflows · contextual orchestration · lineage-aware memory · sparse
 | 10 | Adaptive UI/UX | ✅ Phase 1 complete | 1 | `SemanticIntelligencePanelComponent` (right); `SemanticLeftPanelComponent` (left); both panels fully semantic |
 | 11 | Reality Reconstruction / XR | ⬜ Long-term | 3 | — |
 | 12 | Self-Evolving Infrastructure | ✅ Foundation built | 1 | `WorkflowOptimizerService` (frontend); `workflowIntelligenceService.js` (backend) |
-| 13 | Distributed Local-First | ⬜ Medium-term | 2 | — |
+| 13 | Distributed Local-First | ✅ Foundation built | 2 | `NetworkStatusService`; `OfflineQueueService` + interceptor; semantic context persistence; PWA shell (`ngsw-config.json`) |
 | 14 | Trust + Dignity Computation | ✅ Foundation built | 1 | `dScoreModel.js`, `dScoreService.js` |
 | 15 | Regenerative Device Metabolism | ⬜ Long-term | 3 | — |
 
@@ -295,6 +295,33 @@ Analyzes UCRS saga workflows from MongoDB. `analyzeWorkflows(name?)` returns ste
 
 ### Phase 1 Depth Pass (post-completion wiring)
 - ✅ D-score → welfare priority: `composite_dscore` (weight 30%, direction `asc`) and `dscore_welfare_dimension` added as valid policy criteria. Default policy updated to 35/30/20/10/5 split (goal_category / D-score / monthly_inflow / outstanding_need / days_in_queue). Monthly neuron inflows now auto-computed from NeuronTransaction history (`toBucket: 'my_neurons'`) — EC admin no longer needs to pass the map manually. `welfareService._getDScores()` fetches scores lazily only when the active policy references them.
+
+## Layer 13 — Distributed Local-First
+
+### Purpose
+The app must be resilient to connectivity loss. Users in low-connectivity areas should never see a blank page, lose their semantic context on refresh, or have mutations silently discarded when offline.
+
+### Current Implementation
+
+**PWA Shell** — `ngsw-config.json` + `@angular/service-worker`. Service worker precaches app shell (JS, CSS, manifest), lazy-caches static assets, and applies `freshness` (network-first, 3s timeout) for all API routes and `performance` (cache-first, 1h TTL) for academy content. Registered via `provideServiceWorker` in `app.config.ts` — disabled in dev mode.
+
+**`NetworkStatusService`** — SSR-safe signal `online` wrapping `navigator.onLine` + window `online`/`offline` events. The single source of truth for connectivity state across all Layer 13 components.
+
+**Semantic Context Persistence** — `SemanticContextService` now persists `intent`, `domain`, `workflow`, `contentCid`, and `depth` to localStorage on every state change via `effect()`. Restores on app load with a 30-minute TTL. Page refresh no longer loses the semantic workspace state.
+
+**`OfflineQueueService`** — Queues failed mutation requests (POST/PATCH/PUT/DELETE) to localStorage (max 20, max age 2h). On reconnect (`network.online()` → true), replays FIFO via `HttpClient` so the auth interceptor re-attaches headers. Exposes `queueLength` signal.
+
+**`offlineQueueInterceptor`** — Functional HTTP interceptor (runs last in chain). Catches `HttpErrorResponse` with `status === 0` (network failure) on our own API mutations. Enqueues and does not propagate the error. 4xx/5xx are never queued.
+
+**`OfflineIndicatorComponent`** — Compact badge in the layout. Shows `Offline · N queued` when `!network.online()`. Disappears silently when connectivity returns.
+
+### Evolution Path (Phase 2 deep)
+- CRDT sync for collaborative semantic editing (Yjs + vector clock backend)
+- IndexedDB content store for offline academy section reading
+- Background Sync API for guaranteed delivery of queued mutations
+- Cross-device semantic workspace sync via identity-bound state server
+
+---
 
 ### Phase 2 — Infrastructure Patterns (18 months–5 years)
 - Layer 4: Dormant computation fabric (temporary task-specific modules)
