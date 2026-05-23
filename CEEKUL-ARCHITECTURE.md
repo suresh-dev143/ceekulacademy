@@ -315,9 +315,18 @@ The app must be resilient to connectivity loss. Users in low-connectivity areas 
 
 **`OfflineIndicatorComponent`** — Compact badge in the layout. Shows `Offline · N queued` when `!network.online()`. Disappears silently when connectivity returns.
 
-### Evolution Path (Phase 2 deep)
+### Layer 13 Deep Pass
+
+**`SemanticCacheService`** — IDB wrapper (`ceekul_semantic_v1`, version 1). Two object stores: `api_cache` (keyed by `urlWithParams`) and `content_objects` (keyed by `contentCid`). Each entry stores `{ data, cachedAt, ttlMs }` with TTL-aware eviction on read. Exposes `isReady` signal; queues resolvers until IDB is open. SSR-safe (no-ops on server).
+
+**`semanticCacheInterceptor`** — Functional HTTP interceptor (runs before `offlineQueueInterceptor`). For GET requests to `/api/**`: taps successful responses into IDB (academy paths: 1h TTL; others: 5m TTL). On `status === 0` (network failure), serves from IDB if a non-expired entry exists. Returns a synthetic `HttpResponse(200)` so components receive data transparently.
+
+**Cross-tab semantic sync** — `SemanticContextService` now opens a `BroadcastChannel('ck-semantic-ctx')` on construction. Each `effect()` broadcast includes the tab's unique `_tabId`; incoming messages from other tabs apply remote state to local signals but skip messages where `_tabId === this._tabId` (echo guard). All tabs sharing a browser origin now reflect the same semantic workspace state in real time.
+
+**Periodic replay** — `OfflineQueueService` adds a `setInterval` (60s) alongside the reactive `effect()` reconnect trigger. Catches items that survived a reconnect-replay failure (e.g., server was briefly down). Cleared via `ngOnDestroy`.
+
+### Evolution Path (Phase 3 deep)
 - CRDT sync for collaborative semantic editing (Yjs + vector clock backend)
-- IndexedDB content store for offline academy section reading
 - Background Sync API for guaranteed delivery of queued mutations
 - Cross-device semantic workspace sync via identity-bound state server
 

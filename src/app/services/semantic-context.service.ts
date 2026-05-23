@@ -68,9 +68,22 @@ interface PersistedCtx {
   savedAt:    number;
 }
 
+// ── Cross-tab sync ────────────────────────────────────────────────────────────
+
+interface TabSyncMessage {
+  _tabId:     string;
+  intent:     SemanticIntent | null;
+  domain:     CivilizationDomain;
+  contentCid: string | null;
+  depth:      number;
+  workflow:   (Omit<SemanticWorkflow, 'startedAt'> & { startedAt: string }) | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SemanticContextService {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly _tabId    = Math.random().toString(36).slice(2);
+  private _channel: BroadcastChannel | null = null;
 
   // ── Core state signals ────────────────────────────────────────────────────
 
@@ -183,27 +196,39 @@ export class SemanticContextService {
     this._inferIntentFromPath(path);
   }
 
-  // ── Persistence ──────────────────────────────────────────────────────────
+  // ── Persistence & cross-tab sync ──────────────────────────────────────────
 
   constructor() {
     if (!this.isBrowser) return;
     this._restore();
-    // Persist on every state change (effect runs in injection context).
+    this._initCrossTabSync();
+    // Persist on every state change and broadcast to other tabs.
     effect(() => {
-      // Read all persistable signals to register dependencies.
+      const wf = this.workflow();
       const snapshot: PersistedCtx = {
         intent:     this.intent(),
         domain:     this.domain(),
         contentCid: this.contentCid(),
         depth:      this.depth(),
-        workflow:   this.workflow()
-          ? { ...this.workflow()!, startedAt: this.workflow()!.startedAt.toISOString() }
-          : null,
+        workflow:   wf ? { ...wf, startedAt: wf.startedAt.toISOString() } : null,
         savedAt:    Date.now(),
       };
       try {
         localStorage.setItem(PERSIST_KEY, JSON.stringify(snapshot));
       } catch { /* storage quota — silently skip */ }
+
+      // Broadcast to other tabs (include tabId to prevent echo).
+      if (this._channel) {
+        const msg: TabSyncMessage = {
+          _tabId:     this._tabId,
+          intent:     snapshot.intent,
+          domain:     snapshot.domain,
+          contentCid: snapshot.contentCid,
+          depth:      snapshot.depth,
+          workflow:   snapshot.workflow,
+        };
+        try { this._channel.postMessage(msg); } catch { /* silently skip */ }
+      }
     });
   }
 
@@ -230,6 +255,24 @@ export class SemanticContextService {
   }
 
   // ── Private ───────────────────────────────────────────────────────────────
+
+  private _initCrossTabSync(): void {
+    if (!('BroadcastChannel' in globalThis)) return;
+    this._channel = new BroadcastChannel('ck-semantic-ctx');
+    this._channel.onmessage = (e: MessageEvent<TabSyncMessage>) => {
+      const msg = e.data;
+      if (!msg || msg._tabId === this._tabId) return; // echo guard
+      if (msg.intent)     this.intent.set(msg.intent);
+      if (msg.domain)     this.domain.set(msg.domain);
+      if (msg.contentCid !== undefined) this.contentCid.set(msg.contentCid);
+      if (msg.depth !== undefined)      this.depth.set(msg.depth);
+      if (msg.workflow) {
+        this.workflow.set({ ...msg.workflow, startedAt: new Date(msg.workflow.startedAt) });
+      } else {
+        this.workflow.set(null);
+      }
+    };
+  }
 
   private _inferIntentFromPath(path: string): void {
     // Welfare & solidarity

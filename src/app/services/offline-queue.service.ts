@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, PLATFORM_ID, effect } from '@angular/core';
+import { Injectable, inject, signal, PLATFORM_ID, effect, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NetworkStatusService } from './network-status.service';
@@ -32,7 +32,7 @@ const MAX_AGE_MS  = 2 * 60 * 60 * 1000; // 2 hours
  * queued, they represent server-side problems not connectivity issues.
  */
 @Injectable({ providedIn: 'root' })
-export class OfflineQueueService {
+export class OfflineQueueService implements OnDestroy {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly network   = inject(NetworkStatusService);
   private readonly http      = inject(HttpClient);
@@ -42,18 +42,30 @@ export class OfflineQueueService {
 
   private queue: QueuedRequest[] = [];
   private replaying = false;
+  private _retryTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     if (!this.isBrowser) return;
     this._load();
     this._pruneStale();
 
-    // Replay whenever the browser comes back online.
+    // Replay immediately whenever the browser comes back online.
     effect(() => {
       if (this.network.online() && this.queue.length > 0 && !this.replaying) {
         this._replay();
       }
     });
+
+    // Periodic retry every 60s — catches items that survived a replay failure.
+    this._retryTimer = setInterval(() => {
+      if (this.network.online() && this.queue.length > 0 && !this.replaying) {
+        this._replay();
+      }
+    }, 60_000);
+  }
+
+  ngOnDestroy(): void {
+    if (this._retryTimer !== null) clearInterval(this._retryTimer);
   }
 
   // ── Public API ────────────────────────────────────────────────────────────

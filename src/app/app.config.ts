@@ -8,6 +8,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { offlineQueueInterceptor } from './interceptors/offline-queue.interceptor';
+import { semanticCacheInterceptor } from './interceptors/semantic-cache.interceptor';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -16,7 +17,7 @@ export const appConfig: ApplicationConfig = {
         provideClientHydration(withEventReplay()),
         provideHttpClient(
             withFetch(),
-            withInterceptors([authInterceptor, errorInterceptor, offlineQueueInterceptor])
+            withInterceptors([authInterceptor, errorInterceptor, semanticCacheInterceptor, offlineQueueInterceptor])
         ),
         provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
