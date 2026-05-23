@@ -10,6 +10,13 @@ export interface CoherenceResult {
   cbId?:     string;
 }
 
+export interface VillageCoherenceResult {
+  coherence:    number;
+  level:        CoherenceLevel;
+  memberCount:  number;
+  distribution: { aligned: number; emerging: number; divergent: number };
+}
+
 /**
  * CoherenceService — Layer 9 deep.
  *
@@ -27,14 +34,34 @@ export class CoherenceService {
   private readonly http      = inject(HttpClient);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  readonly memberCoherence = signal<CoherenceResult | null>(null);
+  readonly memberCoherence  = signal<CoherenceResult | null>(null);
+  readonly villageCoherence = signal<VillageCoherenceResult | null>(null);
 
   constructor() {
     if (!this.isBrowser) return;
-    this._fetch();
+    this._fetchMember();
   }
 
-  private _fetch(): void {
+  fetchVillageCoherence(districtId: string): void {
+    if (!this.isBrowser || !districtId) return;
+    this.http.get<{ success: boolean } & VillageCoherenceResult>(
+      `/api/coherence/village/${encodeURIComponent(districtId)}`
+    ).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.villageCoherence.set({
+            coherence:    res.coherence,
+            level:        res.level,
+            memberCount:  res.memberCount,
+            distribution: res.distribution,
+          });
+        }
+      },
+      error: () => { /* silently skip */ },
+    });
+  }
+
+  private _fetchMember(): void {
     this.http.get<{ success: boolean } & CoherenceResult>('/api/coherence/me').subscribe({
       next:  (res) => {
         if (res.success) {

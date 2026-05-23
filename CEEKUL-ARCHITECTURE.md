@@ -343,6 +343,12 @@ Analyzes UCRS saga workflows from MongoDB. `analyzeWorkflows(name?)` returns ste
 ### Phase 1 Depth Pass (post-completion wiring)
 - ✅ D-score → welfare priority: `composite_dscore` (weight 30%, direction `asc`) and `dscore_welfare_dimension` added as valid policy criteria. Default policy updated to 35/30/20/10/5 split (goal_category / D-score / monthly_inflow / outstanding_need / days_in_queue). Monthly neuron inflows now auto-computed from NeuronTransaction history (`toBucket: 'my_neurons'`) — EC admin no longer needs to pass the map manually. `welfareService._getDScores()` fetches scores lazily only when the active policy references them.
 
+### Phase 2 Depth Pass
+
+- ✅ Layer 4 deep: `moduleHandlers.js` — real domain logic wired to each of the 7 civilization modules. When activated: `welfare-analysis` runs `aggregateDemand(district)`; `research-synthesis` and `semantic-prefetch` call `prefetchForUser(userId)`; `governance-consensus` runs `computeVillageCoherence(district)`; `coherence-monitor` runs `computeMemberCoherence(cbId)`; `empathy-support` and `family-coordination` are lightweight at foundation level. Context normalization in `vaController.js` flattens Angular's nested `semanticContext` (workflow.name → currentWorkflow, intent → activeRole) and enriches with server-side user identity before trigger evaluation. Layer 4 dormant→active→does work→dormant loop is now complete.
+
+- ✅ Layer 8/9 deep — Village OS: `ResourceOrchestrationService.fetchDispatch()` + `CoherenceService.fetchVillageCoherence()` wired into village page constructor. Welfare Board tab now shows live dispatch suggestions (fund type, goal category, suggested volunteer, neurons needed). Coordination tab "Village Cohesion Score" section replaced with live `GET /api/coherence/village/:id` data — shows coherence score, level, and member distribution (aligned/emerging/divergent). Sidebar Cohesion row updates dynamically. Village OS is now fully live-data-driven across welfare demand, dispatch, and coherence.
+
 ## Layer 13 — Distributed Local-First
 
 ### Purpose

@@ -3,6 +3,7 @@ import { CommonModule, UpperCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LayoutComponent } from '../../components/layout/layout';
 import { ResourceOrchestrationService } from '../../services/resource-orchestration.service';
+import { CoherenceService } from '../../services/coherence.service';
 
 type VillageTab = 'issues' | 'welfare' | 'volunteers' | 'coordination' | 'resources';
 
@@ -189,6 +190,32 @@ interface Resource {
             </div>
           }
 
+          <!-- Dispatch suggestions from orchestration API -->
+          @if (orchestration.dispatchSuggestions().length > 0) {
+            <div class="vos-dispatch">
+              <div class="vdis-label">◈ SUGGESTED DISPATCH · {{ orchestration.dispatchSuggestions().length }} matches</div>
+              <div class="vdis-list">
+                @for (s of orchestration.dispatchSuggestions().slice(0, 5); track s.applicationId) {
+                  <div class="vdis-row" [class.vdis-emergency]="s.isEmergency">
+                    <div class="vdis-left">
+                      <span class="vdis-type" [class]="'vdist-' + s.fundType.toLowerCase()">{{ s.fundType }}</span>
+                      <span class="vdis-cat">{{ s.goalCategory }}</span>
+                      @if (s.isEmergency) { <span class="vdis-em">EMERGENCY</span> }
+                    </div>
+                    <div class="vdis-right">
+                      @if (s.suggestedVolunteer) {
+                        <span class="vdis-vol">→ {{ s.suggestedVolunteer.userId }}</span>
+                      } @else {
+                        <span class="vdis-novol">No match found</span>
+                      }
+                      <span class="vdis-need">{{ s.outstandingNeed | number }} N</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
           <div class="vos-panel-head">
             <div>
               <div class="vph-icon">✦</div>
@@ -342,14 +369,25 @@ interface Resource {
             }
           </div>
 
-          <!-- Village cohesion score -->
+          <!-- Village coherence from Layer 9 -->
           <div class="vos-cohesion">
-            <div class="vco-label">VILLAGE COHESION SCORE</div>
-            <div class="vco-score">78</div>
-            <div class="vco-bar-track">
-              <div class="vco-bar-fill" style="width:78%"></div>
-            </div>
-            <div class="vco-sub">Based on participation, welfare coordination, and issue resolution velocity.</div>
+            <div class="vco-label">VILLAGE COHERENCE</div>
+            @if (coherence.villageCoherence(); as vc) {
+              <div class="vco-score"
+                   [class.vco--emerging]="vc.level === 'emerging'"
+                   [class.vco--divergent]="vc.level === 'divergent'">{{ vc.coherence }}</div>
+              <div class="vco-bar-track">
+                <div class="vco-bar-fill" [style.width.%]="vc.coherence"></div>
+              </div>
+              <div class="vco-level">{{ vc.level | uppercase }}</div>
+              <div class="vco-dist">
+                {{ vc.distribution.aligned }} aligned · {{ vc.distribution.emerging }} emerging · {{ vc.distribution.divergent }} divergent
+                of {{ vc.memberCount | number }} members
+              </div>
+            } @else {
+              <div class="vco-score vco--loading">—</div>
+              <div class="vco-sub">Computing village coherence...</div>
+            }
           </div>
 
         </div>
@@ -428,8 +466,14 @@ interface Resource {
         <span class="vosh-val vosh-blue">68</span>
       </div>
       <div class="vosh-row">
-        <span class="vosh-label">Cohesion</span>
-        <span class="vosh-val vosh-amber">78</span>
+        <span class="vosh-label">Coherence</span>
+        <span class="vosh-val"
+              [class.vosh-green]="coherence.villageCoherence()?.level === 'aligned'"
+              [class.vosh-amber]="coherence.villageCoherence()?.level === 'emerging'"
+              [class.vosh-red]="coherence.villageCoherence()?.level === 'divergent'"
+              [class.vosh-amber]="!coherence.villageCoherence()">
+          {{ coherence.villageCoherence()?.coherence ?? '—' }}
+        </span>
       </div>
       <div class="vosh-row">
         <span class="vosh-label">Welfare Coverage</span>
@@ -690,6 +734,36 @@ interface Resource {
     .vosh-blue   { color: #3b82f6; }
     .vosh-amber  { color: #f59e0b; }
     .vosh-purple { color: #a78bfa; }
+    .vosh-red    { color: #ef4444; }
+
+    /* ── Dispatch suggestions ── */
+    .vos-dispatch { background: #06090f; border: 1px solid #0f172a; border-left: 2px solid #3b82f633; padding: 0.9rem 1.2rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .vdis-label { font-size: 0.55rem; letter-spacing: 0.18em; color: #3b82f666; text-transform: uppercase; font-weight: 700; }
+    .vdis-list  { display: flex; flex-direction: column; }
+    .vdis-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.4rem 0; border-bottom: 1px solid #0a0d14;
+      &:last-child { border-bottom: none; }
+      &.vdis-emergency { background: #ef444406; margin: 0 -0.5rem; padding: 0.4rem 0.5rem; }
+    }
+    .vdis-left  { display: flex; align-items: center; gap: 0.5rem; }
+    .vdis-type  { font-size: 0.55rem; font-weight: 800; letter-spacing: 0.12em; padding: 0.12rem 0.35rem; border: 1px solid; flex-shrink: 0; }
+    .vdist-fun  { color: #22c55e; border-color: #22c55e44; background: #22c55e0a; }
+    .vdist-cun  { color: #f59e0b; border-color: #f59e0b44; background: #f59e0b0a; }
+    .vdist-sun  { color: #fb923c; border-color: #fb923c44; background: #fb923c0a; }
+    .vdis-cat   { font-size: 0.7rem; color: #94a3b8; }
+    .vdis-em    { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.1em; color: #ef4444; }
+    .vdis-right { display: flex; align-items: center; gap: 0.75rem; }
+    .vdis-vol   { font-size: 0.65rem; color: #3b82f6; }
+    .vdis-novol { font-size: 0.65rem; color: #334155; }
+    .vdis-need  { font-size: 0.6rem; color: #334155; font-family: monospace; }
+
+    /* ── Village coherence (live) ── */
+    .vco--emerging { color: #f59e0b !important; }
+    .vco--divergent { color: #ef4444 !important; }
+    .vco--loading   { color: #334155 !important; }
+    .vco-level { font-size: 0.6rem; letter-spacing: 0.15em; color: #475569; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .vco-dist  { font-size: 0.68rem; color: #334155; margin-top: 0.25rem; }
   `],
 })
 export class VillageComponent {
@@ -700,9 +774,12 @@ export class VillageComponent {
   readonly familyCount = 196;
 
   readonly orchestration = inject(ResourceOrchestrationService);
+  readonly coherence     = inject(CoherenceService);
 
   constructor() {
     this.orchestration.fetchDemand(this.districtId);
+    this.orchestration.fetchDispatch(this.districtId);
+    this.coherence.fetchVillageCoherence(this.districtId);
   }
 
   /** Live welfare need total — falls back to mock count while loading. */

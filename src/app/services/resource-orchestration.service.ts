@@ -11,6 +11,16 @@ export interface DemandAggregate {
   avgApplicantDscore:   number | null;
 }
 
+export interface DispatchSuggestion {
+  applicationId:      string;
+  applicantCBId:      string;
+  fundType:           'FUN' | 'CUN' | 'SUN';
+  goalCategory:       string;
+  isEmergency:        boolean;
+  outstandingNeed:    number;
+  suggestedVolunteer: { userId: string; skills?: string[] } | null;
+}
+
 /**
  * ResourceOrchestrationService — Layer 8 foundation.
  *
@@ -25,8 +35,24 @@ export class ResourceOrchestrationService {
   private readonly http      = inject(HttpClient);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  readonly demandAggregate = signal<DemandAggregate | null>(null);
-  readonly loading         = signal<boolean>(false);
+  readonly demandAggregate     = signal<DemandAggregate | null>(null);
+  readonly loading             = signal<boolean>(false);
+  readonly dispatchSuggestions = signal<DispatchSuggestion[]>([]);
+  readonly dispatchLoading     = signal<boolean>(false);
+
+  fetchDispatch(districtId: string): void {
+    if (!this.isBrowser || !districtId) return;
+    this.dispatchLoading.set(true);
+    this.http.get<{ success: boolean; districtId: string; suggestions: DispatchSuggestion[] }>(
+      `/api/orchestration/dispatch/${encodeURIComponent(districtId)}`
+    ).subscribe({
+      next:  (res) => {
+        if (res.success) this.dispatchSuggestions.set(res.suggestions ?? []);
+        this.dispatchLoading.set(false);
+      },
+      error: () => this.dispatchLoading.set(false),
+    });
+  }
 
   fetchDemand(districtId: string): void {
     if (!this.isBrowser || !districtId) return;
