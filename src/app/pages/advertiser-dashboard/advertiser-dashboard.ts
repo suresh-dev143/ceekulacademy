@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { AdPlatformService, Advertisement, AdAnalytics } from '../../services/ad-platform.service';
-import { RazorpayService } from '../../services/razorpay.service';
 import { AuthService } from '../../services/auth.service';
 import { UcrsService } from '../../services/ucrs.service';
 
@@ -42,7 +41,6 @@ interface CampaignDraft {
 })
 export class AdvertiserDashboardComponent implements OnInit {
   private adService     = inject(AdPlatformService);
-  private razorpay      = inject(RazorpayService);
   private authService   = inject(AuthService);
   private ucrs          = inject(UcrsService);
   private platformId    = inject(PLATFORM_ID);
@@ -73,7 +71,7 @@ export class AdvertiserDashboardComponent implements OnInit {
   // ── Toast ──────────────────────────────────────────────────────────────────
   toast = signal<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // ── Deposit modal ──────────────────────────────────────────────────────────
+  // ── Simulation gateway guard modal ──────────────────────────────────────────────────────────
   showDepositModal = signal(false);
   depositAmount    = 1000;
   today            = new Date().toISOString().split('T')[0];
@@ -105,7 +103,7 @@ export class AdvertiserDashboardComponent implements OnInit {
   readonly wizardSteps = [
     { n: 1, label: 'Content' },
     { n: 2, label: 'Targeting' },
-    { n: 3, label: 'Budget' },
+    { n: 3, label: 'Allocation' },
     { n: 4, label: 'Review' },
   ] as { n: 1 | 2 | 3 | 4; label: string }[];
 
@@ -159,15 +157,8 @@ export class AdvertiserDashboardComponent implements OnInit {
     });
   }
 
-  topUpBudget(ad: Advertisement) {
-    const input = prompt('Additional budget (₹):');
-    if (!input) return;
-    const amount = Number(input);
-    if (isNaN(amount) || amount <= 0) { this._toast('error', 'Enter a valid amount'); return; }
-    this.adService.updateAd(ad._id, { additionalBudget: amount }).subscribe({
-      next: () => { this._toast('success', `Budget topped up by ₹${amount}`); this._loadAds(); },
-      error: (err) => this._toast('error', this._msg(err, 'Top-up failed')),
-    });
+  topUpBudget(_ad: Advertisement) {
+    this._toast('error', 'Legacy budget top-up is disabled during Experimental Internal Simulation. Use /api/neurons/ads/schedule for Semantic Allocation Pool testing.');
   }
 
   // ── Wizard step 1: media upload + UCE commit ──────────────────────────────
@@ -214,7 +205,7 @@ export class AdvertiserDashboardComponent implements OnInit {
       },
       error: (err) => {
         const status = err?.status;
-        let msg = 'Upload failed. Please try again.';
+        let msg = 'Upload failed. please try again.';
         if (status === 413) msg = 'File too large (max 20 MB).';
         else if (status === 400) msg = 'Invalid file type.';
         else if (status === 0)   msg = 'Network error. Check connection.';
@@ -249,7 +240,7 @@ export class AdvertiserDashboardComponent implements OnInit {
     this.draft.optionalCriteria.interestTags = val.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
   }
 
-  // ── Wizard step 3: budget ──────────────────────────────────────────────────
+  // ── Wizard step 3: allocation ──────────────────────────────────────────────────
 
   updateCostPreview() { /* signals auto-update via estimatedCost() */ }
 
@@ -301,26 +292,16 @@ export class AdvertiserDashboardComponent implements OnInit {
     });
   }
 
-  // ── Deposit ────────────────────────────────────────────────────────────────
+  // ── Simulation gateway guard ────────────────────────────────────────────────────────────────
 
-  openDepositModal() { this.showDepositModal.set(true); }
+  openDepositModal() { this._toast('error', 'External top-up is disabled. Use the Experimental Simulation contribution flow for Internal Utility Units.'); }
 
   processDeposit() {
-    if (!this.depositAmount || this.depositAmount <= 0) { this._toast('error', 'Enter a valid amount'); return; }
-    this.razorpay.createOrder(this.depositAmount).subscribe({
-      next: order => {
-        this.razorpay.openCheckout(order, (response: any) => {
-          this.adService.depositToWallet(this.depositAmount, response.razorpay_payment_id).subscribe({
-            next: () => { this.showDepositModal.set(false); this._loadDashboard(); this._toast('success', `₹${this.depositAmount} added to wallet`); },
-            error: (err) => { this.showDepositModal.set(false); this._toast('error', this._msg(err, 'Wallet credit failed. Contact support')); },
-          });
-        });
-      },
-      error: (err) => this._toast('error', this._msg(err, 'Could not initiate payment')),
-    });
+    this.showDepositModal.set(false);
+    this._toast('error', 'External gateway execution is disabled during Experimental Internal Simulation.');
   }
 
-  // ── Utility: CID copy ──────────────────────────────────────────────────────
+  // Utility: CID copy
 
   copyCid(cid: string) {
     if (!this.isBrowser) return;

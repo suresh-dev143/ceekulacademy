@@ -1,27 +1,31 @@
 import { Component, signal, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser, DecimalPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { NeuronService } from '../../services/neuron.service';
-import { PaymentService } from '../../services/payment.service';
 import { environment } from '../../../environments/environment';
 import { LayoutComponent } from '../../components/layout/layout';
 
 @Component({
   selector: 'app-contribute',
   standalone: true,
-  imports: [DecimalPipe, ReactiveFormsModule,LayoutComponent],
+  imports: [DecimalPipe, ReactiveFormsModule, LayoutComponent],
   templateUrl: './contribute.html',
   styleUrl: './contribute.scss',
 })
 export class Contribute implements OnInit {
-  readonly neuronService      = inject(NeuronService);
+  readonly neuronService = inject(NeuronService);
   private readonly fb         = inject(FormBuilder);
-  private readonly paymentSvc = inject(PaymentService);
+  private readonly http       = inject(HttpClient);
   private readonly platformId = inject(PLATFORM_ID);
+
+  // Simulation mode: no external provider execution is active.
+  readonly simulationMode = environment.simulationMode ?? true;
 
   contributionForm!: FormGroup;
   contributionLoading = signal(false);
   contributionError   = signal<string | null>(null);
+  contributionSuccess = signal<string | null>(null);
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -30,7 +34,7 @@ export class Contribute implements OnInit {
     this.contributionForm = this.fb.group({
       entityType: ['', Validators.required],
       entityName: ['', [Validators.required, Validators.minLength(3)]],
-      amountINR:  ['', [Validators.required, Validators.min(1)]],
+      simulationUnits:  ['', [Validators.required, Validators.min(1)]],
       notes:      [''],
     });
   }
@@ -39,17 +43,36 @@ export class Contribute implements OnInit {
     if (this.contributionForm.invalid) { this.contributionForm.markAllAsTouched(); return; }
     this.contributionLoading.set(true);
     this.contributionError.set(null);
+    this.contributionSuccess.set(null);
 
-    this.paymentSvc.initiatePayment(this.contributionForm.value).subscribe({
-      next: (session) => {
+    // Call the internal simulation endpoint instead of any external provider layer.
+    const formValue = this.contributionForm.value;
+    const payload = {
+      entityType: formValue.entityType,
+      entityName: formValue.entityName,
+      simulationUnits: Number(formValue.simulationUnits),
+      notes: formValue.notes,
+      simulationMode: true,
+      transactionReference: `SIM-${Date.now()}`,
+    };
+
+    this.http.post<{ status: boolean; data: { neuronsIssued: number } }>(
+      `${environment.apiUrl}/api/simulation/contribute`,
+      payload,
+    ).subscribe({
+      next: (res) => {
         this.contributionLoading.set(false);
-        const returnUrl = `${environment.appUrl}/payment/return`;
-        const params = new URLSearchParams({ sess: session.sessionId, returnUrl });
-        window.location.href = `${environment.crasmibUrl}/pay?${params.toString()}`;
+        const units = res.data?.neuronsIssued ?? payload.simulationUnits;
+        this.contributionSuccess.set(
+          `✓ ${units} simulation units credited to your FUN bucket. ` +
+          `Ledger entry + UCRS commit generated.`,
+        );
+        this.contributionForm.reset();
+        this.neuronService.loadAll();
       },
       error: (e) => {
         this.contributionLoading.set(false);
-        this.contributionError.set(e?.error?.message ?? 'Failed to initiate payment. Please try again.');
+        this.contributionError.set(e?.error?.message ?? 'Simulation credit failed. Please try again.');
       },
     });
   }

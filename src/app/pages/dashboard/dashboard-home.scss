@@ -48,3 +48,59 @@
         max-width: 1200px;
     }
 }
+
+// ── Need Intelligence Signal strip ────────────────────────────────────────────
+
+.need-signal-strip {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.65rem 0.9rem;
+    background: #0a0f1a;
+    border: 1px solid #0f172a;
+    border-left: 3px solid #64748b;
+    margin-bottom: 1rem;
+    animation: ns-fade 0.3s ease;
+}
+
+@keyframes ns-fade {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.need-signal-strip.urgency-high   { border-left-color: #ef4444; }
+.need-signal-strip.urgency-medium { border-left-color: #f59e0b; }
+.need-signal-strip.urgency-low    { border-left-color: #3b82f6; }
+
+.ns-icon  { font-size: 1rem; flex-shrink: 0; line-height: 1.4; }
+.ns-body  { flex: 1; display: flex; flex-direction: column; gap: 0.2rem; }
+.ns-title { font-size: 0.78rem; font-weight: 600; color: #e2e8f0; }
+.ns-explain { font-size: 0.65rem; color: #64748b; line-height: 1.4; }
+.ns-badge {
+    font-size: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.15rem 0.4rem;
+    background: #0f172a;
+    color: #64748b;
+    border: 1px solid #1e293b;
+    align-self: flex-start;
+    flex-shrink: 0;
+}
+
+.urgency-high   .ns-badge { color: #ef4444; border-color: #3f1a1a; }
+.urgency-medium .ns-badge { color: #f59e0b; border-color: #3f2a0a; }
+.urgency-low    .ns-badge { color: #3b82f6; border-color: #0a1a3f; }
+
+.need-signal-loading {
+    font-size: 0.6rem;
+    color: #334155;
+    padding: 0.4rem 0.9rem;
+    animation: ns-pulse 1.5s ease-in-out infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes ns-pulse {
+    0%, 100% { opacity: 0.4; }
+    50%       { opacity: 1; }
+}

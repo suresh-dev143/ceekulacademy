@@ -5,6 +5,24 @@
             (logout)="handleLogout()">
         </app-profile-summary>
 
+        <!-- Need Intelligence Signal — Layer 2 -->
+        @if (topNeed()) {
+        <div class="need-signal-strip"
+             [class.urgency-high]="topNeed()!.urgency === 'high'"
+             [class.urgency-medium]="topNeed()!.urgency === 'medium'"
+             [class.urgency-low]="topNeed()!.urgency === 'low'">
+            <span class="ns-icon">{{ urgencyIcon(topNeed()!.urgency) }}</span>
+            <div class="ns-body">
+                <span class="ns-title">{{ topNeed()!.title }}</span>
+                <span class="ns-explain">{{ topNeed()!.explanation }}</span>
+            </div>
+            <span class="ns-badge">{{ topNeed()!.urgency }}</span>
+        </div>
+        }
+        @if (loading()) {
+        <div class="need-signal-loading">Syncing intelligence...</div>
+        }
+
         <div class="hub-content-grid">
             <!-- Main Content Column (Integrated in Center) -->
             <div class="hub-main-column">
@@ -12,7 +30,7 @@
                 <app-course-cards [courses]="userCourses"></app-course-cards>
 
                 <!-- Activities Section -->
-                <app-activities-summary [activities]="userActivities"></app-activities-summary>
+                <app-activities-summary [activities]="fallbackActivities"></app-activities-summary>
 
                 <!-- Roles & Availability Section -->
                 <app-roles-availability [roles]="userRoles" [availability]="availabilityInfo">

@@ -56,13 +56,17 @@ export interface Lecture {
   createdAt: string;
 }
 
+/** ⚗️ Simulation mode — ad revenue balances are internal SAU (Simulated Allocation Units).
+ *  bankAccountVerified and real settlement fields are reserved for future regulated integration. */
 export interface NeuronWallet {
   _id: string;
+  /** ⚗️ Simulated allocation units — not real currency */
   balance: number;
   pendingBalance: number;
   lockedBalance: number;
   totalEarned: number;
   totalSpent: number;
+  /** Future: bank account verification — not active in simulation mode */
   bankAccountVerified: boolean;
 }
 
@@ -85,12 +89,16 @@ export interface AdPreferences {
   allowStudentAdControl?: boolean;
 }
 
+/** ⚗️ Simulation mode — settlement amounts are SAU, not INR.
+ *  Real settlement via regulated payment gateway is a future capability. */
 export interface Settlement {
   _id: string;
   month: number;
   year: number;
+  /** ⚗️ Simulated allocation units in simulation mode */
   grossAmount: number;
   netAmount: number;
+  /** Future: INR amount after regulatory/escrow integration */
   amountInINR: number;
   status: 'pending' | 'processing' | 'paid' | 'failed' | 'on_hold';
   paidAt?: string;
@@ -152,6 +160,8 @@ export class AdPlatformService {
     return this.http.get(`${this.api}/advertiser/dashboard`);
   }
 
+  /** Future implementation — real deposit via payment gateway.
+   *  Not active in simulation mode. Use /api/simulation/contribute for SAU credits. */
   depositToWallet(amount: number, razorpayPaymentId: string): Observable<any> {
     return this.http.post(`${this.api}/advertiser/wallet/deposit`, { amount, razorpayPaymentId });
   }
@@ -246,6 +256,8 @@ export class AdPlatformService {
     return this.http.get(`${this.api}/wallet/settlements`, { params: { page: String(page) } });
   }
 
+  /** Future implementation — bank account linking for real settlements.
+   *  Not active in simulation mode. Requires regulated financial infrastructure. */
   linkBankAccount(data: { accountNumber: string; ifscCode: string; accountHolderName: string; upiId?: string }): Observable<any> {
     return this.http.post(`${this.api}/wallet/bank-account`, data);
   }

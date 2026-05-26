@@ -1,0 +1,87 @@
+<div class="cls-root">
+
+  <!-- ── Header ── -->
+  <div class="cls-header">
+    <div class="cls-header__left">
+      <span class="cls-header__icon">◫</span>
+      <span class="cls-header__title">MY LIBRARY</span>
+    </div>
+    <div class="cls-header__actions">
+      <button class="cls-icon-btn" (click)="refresh()" title="Refresh">↺</button>
+      <button class="cls-new-btn" (click)="newContent()" title="New content">+ New</button>
+    </div>
+  </div>
+
+  <!-- ── Tabs ── -->
+  <div class="cls-tabs">
+    @for (sec of LIB_SECTIONS; track sec.key) {
+    <button class="cls-tab" [class.cls-tab--active]="activeSection() === sec.key"
+      (click)="activeSection.set(sec.key)">{{ sec.label }}</button>
+    }
+  </div>
+
+  <!-- ── Content List ── -->
+  <div class="cls-body">
+    @if (loading()) {
+    <div class="cls-loading">
+      <div class="cls-spinner"></div>
+      <span>Loading…</span>
+    </div>
+    } @else if (!grouped().length) {
+    <div class="cls-empty">
+      <span class="cls-empty__icon">◫</span>
+      <p>No content yet.</p>
+      <p class="cls-empty__sub">Save your first draft to begin.</p>
+      <button class="cls-new-btn cls-new-btn--centered" (click)="newContent()">Start Creating</button>
+    </div>
+    } @else {
+      @for (program of grouped(); track program.title) {
+      <div class="cls-program">
+
+        <button class="cls-prog-header" (click)="toggleProgram(program.title)">
+          <span class="cls-prog-arrow" [class.cls-prog-arrow--open]="isProgramExpanded(program.title)">›</span>
+          <span class="cls-prog-title">{{ program.title }}</span>
+          <span class="cls-prog-count">
+            {{ program.sections.length }} section{{ program.sections.length !== 1 ? 's' : '' }}
+          </span>
+        </button>
+
+        @if (isProgramExpanded(program.title)) {
+          @for (section of program.sections; track section.subtitle) {
+          <div class="cls-section">
+            @if (section.subtitle) {
+            <div class="cls-section-label">§{{ section.sectionIndex }} · {{ section.subtitle }}</div>
+            }
+            @for (item of section.items; track item.baseId) {
+            <button class="cls-item" (click)="open(item.baseId)">
+              <div class="cls-item__top">
+                <span class="cls-badge cls-badge--{{ badgeLabel(item) }}">{{ badgeLabel(item) }}</span>
+                <span class="cls-item__title">{{ item.contentTitle || '(Untitled)' }}</span>
+              </div>
+              @if (item.hybridId) {
+              <code class="cls-item__cid">{{ item.hybridId }}</code>
+              }
+              <div class="cls-item__meta">
+                v{{ item.version }} · {{ item.wordCount || 0 }}w
+              </div>
+            </button>
+            }
+          </div>
+          }
+        }
+
+      </div>
+      }
+    }
+  </div>
+
+  <!-- ── Import ── -->
+  <div class="cls-import">
+    <input class="cls-import__input"
+      [value]="importUrl()"
+      (input)="importUrl.set($any($event.target).value)"
+      placeholder="Paste URL, PDF, or video link…" />
+    <button class="cls-import__btn" [disabled]="!importUrl()">Import</button>
+  </div>
+
+</div>

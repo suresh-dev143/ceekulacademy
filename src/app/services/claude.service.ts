@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface CoTeacherReply {
@@ -71,6 +72,11 @@ export class ClaudeService {
   private http = inject(HttpClient);
   private base = `${environment.apiUrl}/api/claude`;
 
+  private handleError(error: any): Observable<never> {
+    console.error('ClaudeService HTTP Error:', error?.message || error?.error?.message || 'Unknown error');
+    return throwError(() => error);
+  }
+
   askCoTeacher(payload: {
     sessionId?: string;
     userMessage: string;
@@ -78,7 +84,7 @@ export class ClaudeService {
   }): Observable<{ status: boolean; data: CoTeacherReply }> {
     return this.http.post<{ status: boolean; data: CoTeacherReply }>(
       `${this.base}/co-teacher`, payload
-    );
+    ).pipe(catchError(error => this.handleError(error)));
   }
 
   generateAdCopy(payload: {
@@ -87,7 +93,7 @@ export class ClaudeService {
   }): Observable<{ status: boolean; data: AdCopy }> {
     return this.http.post<{ status: boolean; data: AdCopy }>(
       `${this.base}/ad-copy`, payload
-    );
+    ).pipe(catchError(error => this.handleError(error)));
   }
 
   evaluateContent(payload: {
@@ -97,7 +103,7 @@ export class ClaudeService {
   }): Observable<{ status: boolean; data: ContentEvaluation }> {
     return this.http.post<{ status: boolean; data: ContentEvaluation }>(
       `${this.base}/evaluate-content`, payload
-    );
+    ).pipe(catchError(error => this.handleError(error)));
   }
 
   generateWorkshop(payload: {
@@ -108,7 +114,7 @@ export class ClaudeService {
   }): Observable<{ status: boolean; data: WorkshopGenResult }> {
     return this.http.post<{ status: boolean; data: WorkshopGenResult }>(
       `${this.base}/generate-workshop`, payload
-    );
+    ).pipe(catchError(error => this.handleError(error)));
   }
 
   dqrgChat(payload: {
@@ -121,6 +127,6 @@ export class ClaudeService {
   }): Observable<{ status: boolean; data: DqrgReply }> {
     return this.http.post<{ status: boolean; data: DqrgReply }>(
       `${this.base}/dqrg`, payload
-    );
+    ).pipe(catchError(error => this.handleError(error)));
   }
 }

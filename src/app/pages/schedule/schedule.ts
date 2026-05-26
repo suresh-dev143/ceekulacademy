@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import {
   UCRSScheduleService, SchedulePayload, UCRSSchedule,
@@ -142,6 +142,7 @@ export class Schedule implements OnInit, OnDestroy {
   private readonly ucrsSvc  = inject(UcrsService);
   private readonly toast    = inject(ToastService);
   private readonly router   = inject(Router);
+  private readonly route    = inject(ActivatedRoute);
   private readonly fb       = inject(FormBuilder);
   private readonly destroy$ = new Subject<void>();
   private readonly search$  = new Subject<string>();
@@ -292,6 +293,7 @@ export class Schedule implements OnInit, OnDestroy {
   readonly today = new Date().toISOString().split('T')[0];
 
   // ── Advertisement signals ───────────────────────────────────────────────────
+  readonly adUcrsLink             = signal('');
   readonly adTitle               = signal('');
   readonly adDescription         = signal('');
   readonly adClickThrough        = signal('');
@@ -321,6 +323,11 @@ export class Schedule implements OnInit, OnDestroy {
       .subscribe(q => this._doFieldLookup(q));
     this.buildAddForm();
     this.loadMySchedules();
+
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      if (params['category'] === 'advertisement') this.category.set('advertisement');
+      if (params['ucrsLink']) this.adUcrsLink.set(params['ucrsLink'] as string);
+    });
   }
 
   ngOnDestroy(): void {
@@ -620,7 +627,7 @@ export class Schedule implements OnInit, OnDestroy {
       ratePerSecondPerStudent: this.adRate() / 100,
       totalBudget:             this.adBudget(),
       expiryDate:              this.adExpiryDate(),
-      contentCid:              this.adCommittedCid() || undefined,
+      contentCid:              this.adUcrsLink() || this.adCommittedCid() || undefined,
       mandatoryCriteria: {
         categories:       this.adMandatoryCategories(),
         ageGroup:         this.adAgeGroup(),
@@ -824,6 +831,7 @@ export class Schedule implements OnInit, OnDestroy {
   }
 
   private _resetAdForm(): void {
+    this.adUcrsLink.set('');
     this.adTitle.set('');
     this.adDescription.set('');
     this.adClickThrough.set('');

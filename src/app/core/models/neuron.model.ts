@@ -1,22 +1,26 @@
 /**
  * CEEKUL NEURON PARTICIPATION ECOSYSTEM — Data Models
  * =====================================================================
+ * ⚗️  EXPERIMENTAL SIMULATION MODE — Phase 1 Architecture Validation
+ *
  * Neurons are NON-MONETARY, NON-WITHDRAWABLE internal participation
- * units that represent a user's contribution to the Ceekul ecosystem.
+ * units used ONLY for semantic orchestration testing, workflow
+ * validation, and contribution flow experimentation.
  *
  * THE SYSTEM IS NEVER A BANK, WALLET, OR FINANCIAL INTERMEDIARY.
+ * NO REAL MONETARY TRANSACTION OCCURS. ALL BALANCES ARE SIMULATED.
  *
  * Four-Bucket Architecture:
  *
- *   MY NEURONS  — Earning layer. Receives work rewards and project
- *                 outcome rewards. Monthly allocation distributes
+ *   MY NEURONS  — Participation layer. Receives simulated work and task
+ *                 participation rewards. Monthly allocation distributes
  *                 its balance to FUN / CUN / SUN.
  *
- *   FUN         — Family Upgradation Neurons. Primary entry point.
- *                 Receives contribution conversions (1 INR = 1 Neuron).
- *                 Can transfer to CUN or SUN. NEVER receives back from
- *                 CUN or SUN. Used for services, sponsorships, and
- *                 investment in any project type.
+ *   FUN         — Family Upgradation Neurons. Primary entry gateway.
+ *                 Receives simulated contribution credits. Can transfer
+ *                 to CUN or SUN. NEVER receives back from CUN or SUN.
+ *                 Used for services, sponsorships, and simulation
+ *                 allocation to any project type.
  *
  *   CUN         — Cognitive Upgradation Neurons. Receives from FUN or
  *                 SUN. Can transfer to SUN only (NEVER back to FUN).
@@ -32,10 +36,11 @@
  *   CUN → FUN ❌   SUN → FUN ❌  (permanently blocked)
  *
  * Return Flow:
- *   Project rewards → My Neurons (variable, outcome-based, non-guaranteed)
- *   Monthly: My Neurons → FUN/CUN/SUN (99% user, 1% Ceekul)
+ *   Participation rewards → My Neurons (variable, non-guaranteed)
+ *   Monthly: My Neurons → FUN/CUN/SUN (99% participant, 1% Ceekul)
  *
- * Real money: ALWAYS external — user bank → entity escrow (outside portal)
+ * Future migration path: simulation balances will be converted to real
+ * coordination flows only after regulatory approval + escrow integration.
  * =====================================================================
  */
 
@@ -44,16 +49,16 @@ export type NeuronBucket = 'my_neurons' | 'fun' | 'cun' | 'sun';
 
 // ── Transaction types ─────────────────────────────────────────────────────────
 export type NeuronTxType =
-  | 'contribution_conversion'    // External money confirmed → FUN (1 INR = 1 Neuron)
-  | 'bucket_transfer'            // User moves neurons between FUN/CUN/SUN
-  | 'investment_lock'            // Source bucket → locked pool
-  | 'investment_release'         // Locked pool returned (project failed/cancelled)
-  | 'project_reward'             // Project outcome → My Neurons (variable, non-guaranteed)
+  | 'contribution_conversion'    // Simulated credit confirmed → FUN (internal units only)
+  | 'bucket_transfer'            // User moves internal units between FUN/CUN/SUN
+  | 'investment_lock'            // Source bucket -> simulated allocation pool
+  | 'investment_release'         // Simulated allocation released (project failed/cancelled)
+  | 'project_reward'             // Project outcome -> My Neurons (variable, non-guaranteed)
   | 'work_reward'                // Work / task completion → My Neurons
   | 'monthly_allocation_user'    // My Neurons → FUN/CUN/SUN (user's 99% share)
   | 'monthly_allocation_ceekul'  // My Neurons → Ceekul's 1% share
-  | 'support_borrow'             // Support debt credited to FUN
-  | 'support_repay'              // Support debt repaid
+  | 'support_borrow'             // Support units credited to FUN
+  | 'support_repay'              // Support units returned
   | 'sponsorship'                // FUN or SUN used to sponsor another user
   | 'service_consume'            // FUN used for platform services
   | 'service_payment'            // Sender side: FUN/CUN/SUN → receiver for a service/product
@@ -89,10 +94,10 @@ export interface NeuronAccount {
   /** Social Upgradation — business / infrastructure / social */
   sun: NeuronBucketState;
 
-  /** Neurons locked in active project investments */
+  /** Neurons reserved in active project coordination allocations */
   lockedPool: { balance: number };
 
-  /** Support debt (max 100,000 neurons, 6-month validity) */
+  /** Support units (max 100,000 neurons, 6-month validity) */
   support: {
     currentDebt: number;
     borrowedAt?: string;
@@ -123,14 +128,16 @@ export interface NeuronTransaction {
   createdAt: string;
 }
 
-// ── Contribution (external money → FUN) ──────────────────────────────────────
+// ── Contribution simulation -> FUN ──────────────────────────────────────
 export interface NeuronContribution {
   _id: string;
   userId: string;
   entityType: 'Trust' | 'Section8' | 'PvtLtd';
   entityName: string;
   entityId?: string;
-  amountINR: number;
+  simulationUnits?: number;
+  amountINR?: number; // Schema compatibility alias for simulation-unit records.
+  externalReferenceAmount?: number;
   transactionReference: string;
   neuronsIssued: number;
   neuronTransactionId?: string;
@@ -141,7 +148,7 @@ export interface NeuronContribution {
   createdAt: string;
 }
 
-// ── Project investment ────────────────────────────────────────────────────────
+// ── Project coordination allocation ────────────────────────────────────────────────────────
 export type NeuronProjectType =
   | 'any'
   | 'research' | 'innovation' | 'knowledge'    // CUN eligible
@@ -200,7 +207,7 @@ export const BUCKET_META: BucketMeta[] = [
     key:         'my_neurons',
     label:       'My Neurons',
     fullName:    'My Neurons',
-    description: 'Your personal earning layer. Receives work rewards, task rewards, and project outcome rewards. Distributed monthly to FUN / CUN / SUN.',
+    description: 'Your personal participation layer. Receives workflow units, task units, and project outcome units. Distributed monthly to FUN / CUN / SUN.',
     color:       '#f59e0b',
     borderColor: '#d97706',
     receiveFrom: 'Work, tasks, project outcomes',
@@ -210,11 +217,11 @@ export const BUCKET_META: BucketMeta[] = [
     key:         'fun',
     label:       'FUN',
     fullName:    'Family Upgradation Neurons',
-    description: 'Primary entry gateway. Receives contribution conversions (1 INR = 1 Neuron). Can be transferred to CUN or SUN, but never the other way.',
+    description: '⚗️ Simulation mode. Primary entry gateway. Receives simulated contribution credits. Can be transferred to CUN or SUN, but never the other way.',
     color:       '#60a5fa',
     borderColor: '#3b82f6',
-    receiveFrom: 'External contributions (1 INR = 1 Neuron), monthly allocation',
-    usedFor:     'Services, sponsorships, any project investment',
+    receiveFrom: 'Simulated contribution units, monthly allocation from My Neurons',
+    usedFor:     'Services, sponsorships, simulation allocation to any project',
   },
   {
     key:         'cun',
@@ -240,8 +247,28 @@ export const BUCKET_META: BucketMeta[] = [
 
 // ── Compliance disclaimer — shown in any UI that displays neuron data ─────────
 export const NEURON_DISCLAIMER =
-  'Neurons are non-monetary internal participation units within Ceekul. ' +
-  'They have no real-world monetary value, cannot be withdrawn, sold, or exchanged ' +
-  'for money, and do not represent any financial claim. ' +
-  'All real-money transactions are handled exclusively by legally registered external entities. ' +
-  'Ceekul is NOT a bank, wallet, or financial intermediary.';
+  'Neurons are Experimental Internal Utility Units within Ceekul. ' +
+  'They are platform-restricted, non-transferable outside Ceekul, and non-exchangeable. ' +
+  'They do not represent a regulated financial claim. ' +
+  'No regulated real-economy execution is active inside this phase. ' +
+  'Ceekul is running simulation, workflow testing, and semantic orchestration validation only.';
+
+// ── Simulation mode notice — shown in contribution and ad campaign UI ─────────
+export const SIMULATION_MODE_NOTICE =
+  '⚗️ Experimental Simulation Mode — Phase 1 Architecture Validation. ' +
+  'No regulated real-economy transaction occurs. All balances are internal utility units used ' +
+  'exclusively for testing semantic orchestration, contribution workflow logic, and ' +
+  'advertisement distribution architecture. ' +
+  'Future regulated contribution flows remain abstracted until approval ' +
+  'and escrow integration are complete.';
+
+// ── Ad distribution ratios — watch-to-earn simulation defaults ────────────────
+export const AD_DISTRIBUTION_RATIOS = {
+  viewer:   0.66,  // 66% to the viewer (attention reward)
+  provider: 0.33,  // 33% to the content provider
+  platform: 0.01,  // 1%  to the platform sustainability pool
+} as const;
+
+// ── Reward rate — simulated attention scoring ─────────────────────────────────
+// 10 seconds of valid, verified attention = 1 internal utility neuron
+export const WATCH_REWARD_RATE_PER_SECOND = 0.1; // SAU (Simulated Allocation Units) / sec

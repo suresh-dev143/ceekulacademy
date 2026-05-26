@@ -96,3 +96,29 @@ $accent:   #3b82f6;
 .status--pending   { background: #1c1a08; color: #fbbf24; border: 1px solid #92400e; }
 .status--confirmed { background: #052e16; color: #86efac; border: 1px solid #166534; }
 .status--rejected  { background: #2d0a0a; color: #fca5a5; border: 1px solid #7f1d1d; }
+
+
+.sim-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+
+  &__icon { font-size: 1.4rem; flex-shrink: 0; }
+  &__text { font-size: 0.85rem; color: #fde68a; line-height: 1.5;
+    strong { color: #fbbf24; display: block; margin-bottom: 2px; } }
+}
+
+.form__success {
+  background: #052e16;
+  border: 1px solid #166534;
+  border-radius: 8px;
+  color: #86efac;
+  padding: 12px 14px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}

@@ -4,6 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { RouterModule } from '@angular/router';
 import { NeuronService } from '../../../services/neuron.service';
 import { CeegroupService } from '../../../services/ceegroup.service';
+import { DScoreService } from '../../../services/dscore.service';
+import { AuthService } from '../../../services/auth.service';
 import {
   BUCKET_META,
   TRANSFER_TARGETS,
@@ -25,6 +27,8 @@ type WorkspaceTab = 'overview' | 'transfer' | 'invest' | 'history' | 'support' |
 export class Neurons implements OnInit {
   readonly neuronService   = inject(NeuronService);
   readonly ceegroupService = inject(CeegroupService);
+  readonly dscoreService   = inject(DScoreService);
+  private readonly auth    = inject(AuthService);
   private readonly fb      = inject(FormBuilder);
   private readonly platformId = inject(PLATFORM_ID);
 
@@ -92,10 +96,21 @@ export class Neurons implements OnInit {
     this.neuronService.transactions().slice(0, 10)
   );
 
+  readonly dscoreDimensions = computed(() => {
+    const dims = this.dscoreService.dimensions();
+    if (!dims) return [];
+    return Object.entries(dims).map(([key, val]) => ({
+      key: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '),
+      val: typeof val === 'number' ? val : 0,
+    })).slice(0, 7);
+  });
+
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.neuronService.loadAll();
       this.ceegroupService.loadMyGroups();
+      const userId = this.auth.currentUserProfile()?.id;
+      if (userId) this.dscoreService.fetch(userId);
     }
     this._buildForms();
   }
@@ -171,7 +186,7 @@ export class Neurons implements OnInit {
     this.neuronService.transfer({ fromBucket, toBucket, amount: Number(amount) }).subscribe({
       next: () => {
         this.transferLoading.set(false);
-        this.transferSuccess.set(`${amount} neurons transferred from ${fromBucket.toUpperCase()} to ${toBucket.toUpperCase()}.`);
+        this.transferSuccess.set(`✓ ${amount} internal units transferred from ${fromBucket.toUpperCase()} to ${toBucket.toUpperCase()}.`);
         this.transferForm.get('amount')!.reset();
       },
       error: (e) => {
@@ -192,12 +207,12 @@ export class Neurons implements OnInit {
       next: (res) => {
         this.investLoading.set(false);
         const inv = res.investment;
-        this.investSuccess.set(`${inv.amount} neurons locked from ${inv.sourceBucket.toUpperCase()} for project "${inv.projectName}". A participation instruction will be generated for the selected entity.`);
+        this.investSuccess.set(`⚗️ ${inv.amount} simulation units allocated from ${inv.sourceBucket.toUpperCase()} for project "${inv.projectName}". A participation instruction will be generated for the selected entity.`);
         this.investForm.reset({ sourceBucket: 'fun', projectType: 'research', entityType: '' });
       },
       error: (e) => {
         this.investLoading.set(false);
-        this.investError.set(e?.error?.message ?? 'Investment failed.');
+        this.investError.set(e?.error?.message ?? 'Allocation failed.');
       },
     });
   }
@@ -213,12 +228,12 @@ export class Neurons implements OnInit {
     this.neuronService.borrowSupport(Number(amount)).subscribe({
       next: () => {
         this.supportLoading.set(false);
-        this.supportSuccess.set(`${amount} support neurons credited to your FUN. Repay within 6 months via work or contributions.`);
+        this.supportSuccess.set(`⚗️ ${amount} simulated support units assigned to your FUN. Return through simulation workflows within 6 months.`);
         this.supportBorrowForm.reset();
       },
       error: (e) => {
         this.supportLoading.set(false);
-        this.supportError.set(e?.error?.message ?? 'Borrow failed.');
+        this.supportError.set(e?.error?.message ?? 'Support request failed.');
       },
     });
   }
@@ -233,12 +248,12 @@ export class Neurons implements OnInit {
     this.neuronService.repaySupport(Number(amount), fromBucket).subscribe({
       next: () => {
         this.supportLoading.set(false);
-        this.supportSuccess.set(`${amount} neurons repaid from ${fromBucket.toUpperCase()}.`);
+        this.supportSuccess.set(`${amount} support simulation units returned from ${fromBucket.toUpperCase()}.`);
         this.supportRepayForm.reset({ fromBucket: 'fun' });
       },
       error: (e) => {
         this.supportLoading.set(false);
-        this.supportError.set(e?.error?.message ?? 'Repayment failed.');
+        this.supportError.set(e?.error?.message ?? 'Support return failed.');
       },
     });
   }
@@ -321,7 +336,7 @@ export class Neurons implements OnInit {
       },
       error: (e) => {
         this.depositLoading.set(false);
-        this.depositError.set(e?.error?.message ?? 'Deposit failed.');
+        this.depositError.set(e?.error?.message ?? 'Allocation failed.');
       },
     });
   }
@@ -337,18 +352,22 @@ export class Neurons implements OnInit {
 
   txLabel(txType: string): string {
     const map: Record<string, string> = {
-      contribution_conversion: 'Contribution → FUN',
-      bucket_transfer: 'Bucket Transfer',
-      investment_lock: 'Investment Locked',
-      investment_release: 'Investment Released',
-      project_reward: 'Project Reward',
-      work_reward: 'Work Reward',
-      monthly_allocation_user: 'Monthly Allocation',
-      support_borrow: 'Support Borrowed',
-      support_repay: 'Support Repaid',
-      sponsorship: 'Sponsorship',
-      service_consume: 'Service Used',
-      expiry: 'Neurons Expired',
+      contribution_conversion:   '⚗️ Simulation Credit → FUN',
+      bucket_transfer:           'Internal Unit Transfer',
+      investment_lock:           '⚗️ Simulation Allocation Locked',
+      investment_release:        '⚗️ Simulation Allocation Released',
+      project_reward:            'Participation Reward',
+      work_reward:               'Work / Task Reward',
+      monthly_allocation_user:   'Monthly Allocation',
+      monthly_allocation_ceekul: 'Platform Allocation (1%)',
+      support_borrow:            'Support Units Requested',
+      support_repay:             'Support Units Returned',
+      sponsorship:               'Sponsorship',
+      service_consume:           'Platform Service Used',
+      service_payment:           'Service Coordination (Sent)',
+      service_receive:           'Service Coordination (Received)',
+      group_deposit:             'CEEGROUP Allocation',
+      expiry:                    'Inactive Units Redistributed',
     };
     return map[txType] ?? txType;
   }

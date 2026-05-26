@@ -1,47 +1,15 @@
 <div class="payment-return">
-
-  @if (state() === 'processing') {
-    <div class="payment-return__card payment-return__card--processing">
-      <div class="payment-return__spinner" aria-label="Loading"></div>
-      <h1 class="payment-return__title">Verifying Payment…</h1>
-      <p class="payment-return__body">
-        Please wait while we confirm your payment and credit your neurons.
-        Do not close or refresh this page.
-      </p>
-    </div>
-  }
-
-  @if (state() === 'success') {
-    <div class="payment-return__card payment-return__card--success">
-      <div class="payment-return__icon payment-return__icon--success">✓</div>
-      <h1 class="payment-return__title">Payment Successful</h1>
-      <p class="payment-return__neurons">
-        <span class="payment-return__neurons-count">{{ neuronsIssued() | number }}</span>
-        neurons credited to your FUN bucket
-      </p>
-      <p class="payment-return__note">
-        Rate: 1 INR = 1 Neuron &nbsp;·&nbsp; Neurons are non-monetary participation units.
-      </p>
-      <button class="payment-return__btn" (click)="goToNeurons()">
-        View My Neurons
-      </button>
-    </div>
-  }
-
-  @if (state() === 'error') {
-    <div class="payment-return__card payment-return__card--error">
-      <div class="payment-return__icon payment-return__icon--error">✕</div>
-      <h1 class="payment-return__title">Verification Failed</h1>
-      <p class="payment-return__body">{{ errorMessage() }}</p>
-      <p class="payment-return__note">
-        If money was deducted from your account, please contact
-        <a href="mailto:ceekul.portal@gmail.com">ceekul.portal&#64;gmail.com</a>
-        with your payment reference.
-      </p>
-      <button class="payment-return__btn payment-return__btn--secondary" (click)="goToNeurons()">
-        Back to Neurons
-      </button>
-    </div>
-  }
-
+  <div class="payment-return__card payment-return__card--processing">
+    <div class="payment-return__icon payment-return__icon--error">!</div>
+    <h1 class="payment-return__title">Provider Flow Disabled</h1>
+    <p class="payment-return__body">
+      Ceekul is currently running Experimental Internal Simulation only. External provider verification is inactive.
+    </p>
+    <p class="payment-return__note">
+      Use the simulation contribution flow to create Internal Utility Units for ledger, UCRS, and workflow testing.
+    </p>
+    <button class="payment-return__btn" (click)="goToSimulation()">
+      Open Simulation Flow
+    </button>
+  </div>
 </div>

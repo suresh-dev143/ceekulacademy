@@ -8,9 +8,34 @@ export type ContentState = 'draft' | 'shared' | 'published';
 
 export interface CreatorBlock {
   blockId: string;
-  type: 'text' | 'code' | 'image' | 'video' | 'audio' | 'divider' | 'columns';
+  type: 'text' | 'subtitle' | 'code' | 'image' | 'video' | 'audio' | 'animation' | 'divider' | 'columns' | 'canvas';
   content: Record<string, unknown>;
   order: number;
+}
+
+export interface ContentView extends ContentDoc {
+  blocks: CreatorBlock[];
+}
+
+export interface PublishedItem {
+  baseId: string;
+  hybridId: string;
+  title: string;
+  subtitle: string;
+  contentTitle: string;
+  contentType: ContentType;
+  domain: string;
+  wordCount: number;
+  views: number;
+  enrollments: number;
+  createdAt: string;
+}
+
+export interface PublishedPage {
+  items: PublishedItem[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export interface DraftPayload {
@@ -119,5 +144,21 @@ export class CreatorService {
 
   getContributions(baseId: string): Observable<{ data: ContributionStats }> {
     return this.http.get<{ data: ContributionStats }>(`${API}/${baseId}/contributions`);
+  }
+
+  getContentView(baseId: string): Observable<{ data: ContentView }> {
+    return this.http.get<{ data: ContentView }>(`${API}/view/${baseId}`);
+  }
+
+  listPublished(params: {
+    q?: string; domain?: string; contentType?: string; page?: number; limit?: number;
+  } = {}): Observable<{ data: PublishedPage }> {
+    const p: Record<string, string> = {};
+    if (params.q)           p['q']           = params.q;
+    if (params.domain)      p['domain']      = params.domain;
+    if (params.contentType) p['contentType'] = params.contentType;
+    if (params.page)        p['page']        = String(params.page);
+    if (params.limit)       p['limit']       = String(params.limit);
+    return this.http.get<{ data: PublishedPage }>(`${API}/published`, { params: p });
   }
 }

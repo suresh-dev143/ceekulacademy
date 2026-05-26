@@ -1,46 +1,134 @@
-<div class="ai-tools-page">
-  <div class="ai-tools">
-    <div class="ai-tools__header">
-      <p>You may set your choice AI Tools from <a>Here</a></p>
-    </div>
-    <div class="ai-tools__grid">
-      @for (tool of tools; track tool.name) {
-        <div class="tool-card" [class.tool-card--expanded]="expandedTool() === tool.name"
-             (click)="toggleTool(tool.name)">
-          <div class="tool-card__info">
-            <span class="tool-card__name">{{ tool.name }}</span>
-            <p class="tool-card__desc">{{ tool.desc }}</p>
-          </div>
-          <span class="tool-card__arrow" [class.tool-card__arrow--open]="expandedTool() === tool.name">›</span>
-        </div>
+<div class="ai-tools-panel">
 
-        @if (expandedTool() === tool.name && tool.name === 'Content Creation') {
-          <div class="tool-sublist">
-            @for (bt of blockTypes; track bt.type) {
-              <a class="subtool-btn"
-                 [routerLink]="['/personal/create']"
-                 [queryParams]="{ block: bt.type }"
-                 (click)="$event.stopPropagation()">
-                <span class="subtool-btn__icon">{{ bt.icon }}</span>
-                <span class="subtool-btn__label">{{ bt.label }}</span>
-                <span class="subtool-btn__desc">{{ bt.desc }}</span>
-              </a>
-            }
-          </div>
+  @if (!isPersonalPage()) {
+    <div class="chat-panel__header">
+      <h3>Content Creation Tool</h3>
+      
+    </div> 
+  <div class="tool-sublist">
+    @for (bt of blockTypes; track bt.type) {
+    <a class="subtool-btn" [routerLink]="['/personal/create']" [queryParams]="{ block: bt.type }"
+      (click)="$event.stopPropagation()">
+      <span class="subtool-btn__label">{{ bt.label }}</span>
+    </a>
+    <div class="subtool-link" >
+    @for(tool of bt.tools; track tool){
+    
+      <a class="subtool-btn" [href]="tool.link" target="_blank" rel="noopener noreferrer">  <span class="subtool-btn__label">{{ tool.label }}</span></a>
+     
+    }
+    </div>
+    }
+  </div>
+  
+
+  <!-- ── Tool 1: Ideas ── -->
+  <!-- <div class="aip-section">
+    <button class="aip-section__header" (click)="toggleTool('ideas')">
+      <span class="aip-section__title">Ideas</span>
+      <span class="aip-section__arrow" [class.aip-section__arrow--open]="expandedTool() === 'ideas'">›</span>
+    </button>
+    @if (expandedTool() === 'ideas') {
+    <div class="aip-body">
+      @if (creatorTools.sessionTitle()) {
+      <p class="aip-context-hint">
+        Topic: <strong>{{ creatorTools.sessionTitle() }}</strong>
+      </p>
+      } @else {
+      <p class="aip-hint">Open a draft to auto-populate the topic, or navigate to the Create page first.</p>
+      }
+      @if (ideasLoading()) {
+      <div class="aip-loading">
+        <div class="aip-spinner"></div><span>Fetching…</span>
+      </div>
+      } @else if (ideasText()) {
+      <div class="aip-result">{{ ideasText() }}</div>
+      }
+      <button class="aip-btn" [disabled]="ideasLoading() || !creatorTools.sessionTitle()" (click)="fetchIdeas()">
+        {{ ideasText() ? 'Refresh' : 'Fetch Ideas' }}
+      </button>
+    </div>
+    }
+  </div> -->
+
+  <!-- ── Tool 2: Update ── -->
+  <!-- <div class="aip-section">
+    <button class="aip-section__header" (click)="toggleTool('update')">
+      <span class="aip-section__title">Update</span>
+      <span class="aip-section__arrow" [class.aip-section__arrow--open]="expandedTool() === 'update'">›</span>
+    </button>
+    @if (expandedTool() === 'update') {
+    <div class="aip-body">
+      <div class="aip-tabs">
+        <button class="aip-tab" [class.aip-tab--active]="updateTab() === 'creator'"
+          (click)="updateTab.set('creator')">Creator</button>
+        <button class="aip-tab" [class.aip-tab--active]="updateTab() === 'ai'" (click)="updateTab.set('ai')">AI</button>
+      </div>
+
+      @if (updateTab() === 'creator') {
+      <div class="aip-update-form">
+        <input class="aip-input" [value]="updateSegmentId()" (input)="updateSegmentId.set($any($event.target).value)"
+          placeholder="Phrase to find in canvas…" />
+        <input class="aip-input" [value]="updateReplacement()"
+          (input)="updateReplacement.set($any($event.target).value)" placeholder="Replacement text…" />
+        <button class="aip-btn"
+          [disabled]="!updateSegmentId() || !updateReplacement() || !creatorTools.hasActiveCanvas()"
+          (click)="applyCreatorUpdate()">
+          {{ creatorTools.hasActiveCanvas() ? 'Apply' : 'Open Create page first' }}
+        </button>
+      </div>
+      }
+
+      @if (updateTab() === 'ai') {
+      <div class="aip-update-form">
+        @if (aiUpdateLoading()) {
+        <div class="aip-loading">
+          <div class="aip-spinner"></div><span>Scanning…</span>
+        </div>
+        } @else if (aiUpdateResult()) {
+        <div class="aip-result">{{ aiUpdateResult() }}</div>
+        } @else {
+        <p class="aip-hint">AI scans the current draft and applies research-backed updates to the canvas.</p>
         }
+        <button class="aip-btn" [disabled]="aiUpdateLoading() || !creatorTools.sessionTitle()"
+          (click)="fetchAiUpdate()">
+          {{ aiUpdateResult() ? 'Refresh' : 'Fetch from Web' }}
+        </button>
+      </div>
       }
     </div>
-  </div>
+    }
+  </div> -->
+  }
 
-  <!-- Chat Panel -->
+  <!-- ── Discussions ── -->
+  @if (!isCreatePage()) {
   <div class="chat-panel">
     <div class="chat-panel__header">
-      <h3>Discussions</h3>
+      <h3>Discussion</h3>
       <span class="status-badge">
         <span class="status-dot"></span>
         Live
       </span>
     </div>
     <app-discussion-chat></app-discussion-chat>
+    
+    <!-- ── Chat Input ── -->
+    <div class="chat-input-container">
+      <input 
+        class="chat-input" 
+        type="text" 
+        placeholder="Type your message…" 
+        (keyup.enter)="sendMessage()"
+        [(ngModel)]="messageText" />
+      <button 
+        class="chat-send-btn" 
+        (click)="sendMessage()"
+        [disabled]="!messageText()?.trim()">
+        Send
+      </button>
+    </div>
   </div>
+  }
+
 </div>

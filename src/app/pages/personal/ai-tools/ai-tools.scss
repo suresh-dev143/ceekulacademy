@@ -4,174 +4,451 @@ $bg-card: #1a1a1a;
 $accent: #ff9900;
 $border-color: #2a2a2a;
 
-.ai-tools-page {
-  max-width: 1200px;
-  margin: 0 auto;
- 
+.ai-tools-panel {
+  display: flex;
+  flex-direction: column;
   font-family: 'Outfit', sans-serif;
+}
 
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
+.cct-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 16px 13px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid $border-color;
+  color: #e0e0e0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s;
+
+  &:hover {
+    color: $accent;
   }
-}
 
-.ai-tools {
-    &__header {
-           margin: 1.2rem;
-        p { color: #888; font-size: 1rem; a { color: $accent; cursor: pointer; text-decoration: underline; } }
+  &__label {
+    flex: 1;
+    text-align: left;
+  }
+
+  &__arrow {
+    font-size: 1.1rem;
+    color: #555;
+    transition: transform 0.2s, color 0.2s;
+    line-height: 1;
+
+    &--open {
+      transform: rotate(90deg);
+      color: $accent;
     }
-
-    &__grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 0.7rem;
-        border-left: 6px solid #1a1a1a;
-        border-right: 6px solid #1a1a1a;
-    }
-}
-
-.tool-card {
-    background: $bg-card;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-
-    &:hover {
-        border-color: $accent;
-        background: rgba($accent, 0.05);
-        transform: translateY(-2px);
-    }
-
-    &--expanded {
-        border-color: $accent;
-        background: rgba($accent, 0.06);
-    }
-
-    &__info { flex: 1; min-width: 0; }
-
-    &__name {
-        display: block;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: white;
-        margin-bottom: 0.25rem;
-    }
-
-    &__desc {
-        font-size: 0.9rem;
-        color: #666;
-        margin: 0;
-    }
-
-    &__arrow {
-        font-size: 1.2rem;
-        color: #555;
-        transition: transform 0.22s, color 0.22s;
-        flex-shrink: 0;
-        line-height: 1;
-
-        &--open {
-            transform: rotate(90deg);
-            color: $accent;
-        }
-    }
+  }
 }
 
 // ── Content Creation sub-tools ─────────────────────────────────────────────
 
 .tool-sublist {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 0.875rem 1rem;
-    background: #111;
-    border-left: 3px solid $accent;
-    animation: subtool-in 0.18s ease;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  background:transparent;
+  border-left: 3px solid $accent;
+  animation: subtool-in 0.18s ease;
 }
 
 @keyframes subtool-in {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .subtool-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 0.4rem;
-    padding: 0.45rem 0.875rem;
-    cursor: pointer;
-    transition: border-color 0.18s, background 0.18s;
-    text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 0.4rem;
+  padding: 0.45rem 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s;
+  text-align: left;
+  text-decoration: none;
 
-    &:hover {
-        border-color: $accent;
-        background: rgba($accent, 0.07);
+  &:hover {
+    border-color: $accent;
+    background: rgba($accent, 0.07);
 
-        .subtool-btn__label { color: $accent; }
+    .subtool-btn__label {
+      color: $accent;
     }
+  }
 
-    &__icon {
-        font-size: 1rem;
-        flex-shrink: 0;
-    }
+  &__icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
 
-    &__label {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #e0e0e0;
-        transition: color 0.18s;
-    }
+  &__label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #e0e0e0;
+    transition: color 0.18s;
+  }
 
-    &__desc {
-        font-size: 0.7rem;
-        color: #555;
-    }
+  &__desc {
+    font-size: 0.7rem;
+    color: #555;
+  }
+}
+.subtool-link{
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+  margin-left: 1rem;
+
+}
+// ── Tool sections (Conceive / Ideas / Update) ──────────────────────────────
+
+.aip-section {
+  border-bottom: 1px solid $border-color;
 }
 
+.aip-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 11px 16px 10px;
+  background: transparent;
+  border: none;
+  color: #bbb;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s;
+
+  &:hover {
+    color: $accent;
+  }
+}
+
+.aip-section__title {
+  flex: 1;
+  text-align: left;
+}
+
+.aip-section__arrow {
+  font-size: 1.1rem;
+  color: #555;
+  transition: transform 0.2s, color 0.2s;
+  line-height: 1;
+
+  &--open {
+    transform: rotate(90deg);
+    color: $accent;
+  }
+}
+
+.aip-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px 14px;
+  background: #111;
+  border-left: 3px solid $accent;
+  animation: subtool-in 0.18s ease;
+}
+
+.aip-textarea {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 0.78rem;
+  font-family: 'Outfit', sans-serif;
+  padding: 7px 9px;
+  resize: vertical;
+  outline: none;
+  line-height: 1.5;
+
+  &::placeholder {
+    color: #444;
+  }
+
+  &:focus {
+    border-color: #3a3a3a;
+  }
+}
+
+.aip-input {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 0.76rem;
+  font-family: 'Outfit', sans-serif;
+  padding: 6px 9px;
+  outline: none;
+
+  &::placeholder {
+    color: #444;
+  }
+
+  &:focus {
+    border-color: #3a3a3a;
+  }
+}
+
+.aip-btn {
+  align-self: flex-end;
+  background: rgba($accent, 0.12);
+  border: 1px solid rgba($accent, 0.3);
+  border-radius: 4px;
+  color: $accent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: rgba($accent, 0.22);
+    border-color: $accent;
+  }
+
+  &:disabled {
+    opacity: 0.38;
+    cursor: default;
+  }
+}
+
+.aip-tabs {
+  display: flex;
+  gap: 4px;
+  background: #1a1a1a;
+  border-radius: 4px;
+  padding: 3px;
+}
+
+.aip-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.05em;
+  padding: 4px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.15s, color 0.15s;
+
+  &--active {
+    background: rgba($accent, 0.15);
+    color: $accent;
+  }
+
+  &:hover:not(.aip-tab--active) {
+    color: #888;
+  }
+}
+
+.aip-update-form {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.aip-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #555;
+  font-size: 0.72rem;
+  padding: 4px 0;
+}
+
+.aip-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #2a2a2a;
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: aip-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes aip-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.aip-result {
+  background: #0e0e0e;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  color: #bbb;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  padding: 8px 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 2px;
+  }
+}
+
+.aip-hint {
+  color: #444;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.aip-context-hint {
+  color: #666;
+  font-size: 0.7rem;
+  margin: 0;
+
+  strong {
+    color: #999;
+  }
+}
+
+// ── Chat panel ───────────────────────────────────────────────────────────────
+
 .chat-panel {
-    background: #161616;
-    border: 1px solid $border-color;
+  background: #161616;
+  border: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  height: 700px;
+  overflow: hidden;
+
+  &__header {
+    padding: 1.5rem;
+
     display: flex;
-    flex-direction: column;
-    height: 700px;
-    overflow: hidden;
+    justify-content: space-between;
+    align-items: center;
 
-    &__header {
-        padding: 1.5rem;
-        border-bottom: 1px solid $border-color;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        h3 { margin: 0; font-size: 1.25rem; font-weight: 700; color: white; }
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: white;
     }
+  }
 }
 
 .status-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(74, 222, 128, 0.1);
-    color: #4ade80;
-    padding: 0.4rem 0.8rem;
-    border-radius: 2rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  padding: 0.4rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .status-dot {
-    width: 6px;
-    height: 6px;
-    background: #4ade80;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #4ade80;
+  width: 6px;
+  height: 6px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #4ade80;
+}
+
+// ── Chat Input ───────────────────────────────────────────────────────────────
+
+.chat-input-container {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #0e0e0e;
+  border-top: 1px solid $border-color;
+  align-items: center;
+      position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+}
+
+.chat-input {
+  flex: 1;
+  background: #1a1a1a;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+  font-family: 'Outfit', sans-serif;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &::placeholder {
+    color: #555;
+  }
+
+  &:focus {
+    border-color: rgba($accent, 0.5);
+  }
+}
+
+.chat-send-btn {
+  background: rgba($accent, 0.15);
+  border: 1px solid rgba($accent, 0.3);
+  border-radius: 4px;
+  color: $accent;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  padding: 7px 18px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: rgba($accent, 0.25);
+    border-color: $accent;
+  }
+
+  &:disabled {
+    opacity: 0.38;
+    cursor: default;
+  }
 }

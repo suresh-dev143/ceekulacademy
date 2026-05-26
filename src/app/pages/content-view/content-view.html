@@ -1,0 +1,341 @@
+<div class="cv-layout">
+
+  <!-- ═══════════════════════════════ LEFT — CONTENT AREA (76%) ═════════════ -->
+  <main class="cv-main">
+
+    @if (loading()) {
+      <div class="cv-loading">
+        <div class="cv-spinner"></div>
+        <span>Loading content…</span>
+      </div>
+    }
+
+    @if (loadError()) {
+      <div class="cv-error">{{ loadError() }}</div>
+    }
+
+    @if (content() && !loading()) {
+      <header class="cv-header">
+        <h1 class="cv-title">{{ content()!.title }}</h1>
+        @if (content()!.subtitle) {
+          <p class="cv-subtitle-text">{{ content()!.subtitle }}</p>
+        }
+      </header>
+
+      <div class="cv-blocks">
+        @for (block of sortedBlocks(); track trackBlock($index, block)) {
+          <article
+            class="cv-block"
+            [class.cv-block--focused]="isFocused(block.blockId)"
+            [class.cv-block--canvas]="block.type === 'canvas'"
+            [class.cv-block--divider]="block.type === 'divider'"
+            (click)="focusBlock(block)"
+          >
+
+            <!-- TEXT ─────────────────────────────────────────────────────────── -->
+            @if (block.type === 'text') {
+              <div
+                class="cv-text"
+                [attr.data-block-id]="block.blockId"
+                [innerHTML]="block.content['html']"
+              ></div>
+            }
+
+            <!-- SUBTITLE ────────────────────────────────────────────────────── -->
+            @if (block.type === 'subtitle') {
+              <h2
+                class="cv-subtitle"
+                [attr.data-block-id]="block.blockId"
+              >{{ block.content['text'] }}</h2>
+            }
+
+            <!-- CODE ─────────────────────────────────────────────────────────── -->
+            @if (block.type === 'code') {
+              <div class="cv-code-wrap" [attr.data-block-id]="block.blockId">
+                <span class="cv-code-lang">{{ block.content['language'] || 'code' }}</span>
+                <pre class="cv-code"><code>{{ block.content['code'] }}</code></pre>
+              </div>
+            }
+
+            <!-- IMAGE ────────────────────────────────────────────────────────── -->
+            @if (block.type === 'image') {
+              <figure class="cv-figure">
+                <img
+                  class="cv-image"
+                  [src]="block.content['url']"
+                  [alt]="block.content['alt'] || ''"
+                />
+                @if (block.content['caption']) {
+                  <figcaption class="cv-caption">{{ block.content['caption'] }}</figcaption>
+                }
+              </figure>
+            }
+
+            <!-- VIDEO ────────────────────────────────────────────────────────── -->
+            @if (block.type === 'video') {
+              <div class="cv-video-wrap">
+                <video
+                  class="cv-video"
+                  [src]="block.content['url']"
+                  controls
+                ></video>
+                @if (block.content['title']) {
+                  <p class="cv-caption">{{ block.content['title'] }}</p>
+                }
+              </div>
+            }
+
+            <!-- AUDIO ────────────────────────────────────────────────────────── -->
+            @if (block.type === 'audio') {
+              <div class="cv-audio-wrap">
+                @if (block.content['title']) {
+                  <p class="cv-audio-title">{{ block.content['title'] }}</p>
+                }
+                <audio class="cv-audio" [src]="block.content['url']" controls></audio>
+              </div>
+            }
+
+            <!-- ANIMATION ────────────────────────────────────────────────────── -->
+            @if (block.type === 'animation') {
+              <div class="cv-anim-wrap">
+                @if (block.content['url']) {
+                  <video
+                    class="cv-anim"
+                    [src]="block.content['url']"
+                    autoplay loop muted playsinline
+                  ></video>
+                } @else {
+                  <div class="cv-anim-placeholder">✨ Animation</div>
+                }
+                @if (block.content['filename']) {
+                  <p class="cv-caption">{{ block.content['filename'] }}</p>
+                }
+              </div>
+            }
+
+            <!-- DIVIDER ─────────────────────────────────────────────────────── -->
+            @if (block.type === 'divider') {
+              <hr class="cv-divider" />
+            }
+
+            <!-- CANVAS ──────────────────────────────────────────────────────── -->
+            @if (block.type === 'canvas') {
+              <div
+                class="cv-canvas-grid"
+                [ngStyle]="canvasGridStyle(block)"
+                (click)="$event.stopPropagation()"
+              >
+                @for (cell of getCanvasCells(block); track trackCell($index, cell)) {
+                  <div
+                    class="cv-cell"
+                    [class.cv-cell--focused]="isFocused(block.blockId, cell.id)"
+                    [ngStyle]="cellGridStyle(cell)"
+                    (click)="focusCanvasCell($event, block, cell)"
+                  >
+                    @if (cell.tool === 'text') {
+                      <div class="cv-cell-text" [innerHTML]="cell.content['html']"></div>
+                    }
+                    @if (cell.tool === 'image' && cell.content['url']) {
+                      <img class="cv-cell-img" [src]="cell.content['url']" [alt]="cell.content['alt'] || ''" />
+                    }
+                    @if (cell.tool === 'video' && cell.content['url']) {
+                      <video class="cv-cell-video" [src]="cell.content['url']" controls></video>
+                    }
+                    @if (cell.tool === 'audio' && cell.content['url']) {
+                      <audio class="cv-cell-audio" [src]="cell.content['url']" controls></audio>
+                    }
+                    @if (cell.tool === 'animation' && cell.content['url']) {
+                      <video class="cv-cell-anim" [src]="cell.content['url']" autoplay loop muted playsinline></video>
+                    }
+                    @if (!cell.content['url'] && cell.tool !== 'text') {
+                      <div class="cv-cell-empty">{{ cell.tool }}</div>
+                    }
+                      <span class="cv-cell-badge">{{ cell.tool }}</span>
+                      @if (cellAnnCount(block.blockId, cell.id) > 0) {
+                        <span class="cv-cell-ann-badge">💬 {{ cellAnnCount(block.blockId, cell.id) }}</span>
+                      }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Block focus ring indicator -->
+            <div class="cv-block-focus-ring"></div>
+
+            <!-- Annotation count badge -->
+            @if (blockAnnCount(block.blockId) > 0) {
+              <span class="cv-ann-badge">💬 {{ blockAnnCount(block.blockId) }}</span>
+            }
+
+          </article>
+        }
+      </div>
+    }
+
+    <!-- ── Text selection bubble ───────────────────────────────────────────── -->
+    @if (bubble()) {
+      <div
+        class="selection-bubble"
+        [style.left.px]="bubble()!.x"
+        [style.top.px]="bubble()!.y"
+      >
+        <button class="sb-btn" (click)="focusSelection()">
+          💬 Discuss with AI
+        </button>
+      </div>
+    }
+
+  </main>
+
+  <!-- ═══════════════════════════════ RIGHT — AI PANEL (24%) ════════════════ -->
+  <aside class="cv-panel">
+
+    <!-- ── Panel top bar (always visible) ───────────────────────────────────── -->
+    <div class="cv-panel-topbar">
+      <span class="cv-panel-title">AI Tools</span>
+      <button
+        class="cv-share-content-btn"
+        (click)="shareContent()"
+        [title]="contentShareCopied() ? 'Copied!' : 'Share this content'"
+      >
+        {{ contentShareCopied() ? '✓ Copied' : '🔗 Share' }}
+      </button>
+    </div>
+
+    <!-- ── Empty state: nothing focused ─────────────────────────────────────── -->
+    @if (!focus()) {
+      <div class="cv-panel-empty">
+        <span class="cpe-icon">🤖</span>
+        <p class="cpe-hint">
+          Select text, click a block, or tap a canvas cell to start an AI conversation
+        </p>
+      </div>
+    }
+
+    <!-- ── Focused, no tool chosen yet ──────────────────────────────────────── -->
+    @if (focus() && !activeTool()) {
+      <div class="cv-panel-pick">
+        <div class="cpp-focus-tag">
+          <span class="cpp-pin">📌</span>
+          <span class="cpp-label">{{ focusLabel() }}</span>
+        </div>
+        <p class="cpp-prompt">Choose an AI tool:</p>
+        <div class="cv-tool-grid">
+          @for (tool of tools(); track tool) {
+            <button class="cv-tool-btn" (click)="selectTool(tool)">
+              <span class="cv-tool-icon">{{ toolMeta[tool].icon }}</span>
+              <span class="cv-tool-name">{{ toolMeta[tool].label }}</span>
+              <span class="cv-tool-desc">{{ toolMeta[tool].desc }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ── Tool active — show thread ────────────────────────────────────────── -->
+    @if (focus() && activeTool()) {
+      <div class="cv-thread">
+
+        <!-- Thread header -->
+        <div class="cvt-header">
+          <button class="cvt-back" (click)="clearTool()" title="Back to tool picker">
+            ← {{ toolMeta[activeTool()!].icon }}
+          </button>
+          <span class="cvt-tool-name">{{ toolMeta[activeTool()!].label }}</span>
+          <span class="cvt-focus-label" [title]="focusLabel() || ''">{{ focusLabel() }}</span>
+          @if (activeAnnotation()) {
+            <button class="cvt-new-btn" (click)="startNewThread()" title="Start a new thread">＋</button>
+          }
+        </div>
+
+        @if (activeAnnotation()) {
+          <div class="cvt-existing-banner">
+            Continuing an earlier thread · <button class="cvt-new-link" (click)="startNewThread()">Start new</button>
+          </div>
+        }
+
+        <!-- Message thread -->
+        <div class="cvt-messages">
+          @if (activeAnnotation()) {
+            @for (msg of activeAnnotation()!.thread; track trackMsg($index, msg)) {
+              <div
+                class="cvt-msg"
+                [class.cvt-msg--user]="msg.role === 'user'"
+                [class.cvt-msg--ai]="msg.role === 'ai'"
+              >
+                <div class="cvt-bubble">{{ msg.text }}</div>
+              </div>
+            }
+          } @else {
+            <div class="cvt-empty">
+              <p>{{ toolMeta[activeTool()!].desc }}</p>
+            </div>
+          }
+
+          @if (aiLoading()) {
+            <div class="cvt-msg cvt-msg--ai">
+              <div class="cvt-bubble cvt-typing">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Input area -->
+        <div class="cvt-input-area">
+          <textarea
+            class="cvt-input"
+            [(ngModel)]="threadInputValue"
+            [placeholder]="activeAnnotation() ? 'Continue the conversation… (Enter to send)' : toolMeta[activeTool()!].desc"
+            rows="3"
+            (keydown)="onInputKeydown($event)"
+          ></textarea>
+          <button
+            class="cvt-send"
+            (click)="submitMessage()"
+            [disabled]="aiLoading() || !threadInputValue.trim()"
+          >
+            @if (aiLoading()) { … } @else { Ask }
+          </button>
+        </div>
+
+        <!-- Share + visibility row -->
+        @if (activeAnnotation()) {
+          <div class="cvt-share-row">
+            <!-- Visibility toggle -->
+            <div class="cvt-visibility-row">
+              <button
+                class="cvt-vis-btn"
+                [class.cvt-vis-btn--public]="activeAnnotation()!.visibility === 'public'"
+                (click)="toggleVisibility()"
+              >
+                {{ activeAnnotation()!.visibility === 'private' ? '🔒 Private' : '🌐 Public' }}
+              </button>
+              <span class="cvt-vis-hint">
+                {{ activeAnnotation()!.visibility === 'private' ? 'Only you can see this' : 'Anyone with the link can view' }}
+              </span>
+            </div>
+
+            @if (activeAnnotation()!.visibility !== 'private') {
+              @if (!shareLink()) {
+                <button class="cvt-share-btn" (click)="shareThread()">
+                  🔗 Get share link
+                </button>
+              } @else {
+                <div class="cvt-share-link">
+                  <span class="cvt-share-url">{{ shareLink() }}</span>
+                  <button class="cvt-copy-btn" (click)="copyShareLink()">
+                    {{ shareCopied() ? '✓ Copied' : 'Copy' }}
+                  </button>
+                </div>
+              }
+            }
+          </div>
+        }
+
+      </div>
+    }
+
+  </aside>
+
+</div>

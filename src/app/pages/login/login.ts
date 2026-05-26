@@ -96,6 +96,7 @@ export class LoginComponent {
             },
             error: (err) => {
                 this.isSubmitting.set(false);
+                console.log('login error -- ',err);
                 this.errorMessage.set(err?.error?.message ?? 'Login failed. Please try again.');
             }
         });

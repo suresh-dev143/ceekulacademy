@@ -16,6 +16,7 @@ import { SemanticGraphService } from './services/semantic-graph.service';
 import { CoherenceService } from './services/coherence.service';
 import { SemanticDeltaSubscriptionService } from './services/semantic-delta-subscription.service';
 import { DormantComputationService } from './services/dormant-computation.service';
+import { ApiContextService } from './services/api-context.service';
 
 @Component({
   selector: 'app-root',
@@ -37,6 +38,7 @@ export class App {
   private readonly _coherence      = inject(CoherenceService);
   private readonly _deltaSub       = inject(SemanticDeltaSubscriptionService);
   private readonly _dormant        = inject(DormantComputationService);
+  private readonly _apiCtx         = inject(ApiContextService);
   private readonly _router         = inject(Router);
 
   constructor() {
@@ -46,6 +48,8 @@ export class App {
       const token = this._auth.getToken();
       if (user && token) {
         this._screenSync.init(token, user.id);
+        this._apiCtx.loadFromServer();
+        this._coherence.fetchMember();
       } else {
         this._screenSync.disconnect();
       }
@@ -55,7 +59,9 @@ export class App {
     this._router.events.pipe(
       filter(e => e instanceof NavigationEnd)
     ).subscribe(e => {
-      this._semanticCtx.syncPagePath((e as NavigationEnd).urlAfterRedirects);
+      const url = (e as NavigationEnd).urlAfterRedirects;
+      this._semanticCtx.syncPagePath(url);
+      this._apiCtx.touch(url);
     });
   }
 }

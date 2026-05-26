@@ -82,11 +82,17 @@ export class DiscussionService implements OnDestroy {
     this.socket = io(`${environment.apiUrl}/discussion`, {
       path:       '/socket.io',
       query:      { userId, userName, userRole },
-      transports: ['websocket', 'polling']
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
     });
 
     this.socket.on('connect',    () => this.connected$.next(true));
     this.socket.on('disconnect', () => this.connected$.next(false));
+    this.socket.on('connect_error', (error: any) => {
+      console.warn('Socket.io connection error:', error?.message);
+    });
 
     this.socket.on('discussion:rooms',        (rooms: DiscussionRoom[])   => this.rooms$.next(rooms));
     this.socket.on('discussion:room',         (room: DiscussionRoom)      => this.activeRoom$.next(room));

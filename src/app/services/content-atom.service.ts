@@ -106,11 +106,15 @@ export class ContentAtomService {
   recordView(atomId: string, dwellTime: number, motivationDelta = 0, triggerResponded = false): void {
     this.http.post(`${this.apiBase}/api/adaptive/atoms/${atomId}/view`, {
       dwellTime, motivationDelta, triggerResponded
-    }).subscribe();
+    }).subscribe({
+      error: (err) => console.warn('[ContentAtom] recordView error:', err?.message)
+    });
   }
 
   recordCompletion(atomId: string): void {
-    this.http.post(`${this.apiBase}/api/adaptive/atoms/${atomId}/complete`, {}).subscribe();
+    this.http.post(`${this.apiBase}/api/adaptive/atoms/${atomId}/complete`, {}).subscribe({
+      error: (err) => console.warn('[ContentAtom] recordCompletion error:', err?.message)
+    });
   }
 
   addResearchItem(item: { title: string; abstract: string; topicTags: string[] }): Observable<any> {

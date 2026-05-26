@@ -3,11 +3,30 @@
   <!-- ── Header ── -->
   <header class="library-header">
     <div class="header-text">
-      <h1 class="page-title">My Library</h1>
-      <p class="page-sub">Manage your created content</p>
+      <h1 class="page-title">{{ mode() === 'mine' ? 'My Library' : 'Discover Content' }}</h1>
+      <p class="page-sub">{{ mode() === 'mine' ? 'Manage your created content' : 'Browse and learn from published content' }}</p>
     </div>
+    @if (mode() === 'mine') {
+      <button class="cta-btn" (click)="goToCreate()">+ New Content</button>
+    }
+  </header>
 
-    <div class="header-controls">
+  <!-- ── Mode Tabs ── -->
+  <div class="lib-mode-tabs">
+    <button class="lib-tab" [class.lib-tab--active]="mode() === 'mine'" (click)="switchMode('mine')">
+      My Content
+    </button>
+    <button class="lib-tab" [class.lib-tab--active]="mode() === 'discover'" (click)="switchMode('discover')">
+      Discover
+    </button>
+  </div>
+
+  <!-- ══════════════════════ MY CONTENT ══════════════════════ -->
+
+  @if (mode() === 'mine') {
+
+    <!-- ── Mine Controls ── -->
+    <div class="mine-controls">
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
         <input
@@ -18,95 +37,183 @@
           (input)="onSearch($any($event.target).value)"
         />
       </div>
-
       <select class="filter-select" (change)="onStatusChange($any($event.target).value)">
         @for (opt of STATUS_OPTIONS; track opt.value) {
           <option [value]="opt.value" [selected]="opt.value === selectedStatus()">{{ opt.label }}</option>
         }
       </select>
     </div>
-  </header>
 
-  <!-- ── Error Banner ── -->
-  @if (errorMsg()) {
-    <div class="error-banner">{{ errorMsg() }}</div>
+    <!-- ── Error Banner ── -->
+    @if (errorMsg()) {
+      <div class="error-banner">{{ errorMsg() }}</div>
+    }
+
+    <!-- ── Table Container ── -->
+    <div class="table-container">
+
+      @if (loading()) {
+        <div class="state-overlay">
+          <span class="spinner"></span>
+          <span>Loading your content...</span>
+        </div>
+      } @else if (items().length === 0) {
+        <div class="state-overlay empty">
+          <span class="empty-icon">📄</span>
+          <p class="empty-text">No content found. Start creating from the Create Page.</p>
+          <button class="cta-btn" (click)="goToCreate()">Go to Create</button>
+        </div>
+      } @else {
+        <table class="content-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Hybrid ID</th>
+              <th>Ver.</th>
+              <th>Last Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items(); track item.baseId) {
+              <tr class="table-row"
+                  [dqrgDraggable]="true"
+                  [dqrgCid]="item.hybridId"
+                  [dqrgTitle]="item.title || '(untitled)'"
+                  [dqrgCategory]="item.contentTitle"
+                  title="Drag to DQRG panel to analyse with AI">
+                <td class="col-title">
+                  <span class="drag-handle" title="Drag to DQRG">⠿</span>
+                  {{ item.title || '(untitled)' }}
+                </td>
+                <td>
+                  <span class="badge badge-cat">{{ item.contentTitle }}</span>
+                </td>
+                <td>
+                  <span [class]="'badge badge-status-' + getItemState(item)">
+                    {{ getItemState(item) }}
+                  </span>
+                </td>
+                <td class="col-mono">{{ item.hybridId }}</td>
+                <td class="col-ver">v{{ item.version }}</td>
+                <td class="col-date">{{ item.updatedAt | date:'dd MMM yyyy' }}</td>
+                <td>
+                  <div class="row-actions">
+                    <button class="row-btn btn-read" (click)="read(item)">Read</button>
+                    <button class="row-btn btn-edit" (click)="edit(item)">Edit</button>
+                    <button class="row-btn btn-use-as" (click)="openUseAs(item)">Use As</button>
+                    <button class="row-btn btn-delete" (click)="confirmDelete(item)">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <!-- ── Mine Pagination ── -->
+    @if (totalItems() > 0) {
+      <footer class="pagination">
+        <span class="page-info">{{ displayStart }}–{{ displayEnd }} of {{ totalItems() }}</span>
+        <div class="page-controls">
+          <button class="page-btn" (click)="prevPage()" [disabled]="currentPage() === 1">← Prev</button>
+          <span class="page-num">{{ currentPage() }} / {{ totalPages }}</span>
+          <button class="page-btn" (click)="nextPage()" [disabled]="currentPage() >= totalPages">Next →</button>
+        </div>
+      </footer>
+    }
+
   }
 
-  <!-- ── Table Container ── -->
-  <div class="table-container">
+  <!-- ══════════════════════ DISCOVER ══════════════════════ -->
 
-    @if (loading()) {
-      <div class="state-overlay">
-        <span class="spinner"></span>
-        <span>Loading your content...</span>
+  @if (mode() === 'discover') {
+
+    <!-- ── Discover Controls ── -->
+    <div class="discover-controls">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input
+          class="search-input"
+          type="text"
+          placeholder="Search published content..."
+          [value]="discoverQ()"
+          (input)="onDiscoverSearch($any($event.target).value)"
+        />
       </div>
-    } @else if (items().length === 0) {
-      <div class="state-overlay empty">
-        <span class="empty-icon">📄</span>
-        <p class="empty-text">No content found. Start creating from the Create Page.</p>
-        <button class="cta-btn" (click)="goToCreate()">Go to Create</button>
-      </div>
-    } @else {
-      <table class="content-table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Category</th>
-            <th>Status</th>
-            <th>Hybrid ID</th>
-            <th>Ver.</th>
-            <th>Last Updated</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of items(); track item.baseId) {
-            <tr class="table-row"
-                [dqrgDraggable]="true"
-                [dqrgCid]="item.hybridId"
-                [dqrgTitle]="item.title || '(untitled)'"
-                [dqrgCategory]="item.contentTitle"
-                title="Drag to DQRG panel to analyse with AI">
-              <td class="col-title">
-                <span class="drag-handle" title="Drag to DQRG">⠿</span>
-                {{ item.title || '(untitled)' }}
-              </td>
-              <td>
-                <span class="badge badge-cat">{{ item.contentTitle }}</span>
-              </td>
-              <td>
-                <span [class]="'badge badge-status-' + getItemState(item)">
-                  {{ getItemState(item) }}
-                </span>
-              </td>
-              <td class="col-mono">{{ item.hybridId }}</td>
-              <td class="col-ver">v{{ item.version }}</td>
-              <td class="col-date">{{ item.updatedAt | date:'dd MMM yyyy' }}</td>
-              <td>
-                <div class="row-actions">
-                  <button class="row-btn btn-read" (click)="read(item)">Read</button>
-                  <button class="row-btn btn-edit" (click)="edit(item)">Edit</button>
-                  <button class="row-btn btn-use-as" (click)="openUseAs(item)">Use As</button>
-                  <button class="row-btn btn-delete" (click)="confirmDelete(item)">Delete</button>
+      <select class="filter-select" (change)="onDiscoverDomain($any($event.target).value)">
+        @for (opt of DOMAIN_OPTIONS; track opt.value) {
+          <option [value]="opt.value" [selected]="opt.value === discoverDomain()">{{ opt.label }}</option>
+        }
+      </select>
+      <select class="filter-select" (change)="onDiscoverType($any($event.target).value)">
+        @for (opt of TYPE_OPTIONS; track opt.value) {
+          <option [value]="opt.value" [selected]="opt.value === discoverType()">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- ── Discover Body ── -->
+    <div class="discover-body">
+
+      @if (discoverLoading()) {
+        <div class="state-overlay">
+          <span class="spinner"></span>
+          <span>Loading content...</span>
+        </div>
+      } @else if (discoverItems().length === 0) {
+        <div class="state-overlay empty">
+          <span class="empty-icon">🔍</span>
+          <p class="empty-text">No published content found. Try adjusting the filters.</p>
+        </div>
+      } @else {
+        <div class="discover-grid">
+          @for (item of discoverItems(); track item.baseId) {
+            <div class="discover-card" (click)="openContent(item)">
+              <div class="dc-accent-bar" [style.background]="domainColor(item.domain)"></div>
+              <div class="dc-body">
+                <div class="dc-top-row">
+                  <span class="dc-type-badge">{{ typeLabel(item.contentType) }}</span>
+                  <span class="dc-read-time">{{ readTime(item.wordCount) }} read</span>
                 </div>
-              </td>
-            </tr>
+                <h3 class="dc-title">{{ item.title }}</h3>
+                @if (item.subtitle) {
+                  <p class="dc-subtitle">{{ item.subtitle }}</p>
+                }
+                <div class="dc-footer">
+                  @if (item.domain) {
+                    <span class="dc-domain-pill" [style.background]="domainColor(item.domain) + '22'" [style.color]="domainColor(item.domain)">
+                      {{ domainLabel(item.domain) }}
+                    </span>
+                  }
+                  <div class="dc-meta">
+                    <span title="Views">👁 {{ item.views ?? 0 }}</span>
+                    <span title="Enrollments">🎓 {{ item.enrollments ?? 0 }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           }
-        </tbody>
-      </table>
-    }
-  </div>
+        </div>
+      }
 
-  <!-- ── Pagination ── -->
-  @if (totalItems() > 0) {
-    <footer class="pagination">
-      <span class="page-info">{{ displayStart }}–{{ displayEnd }} of {{ totalItems() }}</span>
-      <div class="page-controls">
-        <button class="page-btn" (click)="prevPage()" [disabled]="currentPage() === 1">← Prev</button>
-        <span class="page-num">{{ currentPage() }} / {{ totalPages }}</span>
-        <button class="page-btn" (click)="nextPage()" [disabled]="currentPage() >= totalPages">Next →</button>
-      </div>
-    </footer>
+    </div>
+
+    <!-- ── Discover Pagination ── -->
+    @if (discoverTotal() > 12) {
+      <footer class="pagination">
+        <span class="page-info">{{ (discoverPage() - 1) * 12 + 1 }}–{{ discoverEnd }} of {{ discoverTotal() }}</span>
+        <div class="page-controls">
+          <button class="page-btn" (click)="discoverPrev()" [disabled]="discoverPage() === 1">← Prev</button>
+          <span class="page-num">{{ discoverPage() }} / {{ discoverTotalPages }}</span>
+          <button class="page-btn" (click)="discoverNext()" [disabled]="discoverPage() >= discoverTotalPages">Next →</button>
+        </div>
+      </footer>
+    }
+
   }
 
   <!-- ── Use As Modal ── -->

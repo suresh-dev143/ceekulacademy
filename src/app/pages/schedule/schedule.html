@@ -751,6 +751,17 @@
         @if (isAdvertisementCategory()) {
           <div class="ad-campaign-panel">
 
+            <!-- Simulation Mode Banner -->
+            <div class="sim-mode-banner">
+              <span class="smb-icon">⚗️</span>
+              <div class="smb-text">
+                <strong>Experimental Ad Simulation Mode</strong>
+                Budget is allocated in <strong>SAU (Simulated Allocation Units)</strong> from your FUN balance.
+                No real monetary transaction occurs. This tests semantic attention coordination,
+                distribution flow logic, and UCRS lineage architecture.
+              </div>
+            </div>
+
             <!-- O(1) auto-delivery info -->
             <div class="ad-info-banner">
               <span class="ad-info-icon">⧖</span>
@@ -763,6 +774,34 @@
             <!-- Section 1: Ad Creative -->
             <div class="ad-section">
               <div class="ad-section-title">Ad Creative</div>
+
+              <!-- UCRS Content Link — O(1) semantic match key -->
+              <div class="sem-field">
+                <label class="sem-label">
+                  UCRS Content Link
+                  <span class="sem-hint">from your Create page — unlocks O(1) session matching</span>
+                </label>
+                <div class="ucrs-link-field">
+                  <span class="ucrs-link-ico">◈</span>
+                  <input class="ghost-input mono-input"
+                    [value]="adUcrsLink()"
+                    (input)="adUcrsLink.set($any($event.target).value)"
+                    placeholder="CB100000000001-E-L-001-V01-S" />
+                  @if (adUcrsLink()) {
+                    <button class="ucrs-clear-btn" (click)="adUcrsLink.set('')" title="Clear">✕</button>
+                  }
+                </div>
+                @if (adUcrsLink()) {
+                  <div class="ucrs-match-armed">
+                    ✓ O(1) match armed — ad routes directly to every session teaching <code>{{ adUcrsLink() }}</code>
+                  </div>
+                } @else {
+                  <p class="ucrs-link-desc">
+                    Save your content in <strong>Create</strong> → copy the UCRS link → paste here.
+                    When set, your ad skips criteria scoring and is placed directly into matching sessions at zero runtime cost.
+                  </p>
+                }
+              </div>
 
               <div class="sem-field">
                 <label class="sem-label">Ad Title <span class="required">*</span></label>
@@ -885,25 +924,34 @@
               </div>
             </div>
 
-            <!-- Section 4: Budget & Pricing -->
+            <!-- Section 4: Budget & Allocation (Simulation) -->
             <div class="ad-section">
-              <div class="ad-section-title">Budget &amp; Pricing</div>
+              <div class="ad-section-title">⚗️ Allocation Budget &amp; Engagement Rate (Simulation)</div>
 
               <div class="ad-pricing-grid">
                 <div class="sem-field">
-                  <label class="sem-label">Rate <span class="sem-hint">paise / second / user</span></label>
+                  <label class="sem-label">
+                    Engagement Rate
+                    <span class="sem-hint">SAU / second / viewer</span>
+                  </label>
                   <div class="ad-rate-row">
                     <input class="sem-inline-input" type="number" min="1" step="1"
                       [value]="adRate()"
                       (input)="adRate.set(+$any($event.target).value || 5)"
                       placeholder="5" />
-                    <span class="ad-rate-unit">paise / sec / user</span>
+                    <span class="ad-rate-unit">SAU / sec / viewer</span>
                   </div>
-                  <div class="ad-rate-hint">= ₹{{ (adRate() / 100).toFixed(2) }} per second per user</div>
+                  <div class="ad-rate-hint">
+                    = {{ adRate() }} simulated allocation units per second per verified viewer
+                    — deducted from your FUN distribution pool
+                  </div>
                 </div>
 
                 <div class="sem-field">
-                  <label class="sem-label">Total Budget (₹)</label>
+                  <label class="sem-label">
+                    Allocation Budget
+                    <span class="sem-hint">SAU from your FUN balance</span>
+                  </label>
                   <input class="sem-inline-input" type="number" min="100" step="100"
                     [value]="adBudget()"
                     (input)="adBudget.set(+$any($event.target).value || 1000)"
@@ -919,23 +967,27 @@
                   [min]="today" />
               </div>
 
-              <!-- Cost Preview -->
+              <!-- Simulation Cost Preview -->
               <div class="ad-cost-preview">
                 <div class="ad-cost-row">
-                  <span>Rate</span>
-                  <span>{{ adRate() }} paise/sec/user · ₹{{ (adRate() / 100).toFixed(2) }}</span>
+                  <span>Engagement Rate</span>
+                  <span>{{ adRate() }} SAU / sec / viewer</span>
                 </div>
                 <div class="ad-cost-row">
-                  <span>Duration</span>
+                  <span>Ad Duration</span>
                   <span>{{ adDuration() }} seconds</span>
                 </div>
                 <div class="ad-cost-row">
-                  <span>Cost per user view</span>
-                  <span>₹{{ ((adRate() / 100) * adDuration()).toFixed(2) }}</span>
+                  <span>Allocation per viewer view</span>
+                  <span>{{ adRate() * adDuration() }} SAU</span>
                 </div>
                 <div class="ad-cost-row ad-cost-total">
-                  <span>Estimated reach with ₹{{ adBudget() }}</span>
-                  <span>~{{ adRate() > 0 ? ((adBudget() * 100) / (adRate() * adDuration())).toFixed(0) : '—' }} user-views</span>
+                  <span>Est. viewer reach with {{ adBudget() }} SAU</span>
+                  <span>~{{ adRate() > 0 ? ((adBudget()) / (adRate() * adDuration())).toFixed(0) : '—' }} viewer-views</span>
+                </div>
+                <div class="ad-cost-row ad-sim-note">
+                  <span>Distribution:</span>
+                  <span>66% viewer · 33% content provider · 1% platform</span>
                 </div>
               </div>
             </div>

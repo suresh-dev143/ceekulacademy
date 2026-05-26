@@ -1,26 +1,62 @@
 <div class="sidebar-inner futuristic-sidebar">
-    <div class="sidebar-section">
-        <h3 class="section-title">Context Layer</h3>
-    </div>
-    
-    <div class="activity-card">
-        <div class="activity-icon"><i class="fas fa-brain"></i></div>
-        <div class="activity-info">
-            <h4>Cognitive Load</h4>
-            <p>Optimal State</p>
-        </div>
+
+  <!-- ── Recent AI Discussions ──────────────────────────────────────── -->
+  <div class="sidebar-section">
+    <div class="section-header">
+      <h3 class="section-title">Recent Discussions</h3>
+      @if (recentAnnotations().length > 0) {
+        <button class="see-all-btn" (click)="goToAllAnnotations()">See all</button>
+      }
     </div>
 
-    <div class="activity-card">
-        <div class="activity-icon"><i class="fas fa-project-diagram"></i></div>
-        <div class="activity-info">
-            <h4>Recent Content</h4>
-            <p>Neural Networking Basics</p>
-        </div>
-    </div>
+    @if (annLoading()) {
+      <div class="ann-loading">
+        <div class="ann-spinner"></div>
+        <span>Loading…</span>
+      </div>
+    } @else if (recentAnnotations().length === 0) {
+      <div class="ann-empty">
+        <span class="ann-empty__icon">💬</span>
+        <p>No AI discussions yet.</p>
+        <p class="ann-empty__sub">Open any content and click a block to start.</p>
+        <button class="lib-link-btn" (click)="goToLibrary()">Browse Library →</button>
+      </div>
+    } @else {
+      <div class="ann-list">
+        @for (item of recentAnnotations(); track item._id) {
+          <button class="ann-card" (click)="openAnnotation(item)">
+            <div class="ann-card__top">
+              <span class="ann-tool">{{ toolIcon(item.tool) }}</span>
+              <span class="ann-content-title">{{ item.contentTitle || '(Untitled)' }}</span>
+            </div>
+            @if (item.lastMessage) {
+              <p class="ann-preview">
+                {{ item.lastMessage.role === 'ai' ? '🤖' : '🙋' }}
+                {{ msgPreview(item.lastMessage.text) }}
+              </p>
+            }
+            <span class="ann-date">{{ item.updatedAt | date:'dd MMM' }}</span>
+          </button>
+        }
+      </div>
+    }
+  </div>
 
-    <div class="sidebar-section insight-section">
-        <h4 class="insight-title">Lightweight Insight</h4>
-        <p class="insight-text">Your focus patterns align perfectly with deep learning cycles.</p>
+  <!-- ── Library Quick Links ────────────────────────────────────────── -->
+  <div class="sidebar-section">
+    <h3 class="section-title">Library</h3>
+    <div class="lib-links">
+      <button class="lib-link" (click)="goToLibrary()">📚 My Content</button>
+      <button class="lib-link" (click)="goToAllAnnotations()">💬 My Notes</button>
     </div>
+  </div>
+
+  <!-- ── Cycling Research Insight ──────────────────────────────────── -->
+  @for (title of [localResearch()[activeIndex()]]; track title.id) {
+    <div class="sidebar-section insight-section insight-section--cycle">
+      <h4 class="insight-title">Semantic Context</h4>
+      <p class="insight-text">{{ title.title }}</p>
+    </div>
+  }
+
 </div>

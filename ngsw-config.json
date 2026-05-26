@@ -27,26 +27,5 @@
       }
     }
   ],
-  "dataGroups": [
-    {
-      "name": "academy-content",
-      "urls": ["/api/academy/**"],
-      "cacheConfig": {
-        "strategy": "performance",
-        "maxSize": 50,
-        "maxAge": "1h",
-        "timeout": "3s"
-      }
-    },
-    {
-      "name": "api-data",
-      "urls": ["/api/**"],
-      "cacheConfig": {
-        "strategy": "freshness",
-        "maxSize": 100,
-        "maxAge": "5m",
-        "timeout": "3s"
-      }
-    }
-  ]
+  "dataGroups": []
 }

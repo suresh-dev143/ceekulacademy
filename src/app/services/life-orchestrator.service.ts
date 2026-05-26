@@ -644,7 +644,9 @@ export class LifeOrchestratorService {
    */
   initUserSchedule(ceebrainId: string): void {
     if (!this.auth.isLoggedIn()) return;
-    this.http.post(this.apiBase, { schedule_overrides: {}, ceebrainId }).subscribe();
+    this.http.post(this.apiBase, { schedule_overrides: {}, ceebrainId }).subscribe({
+      error: (err) => console.warn('[LifeOrchestrator] initUserSchedule error:', err?.message)
+    });
   }
 
   private _loadFromBackend(): void {
@@ -684,7 +686,9 @@ export class LifeOrchestratorService {
       schedule_overrides[String(h)] = entry;
     }
     const ceebrainId = this.auth.currentUserProfile()?.ceebrainId;
-    this.http.post(this.apiBase, { schedule_overrides, ceebrainId }).subscribe();
+    this.http.post(this.apiBase, { schedule_overrides, ceebrainId }).subscribe({
+      error: (err) => console.warn('[LifeOrchestrator] _saveToBackend error:', err?.message)
+    });
   }
 
   private _buildSchedule(): void {

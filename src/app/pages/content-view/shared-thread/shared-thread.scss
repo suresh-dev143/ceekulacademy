@@ -1,0 +1,408 @@
+// ── Page shell ────────────────────────────────────────────────────────────────
+
+.st-page {
+  min-height: 100vh;
+  background: #0a0a0b;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px 80px;
+  font-family: 'Inter', sans-serif;
+  color: #e2e8f0;
+}
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+
+.st-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: 120px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.st-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #1e293b;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Error state ───────────────────────────────────────────────────────────────
+
+.st-error-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 100px;
+  text-align: center;
+  max-width: 360px;
+}
+
+.st-error-icon {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.st-error-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.st-error-body {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.st-home-btn {
+  margin-top: 8px;
+  padding: 10px 24px;
+  background: #6366f1;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s;
+
+  &:hover { background: #4f46e5; }
+}
+
+// ── Main wrap ─────────────────────────────────────────────────────────────────
+
+.st-wrap {
+  width: 100%;
+  max-width: 660px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.st-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.st-brand {
+  font-size: 18px;
+  font-weight: 800;
+  color: #6366f1;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+
+  &:hover { color: #818cf8; }
+}
+
+.st-tagline {
+  font-size: 13px;
+  color: #4b5563;
+}
+
+// ── Card ──────────────────────────────────────────────────────────────────────
+
+.st-card {
+  background: #111827;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+// ── Context strip ─────────────────────────────────────────────────────────────
+
+.st-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background: #0d1117;
+  border-bottom: 1px solid #1e293b;
+}
+
+.st-tool-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: #818cf8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.st-range-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #1e293b;
+  color: #64748b;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  max-width: 380px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Messages ──────────────────────────────────────────────────────────────────
+
+.st-messages {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.st-empty {
+  text-align: center;
+  font-size: 13px;
+  color: #374151;
+  padding: 24px;
+  font-style: italic;
+}
+
+.st-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &--user {
+    align-items: flex-end;
+
+    .st-bubble {
+      background: #1e1b4b;
+      border: 1px solid #312e81;
+      color: #c7d2fe;
+      border-radius: 14px 14px 4px 14px;
+    }
+
+    .st-msg-label { color: #6366f1; }
+  }
+
+  &--ai {
+    align-items: flex-start;
+
+    .st-bubble {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      color: #d1d5db;
+      border-radius: 14px 14px 14px 4px;
+    }
+
+    .st-msg-label { color: #4b5563; }
+  }
+}
+
+.st-msg-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  padding: 0 4px;
+}
+
+.st-bubble {
+  max-width: 90%;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+// ── CTA strip ─────────────────────────────────────────────────────────────────
+
+.st-cta {
+  padding: 16px 20px 20px;
+  border-top: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.st-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: #6366f1;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s;
+
+  &:hover { background: #4f46e5; }
+}
+
+.st-cta-hint {
+  font-size: 12px;
+  color: #374151;
+  margin: 0;
+  text-align: center;
+}
+
+// ── Header additions ─────────────────────────────────────────────────────────
+
+.st-view-content-link {
+  margin-left: auto;
+  font-size: 12px;
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover { color: #818cf8; }
+}
+
+// ── New messages banner ───────────────────────────────────────────────────────
+
+.st-new-banner {
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #818cf8;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s;
+
+  &:hover { background: rgba(99, 102, 241, 0.2); }
+}
+
+// ── Reply section ─────────────────────────────────────────────────────────────
+
+.st-reply-section {
+  border-top: 1px solid #1e293b;
+  padding: 16px 20px 20px;
+}
+
+.st-reply-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.st-reply-input {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-family: inherit;
+  padding: 10px 12px;
+  resize: none;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.15s;
+
+  &::placeholder { color: #374151; }
+  &:focus { border-color: #6366f1; }
+}
+
+.st-reply-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.st-ask-ai-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: #64748b;
+  cursor: pointer;
+  user-select: none;
+
+  input[type='checkbox'] {
+    accent-color: #6366f1;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+  }
+}
+
+.st-reply-btn {
+  background: #6366f1;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) { background: #4f46e5; }
+
+  &:disabled {
+    background: #1e293b;
+    color: #4b5563;
+    cursor: not-allowed;
+  }
+}
+
+.st-reply-error {
+  font-size: 12px;
+  color: #f87171;
+  margin: 0;
+}
+
+.st-guest-cta {
+  text-align: center;
+  padding: 8px 0 4px;
+
+  p {
+    font-size: 13px;
+    color: #4b5563;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.st-login-link {
+  color: #6366f1;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover { color: #818cf8; }
+}
+
+// ── Bottom CTA ────────────────────────────────────────────────────────────────
+
+.st-bottom-cta {
+  display: flex;
+  justify-content: center;
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+
+.st-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #1f2937;
+}

@@ -1,9 +1,12 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SemanticContextService } from '../../services/semantic-context.service';
 import { WorkflowOptimizerService, SuggestionType } from '../../services/workflow-optimizer.service';
 import { CoherenceService, CoherenceLevel } from '../../services/coherence.service';
+import { DScoreService } from '../../services/dscore.service';
+import { NeedsIntelligenceService } from '../../services/needs-intelligence.service';
+import { AuthService } from '../../services/auth.service';
 
 // ── Mode configuration ─────────────────────────────────────────────────────────
 
@@ -178,6 +181,21 @@ const DEFAULT_ACTIONS: QuickAction[] = [
     .sp-health--warn .sp-health-score { color: #f59e0b; }
     .sp-health--crit .sp-health-score { color: #ef4444; }
 
+    /* ── D-score strip ── */
+    .sp-dscore { background:#0a0f1a; border:1px solid #0f172a; padding:0.35rem 0.65rem; display:flex; align-items:center; gap:0.4rem; }
+    .sp-ds-label { font-size:0.52rem; color:#334155; text-transform:uppercase; letter-spacing:0.08em; flex:1; }
+    .sp-ds-value { font-size:0.62rem; font-weight:700; color:#a78bfa; font-variant-numeric:tabular-nums; }
+    .sp-ds-level { font-size:0.5rem; color:#475569; margin-left:0.2rem; }
+
+    /* ── Need strip ── */
+    .sp-need { background:#0a0f1a; border:1px solid #0f172a; border-left:2px solid #64748b; padding:0.35rem 0.55rem; display:flex; align-items:center; gap:0.4rem; }
+    .sp-need--high   { border-left-color:#ef4444; }
+    .sp-need--medium { border-left-color:#f59e0b; }
+    .sp-need--low    { border-left-color:#3b82f6; }
+    .sp-need-icon  { font-size:0.65rem; flex-shrink:0; }
+    .sp-need-title { font-size:0.58rem; color:#94a3b8; flex:1; line-height:1.3; }
+    .sp-need-urgency { font-size:0.48rem; color:#475569; flex-shrink:0; text-transform:uppercase; }
+
     /* ── Coherence strip ── */
     .sp-coh {
       background: #0a0f1a; border: 1px solid #0f172a;
@@ -255,6 +273,27 @@ const DEFAULT_ACTIONS: QuickAction[] = [
         </div>
       }
 
+      <!-- D-score strip — Layer 14 -->
+      @if (dScore.score() !== null) {
+        <div class="sp-dscore">
+          <span class="sp-ds-label">D-Score</span>
+          <span class="sp-ds-value">{{ dScore.score() }}</span>
+          <span class="sp-ds-level">{{ dScore.level() }}</span>
+        </div>
+      }
+
+      <!-- Top need signal — Layer 2 -->
+      @if (needs.topSignal() !== null) {
+        <div class="sp-need"
+             [class.sp-need--high]="needs.topSignal()!.urgency === 'high'"
+             [class.sp-need--medium]="needs.topSignal()!.urgency === 'medium'"
+             [class.sp-need--low]="needs.topSignal()!.urgency === 'low'">
+          <span class="sp-need-icon">{{ needIcon(needs.topSignal()!.urgency) }}</span>
+          <span class="sp-need-title">{{ needs.topSignal()!.title }}</span>
+          <span class="sp-need-urgency">{{ needs.topSignal()!.urgency }}</span>
+        </div>
+      }
+
       <!-- Optimization suggestions -->
       @if (optimizer.suggestions().length > 0) {
         <div class="sp-opts">
@@ -296,6 +335,20 @@ export class SemanticIntelligencePanelComponent {
   readonly ctx       = inject(SemanticContextService);
   readonly optimizer = inject(WorkflowOptimizerService);
   readonly coherence = inject(CoherenceService);
+  readonly dScore    = inject(DScoreService);
+  readonly needs     = inject(NeedsIntelligenceService);
+  private readonly _auth = inject(AuthService);
+
+  constructor() {
+    // Self-populate D-Score and needs signals on every page when authenticated.
+    effect(() => {
+      const user = this._auth.currentUserProfile();
+      if (user?.id) {
+        this.dScore.fetch(user.id);
+        this.needs.assess(user.id);
+      }
+    });
+  }
 
   private readonly activeMode = computed<AssistanceMode>(() =>
     this.ctx.assistanceMode() ?? 'navigator'
@@ -322,6 +375,15 @@ export class SemanticIntelligencePanelComponent {
       case 'high_abandonment': return '⚑';
       case 'slow_run':         return '◉';
       case 'bottleneck_step':  return '⊘';
+    }
+  }
+
+  needIcon(urgency: string): string {
+    switch (urgency) {
+      case 'high':   return '⚡';
+      case 'medium': return '◉';
+      case 'low':    return '◎';
+      default:       return '◎';
     }
   }
 }

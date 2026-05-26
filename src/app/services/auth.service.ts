@@ -1,8 +1,8 @@
-import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, signal, computed, inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, map, tap, interval, Subscription } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Address, GeoLocation } from '../core/models/address.model';
 
@@ -105,6 +105,7 @@ interface ApiLoginResponse {
     status: boolean;
     message: string;
     token: string;
+    refreshToken?: string;
     user: ApiUser;
 }
 
@@ -147,13 +148,14 @@ interface ApiAuthResponse {
 /** Normalised internal shape used by the app */
 export interface AuthResponse {
     token: string;
+    refreshToken?: string;
     user: UserProfile;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
-export class AuthService {
+export class AuthService implements OnDestroy {
 
     private http = inject(HttpClient);
     private router = inject(Router);
@@ -161,6 +163,7 @@ export class AuthService {
     private isBrowser = isPlatformBrowser(this.platformId);
 
     private readonly base = environment.apiUrl;
+    private refreshSubscription?: Subscription;
 
     // ── State ─────────────────────────────────────────────────────────────────
 
@@ -184,6 +187,11 @@ export class AuthService {
         if (this.isBrowser) {
             this._token.set(localStorage.getItem('auth_token'));
             this._currentUser.set(this.loadUserFromStorage());
+            
+            // If already logged in, start the token refresh timer
+            if (this._token() && this.getRefreshToken()) {
+                this.startTokenRefreshTimer();
+            }
         }
     }
 
@@ -249,9 +257,10 @@ export class AuthService {
                 map(res => {
                     const user = res.user;
                     const role = user.selectedRole || (user.partnerType ? 'Partner' : (user.expertTypes && user.expertTypes.length > 0 ? user.expertTypes[0] : 'Student'));
-                    
+
                     return {
                         token: res.token,
+                        refreshToken: res.refreshToken,
                         user: {
                             id: user._id,
                             name: user.name,
@@ -335,22 +344,132 @@ export class AuthService {
             );
     }
 
+    getRefreshToken(): string | null {
+        if (!this.isBrowser) return null;
+        return localStorage.getItem('auth_refresh_token');
+    }
+
+    // ── JWT Token Expiration Handling ──────────────────────────────────────────
+    
+    /**
+     * Decode JWT payload without verification (client-side only)
+     * Returns null if token is invalid or cannot be decoded
+     */
+    private decodeJwt(token: string): any | null {
+        try {
+            const parts = token.split('.');
+            if (parts.length !== 3) return null;
+            
+            const decoded = atob(parts[1]);
+            return JSON.parse(decoded);
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Get token expiration time in seconds from epoch
+     * Returns null if token cannot be decoded or has no exp claim
+     */
+    private getTokenExpiration(token?: string): number | null {
+        const t = token || this.getToken();
+        if (!t) return null;
+        
+        const payload = this.decodeJwt(t);
+        return payload?.exp ?? null;
+    }
+
+    /**
+     * Check if token is expired or will expire within the given buffer (seconds)
+     */
+    isTokenExpired(bufferSeconds = 0): boolean {
+        const expTime = this.getTokenExpiration();
+        if (!expTime) return true;
+        
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        return expTime <= (nowSeconds + bufferSeconds);
+    }
+
+    /**
+     * Start automatic token refresh before expiration
+     * Refreshes 30 seconds before token expires
+     */
+    private startTokenRefreshTimer(): void {
+        // Clean up existing subscription
+        this.stopTokenRefreshTimer();
+
+        const checkInterval = 10000; // Check every 10 seconds
+        const refreshBuffer = 30; // Refresh 30 seconds before expiry
+
+        this.refreshSubscription = interval(checkInterval).subscribe(() => {
+            if (this.isTokenExpired(refreshBuffer)) {
+                const refreshToken = this.getRefreshToken();
+                if (refreshToken) {
+                    this.refreshTokens().subscribe({
+                        next: () => console.log('[Auth] Token refreshed automatically'),
+                        error: (err) => {
+                            console.warn('[Auth] Auto-refresh failed:', err);
+                            // If refresh fails, token is likely invalid
+                            this.logout();
+                        }
+                    });
+                } else {
+                    // No refresh token available
+                    this.logout();
+                }
+            }
+        });
+    }
+
+    /**
+     * Stop automatic token refresh timer
+     */
+    private stopTokenRefreshTimer(): void {
+        if (this.refreshSubscription) {
+            this.refreshSubscription.unsubscribe();
+            this.refreshSubscription = undefined;
+        }
+    }
+
+    ngOnDestroy(): void {
+        this.stopTokenRefreshTimer();
+    }
+
+    refreshTokens(): Observable<{ token: string; refreshToken: string }> {
+        const refreshToken = this.getRefreshToken();
+        return this.http
+            .post<{ status: boolean; accessToken: string; refreshToken: string }>(
+                `${this.base}/api/auth/refresh`,
+                { refreshToken }
+            )
+            .pipe(
+                tap(res => {
+                    this._token.set(res.accessToken);
+                    if (this.isBrowser) {
+                        localStorage.setItem('auth_token', res.accessToken);
+                        localStorage.setItem('auth_refresh_token', res.refreshToken);
+                    }
+                }),
+                map(res => ({ token: res.accessToken, refreshToken: res.refreshToken }))
+            );
+    }
+
     logout() {
+        this.stopTokenRefreshTimer();
         if (this.isBrowser) {
             localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_refresh_token');
             localStorage.removeItem('auth_user');
         }
         this._token.set(null);
         this._currentUser.set(null);
-        
-        // Use navigateByUrl to avoid issues with current route state
         this.router.navigateByUrl('/login');
     }
 
     getToken(): string | null {
         const token = this._token();
         if (token) return token;
-        
+
         if (this.isBrowser) {
             const storedToken = localStorage.getItem('auth_token');
             if (storedToken) {
@@ -367,9 +486,15 @@ export class AuthService {
         if (this.isBrowser) {
             localStorage.setItem('auth_token', res.token);
             localStorage.setItem('auth_user', JSON.stringify(res.user));
+            if (res.refreshToken) {
+                localStorage.setItem('auth_refresh_token', res.refreshToken);
+            }
         }
         this._token.set(res.token);
         this._currentUser.set(res.user);
+        
+        // Start automatic token refresh timer
+        this.startTokenRefreshTimer();
     }
 
     private loadUserFromStorage(): UserProfile | null {

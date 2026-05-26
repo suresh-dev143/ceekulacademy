@@ -62,6 +62,8 @@ export const routes: Routes = [
   // ==================== ADAPTIVE CONTENT ENGINE ====================
   { path: 'learn', redirectTo: 'learn/default', pathMatch: 'full' },
   { path: 'learn/:topicId', loadComponent: () => import('./pages/adaptive-content/adaptive-content').then(m => m.AdaptiveContentComponent) },
+  { path: 'content/share/:token', loadComponent: () => import('./pages/content-view/shared-thread/shared-thread').then(m => m.SharedThreadComponent) },
+  { path: 'content/:baseId', loadComponent: () => import('./pages/content-view/content-view').then(m => m.ContentViewComponent) },
   { path: 'interactive-learning', loadComponent: () => import('./components/orchestration/split-screen-layout.component').then(m => m.SplitScreenLayoutComponent) },
   // ==================== NEURON PARTICIPATION HUB ====================
   { path: 'neurons', loadComponent: () => import('./pages/neuron-hub/neuron-hub').then(m => m.NeuronHubComponent) },
@@ -76,7 +78,7 @@ export const routes: Routes = [
   { path: 'dinner', loadComponent: () => import('./pages/dinner/dinner').then(m => m.DinnerComponent) },
 
 
-  // ==================== PAYMENT RETURN (Cramib redirect-back) ====================
+  // ==================== DISABLED PROVIDER RETURN (simulation-only notice) ====================
   { path: 'payment/return', loadComponent: () => import('./pages/payment-return/payment-return').then(m => m.PaymentReturn) },
 
   // Registration — standalone full-page layout (not wrapped in PersonalLayout)
@@ -112,8 +114,7 @@ export const routes: Routes = [
       { path: 'programs/:programId/:sectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
       { path: 'programs/:programId/:sectionId/:subSectionId', loadComponent: () => import('./pages/program-detail/program-detail').then(m => m.ProgramDetailComponent) },
       {
-        path: 'my-activities',
-        component: MyActivities,
+        path: 'my-activities', component: MyActivities,
       },
       { path: 'set-my-content', loadComponent: () => import('./pages/personal/personal-page/set-my-content/set-my-content').then(m => m.SetMyContent), data: { leftSidebar: 'meta' } },
       { path: 'past-content', loadComponent: () => import('./pages/personal/personal-page/past-content/past-content').then(m => m.PastContent), data: { leftSidebar: 'meta' } },
@@ -127,8 +128,8 @@ export const routes: Routes = [
       // Action Hub — unified create / offer / advertise / explore
       // { path: 'action-hub', loadComponent: () => import('./pages/personal/action-hub/action-hub').then(m => m.ActionHub) },
       // Top navbar routes
-      { path: 'create', component: Create, data: { leftSidebar: 'contextual' } },
-      { path: 'create/:pageId', component: Create, data: { leftSidebar: 'contextual' } },
+      { path: 'create', component: Create, data: { leftSidebar: 'library' } },
+      { path: 'create/:pageId', component: Create, data: { leftSidebar: 'library' } },
       {
         path: 'schedule', loadComponent: () => import('./pages/schedule/schedule').then(m => m.Schedule),
       },
@@ -143,6 +144,7 @@ export const routes: Routes = [
       { path: 'local-news', loadComponent: () => import('./pages/personal/local-news/local-news').then(m => m.LocalNewsPage) },
       { path: 'ai-tools', loadComponent: () => import('./pages/personal/ai-tools/ai-tools').then(m => m.AiToolsPage) },
       { path: 'library', loadComponent: () => import('./pages/personal/library/library').then(m => m.LibraryComponent), data: { leftSidebar: 'contextual' } },
+      { path: 'my-annotations', loadComponent: () => import('./pages/personal/my-annotations/my-annotations').then(m => m.MyAnnotationsComponent), data: { leftSidebar: 'contextual' } },
       { path: 'welfare', loadComponent: () => import('./pages/personal/welfare/welfare').then(m => m.Welfare) },
     ]
   },

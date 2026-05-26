@@ -10,6 +10,7 @@ import { ContextSidebarComponent } from '../../pages/personal/context-sidebar/co
 import { AiToolsPage } from '../../pages/personal/ai-tools/ai-tools';
 import { LocalNewsPage } from '../../pages/personal/local-news/local-news';
 import { MetaIntelligenceComponent } from './meta-intelligence/meta-intelligence';
+import { CreateLibrarySidebarComponent } from '../create-library-sidebar/create-library-sidebar';
 
 @Component({
     selector: 'app-personal-layout',
@@ -25,6 +26,7 @@ import { MetaIntelligenceComponent } from './meta-intelligence/meta-intelligence
       AiToolsPage,
       LocalNewsPage,
       MetaIntelligenceComponent,
+      CreateLibrarySidebarComponent,
     ],
     templateUrl: './personal-layout.html',
     styleUrl: './personal-layout.scss'
@@ -36,14 +38,15 @@ export class PersonalLayout implements OnInit {
 
     readonly ceebrainId = computed(() => this.auth.currentUserProfile()?.ceebrainId ?? '');
 
-    readonly sidebarType = signal<'news' | 'contextual' | 'meta'>('news');
+    readonly sidebarType = signal<'news' | 'contextual' | 'meta' | 'library'>('news');
     readonly leftSidebarOpen = signal(true);
     readonly rightSidebarOpen = signal(true);
     readonly topNavItems = [
         { label: 'HOME', route: '/', exact: true },
         { label: 'PERSONAL', route: '/personal', exact: true },
         { label: 'CREATE', route: '/personal/create' },
-
+        { label: 'LIBRARY', route: '/personal/library' },
+        { label: 'MY NOTES', route: '/personal/my-annotations' },
         { label: 'NEARBY', route: '/personal/local-news' },
         { label: 'AI TOOLS', route: '/personal/ai-tools' },
         { label: 'WORKSPACE', route: '/workspace' },
@@ -66,15 +69,15 @@ export class PersonalLayout implements OnInit {
         mergeMap(route => route.data)
       ).subscribe(data => {
         const type = data['leftSidebar'] || 'news';
-        this.sidebarType.set(type as 'news' | 'contextual');
+        this.sidebarType.set(type as 'news' | 'contextual' | 'meta' | 'library');
       });
-      
+
       // Also check initial route
       let route = this.activatedRoute;
       while (route.firstChild) route = route.firstChild;
       route.data.subscribe(data => {
         const type = data['leftSidebar'] || 'news';
-        this.sidebarType.set(type as 'news' | 'contextual');
+        this.sidebarType.set(type as 'news' | 'contextual' | 'meta' | 'library');
       });
     }
 

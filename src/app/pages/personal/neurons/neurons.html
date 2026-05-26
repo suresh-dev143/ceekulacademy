@@ -5,12 +5,13 @@
     <div class="workspace__header-top">
       <div class="workspace__title-block">
         <h1 class="workspace__title">My Neuron Workspace</h1>
-        <p class="workspace__subtitle">Participation · Contribution · Growth</p>
+        <p class="workspace__subtitle">Simulation · Contribution · Coordination</p>
+        <span class="workspace__sim-tag">⚗️ Experimental Simulation</span>
       </div>
       <div class="workspace__total">
         <span class="workspace__total-label">All Buckets</span>
         <span class="workspace__total-value">{{ totalAcrossBuckets() | number }}</span>
-        <span class="workspace__total-unit">neurons</span>
+        <span class="workspace__total-unit">units</span>
       </div>
     </div>
     <div class="workspace__disclaimer" role="note">
@@ -47,18 +48,41 @@
     }
   </section>
 
+  <!-- ── D-Score Strip ─────────────────────────────────────────────── -->
+  @if (dscoreService.score() !== null) {
+    <div class="dscore-strip">
+      <div class="dscore-strip__left">
+        <span class="dscore-label">D-Score</span>
+        <span class="dscore-value">{{ dscoreService.score() | number:'1.1-1' }}</span>
+        <span class="dscore-level" [attr.data-level]="dscoreService.level()">
+          {{ dscoreService.level() || 'Contributor' }}
+        </span>
+      </div>
+      @if (dscoreService.dimensions()) {
+        <div class="dscore-dims">
+          @for (entry of dscoreDimensions(); track entry.key) {
+            <div class="dscore-dim">
+              <span class="dscore-dim__key">{{ entry.key }}</span>
+              <span class="dscore-dim__val">{{ entry.val | number:'1.0-0' }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
   <!-- Locked pool + support debt indicators -->
   <div class="status-strip">
     @if (neuronService.lockedBalance() > 0) {
       <div class="status-strip__item status-strip__item--locked">
         <span>&#128274;</span>
-        <span>{{ neuronService.lockedBalance() | number }} neurons locked in investments</span>
+        <span>{{ neuronService.lockedBalance() | number }} units locked in coordination pools</span>
       </div>
     }
     @if (neuronService.supportDebt() > 0) {
       <div class="status-strip__item status-strip__item--debt">
         <span>&#9888;</span>
-        <span>Support debt: {{ neuronService.supportDebt() | number }} neurons</span>
+        <span>Support simulation: {{ neuronService.supportDebt() | number }} units</span>
       </div>
     }
     @if (neuronService.contributorGrade()) {
@@ -74,8 +98,8 @@
     @for (tab of [
       { id: 'overview',    label: 'Overview' },
       { id: 'transfer',    label: 'Transfer' },
-      { id: 'invest',      label: 'Invest' },
-      { id: 'send',        label: 'Send Neurons' },
+      { id: 'invest',      label: 'Allocate' },
+      { id: 'send',        label: 'Coordinate Units' },
       { id: 'groups',      label: 'CEEGROUPs' },
       { id: 'history',     label: 'History' },
       { id: 'support',     label: 'Support' }
@@ -117,19 +141,23 @@
             <li><b>Your share (99%)</b> → 33% FUN + 33% CUN + 33% SUN</li>
             <li><b>Ceekul share (1%)</b> → 33% FUN + 33% CUN + 34% SUN</li>
           </ul>
-          <p>Project outcome rewards and work rewards are always credited to <b>My Neurons</b> first.</p>
+          <p>Project outcome units and workflow units are always assigned to <b>My Neurons</b> first.</p>
         </div>
 
-        <h2 class="panel__heading" style="margin-top:2rem">Investment Rules</h2>
+        <h2 class="panel__heading" style="margin-top:2rem">⚗️ Simulation Allocation Rules</h2>
         <div class="rules-grid">
           <div class="rule rule--allowed">FUN → Any project ✅</div>
           <div class="rule rule--allowed">CUN → Research / Innovation / Knowledge ✅</div>
           <div class="rule rule--allowed">SUN → Business / Infrastructure / Social ✅</div>
         </div>
+        <p class="panel__note" style="margin-top:1rem">
+          Allocations lock simulated units into a project pool for architecture validation.
+          No real funds move. Participation instructions are generated for the selected entity.
+        </p>
 
         <h2 class="panel__heading" style="margin-top:2rem">Recent Activity</h2>
         @if (recentHistory().length === 0) {
-          <p class="panel__empty">No transactions yet. Make a contribution to get started.</p>
+          <p class="panel__empty">No ledger activity yet. Simulate a contribution to get started.</p>
         } @else {
           <ul class="tx-list">
             @for (tx of recentHistory(); track tx.txId) {
@@ -177,7 +205,7 @@
           </div>
 
           <div class="form__field">
-            <label class="form__label">Number of Neurons</label>
+            <label class="form__label">Internal Utility Units</label>
             <input type="number" formControlName="amount" class="form__input"
                    placeholder="e.g. 100" min="1" />
           </div>
@@ -190,7 +218,7 @@
           }
 
           <button type="submit" class="form__submit" [disabled]="transferLoading()">
-            {{ transferLoading() ? 'Transferring…' : 'Transfer Neurons' }}
+            {{ transferLoading() ? 'Transferring…' : 'Transfer Units' }}
           </button>
         </form>
       </div>
@@ -199,15 +227,16 @@
     <!-- ─── INVEST ─── -->
     @if (activeTab() === 'invest') {
       <div class="panel-form">
-        <h2 class="panel__heading">Invest in a Project</h2>
+        <h2 class="panel__heading">⚗️ Allocate Simulation Units to Project</h2>
         <p class="panel__note">
-          Neurons are locked from your chosen bucket into the project's participation pool.
-          The portal generates a <b>non-financial instruction</b> for the selected entity.
-          The entity then transfers real money from its escrow account to the project's
-          development escrow — entirely outside this portal.
+          Internal utility units are locked from your chosen bucket into the project's
+          simulation allocation pool. The portal generates a <b>non-financial participation
+          instruction</b> for the selected entity. All fund movements are entirely outside
+          this portal — this is a workflow simulation only.
         </p>
         <p class="panel__compliance">
-          Returns are <b>variable, outcome-based, and non-guaranteed</b>. Not fixed returns, not interest.
+          ⚠️ Participation outcomes are <b>variable, non-guaranteed</b> and simulation-only.
+          No monetary outcome is implied or promised.
         </p>
 
         <form [formGroup]="investForm" (ngSubmit)="onSubmitInvest()" class="form">
@@ -261,7 +290,7 @@
           </div>
 
           <div class="form__field">
-            <label class="form__label">Number of Neurons to Invest</label>
+            <label class="form__label">Simulation Units to Allocate</label>
             <input type="number" formControlName="amount" class="form__input"
                    placeholder="e.g. 500" min="1" />
           </div>
@@ -274,25 +303,25 @@
           }
 
           <button type="submit" class="form__submit" [disabled]="investLoading()">
-            {{ investLoading() ? 'Locking Neurons…' : 'Invest Neurons' }}
+            {{ investLoading() ? 'Allocating…' : '⚗️ Allocate Units' }}
           </button>
         </form>
 
         <!-- Active investments -->
         @if (neuronService.investments().length > 0) {
-          <h3 class="panel__subheading">My Investments</h3>
+          <h3 class="panel__subheading">⚗️ My Simulation Allocations</h3>
           <ul class="record-list">
             @for (inv of neuronService.investments(); track inv._id) {
               <li class="record-item">
                 <div class="record-item__row">
                   <span class="record-item__name">{{ inv.projectName }}</span>
-                  <span class="record-item__amount">{{ inv.amount | number }} neurons</span>
+                  <span class="record-item__amount">{{ inv.amount | number }} units</span>
                 </div>
                 <div class="record-item__row record-item__row--meta">
                   <span class="record-item__type">{{ inv.sourceBucket.toUpperCase() }} → {{ inv.projectType }}</span>
                   <span class="record-item__status" [class]="statusClass(inv.status)">{{ inv.status }}</span>
                   @if (inv.rewardAmount && inv.rewardAmount > 0) {
-                    <span class="record-item__neurons">+{{ inv.rewardAmount | number }} reward</span>
+                    <span class="record-item__neurons">+{{ inv.rewardAmount | number }} outcome units</span>
                   }
                 </div>
               </li>
@@ -333,39 +362,38 @@
     <!-- ─── SUPPORT ─── -->
     @if (activeTab() === 'support') {
       <div class="panel-form">
-        <h2 class="panel__heading">Support (Debt System)</h2>
+        <h2 class="panel__heading">Support Simulation</h2>
         <p class="panel__note">
-          Borrow up to <b>100,000 neurons</b> when your balance is insufficient.
-          Valid for <b>6 months</b>. Must be repaid via work rewards or contributions.
+          Request up to <b>100,000 internal utility units</b> for simulation workflows. Valid for <b>6 months</b> inside the test environment.
         </p>
 
         @if (neuronService.supportDebt() > 0) {
           <div class="support-status">
-            <span class="support-status__label">Current Debt</span>
-            <span class="support-status__value">{{ neuronService.supportDebt() | number }} neurons</span>
+            <span class="support-status__label">Current Support Units</span>
+            <span class="support-status__value">{{ neuronService.supportDebt() | number }} units</span>
           </div>
         }
 
-        <!-- Borrow -->
-        <h3 class="panel__subheading">Borrow Support</h3>
+        <!-- Request support -->
+        <h3 class="panel__subheading">Request Support</h3>
         <form [formGroup]="supportBorrowForm" (ngSubmit)="onBorrowSupport()" class="form form--compact">
           <div class="form__field">
             <label class="form__label">Amount (max 100,000)</label>
             <input type="number" formControlName="amount" class="form__input"
-                   placeholder="Neurons needed" min="1" max="100000" />
+                   placeholder="Units needed" min="1" max="100000" />
           </div>
           <button type="submit" class="form__submit form__submit--secondary" [disabled]="supportLoading()">
-            {{ supportLoading() ? 'Processing…' : 'Borrow Neurons' }}
+            {{ supportLoading() ? 'Processing…' : 'Request Units' }}
           </button>
         </form>
 
-        <!-- Repay -->
+        <!-- Return support -->
         @if (neuronService.supportDebt() > 0) {
-          <h3 class="panel__subheading">Repay Support</h3>
+          <h3 class="panel__subheading">Return Support</h3>
           <form [formGroup]="supportRepayForm" (ngSubmit)="onRepaySupport()" class="form form--compact">
             <div class="form__row">
               <div class="form__field">
-                <label class="form__label">Repay From</label>
+                <label class="form__label">Return From</label>
                 <select formControlName="fromBucket" class="form__input form__select">
                   <option value="fun">FUN — {{ neuronService.funBalance() | number }} available</option>
                   <option value="cun">CUN — {{ neuronService.cunBalance() | number }} available</option>
@@ -375,11 +403,11 @@
               <div class="form__field">
                 <label class="form__label">Amount</label>
                 <input type="number" formControlName="amount" class="form__input"
-                       placeholder="Neurons to repay" min="1" />
+                       placeholder="Units to return" min="1" />
               </div>
             </div>
             <button type="submit" class="form__submit" [disabled]="supportLoading()">
-              {{ supportLoading() ? 'Processing…' : 'Repay Neurons' }}
+              {{ supportLoading() ? 'Processing…' : 'Return Units' }}
             </button>
           </form>
         }
@@ -393,18 +421,15 @@
       </div>
     }
 
-    <!-- ─── SEND NEURONS ─── -->
+    <!-- ─── SERVICE COORDINATION ─── -->
     @if (activeTab() === 'send') {
       <div class="panel-form">
-        <h2 class="panel__heading">Send Neurons for a Service or Product</h2>
+        <h2 class="panel__heading">Record Service Coordination Units</h2>
         <p class="panel__note">
-          Pay another person (<b>CEEBRAIN</b>, 12-digit ID) or a group (<b>CEEGROUP</b>, 15-digit ID)
-          for any service, product, or infrastructure within the portal.
-          Neurons are deducted from your FUN/CUN/SUN and credited to the receiver's
-          <b>My Neurons</b> (individual) or <b>Group Neurons</b> (CEEGROUP).
+          Record internal coordination units for another person (<b>CEEBRAIN</b>, 12-digit ID) or a group (<b>CEEGROUP</b>, 15-digit ID) for service, product, or infrastructure workflows. Units move inside the platform-restricted simulation ledger only.
         </p>
         <p class="panel__compliance">
-          ⚠️ Neurons have no monetary value. This is not a payment — it is a participation record.
+          ⚠️ Neurons have no monetary value. This is an internal participation record inside the simulation ledger.
         </p>
 
         <form [formGroup]="sendForm" (ngSubmit)="onSendNeurons()" class="form">
@@ -436,7 +461,7 @@
               <span class="form__hint">
                 {{ resolvedReceiver()!.type === 'ceebrain' ? '👤' : '👥' }}
                 {{ resolvedReceiver()!.name }}
-                — neurons will land in
+                — units will be recorded in
                 {{ resolvedReceiver()!.type === 'ceebrain' ? 'their My Neurons' : 'Group Neurons' }}
               </span>
             }
@@ -458,16 +483,16 @@
             </div>
             <div class="form__arrow">→</div>
             <div class="form__field">
-              <label class="form__label">Amount (Neurons)</label>
+              <label class="form__label">Amount (Units)</label>
               <input type="number" formControlName="amount" class="form__input"
                      placeholder="e.g. 100" min="1" />
             </div>
           </div>
 
           <div class="form__field">
-            <label class="form__label">Service / Product Description</label>
+            <label class="form__label">Coordination Description</label>
             <input type="text" formControlName="serviceDescription" class="form__input"
-                   placeholder="What is this payment for? e.g. 'Course mentorship session'" />
+                   placeholder="What is this coordination record for? e.g. 'Course mentorship session'" />
           </div>
 
           @if (sendSuccess()) {
@@ -478,7 +503,7 @@
           }
 
           <button type="submit" class="form__submit" [disabled]="sendLoading()">
-            {{ sendLoading() ? 'Sending…' : 'Send Neurons' }}
+            {{ sendLoading() ? 'Recording…' : 'Record Units' }}
           </button>
         </form>
       </div>
@@ -490,8 +515,8 @@
         <!-- Create group -->
         <h2 class="panel__heading">Create a CEEGROUP</h2>
         <p class="panel__note">
-          A CEEGROUP has a unique <b>15-digit ID</b>. Members can deposit neurons into the group's
-          FUN/CUN/SUN buckets. The group can then send service payments and receive neurons
+          A CEEGROUP has a unique <b>15-digit ID</b>. Members can allocate internal units into the group's
+          FUN/CUN/SUN buckets. The group can then record service coordination and receive internal units
           into its <b>Group Neurons</b> bucket.
         </p>
 
@@ -544,9 +569,9 @@
             }
           </ul>
 
-          <!-- Deposit to selected group -->
+          <!-- Allocate to selected group -->
           @if (selectedGroup()) {
-            <h3 class="panel__subheading">Deposit to "{{ selectedGroup()!.name }}"</h3>
+            <h3 class="panel__subheading">Allocate to "{{ selectedGroup()!.name }}"</h3>
             <p class="panel__note">
               Transfer from your personal FUN/CUN/SUN to the group's matching bucket.
             </p>
@@ -564,7 +589,7 @@
                 <div class="form__field">
                   <label class="form__label">Amount</label>
                   <input type="number" formControlName="amount" class="form__input"
-                         placeholder="Neurons to deposit" min="1" />
+                         placeholder="Units to allocate" min="1" />
                 </div>
               </div>
               @if (depositSuccess()) {
@@ -574,7 +599,7 @@
                 <div class="form__error">{{ depositError() }}</div>
               }
               <button type="submit" class="form__submit" [disabled]="depositLoading()">
-                {{ depositLoading() ? 'Depositing…' : 'Deposit to Group' }}
+                {{ depositLoading() ? 'Allocating…' : 'Allocate to Group' }}
               </button>
             </form>
           }

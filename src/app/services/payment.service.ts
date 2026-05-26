@@ -1,69 +1,59 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { NeuronAccount } from '../core/models/neuron.model';
-import { environment } from '../../environments/environment';
+import { Injectable } from '@angular/core';
+import { Observable, throwError } from 'rxjs';
 
 export interface InitiatePaymentPayload {
-  currency?:   string;
-  entityType:  'Trust' | 'Section8' | 'PvtLtd';
-  entityName:  string;
-  amountINR:   number;
-  notes?:      string;
+  entityType: 'Trust' | 'Section8' | 'PvtLtd';
+  entityName: string;
+  simulationUnits: number;
+  notes?: string;
 }
 
 export interface InitiatePaymentResponse {
-  sessionId:  string;
-  amountINR:  number;
-  currency:   string;
+  sessionId: string;
+  simulationUnits: number;
   entityName: string;
   entityType: string;
 }
 
 export interface VerifyPaymentPayload {
-  sessionId:          string;
-  razorpayPaymentId:  string;
-  razorpayOrderId:    string;
-  razorpaySignature:  string;
+  sessionId: string;
+  providerReference?: string;
+  providerReturnParams?: Record<string, string>;
 }
 
 export interface VerifyPaymentResponse {
-  neuronsIssued:    number;
-  account:          NeuronAccount;
+  neuronsIssued: number;
   alreadyProcessed: boolean;
 }
 
 export interface PaymentSessionStatus {
-  sessionId:         string;
-  status:            'pending' | 'completed' | 'failed' | 'expired';
-  amountINR:         number;
-  neuronsIssued:     number;
-  entityName:        string;
-  entityType:        string;
-  completedAt?:      string;
-  failureReason?:    string;
+  sessionId: string;
+  status: 'disabled' | 'simulation_only';
+  simulationUnits: number;
+  neuronsIssued: number;
+  entityName: string;
+  entityType: string;
+  completedAt?: string;
+  failureReason?: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
-  private readonly http    = inject(HttpClient);
-  private readonly apiBase = `${environment.apiUrl}/api/payment`;
+  private readonly disabledMessage = 'Real-economy provider operations are disabled during Experimental Internal Simulation.';
 
-  /** Create a payment session and get the Cramib redirect URL. */
-  initiatePayment(payload: InitiatePaymentPayload): Observable<InitiatePaymentResponse> {
-    return this.http.post<InitiatePaymentResponse>(`${this.apiBase}/initiate`, payload);
+  initiatePayment(_payload: InitiatePaymentPayload): Observable<InitiatePaymentResponse> {
+    return this._disabled<InitiatePaymentResponse>();
   }
 
-  /**
-   * Verify the Razorpay payment returned from Cramib.
-   * Called by the /payment/return page with query params from Cramib's redirect.
-   */
-  verifyPayment(payload: VerifyPaymentPayload): Observable<VerifyPaymentResponse> {
-    return this.http.post<VerifyPaymentResponse>(`${this.apiBase}/verify`, payload);
+  verifyPayment(_payload: VerifyPaymentPayload): Observable<VerifyPaymentResponse> {
+    return this._disabled<VerifyPaymentResponse>();
   }
 
-  /** Poll the status of a session (optional — for status display). */
-  getSession(sessionId: string): Observable<{ session: PaymentSessionStatus }> {
-    return this.http.get<{ session: PaymentSessionStatus }>(`${this.apiBase}/session/${sessionId}`);
+  getSession(_sessionId: string): Observable<{ session: PaymentSessionStatus }> {
+    return this._disabled<{ session: PaymentSessionStatus }>();
+  }
+
+  private _disabled<T>(): Observable<T> {
+    return throwError(() => new Error(this.disabledMessage));
   }
 }

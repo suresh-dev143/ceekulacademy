@@ -1,0 +1,124 @@
+<div class="st-page">
+
+  <!-- ── Loading ────────────────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="st-loading">
+      <div class="st-spinner"></div>
+      <span>Loading shared thread…</span>
+    </div>
+  }
+
+  <!-- ── Error ──────────────────────────────────────────────────────────── -->
+  @if (loadError()) {
+    <div class="st-error-wrap">
+      <div class="st-error-icon">🔒</div>
+      <h2 class="st-error-title">Thread not available</h2>
+      <p class="st-error-body">{{ loadError() }}</p>
+      <a routerLink="/" class="st-home-btn">Go to Ceekul</a>
+    </div>
+  }
+
+  <!-- ── Thread ─────────────────────────────────────────────────────────── -->
+  @if (annotation() && !loading()) {
+    <div class="st-wrap">
+
+      <!-- Brand header -->
+      <header class="st-header">
+        <a routerLink="/" class="st-brand">Ceekul Academy</a>
+        <span class="st-tagline">Shared learning thread</span>
+        <a [routerLink]="contentLink" class="st-view-content-link">View content →</a>
+      </header>
+
+      <!-- New messages banner -->
+      @if (newMessages() > 0) {
+        <div class="st-new-banner" (click)="dismissNew()">
+          {{ newMessages() }} new message{{ newMessages() > 1 ? 's' : '' }} · click to dismiss
+        </div>
+      }
+
+      <!-- Thread card -->
+      <main class="st-card">
+
+        <!-- Tool + context strip -->
+        <div class="st-context">
+          <span class="st-tool-badge">{{ toolIcon }} {{ toolLabel }}</span>
+          <span class="st-range-badge">{{ rangeSummary().icon }} {{ rangeSummary().label }}</span>
+        </div>
+
+        <!-- Messages -->
+        <div class="st-messages">
+          @for (msg of annotation()!.thread; track trackMsg($index, msg)) {
+            <div
+              class="st-msg"
+              [class.st-msg--user]="msg.role === 'user'"
+              [class.st-msg--ai]="msg.role === 'ai'"
+            >
+              <div class="st-msg-label">
+                @if (msg.role === 'ai')   { 🤖 AI }
+                @if (msg.role === 'user') { 👤 Learner }
+              </div>
+              <div class="st-bubble">{{ msg.text }}</div>
+            </div>
+          }
+
+          @if (annotation()!.thread.length === 0) {
+            <div class="st-empty">This thread has no messages yet.</div>
+          }
+        </div>
+
+        <!-- Reply section -->
+        <div class="st-reply-section">
+
+          @if (isLoggedIn()) {
+            <!-- Logged-in: show reply input -->
+            <div class="st-reply-input-wrap">
+              <textarea
+                class="st-reply-input"
+                [(ngModel)]="replyInput"
+                placeholder="Add to this discussion… (Enter to send)"
+                rows="3"
+                (keydown)="onReplyKeydown($event)"
+              ></textarea>
+
+              <div class="st-reply-controls">
+                <label class="st-ask-ai-toggle">
+                  <input type="checkbox" [(ngModel)]="askAiToo" />
+                  <span>Ask AI too</span>
+                </label>
+                <button
+                  class="st-reply-btn"
+                  (click)="submitReply()"
+                  [disabled]="replyLoading() || !replyInput.trim()"
+                >
+                  @if (replyLoading()) { … } @else { Reply }
+                </button>
+              </div>
+
+              @if (replyError()) {
+                <p class="st-reply-error">{{ replyError() }}</p>
+              }
+            </div>
+          } @else {
+            <!-- Guest: CTA to log in -->
+            <div class="st-guest-cta">
+              <p>
+                <a routerLink="/login" class="st-login-link">Log in</a> to join this discussion and use AI tools on the content
+              </p>
+            </div>
+          }
+
+        </div>
+
+      </main>
+
+      <!-- View full content -->
+      <div class="st-bottom-cta">
+        <a [routerLink]="contentLink" class="st-view-btn">📖 View full content</a>
+      </div>
+
+      <footer class="st-footer">Ceekul Academy · AI-assisted learning</footer>
+
+    </div>
+  }
+
+</div>

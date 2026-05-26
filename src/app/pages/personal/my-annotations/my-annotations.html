@@ -1,0 +1,135 @@
+<div class="ma-surface">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="ma-header">
+    <div class="ma-header__text">
+      <h1 class="ma-title">My Annotations</h1>
+      <p class="ma-sub">AI-assisted notes and discussions across your content</p>
+    </div>
+    <div class="ma-filters">
+      <select
+        class="ma-select"
+        [value]="filterVisibility()"
+        (change)="onVisibilityChange($any($event.target).value)"
+      >
+        @for (opt of VISIBILITY_OPTS; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+      <select
+        class="ma-select"
+        [value]="filterTool()"
+        (change)="onToolChange($any($event.target).value)"
+      >
+        @for (opt of TOOL_OPTS; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- ── Body ─────────────────────────────────────────────────────────────── -->
+  <div class="ma-body">
+
+    @if (loading()) {
+      <div class="ma-loading">
+        <div class="ma-spinner"></div>
+        <span>Loading annotations…</span>
+      </div>
+    } @else if (errorMsg()) {
+      <div class="ma-error">{{ errorMsg() }}</div>
+    } @else if (!items().length) {
+      <div class="ma-empty">
+        <span class="ma-empty__icon">💬</span>
+        <p class="ma-empty__heading">No annotations yet</p>
+        <p class="ma-empty__sub">
+          Select text or click a block in any content page to start an AI discussion.
+        </p>
+      </div>
+    } @else {
+      <div class="ma-list">
+        @for (item of items(); track item._id) {
+          <div class="ma-card">
+
+            <!-- Top row: tool badge + visibility + thread count -->
+            <div class="ma-card__top">
+              <span
+                class="ma-tool-badge"
+                [style.background-color]="toolColor(item.tool) + '22'"
+                [style.color]="toolColor(item.tool)"
+              >{{ toolIcon(item.tool) }} {{ toolLabel(item.tool) }}</span>
+
+              <span class="ma-vis-badge" [class]="visibilityClass(item.visibility)">
+                @if (item.visibility === 'private') { 🔒 Private }
+                @else if (item.visibility === 'shared') { 🔗 Shared }
+                @else { 🌐 Public }
+              </span>
+
+              <span class="ma-thread-count">
+                {{ item.threadCount }} msg{{ item.threadCount !== 1 ? 's' : '' }}
+              </span>
+            </div>
+
+            <!-- Content title (clickable) -->
+            <button class="ma-content-title" (click)="openContent(item)">
+              {{ item.contentTitle || '(Untitled content)' }} →
+            </button>
+
+            <!-- Last message preview -->
+            @if (item.lastMessage) {
+              <p class="ma-preview">
+                <span class="ma-preview__role">
+                  {{ item.lastMessage.role === 'ai' ? '🤖' : '🙋' }}
+                </span>
+                {{ msgPreview(item.lastMessage.text) }}
+              </p>
+            }
+
+            <!-- Footer: date + delete -->
+            <div class="ma-card__footer">
+              <span class="ma-date">{{ item.updatedAt | date: 'dd MMM yyyy' }}</span>
+              <button
+                class="ma-delete-btn"
+                (click)="confirmDelete(item)"
+                title="Delete annotation"
+              >🗑 Delete</button>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+  <!-- ── Pagination ────────────────────────────────────────────────────────── -->
+  @if (total() > pageSize) {
+    <div class="ma-pagination">
+      <button class="ma-page-btn" [disabled]="page() === 1" (click)="prevPage()">← Prev</button>
+      <span class="ma-page-info">{{ displayStart }}–{{ displayEnd }} of {{ total() }}</span>
+      <button class="ma-page-btn" [disabled]="page() === totalPages" (click)="nextPage()">Next →</button>
+    </div>
+  }
+
+  <!-- ── Delete confirm modal ──────────────────────────────────────────────── -->
+  @if (deleteTarget()) {
+    <div class="ma-overlay" (click)="cancelDelete()">
+      <div class="ma-modal" (click)="$event.stopPropagation()">
+        <h3 class="ma-modal__title">Delete annotation?</h3>
+        <p class="ma-modal__body">
+          This will permanently delete your
+          <strong>{{ toolLabel(deleteTarget()!.tool) }}</strong> discussion on
+          "<strong>{{ deleteTarget()!.contentTitle || 'this content' }}</strong>".
+          This cannot be undone.
+        </p>
+        <div class="ma-modal__actions">
+          <button class="ma-modal__cancel" (click)="cancelDelete()">Cancel</button>
+          <button class="ma-modal__confirm" [disabled]="deleting()" (click)="executeDelete()">
+            {{ deleting() ? 'Deleting…' : 'Delete' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

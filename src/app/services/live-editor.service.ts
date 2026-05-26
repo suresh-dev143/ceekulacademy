@@ -104,11 +104,15 @@ export class LiveEditorService implements OnDestroy {
     this.socket = io(`${environment.apiUrl}/editor`, {
       path:  '/socket.io',
       query: { lectureId, userId, userName, role },
-      transports: ['websocket', 'polling']
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
     });
 
     this.socket.on('connect',              ()    => this.connected$.next(true));
     this.socket.on('disconnect',           ()    => this.connected$.next(false));
+    this.socket.on('connect_error',        (e: any) => console.warn('[LiveEditor] Socket error:', e?.message));
     this.socket.on('editor:participants',  (p)   => this.participants$.next(p));
     this.socket.on('editor:op',            (op)  => this.op$.next(op));
     this.socket.on('editor:cursor',        (c)   => this.cursor$.next(c));

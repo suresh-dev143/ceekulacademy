@@ -1,10 +1,10 @@
 /**
  * NeuronService — Angular frontend service for the Ceekul neuron ecosystem.
  *
- * LEGAL NOTE: Neurons are NON-MONETARY, NON-WITHDRAWABLE participation units.
- * This service never processes payments or stores financial data.
- * All real-money flows occur outside the portal between user bank accounts
- * and external entity escrow accounts.
+ * LEGAL NOTE: Neurons are platform-restricted Internal Utility Units for simulation.
+ * This service never executes real-economy provider operations.
+ * Current contribution flows use internal simulation endpoints only.
+
  */
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -26,7 +26,7 @@ export interface SubmitContributionPayload {
   entityType: 'Trust' | 'Section8' | 'PvtLtd';
   entityName: string;
   entityId?: string;
-  amountINR: number;
+  simulationUnits: number;
   transactionReference: string;
   notes?: string;
 }
@@ -84,12 +84,12 @@ export class NeuronService {
   /** Returns transfer target options for a given source bucket */
   readonly transferTargets = (from: NeuronBucket) => TRANSFER_TARGETS[from] ?? [];
 
-  /** Locked investments still in progress */
+  /** Locked simulation allocations still in progress */
   readonly lockedInvestments = computed(() =>
     this._investments().filter(i => i.status === 'locked')
   );
 
-  /** Pending contributions awaiting admin confirmation */
+  /** Simulation contributions awaiting confirmation */
   readonly pendingContributions = computed(() =>
     this._contributions().filter(c => c.status === 'pending')
   );
@@ -159,13 +159,14 @@ export class NeuronService {
 
   // ── Mutations (return Observables so callers can react to result) ─────
 
-  /** Submit proof of external contribution. Neurons credited after admin confirms. */
-  submitContribution(payload: SubmitContributionPayload): Observable<{ contribution: NeuronContribution }> {
-    return this.http.post<{ status: boolean; contribution: NeuronContribution }>(
-      `${this.apiBase}/contributions`, payload
+  /** Submit an internal simulation contribution. */
+  submitContribution(payload: SubmitContributionPayload): Observable<{ status: boolean; data?: { contribution?: NeuronContribution; neuronsIssued?: number } }> {
+    return this.http.post<{ status: boolean; data?: { contribution?: NeuronContribution; neuronsIssued?: number } }>(
+      `${environment.apiUrl}/api/simulation/contribute`, payload
     ).pipe(
       tap(res => {
-        this._contributions.update(list => [res.contribution, ...list]);
+        const contribution = res.data?.contribution;
+        if (contribution) this._contributions.update(list => [contribution, ...list]);
       })
     );
   }
@@ -186,7 +187,7 @@ export class NeuronService {
     );
   }
 
-  /** Lock neurons into a project investment. */
+  /** Reserve units into a project coordination allocation. */
   invest(payload: InvestPayload): Observable<{ account: NeuronAccount; investment: NeuronInvestment }> {
     return this.http.post<{ status: boolean; account: NeuronAccount; investment: NeuronInvestment }>(
       `${this.apiBase}/invest`, payload
@@ -198,14 +199,14 @@ export class NeuronService {
     );
   }
 
-  /** Borrow support neurons (max 100k, 6-month validity) */
+  /** Request support units (max 100k, 6-month validity) */
   borrowSupport(amount: number): Observable<{ account: NeuronAccount }> {
     return this.http.post<{ status: boolean; account: NeuronAccount }>(
       `${this.apiBase}/support/borrow`, { amount }
     ).pipe(tap(res => { if (res.account) this._account.set(res.account); }));
   }
 
-  /** Repay support debt from a bucket */
+  /** Return support units from a bucket */
   repaySupport(amount: number, fromBucket: NeuronBucket = 'fun'): Observable<{ account: NeuronAccount }> {
     return this.http.post<{ status: boolean; account: NeuronAccount }>(
       `${this.apiBase}/support/repay`, { amount, fromBucket }

@@ -12,6 +12,8 @@ export const serverRoutes: ServerRoute[] = [
   // CG Page — parameterised, render on-demand (CG IDs are not known at build time)
   { path: 'cg/:cgId', renderMode: RenderMode.Server },
   // Auth-gated personal routes — skip SSR (require live API + auth token)
+  { path: 'personal/library',                             renderMode: RenderMode.Client },
+  { path: 'personal/my-annotations',                      renderMode: RenderMode.Client },
   { path: 'personal/schedule',                             renderMode: RenderMode.Client },
   { path: 'personal/enrol',                               renderMode: RenderMode.Client },
   { path: 'personal/welfare',                             renderMode: RenderMode.Client },
@@ -21,6 +23,8 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'lectures/:lectureId/edit',                      renderMode: RenderMode.Client },
   { path: 'lectures/:lectureId/chat',                      renderMode: RenderMode.Client },
   { path: 'learn/:topicId',                                renderMode: RenderMode.Client },
+  { path: 'content/share/:token',                         renderMode: RenderMode.Client },
+  { path: 'content/:baseId',                              renderMode: RenderMode.Client },
   { path: 'dashboard/digital-twin',                        renderMode: RenderMode.Client },
   { path: 'dashboard/innovation',                          renderMode: RenderMode.Client },
   {

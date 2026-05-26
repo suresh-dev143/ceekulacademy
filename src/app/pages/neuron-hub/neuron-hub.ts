@@ -16,9 +16,9 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
 /**
  * NeuronHubComponent — /neurons
  * Platform-level overview AND management hub for the Ceekul neuron ecosystem.
- * Tabs: Overview · Transfer · Contribute · Invest · Ledger · Guide
+ * Tabs: Overview · Transfer · Contribute · Allocate · Ledger · Guide
  *
- * LEGAL NOTE: Neurons are non-monetary, non-withdrawable participation units.
+ * LEGAL NOTE: Neurons are platform-restricted internal utility units.
  */
 @Component({
   selector: 'app-neuron-hub',
@@ -63,13 +63,13 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
             } @else {
               <span class="stat-card__value">{{ neuronService.sunBalance() | number }}</span>
             }
-            <span class="stat-card__unit">neurons</span>
+            <span class="stat-card__unit">units</span>
           </div>
         }
         <div class="stat-card stat-card--locked">
           <span class="stat-card__label">Locked</span>
           <span class="stat-card__value">{{ neuronService.lockedBalance() | number }}</span>
-          <span class="stat-card__unit">in investments</span>
+          <span class="stat-card__unit">in allocations</span>
         </div>
       </section>
 
@@ -141,12 +141,12 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
                 <h3 class="hub__section-title">Quick Actions</h3>
                 <p class="hub__pools-note">
                   Use the tabs above to transfer neurons between buckets, submit
-                  external contributions, or invest in projects.
+                  simulation contributions, or allocate units to projects.
                 </p>
                 <div class="hub__quick-actions">
-                  <button class="hub__quick-btn" (click)="activeTab.set('transfer')">Transfer Neurons</button>
-                  <button class="hub__quick-btn" (click)="activeTab.set('contribute')">Submit Contribution</button>
-                  <button class="hub__quick-btn" (click)="activeTab.set('invest')">Invest in Project</button>
+                  <button class="hub__quick-btn" (click)="activeTab.set('transfer')">Transfer Units</button>
+                  <button class="hub__quick-btn" (click)="activeTab.set('contribute')">Simulate Contribution</button>
+                  <button class="hub__quick-btn" (click)="activeTab.set('invest')">Allocate to Project</button>
                 </div>
                 <a routerLink="/personal/neurons" class="hub__cta">
                   Full Workspace →
@@ -154,8 +154,8 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
 
                 @if (neuronService.supportDebt() > 0) {
                   <div class="hub__debt-warning">
-                    ⚠️ Support debt: {{ neuronService.supportDebt() | number }} neurons.
-                    Repay via the full workspace.
+                    ⚠️ Support simulation: {{ neuronService.supportDebt() | number }} neurons.
+                    Return units via the full workspace.
                   </div>
                 }
               </section>
@@ -259,11 +259,11 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
             <div class="hub__two-col">
 
               <section>
-                <h3 class="hub__section-title">Submit Contribution</h3>
+                <h3 class="hub__section-title">Simulate Contribution</h3>
                 <p class="hub__pools-note">
-                  Transfer money to a registered entity's escrow account <em>outside this portal</em>,
-                  then submit the transaction reference. Once admin confirms:
-                  <strong>1 INR = 1 Neuron</strong> credited to your FUN bucket.
+                  Create an internal simulation entry for a participating entity,
+                  then submit a traceable simulation reference.
+                  Internal Utility Units are credited to your FUN bucket.
                 </p>
 
                 <form [formGroup]="contributeForm" (ngSubmit)="onContribute()" class="hub__form">
@@ -283,15 +283,15 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
                   </div>
 
                   <div class="hub__form-group">
-                    <label class="hub__form-label">Amount (INR)</label>
-                    <input class="hub__form-input" type="number" formControlName="amountINR"
-                           placeholder="e.g. 5000" min="1">
+                    <label class="hub__form-label">Simulation Units</label>
+                    <input class="hub__form-input" type="number" formControlName="simulationUnits"
+                           placeholder="e.g. 500" min="1">
                   </div>
 
                   <div class="hub__form-group">
-                    <label class="hub__form-label">Transaction Reference</label>
+                    <label class="hub__form-label">Simulation Reference</label>
                     <input class="hub__form-input" formControlName="transactionReference"
-                           placeholder="UPI / NEFT / RTGS reference number">
+                           placeholder="Simulation reference ID">
                   </div>
 
                   <div class="hub__form-group">
@@ -309,7 +309,7 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
 
                   <button class="hub__form-btn" type="submit"
                           [disabled]="contributeForm.invalid || contributeLoading()">
-                    {{ contributeLoading() ? 'Submitting…' : 'Submit Contribution' }}
+                    {{ contributeLoading() ? 'Recording…' : 'Simulate Contribution' }}
                   </button>
                 </form>
               </section>
@@ -319,30 +319,30 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
                 <div class="hub__info-steps">
                   <div class="hub__info-step">
                     <span class="hub__info-num">1</span>
-                    <p>Transfer money from your bank to the entity's escrow account <em>outside this portal</em>.</p>
+                    <p>Create an internal simulation record for the participating entity.</p>
                   </div>
                   <div class="hub__info-step">
                     <span class="hub__info-num">2</span>
-                    <p>Note the UPI / NEFT / RTGS transaction reference number.</p>
+                    <p>Add a simulation reference so the ledger entry is traceable.</p>
                   </div>
                   <div class="hub__info-step">
                     <span class="hub__info-num">3</span>
-                    <p>Submit the form here. Admin verifies and confirms within 1–2 business days.</p>
+                    <p>Submit the form here. The simulation ledger records the test flow.</p>
                   </div>
                   <div class="hub__info-step">
                     <span class="hub__info-num">4</span>
-                    <p>On confirmation: <strong>1 INR = 1 Neuron</strong> is credited to your <strong>FUN</strong> bucket.</p>
+                    <p>Internal Utility Units are credited to your <strong>FUN</strong> bucket.</p>
                   </div>
                 </div>
                 <div class="hub__compliance-note">
-                  Real money never enters this portal. All external transfers go directly
-                  between your bank and the entity's registered escrow account.
-                  Ceekul is not a bank, wallet, or financial intermediary.
+                  This is an internal, platform-restricted test flow.
+                  No external provider operation is active in this hub.
+                  Only simulation ledger and lineage events are recorded.
                 </div>
 
                 @if (neuronService.pendingContributions().length > 0) {
                   <div class="hub__pending-note">
-                    {{ neuronService.pendingContributions().length }} contribution(s) pending admin confirmation.
+                    {{ neuronService.pendingContributions().length }} contribution(s) pending simulation confirmation.
                   </div>
                 }
               </section>
@@ -356,10 +356,10 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
             <div class="hub__two-col">
 
               <section>
-                <h3 class="hub__section-title">Invest in a Project</h3>
+                <h3 class="hub__section-title">Allocate to a Project</h3>
                 <p class="hub__pools-note">
-                  Lock neurons into a project participation pool. Neurons are non-withdrawable
-                  once invested. Outcome rewards (non-guaranteed) are credited to My Neurons.
+                  Reserve internal units into a project participation pool. Units remain platform-restricted
+                  once allocated. Outcome units, when generated by tests, are credited to My Neurons.
                 </p>
 
                 <form [formGroup]="investForm" (ngSubmit)="onInvest()" class="hub__form">
@@ -412,9 +412,9 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
                   </div>
 
                   <div class="hub__form-group">
-                    <label class="hub__form-label">Amount to Lock</label>
+                    <label class="hub__form-label">Simulation Units to Allocate</label>
                     <input class="hub__form-input" type="number" formControlName="amount"
-                           placeholder="Neurons to invest" min="1">
+                           placeholder="Units to allocate" min="1">
                   </div>
 
                   @if (investSuccess()) {
@@ -426,7 +426,7 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
 
                   <button class="hub__form-btn" type="submit"
                           [disabled]="investForm.invalid || investLoading()">
-                    {{ investLoading() ? 'Locking…' : 'Lock Investment' }}
+                    {{ investLoading() ? 'Allocating…' : 'Allocate Units' }}
                   </button>
                 </form>
               </section>
@@ -449,15 +449,15 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
                 </div>
 
                 <div class="hub__compliance-note">
-                  Neurons locked in investments are non-withdrawable.
-                  Project rewards (if any) go to My Neurons — not guaranteed and not fixed interest.
-                  Real-money movement between escrow accounts is handled by external entities only.
+                  Units reserved in allocations remain simulation-only.
+                  Project outcome units, if any, go to My Neurons and remain simulation-only.
+                  No external provider or regulated execution flow is active here.
                 </div>
 
                 @if (neuronService.lockedBalance() > 0) {
                   <div class="hub__locked-info">
                     <span>&#128274;</span>
-                    <span>{{ neuronService.lockedBalance() | number }} neurons currently locked</span>
+                    <span>{{ neuronService.lockedBalance() | number }} units currently reserved</span>
                   </div>
                 }
               </section>
@@ -508,8 +508,8 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
               <div class="guide-step">
                 <span class="guide-step__num">2</span>
                 <div>
-                  <b>Contribute (External Money → FUN)</b>
-                  <p>Transfer money from your bank account to a registered entity's escrow account <em>outside this portal</em>. Submit the transaction reference here. Once confirmed: <strong>1 INR = 1 Neuron</strong>, credited to your FUN bucket.</p>
+                  <b>Simulate Contribution -> FUN</b>
+                  <p>Create an internal simulation entry for a participating entity. The ledger records the reference and credits Internal Utility Units to your FUN bucket.</p>
                 </div>
               </div>
               <div class="guide-step">
@@ -522,22 +522,22 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
               <div class="guide-step">
                 <span class="guide-step__num">4</span>
                 <div>
-                  <b>Invest in Projects</b>
-                  <p>FUN = any project. CUN = research/innovation/knowledge only. SUN = business/infrastructure/social only. Neurons are locked into the project's participation pool.</p>
+                  <b>Allocate to Projects</b>
+                  <p>FUN = any project. CUN = research/innovation/knowledge only. SUN = business/infrastructure/social only. Units are reserved in the project participation pool.</p>
                 </div>
               </div>
               <div class="guide-step">
                 <span class="guide-step__num">5</span>
                 <div>
-                  <b>Earn via Work &amp; Tasks</b>
+                  <b>Receive Units via Work &amp; Tasks</b>
                   <p>Completing work, tasks, and other platform activities credits <strong>My Neurons</strong> — not FUN/CUN/SUN.</p>
                 </div>
               </div>
               <div class="guide-step">
                 <span class="guide-step__num">6</span>
                 <div>
-                  <b>Project Rewards → My Neurons</b>
-                  <p>After project evaluation, variable outcome-based rewards are credited to <strong>My Neurons only</strong>. NOT guaranteed. NOT fixed return. NOT interest.</p>
+                  <b>Project Outcome Units -> My Neurons</b>
+                  <p>After project evaluation, variable outcome units may be credited to <strong>My Neurons only</strong>. No monetary outcome is implied or promised.</p>
                 </div>
               </div>
               <div class="guide-step">
@@ -557,9 +557,9 @@ type HubTab = 'overview' | 'transfer' | 'contribute' | 'invest' | 'history' | 'g
             </div>
 
             <div class="guide-compliance">
-              <strong>Ceekul is NOT:</strong> a bank &nbsp;·&nbsp; a wallet &nbsp;·&nbsp; a currency &nbsp;·&nbsp; an investment platform.<br/>
-              Neurons cannot be withdrawn, sold, or exchanged for real money.
-              All real-money flows occur exclusively between external registered entities.
+              <strong>Ceekul is currently:</strong> an Experimental Internal Simulation environment for workflow testing.<br/>
+              Internal units cannot be used outside the Ceekul testing environment.
+              Real-economy provider operations are inactive.
             </div>
           </div>
         }
@@ -581,7 +581,7 @@ export class NeuronHubComponent implements OnInit {
     { id: 'overview',   label: 'Overview' },
     { id: 'transfer',   label: 'Transfer' },
     { id: 'contribute', label: 'Contribute' },
-    { id: 'invest',     label: 'Invest' },
+    { id: 'invest',     label: 'Allocate' },
     { id: 'history',    label: 'Ledger' },
     { id: 'guide',      label: 'Guide' },
   ];
@@ -625,7 +625,7 @@ export class NeuronHubComponent implements OnInit {
     this.contributeForm = this.fb.group({
       entityType:           ['Trust', Validators.required],
       entityName:           ['', Validators.required],
-      amountINR:            [null, [Validators.required, Validators.min(1)]],
+      simulationUnits:      [null, [Validators.required, Validators.min(1)]],
       transactionReference: ['', Validators.required],
       notes:                [''],
     });
@@ -680,7 +680,7 @@ export class NeuronHubComponent implements OnInit {
     this.neuronService.submitContribution(this.contributeForm.value).subscribe({
       next: () => {
         this.contributeSuccess.set(
-          'Contribution submitted. Neurons will be credited after admin confirmation.'
+          'Simulation contribution recorded. Internal Utility Units are available for workflow testing.'
         );
         this.contributeForm.reset({ entityType: 'Trust' });
         this.contributeLoading.set(false);
@@ -708,13 +708,13 @@ export class NeuronHubComponent implements OnInit {
       amount:       v.amount,
     }).subscribe({
       next: () => {
-        this.investSuccess.set('Investment locked successfully.');
+        this.investSuccess.set('Simulation allocation recorded successfully.');
         this.investForm.reset({ entityType: 'Trust', sourceBucket: 'fun', projectType: 'any' });
         this.selectedBucket.set('fun');
         this.investLoading.set(false);
       },
       error: (err: { error?: { message?: string } }) => {
-        this.investError.set(err?.error?.message ?? 'Investment failed. Please try again.');
+        this.investError.set(err?.error?.message ?? 'Allocation failed. Please try again.');
         this.investLoading.set(false);
       },
     });

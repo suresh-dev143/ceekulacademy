@@ -1,16 +1,8 @@
 <app-toast></app-toast>
-<div class="ceekul-create-surface">
+<div class="ceekul-create-surface" (click)="dismissInsertPicker()">
 
   <!-- ══ HORIZONTAL AI TOOLBAR ═══════════════════════════════════════════════ -->
   <div class="ai-topbar">
-    <div class="ai-topbar__tools">
-      <button class="ai-topbar__btn" [class.ai-topbar__btn--active]="rightPanel() === 'conceive'"
-        (click)="toggleRightPanel('conceive')">Conceive</button>
-      <button class="ai-topbar__btn" [class.ai-topbar__btn--active]="rightPanel() === 'ideas'"
-        (click)="toggleRightPanel('ideas')">Ideas</button>
-      <button class="ai-topbar__btn" [class.ai-topbar__btn--active]="rightPanel() === 'update'"
-        (click)="toggleRightPanel('update')">Update</button>
-    </div>
     <div class="ai-topbar__spacer"></div>
     @if (syncStatus() === 'saving') {
     <span class="ai-topbar__sync">saving…</span>
@@ -20,10 +12,10 @@
   </div>
 
   <!-- ══ HORIZONTAL BLOCK PALETTE ════════════════════════════════════════════ -->
-  <div class="block-palette-bar">
+  <div class="block-palette-bar" (click)="$event.stopPropagation()">
     <span class="bp-label">Blocks</span>
     @for (bt of BLOCK_TYPES; track bt.type) {
-    <button class="bp-btn" (click)="addBlock(bt.type)" [title]="bt.desc">
+    <button class="bp-btn" (click)="addBlock(bt.type, insertTargetId())" [title]="bt.desc">
       <span class="bp-icon">{{ bt.icon }}</span>
       <span>{{ bt.label }}</span>
     </button>
@@ -34,100 +26,60 @@
       <span>Upload</span>
     </button>
     <div class="bp-sep"></div>
-    <button class="bp-btn bp-btn--save" (click)="save()" title="Save draft">
+    <button class="bp-btn bp-btn--save" (click)="saveDraft()" title="Save private draft (Layer 2)"
+      [disabled]="serverSyncState() === 'saving'">
       <span class="bp-icon">◎</span>
-      <span>Save</span>
+      <span>{{ serverSyncState() === 'saving' ? 'Saving…' : 'Save Draft' }}</span>
     </button>
+    <button class="bp-btn bp-btn--publish" (click)="publishContent()" title="Publish through AI filter (Layer 3)"
+      [disabled]="serverSyncState() === 'saving' || !baseId() || contentState() === 'published'">
+      <span class="bp-icon">⬡</span>
+      <span>Publish</span>
+    </button>
+    <button class="bp-btn bp-btn--update" (click)="republishContent()" title="Create new version (semantic lineage)"
+      [disabled]="serverSyncState() === 'saving' || contentState() !== 'published'">
+      <span class="bp-icon">⟳</span>
+      <span>{{ serverSyncState() === 'saving' && contentState() === 'published' ? 'Updating…' : 'Update' }}</span>
+    </button>
+    @if (hybridId()) {
+    <div class="bp-sep"></div>
+    <div class="bp-ucrs-chip">
+      <span class="bp-ucrs-ico">◈</span>
+      <code class="bp-ucrs-val" [title]="hybridId()">{{ hybridId() }}</code>
+      <button class="bp-ucrs-copy" (click)="copyUcrsLink()">{{ ucrsLinkCopied() ? '✓' : 'Copy' }}</button>
+      <button class="bp-ucrs-campaign" (click)="navigateToCampaign()">→ Campaign</button>
+    </div>
+    }
     @if (syncStatus() === 'saving') {
     <span class="bp-sync">saving…</span>
     } @else if (syncStatus() === 'error') {
     <span class="bp-sync bp-sync--err">save failed</span>
     }
+    @if (insertTargetId()) {
+    <span class="bp-insert-hint">↳ inserting after block</span>
+    }
   </div>
 
-  <!-- ── Expanded AI Panel (drops below palette) ── -->
-  @if (rightPanel()) {
-  <div class="ai-panel-expanded">
 
-    @if (rightPanel() === 'conceive') {
-    <div class="aip-h-row">
-      <p class="aip-hint aip-h-desc">Start with a core concept. AI drafts the atomic architecture.</p>
-      <textarea class="aip-h-textarea" placeholder="Describe the core concept (e.g. Photosynthesis for age 12)…"></textarea>
-      <button class="aip-btn">Draft Architecture</button>
+  <!-- ══ RECOVERY BANNER ═════════════════════════════════════════════════════ -->
+  @if (showRecoveryBanner()) {
+  <div class="recovery-banner">
+    <span class="recovery-banner__ico">◷</span>
+    <div class="recovery-banner__body">
+      <strong>Unfinished session found</strong>
+      <span class="recovery-banner__detail">
+        "{{ recoveredSnapshot()?.title || 'Untitled' }}" — last saved
+        {{ recoveredSnapshot()?.snapshotAt ? (recoveredSnapshot()!.snapshotAt | date:'short') : 'recently' }}
+      </span>
     </div>
-    }
-
-    @if (rightPanel() === 'ideas') {
-    <div class="aip-h-row">
-      @if (ideasLoading()) {
-      <div class="aip-loading">
-        <div class="eval-spinner"></div>
-        <p class="aip-loading-text">Fetching from Ceekul Web…</p>
-      </div>
-      } @else if (ideasText()) {
-      <div class="aip-ideas-text aip-ideas-text--h">{{ ideasText() }}</div>
-      } @else {
-      <p class="aip-empty">Add a content title to load research ideas.</p>
-      }
-      @if (title() && !ideasLoading()) {
-      <button class="aip-btn aip-btn--sm" style="align-self:flex-start" (click)="fetchIdeas()">Refresh</button>
-      }
-    </div>
-    }
-
-    @if (rightPanel() === 'update') {
-    <div class="aip-h-row aip-h-row--update">
-      <div class="aip-tabs aip-tabs--h">
-        <button class="aip-tab" [class.active]="updateTab() === 'creator'"
-          (click)="updateTab.set('creator')">Creator</button>
-        <button class="aip-tab" [class.active]="updateTab() === 'ai'"
-          (click)="updateTab.set('ai')">AI Research</button>
-      </div>
-      @if (updateTab() === 'creator') {
-      <div class="aip-h-update">
-        <div class="aip-h-field">
-          <label class="aip-label">Phrase to find</label>
-          <input class="aip-input" [value]="updateSegmentId()"
-            (input)="updateSegmentId.set($any($event.target).value)" placeholder="Exact phrase from content…" />
-        </div>
-        <div class="aip-h-field">
-          <label class="aip-label">Your update</label>
-          <input class="aip-input" [value]="updateContent()"
-            (input)="updateContent.set($any($event.target).value)" placeholder="Replacement text…" />
-        </div>
-        <button class="aip-btn" [disabled]="!updateSegmentId() || !updateContent()"
-          (click)="applyCreatorUpdate()">Apply</button>
-      </div>
-      }
-      @if (updateTab() === 'ai') {
-      <div class="aip-h-update">
-        @if (aiUpdateLoading()) {
-        <div class="aip-loading">
-          <div class="eval-spinner"></div>
-          <p class="aip-loading-text">Scanning Ceekul Web…</p>
-        </div>
-        } @else if (aiUpdateResult()) {
-        <div class="aip-result aip-result--h">{{ aiUpdateResult() }}</div>
-        } @else {
-        <p class="aip-hint" style="align-self:center">AI scans Ceekul Web and annotates your content with
-          research-backed updates.</p>
-        }
-        <button class="aip-btn" style="align-self:flex-end" [disabled]="aiUpdateLoading() || !title()"
-          (click)="fetchAiUpdate()">
-          {{ aiUpdateResult() ? 'Refresh' : 'Fetch from Web' }}
-        </button>
-      </div>
-      }
-    </div>
-    }
-
+    <button class="recovery-banner__restore" (click)="restoreRecoveredDraft()">Restore</button>
+    <button class="recovery-banner__dismiss" (click)="dismissRecoveredDraft()">Discard</button>
   </div>
   }
 
   <!-- ══ DOCUMENT CANVAS ══════════════════════════════════════════════════════ -->
   <div class="create-layout">
 
-    <!-- ── Document Canvas ──────────────────────────────────────────────────── -->
     <main class="create-canvas" [style.--accent]="categoryAccentColor()">
       <div class="canvas-inner">
 
@@ -138,128 +90,355 @@
           (blur)="onIdentityChange()" placeholder="Section Title..." />
         <input class="doc-meta" [value]="contentTitle()" (input)="contentTitle.set($any($event.target).value)"
           (blur)="onIdentityChange()" placeholder="Content Title..." />
+        <input class="doc-targeted-use" [value]="domain()" (input)="domain.set($any($event.target).value); onFieldChange()"
+          placeholder="Targeted Use (e.g. workshop, film, advertisement, poetry, lecture)..." />
 
-        <!-- Blocks — chapter style -->
+        <!-- Start Creating CTA -->
+        @if (!blocks().length) {
+        <div class="start-creating">
+          <button class="start-creating__btn" (click)="addBlock('text', null)">
+            <span class="start-creating__icon">✍</span>
+            <span class="start-creating__label">Start Creating</span>
+          </button>
+        </div>
+        }
+
+        <!-- Blocks -->
         @for (block of blocks(); track block.id; let idx = $index) {
-        <article class="content-block">
 
-          <!-- Floating controls — appear on hover -->
-          <div class="block-controls">
-            <button class="block-ctrl-btn" (click)="moveBlock(block.id, 'up')" [disabled]="idx === 0"
-              title="Move Up">↑</button>
-            <div class="block-drag-handle">⠿</div>
-            <button class="block-ctrl-btn" (click)="moveBlock(block.id, 'down')"
-              [disabled]="idx === blocks().length - 1" title="Move Down">↓</button>
-            <button class="block-ctrl-btn delete" (click)="removeBlock(block.id)" title="Remove">✕</button>
+          <article class="content-block" [ngStyle]="blockStyleToCSS(block.id)">
+
+            <!-- Floating controls -->
+            <div class="block-controls" (click)="$event.stopPropagation()">
+              <button class="block-ctrl-btn" (click)="moveBlock(block.id, 'up')" [disabled]="idx === 0"
+                title="Move Up">↑</button>
+              <div class="block-drag-handle">⠿</div>
+              <button class="block-ctrl-btn" (click)="moveBlock(block.id, 'down')"
+                [disabled]="idx === blocks().length - 1" title="Move Down">↓</button>
+              <button class="block-ctrl-btn style" [class.active]="styleEditorBlockId() === block.id"
+                (click)="toggleStyleEditor(block.id)" title="Style">✦</button>
+              <button class="block-ctrl-btn delete" (click)="removeBlock(block.id)" title="Remove">✕</button>
+            </div>
+
+            <!-- Inline style editor -->
+            @if (styleEditorBlockId() === block.id) {
+            <div class="block-style-editor" (click)="$event.stopPropagation()">
+              <div class="bse-row">
+                <span class="bse-label">Background</span>
+                <input class="bse-color" type="color"
+                  [value]="getBlockStyle(block.id).bg || '#0d1117'"
+                  (input)="setBlockStyle(block.id, {bg: $any($event.target).value})" />
+                <input class="bse-text" type="text"
+                  [value]="getBlockStyle(block.id).bg || ''"
+                  (input)="setBlockStyle(block.id, {bg: $any($event.target).value})"
+                  placeholder="e.g. rgba(99,102,241,0.08)" />
+              </div>
+              <div class="bse-row">
+                <span class="bse-label">Padding</span>
+                <input class="bse-text bse-text--wide" type="text"
+                  [value]="getBlockStyle(block.id).padding || ''"
+                  (input)="setBlockStyle(block.id, {padding: $any($event.target).value})"
+                  placeholder="e.g. 16px 24px" />
+              </div>
+              <div class="bse-row">
+                <span class="bse-label">Radius</span>
+                <input class="bse-text bse-text--wide" type="text"
+                  [value]="getBlockStyle(block.id).borderRadius || ''"
+                  (input)="setBlockStyle(block.id, {borderRadius: $any($event.target).value})"
+                  placeholder="e.g. 12px" />
+              </div>
+              <div class="bse-row">
+                <span class="bse-label">Font size</span>
+                <input class="bse-text bse-text--wide" type="text"
+                  [value]="getBlockStyle(block.id).fontSize || ''"
+                  (input)="setBlockStyle(block.id, {fontSize: $any($event.target).value})"
+                  placeholder="e.g. 1.1rem" />
+              </div>
+              <div class="bse-row">
+                <span class="bse-label">Opacity</span>
+                <input class="bse-range" type="range" min="0" max="1" step="0.05"
+                  [value]="getBlockStyle(block.id).opacity ?? 1"
+                  (input)="setBlockStyle(block.id, {opacity: +$any($event.target).value})" />
+                <span class="bse-val">{{ formatOpacity(getBlockStyle(block.id).opacity) }}</span>
+              </div>
+              <div class="bse-row">
+                <span class="bse-label">Align</span>
+                @for (a of ['left','center','right']; track a) {
+                <button class="bse-align-btn" [class.active]="getBlockStyle(block.id).align === a"
+                  (click)="setBlockStyle(block.id, {align: $any(a)})">{{ a }}</button>
+                }
+              </div>
+            </div>
+            }
+
+            <div class="block-main">
+
+              @if (block.type === 'text') {
+              <textarea class="doc-text" [value]="getBlockHtml(block)"
+                (input)="block.content['html'] = $any($event.target).value; onFieldChange()"
+                placeholder="Write here…"></textarea>
+              }
+
+              @if (block.type === 'subtitle') {
+              <input class="doc-subtitle-block" [value]="$any(block.content['text']) || ''"
+                (input)="block.content['text'] = $any($event.target).value; onFieldChange()"
+                placeholder="Section heading…" />
+              }
+
+              @if (block.type === 'code') {
+              <div class="code-editor-wrap">
+                <div class="code-meta">{{ block.content['language'] || 'plain' }}</div>
+                <textarea class="atomic-code-area" [value]="getBlockCode(block)"
+                  (input)="block.content['code'] = $any($event.target).value; onFieldChange()"
+                  spellcheck="false"></textarea>
+              </div>
+              }
+
+              @if (block.type === 'image') {
+              <div class="image-block-wrap">
+                @if (block.content['src']) {
+                <img class="block-image" [src]="$any(block.content['src'])" [alt]="$any(block.content['alt']) || ''" />
+                } @else {
+                <div class="media-placeholder" (click)="uploadTarget.set({blockId: block.id}); activeModal.set('upload')">
+                  <span class="placeholder-icon">📸</span>
+                  <span class="placeholder-text">Click to add image</span>
+                </div>
+                }
+                <input class="caption-input" [value]="$any(block.content['caption']) || ''"
+                  (input)="block.content['caption'] = $any($event.target).value; onFieldChange()"
+                  placeholder="Caption..." />
+              </div>
+              }
+
+              @if (block.type === 'video') {
+              <div class="video-block-wrap">
+                @if (block.content['src']) {
+                <video class="block-video" [attr.src]="block.content['src']" controls></video>
+                } @else {
+                <div class="media-placeholder" (click)="uploadTarget.set({blockId: block.id}); activeModal.set('upload')">
+                  <span class="placeholder-icon">🎬</span>
+                  <span class="placeholder-text">Click to add video</span>
+                </div>
+                }
+                <input class="caption-input" [value]="$any(block.content['caption']) || ''"
+                  (input)="block.content['caption'] = $any($event.target).value; onFieldChange()"
+                  placeholder="Caption..." />
+              </div>
+              }
+
+              @if (block.type === 'audio') {
+              <div class="audio-block-wrap">
+                <input class="caption-input" [value]="$any(block.content['title']) || ''"
+                  (input)="block.content['title'] = $any($event.target).value; onFieldChange()"
+                  placeholder="Track title..." />
+                @if (block.content['src']) {
+                <audio class="block-audio" [attr.src]="block.content['src']" controls></audio>
+                } @else {
+                <div class="media-placeholder" (click)="uploadTarget.set({blockId: block.id}); activeModal.set('upload')">
+                  <span class="placeholder-icon">🎵</span>
+                  <span class="placeholder-text">Click to add audio</span>
+                </div>
+                }
+              </div>
+              }
+
+              @if (block.type === 'animation') {
+              <div class="animation-block-wrap">
+                @if (block.content['src']) {
+                <div class="anim-loaded">
+                  <div class="anim-preview-badge">
+                    <span class="anim-big-icon">✨</span>
+                    <div class="anim-info">
+                      <span class="anim-label">Lottie Animation</span>
+                      <span class="anim-filename">{{ $any(block.content['caption']) || 'animation.json' }}</span>
+                    </div>
+                    <button class="anim-replace-btn"
+                      (click)="uploadTarget.set({blockId: block.id}); activeModal.set('upload')">Replace</button>
+                  </div>
+                </div>
+                } @else {
+                <div class="media-placeholder" (click)="uploadTarget.set({blockId: block.id}); activeModal.set('upload')">
+                  <span class="placeholder-icon">✨</span>
+                  <span class="placeholder-text">Click to add Lottie animation (.json)</span>
+                </div>
+                }
+                <input class="caption-input" [value]="$any(block.content['caption']) || ''"
+                  (input)="block.content['caption'] = $any($event.target).value; onFieldChange()"
+                  placeholder="Animation caption..." />
+              </div>
+              }
+
+              @if (block.type === 'divider') {
+              <div class="divider-block-wrap">
+                <hr class="block-divider" [ngClass]="'divider-' + ($any(block.content['style']) || 'line')" />
+              </div>
+              }
+
+              @if (block.type === 'columns') {
+              <div class="columns-block-wrap">
+                <div class="columns-grid">
+                  <textarea class="column-textarea" [value]="$any(block.content['left']) || ''"
+                    (input)="block.content['left'] = $any($event.target).value; onFieldChange()"
+                    placeholder="Left column..."></textarea>
+                  <textarea class="column-textarea" [value]="$any(block.content['right']) || ''"
+                    (input)="block.content['right'] = $any($event.target).value; onFieldChange()"
+                    placeholder="Right column..."></textarea>
+                </div>
+              </div>
+              }
+
+              @if (block.type === 'ideas') {
+              <div class="ideas-block-wrap">
+                <div class="ideas-block__header">
+                  <span class="ideas-block__icon">💡</span>
+                  <span class="ideas-block__title">Research Ideas</span>
+                  @if (title()) {
+                  <span class="ideas-block__topic">— {{ title() }}</span>
+                  }
+                  <button class="ideas-block__btn"
+                    [disabled]="ideasLoadingBlocks().has(block.id)"
+                    (click)="fetchBlockIdeas(block.id); $event.stopPropagation()">
+                    {{ ideasLoadingBlocks().has(block.id) ? 'Fetching…' : ($any(block.content['fetched']) ? 'Refresh' : 'Fetch Ideas') }}
+                  </button>
+                </div>
+                @if (ideasLoadingBlocks().has(block.id)) {
+                <div class="ideas-block__loading">
+                  <div class="ideas-block__spinner"></div>
+                  <span>Fetching research insights…</span>
+                </div>
+                } @else if ($any(block.content['ideasText'])) {
+                <div class="ideas-block__body">{{ $any(block.content['ideasText']) }}</div>
+                } @else {
+                <div class="ideas-block__empty">
+                  Click "Fetch Ideas" to load AI research insights at this position in your content.
+                </div>
+                }
+              </div>
+              }
+
+              @if (block.type === 'canvas') {
+              <div class="canvas-block-wrap" (click)="$event.stopPropagation()">
+                <div class="canvas-grid"
+                  [style.--cols]="($any(block.content['cols']) || 12).toString()"
+                  [style.--row-h]="(($any(block.content['rowHeight']) || 80).toString()) + 'px'">
+                  @for (cell of getCanvasCells(block); track cell.id) {
+                  <div class="canvas-cell" [ngStyle]="cellGridStyle(cell)">
+
+                    @if (cell.tool === 'text') {
+                    <textarea class="cell-text"
+                      [value]="$any(cell.content['text']) || ''"
+                      (input)="updateCanvasCell(block.id, cell.id, {content: {text: $any($event.target).value}})"
+                      placeholder="Type here…"></textarea>
+                    }
+
+                    @if (cell.tool === 'image') {
+                      @if (cell.content['src']) {
+                      <img class="cell-media" [src]="$any(cell.content['src'])" [alt]="$any(cell.content['alt']) || ''" />
+                      } @else {
+                      <div class="cell-placeholder" (click)="openCellUpload(block.id, cell.id)">
+                        <span class="cell-ph-icon">📸</span>
+                        <span>Image</span>
+                      </div>
+                      }
+                    }
+
+                    @if (cell.tool === 'video') {
+                      @if (cell.content['src']) {
+                      <video class="cell-media" [attr.src]="$any(cell.content['src'])" controls></video>
+                      } @else {
+                      <div class="cell-placeholder" (click)="openCellUpload(block.id, cell.id)">
+                        <span class="cell-ph-icon">🎬</span>
+                        <span>Video</span>
+                      </div>
+                      }
+                    }
+
+                    @if (cell.tool === 'audio') {
+                      @if (cell.content['src']) {
+                      <audio class="cell-audio" [attr.src]="$any(cell.content['src'])" controls></audio>
+                      } @else {
+                      <div class="cell-placeholder" (click)="openCellUpload(block.id, cell.id)">
+                        <span class="cell-ph-icon">🎵</span>
+                        <span>Audio</span>
+                      </div>
+                      }
+                    }
+
+                    @if (cell.tool === 'animation') {
+                      @if (cell.content['src']) {
+                      <div class="cell-anim-preview">
+                        <span class="cell-ph-icon">✨</span>
+                        <span class="cell-anim-name">{{ $any(cell.content['caption']) || 'Animation' }}</span>
+                      </div>
+                      } @else {
+                      <div class="cell-placeholder" (click)="openCellUpload(block.id, cell.id)">
+                        <span class="cell-ph-icon">✨</span>
+                        <span>Animation</span>
+                      </div>
+                      }
+                    }
+
+                    <div class="cell-ctrl-row">
+                      <span class="cell-tool-badge">{{ cell.tool }}</span>
+                      <button class="cell-ctrl-btn" (click)="removeCanvasCell(block.id, cell.id)" title="Remove cell">✕</button>
+                    </div>
+                  </div>
+                  }
+                </div>
+
+                <div class="canvas-grid-footer">
+                  <div class="canvas-grid-settings">
+                    <label class="cgs-label">Cols</label>
+                    <input class="cgs-input" type="number" min="1" max="24"
+                      [value]="$any(block.content['cols']) || 12"
+                      (input)="block.content['cols'] = +$any($event.target).value; onFieldChange()" />
+                    <label class="cgs-label">Row height</label>
+                    <input class="cgs-input" type="number" min="40" max="600"
+                      [value]="$any(block.content['rowHeight']) || 80"
+                      (input)="block.content['rowHeight'] = +$any($event.target).value; onFieldChange()" />
+                    <span class="cgs-hint">{{ getCanvasCells(block).length }} cells</span>
+                  </div>
+                  <button class="canvas-add-cell-btn" (click)="openAddCell(block.id)">+ Add Cell</button>
+                </div>
+              </div>
+              }
+
+            </div>
+          </article>
+
+          <!-- Insert zone (appears after each block) -->
+          <div class="insert-zone" [class.insert-zone--open]="insertTargetId() === block.id"
+            (click)="$event.stopPropagation()">
+            <div class="insert-zone__line">
+              <button class="insert-zone__btn"
+                (click)="insertTargetId.set(insertTargetId() === block.id ? null : block.id)">+</button>
+            </div>
+            @if (insertTargetId() === block.id) {
+            <div class="insert-picker">
+              @for (bt of BLOCK_TYPES; track bt.type) {
+              <button class="insert-picker__btn" (click)="addBlock(bt.type, block.id)">
+                <span class="ip-icon">{{ bt.icon }}</span>
+                <span>{{ bt.label }}</span>
+              </button>
+              }
+            </div>
+            }
           </div>
 
-          <div class="block-main">
-
-            @if (block.type === 'text') {
-            <textarea class="doc-text" [value]="getBlockHtml(block)"
-              (input)="block.content['html'] = $any($event.target).value; onFieldChange()"
-              placeholder="Write here…"></textarea>
-            }
-
-            @if (block.type === 'subtitle') {
-            <input class="doc-subtitle-block" [value]="$any(block.content['text']) || ''"
-              (input)="block.content['text'] = $any($event.target).value; onFieldChange()"
-              placeholder="Section heading…" />
-            }
-
-            @if (block.type === 'code') {
-            <div class="code-editor-wrap">
-              <div class="code-meta">{{ block.content['language'] || 'plain' }}</div>
-              <textarea class="atomic-code-area" [value]="getBlockCode(block)"
-                (input)="block.content['code'] = $any($event.target).value; onFieldChange()"
-                spellcheck="false"></textarea>
-            </div>
-            }
-
-            @if (block.type === 'image') {
-            <div class="image-block-wrap">
-              @if (block.content['src']) {
-              <img class="block-image" [src]="$any(block.content['src'])" [alt]="$any(block.content['alt']) || ''" />
-              } @else {
-              <div class="media-placeholder" (click)="activeModal.set('upload')">
-                <span class="placeholder-icon">📸</span>
-                <span class="placeholder-text">Click to add image</span>
-              </div>
-              }
-              <input class="caption-input" [value]="$any(block.content['caption']) || ''"
-                (input)="block.content['caption'] = $any($event.target).value; onFieldChange()"
-                placeholder="Caption..." />
-            </div>
-            }
-
-            @if (block.type === 'video') {
-            <div class="video-block-wrap">
-              @if (block.content['src']) {
-              <video class="block-video" [attr.src]="block.content['src']" controls></video>
-              } @else {
-              <div class="media-placeholder" (click)="activeModal.set('upload')">
-                <span class="placeholder-icon">🎬</span>
-                <span class="placeholder-text">Click to add video</span>
-              </div>
-              }
-              <input class="caption-input" [value]="$any(block.content['caption']) || ''"
-                (input)="block.content['caption'] = $any($event.target).value; onFieldChange()"
-                placeholder="Caption..." />
-            </div>
-            }
-
-            @if (block.type === 'audio') {
-            <div class="audio-block-wrap">
-              <input class="caption-input" [value]="$any(block.content['title']) || ''"
-                (input)="block.content['title'] = $any($event.target).value; onFieldChange()"
-                placeholder="Track title..." />
-              @if (block.content['src']) {
-              <audio class="block-audio" [attr.src]="block.content['src']" controls></audio>
-              } @else {
-              <div class="media-placeholder" (click)="activeModal.set('upload')">
-                <span class="placeholder-icon">🎵</span>
-                <span class="placeholder-text">Click to add audio</span>
-              </div>
-              }
-            </div>
-            }
-
-            @if (block.type === 'divider') {
-            <div class="divider-block-wrap">
-              <hr class="block-divider" [ngClass]="'divider-' + ($any(block.content['style']) || 'line')" />
-            </div>
-            }
-
-            @if (block.type === 'columns') {
-            <div class="columns-block-wrap">
-              <div class="columns-grid">
-                <textarea class="column-textarea" [value]="$any(block.content['left']) || ''"
-                  (input)="block.content['left'] = $any($event.target).value; onFieldChange()"
-                  placeholder="Left column..."></textarea>
-                <textarea class="column-textarea" [value]="$any(block.content['right']) || ''"
-                  (input)="block.content['right'] = $any($event.target).value; onFieldChange()"
-                  placeholder="Right column..."></textarea>
-              </div>
-            </div>
-            }
-
-          </div>
-        </article>
         }
 
         @if (!blocks().length) {
         <div class="canvas-empty">
-          <span class="canvas-empty__hint">Select a block type from the left panel to begin writing.</span>
+          <span class="canvas-empty__hint">Select a block type above to begin writing.</span>
         </div>
         }
 
       </div>
     </main>
 
-
   </div>
 
-  <!-- ══ UPLOAD MODAL (kept as modal for drag-drop UX) ════════════════════════ -->
+  <!-- ══ UPLOAD MODAL ════════════════════════════════════════════════════════ -->
   @if (activeModal() === 'upload') {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-card upload-modal" (click)="$event.stopPropagation()">
@@ -267,7 +446,10 @@
       <div class="upload-header">
         <div>
           <h3 class="modal-title" style="margin-bottom:4px">Upload Content</h3>
-          <p class="modal-subtitle">Add multimedia content to your page</p>
+          <p class="modal-subtitle">
+            @if (uploadTarget()?.cellId) { Uploading to canvas cell · }
+            Add multimedia content to your page
+          </p>
         </div>
         <button class="upload-close-btn" (click)="closeModal()">✕</button>
       </div>
@@ -283,7 +465,7 @@
       <div class="dropzone" [class.dragover]="isDragOver()" (dragover)="onDragOver($event)"
         (dragleave)="isDragOver.set(false)" (drop)="onDrop($event)" (click)="fileInput.click()">
         <p class="dz-text">Drag &amp; drop files here</p>
-        <p class="dz-hint">or click to browse · Image, Video, Audio, PDF, Lottie</p>
+        <p class="dz-hint">or click to browse · Image, Video, Audio, PDF, Lottie (.json)</p>
         <input #fileInput type="file" multiple hidden (change)="onFileSelect($event)"
           accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mp3,.wav,.pdf,.docx,.json" />
       </div>
@@ -344,6 +526,63 @@
         </button>
       </div>
 
+    </div>
+  </div>
+  }
+
+  <!-- ══ CELL PICKER MODAL ═══════════════════════════════════════════════════ -->
+  @if (activeModal() === 'cell-picker') {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card cell-picker-modal" (click)="$event.stopPropagation()">
+      <h3 class="modal-title">Add Canvas Cell</h3>
+      <p class="modal-subtitle">Define position, size, and content type for this cell.</p>
+
+      <div class="cell-picker-form">
+        <div class="cpf-grid">
+          <div class="cpf-field">
+            <label class="cpf-label">Column start</label>
+            <input class="cpf-input" type="number" min="1"
+              [value]="newCellConfig().col"
+              (input)="newCellConfig.set({col: +$any($event.target).value, row: newCellConfig().row, colSpan: newCellConfig().colSpan, rowSpan: newCellConfig().rowSpan, tool: newCellConfig().tool})" />
+          </div>
+          <div class="cpf-field">
+            <label class="cpf-label">Row start</label>
+            <input class="cpf-input" type="number" min="1"
+              [value]="newCellConfig().row"
+              (input)="newCellConfig.set({col: newCellConfig().col, row: +$any($event.target).value, colSpan: newCellConfig().colSpan, rowSpan: newCellConfig().rowSpan, tool: newCellConfig().tool})" />
+          </div>
+          <div class="cpf-field">
+            <label class="cpf-label">Width (col span)</label>
+            <input class="cpf-input" type="number" min="1" max="12"
+              [value]="newCellConfig().colSpan"
+              (input)="newCellConfig.set({col: newCellConfig().col, row: newCellConfig().row, colSpan: +$any($event.target).value, rowSpan: newCellConfig().rowSpan, tool: newCellConfig().tool})" />
+          </div>
+          <div class="cpf-field">
+            <label class="cpf-label">Height (row span)</label>
+            <input class="cpf-input" type="number" min="1" max="12"
+              [value]="newCellConfig().rowSpan"
+              (input)="newCellConfig.set({col: newCellConfig().col, row: newCellConfig().row, colSpan: newCellConfig().colSpan, rowSpan: +$any($event.target).value, tool: newCellConfig().tool})" />
+          </div>
+        </div>
+
+        <div class="cpf-tools">
+          <label class="cpf-label">Content type</label>
+          <div class="cpf-tool-grid">
+            @for (ct of cellTools; track ct.type) {
+            <button class="cpf-tool-btn" [class.active]="newCellConfig().tool === ct.type"
+              (click)="newCellConfig.set({col: newCellConfig().col, row: newCellConfig().row, colSpan: newCellConfig().colSpan, rowSpan: newCellConfig().rowSpan, tool: ct.type})">
+              <span class="cpf-tool-icon">{{ ct.icon }}</span>
+              <span>{{ ct.label }}</span>
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-actions" style="margin-top:1.5rem">
+        <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+        <button class="submit-upload-btn" (click)="confirmAddCell()">Add Cell</button>
+      </div>
     </div>
   </div>
   }

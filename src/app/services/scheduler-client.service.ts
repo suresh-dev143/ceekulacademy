@@ -87,11 +87,18 @@ export class SchedulerClientService implements OnDestroy {
     this.socket = io(environment.apiUrl, {
       path:  '/socket.io',
       query: { sessionId },
-      transports: ['websocket', 'polling']
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5
     });
 
     this.socket.on('connect', () => {
       console.log('[Scheduler] WebSocket connected');
+    });
+
+    this.socket.on('connect_error', (error: any) => {
+      console.warn('[Scheduler] Socket connection error:', error?.message);
     });
 
     this.socket.on('phase:change', (event: PhaseChangeEvent) => {
