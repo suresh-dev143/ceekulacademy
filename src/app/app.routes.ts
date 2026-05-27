@@ -16,6 +16,7 @@ import { Register } from './pages/register copy/register';
 import { Personal } from './pages/personal/personal-page/personal';
 import { MyActivities } from './pages/personal/my-activities/my-activities';
 import { Mission } from './pages/mission/mission';
+import { Work } from './pages/personal/work/work';
 
 export const routes: Routes = [
   // { path: 'home', loadComponent: () => import('./pages/home/home').then(m => m.HomeComponent) },
@@ -99,7 +100,7 @@ export const routes: Routes = [
     component: PersonalLayout,
     children: [
       { path: '', component: Personal },
-
+     { path: 'work',component:Work},
       { path: 'dashboard/teacher/workshops', redirectTo: 'dashboard/my-workshops', pathMatch: 'full' },
       { path: 'dashboard/my-workshops', loadComponent: () => import('./pages/workshops/my-workshops/my-workshops').then(m => m.MyWorkshopsComponent) },
       { path: 'dashboard/enrolled-workshops', loadComponent: () => import('./pages/workshops/enrolled-workshops/enrolled-workshops').then(m => m.EnrolledWorkshopsComponent) },

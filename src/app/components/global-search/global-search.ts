@@ -78,11 +78,11 @@ const NAV_ITEMS: { label: string; route: string;  exact?: boolean }[] = [
     { label: 'Home',      route: '/',                      exact: true },
     { label: 'Create',    route: '/personal/create',     },
     { label: 'Schedule',  route: '/personal/schedule',   },
-    { label: 'Enrol',     route: '/personal/enrol',      },
+    { label: 'Enroll',     route: '/personal/enrol',      },
     // { label: 'Advertise', route: '/personal/advertise',  },
     { label: 'Demand',    route: '/personal/demand',     },
     { label: 'Supply',    route: '/personal/supply',    },
-    { label: 'Work',      route: '/personal/edit',       },
+    { label: 'Work',      route: '/personal/work',       },
 ];
 
 @Component({

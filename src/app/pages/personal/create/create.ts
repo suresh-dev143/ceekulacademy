@@ -2,6 +2,7 @@ import { Component, signal, computed, inject, OnInit, OnDestroy, Pipe, PipeTrans
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CreatorService, ContentType, ContentState, CreatorBlock, DraftPayload, DraftSummary } from '../../../services/creator.service';
+import { SemanticGovernanceService, GovernanceDecision } from '../../../services/semantic-governance.service';
 import { ClaudeService } from '../../../services/claude.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { CreatorToolsService } from '../../../services/creator-tools.service';
@@ -217,9 +218,16 @@ export class Create implements OnInit, OnDestroy {
   private readonly toast = inject(ToastService);
   private readonly creatorTools = inject(CreatorToolsService);
   private readonly mediaUploadService = inject(MediaUploadService);
+  private readonly governanceSvc = inject(SemanticGovernanceService);
   private readonly destroy$ = new Subject<void>();
   private _isExistingDraft = false;
   private _loadedIdentity = { title: '', contentTitle: '' };
+
+  // ── Governance state (Layer 4 — publish-time semantic governance) ──────────
+  readonly governanceDecision = signal<GovernanceDecision | null>(null);
+  readonly governanceReason   = signal<string>('');
+  readonly governanceProvisional = signal(false);
+  readonly governanceFlags    = signal<string[]>([]);
 
   // ── Three-layer save state ─────────────────────────────────────────────────
   // Layer 1 — Local draft (IndexedDB, silent, crash-resistant)
@@ -252,7 +260,7 @@ export class Create implements OnInit, OnDestroy {
   readonly title = signal('');
   readonly subtitle = signal('');
   readonly contentType = signal<ContentType>('L');
-  readonly domain = signal('education');
+  readonly domain = signal('Course');
   readonly contentTitle = signal('');
   readonly contentState = signal<ContentState>('draft');
   readonly collaboratorIds = signal<string[]>([]);
@@ -323,6 +331,16 @@ export class Create implements OnInit, OnDestroy {
     'governance','education','music','wellness','animation',
     'agriculture','science','philosophy','workshop','multilingual',
   ];
+
+  readonly CATEGORIES = [
+    'Course',
+    'workshop',
+    'webinar',
+    'research',
+    'project',
+    'advertisement',
+    'other',
+  ] as const;
 
   // ── Insert at Position ─────────────────────────────────────────────────────
   readonly insertTargetId = signal<string | null>(null);
@@ -521,7 +539,7 @@ export class Create implements OnInit, OnDestroy {
     }
   }
 
-  // Layer 3: Publish — AI-filtered semantic commit, publicly discoverable
+  // Layer 3: Publish — semantic governance then public commit
   publishContent(): void {
     if (!this.title()) { this.toast.warning('Add a title before publishing.'); return; }
     if (!this.baseId()) {
@@ -529,19 +547,50 @@ export class Create implements OnInit, OnDestroy {
       return;
     }
     this.serverSyncState.set('saving');
+    this.governanceDecision.set(null);
+    this.governanceReason.set('');
+    this.governanceFlags.set([]);
+
     this.creatorService.publish(this.baseId()).subscribe({
-      next: ({ data }) => {
+      next: (res: any) => {
+        const data = res.data ?? res;
         this.contentState.set('published');
         this.hybridId.set(data.hybridId);
         this.serverSyncState.set('saved');
         this.localDraftState.set('clean');
         this._engine.clear(this._sessionKey).catch(() => {});
-        this.toast.success('Published — now discoverable by members.');
         this.refreshLibrary();
+
+        // Surface governance result to UI
+        const gov = res.governance;
+        if (gov) {
+          this.governanceDecision.set(gov.decision ?? 'approved');
+          this.governanceReason.set(gov.reason ?? '');
+          this.governanceProvisional.set(gov.provisional ?? false);
+          this.governanceFlags.set(gov.flags ?? []);
+
+          if (gov.decision === 'pending_human_review') {
+            this.toast.warning('Published — content is under semantic review. It will be visible once approved.');
+          } else if (gov.flags?.length) {
+            this.toast.success('Published — note: some content flags were raised and are being reviewed.');
+          } else {
+            this.toast.success('Published — now discoverable by members.');
+          }
+        } else {
+          this.toast.success('Published — now discoverable by members.');
+        }
       },
-      error: () => {
+      error: (err: any) => {
         this.serverSyncState.set('error');
-        this.toast.error('Publish failed — AI filter may have rejected the content.');
+        // governance_rejected is a semantic governance rejection (422)
+        if (err?.code === 'VALIDATION_ERROR' || err?.message?.includes('governance')) {
+          const reason = err?.message ?? 'Content could not be published.';
+          this.governanceDecision.set('rejected');
+          this.governanceReason.set(reason);
+          this.toast.error(`Publish blocked: ${reason}`);
+        } else {
+          this.toast.error(err?.message ?? 'Publish failed — please try again.');
+        }
       },
     });
   }
@@ -717,7 +766,7 @@ export class Create implements OnInit, OnDestroy {
     this.subtitle.set('');
     this.blocks.set([]);
     this.contentTitle.set('');
-    this.domain.set('education');
+    this.domain.set('Course');
     this.contentType.set('L');
     this.contentState.set('draft');
     this.collaboratorIds.set([]);

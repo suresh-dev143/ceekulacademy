@@ -33,9 +33,23 @@ const STATUS_MESSAGES: Record<number, string> = {
  *   { message: string }
  *   { error: { message: string } }
  *   { errors: Record<string, string> }    ← validation
+ *
+ * Also handles the special case where the server returned HTML instead of JSON
+ * (SyntaxError: Unrecognized token '<') — typically happens when the backend is
+ * restarting or a proxy returns an error page.
  */
 export function normalizeHttpError(err: HttpErrorResponse): AppError {
     const body = err.error;
+
+    // Guard: server returned HTML (or other non-JSON) → HttpClient throws SyntaxError.
+    // Surface a clean message instead of the raw "Unexpected token '<'".
+    if (body instanceof SyntaxError) {
+        return {
+            status:  err.status,
+            code:    'PARSE_ERROR',
+            message: 'The server returned an unexpected response. Please try again.',
+        };
+    }
 
     const message: string =
         body?.message ??

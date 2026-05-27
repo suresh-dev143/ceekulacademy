@@ -4,7 +4,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, takeUntil, timeout, catchError, of } from 'rxjs';
+import { SemanticGovernanceService, GovernanceDecision } from '../../services/semantic-governance.service';
 import {
   UCRSScheduleService, SchedulePayload, UCRSSchedule,
   ContentSearchResult, ScheduleCategory, DeliveryMode,
@@ -15,6 +16,7 @@ import { ToastComponent } from '../../components/toast/toast';
 import { FacilityDiscoveryComponent } from '../../components/workshops/facility-discovery/facility-discovery.component';
 import { AdPlatformService } from '../../services/ad-platform.service';
 import { UcrsService } from '../../services/ucrs.service';
+import { CreatorService, CreatorBlock } from '../../services/creator.service';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -137,15 +139,18 @@ export const STREAMING_PLATFORMS: { id: string; label: string }[] = [
   styleUrl: './schedule.scss',
 })
 export class Schedule implements OnInit, OnDestroy {
-  private readonly schedSvc = inject(UCRSScheduleService);
-  private readonly adSvc    = inject(AdPlatformService);
-  private readonly ucrsSvc  = inject(UcrsService);
-  private readonly toast    = inject(ToastService);
-  private readonly router   = inject(Router);
-  private readonly route    = inject(ActivatedRoute);
-  private readonly fb       = inject(FormBuilder);
-  private readonly destroy$ = new Subject<void>();
-  private readonly search$  = new Subject<string>();
+  private readonly schedSvc     = inject(UCRSScheduleService);
+  private readonly adSvc        = inject(AdPlatformService);
+  private readonly ucrsSvc      = inject(UcrsService);
+  private readonly creatorSvc   = inject(CreatorService);
+  private readonly governanceSvc = inject(SemanticGovernanceService);
+  private readonly toast        = inject(ToastService);
+  private readonly router       = inject(Router);
+  private readonly route        = inject(ActivatedRoute);
+  private readonly fb           = inject(FormBuilder);
+  private readonly destroy$     = new Subject<void>();
+  private readonly search$      = new Subject<string>();
+  private readonly ucrsMediaLink$ = new Subject<string>();
 
   // ── Core Form Fields ────────────────────────────────────────────────────────
   readonly category      = signal<ScheduleCategory>('course');
@@ -225,9 +230,14 @@ export class Schedule implements OnInit, OnDestroy {
 
   readonly canSubmit = computed(() => {
     if (this.isAdvertisementCategory()) {
-      return !!this.adTitle().trim() && !!this.adMediaUrl() &&
-        !!this.adExpiryDate() && this.adBudget() > 0 &&
-        !this.submitting() && !this.adIsCommitting();
+      return !!this.adTitle().trim() &&
+        !!this.adMediaUrl() &&
+        !!this.adAdType() &&          // must be 'image' | 'video' — never null
+        !!this.adExpiryDate() &&
+        this.adBudget() > 0 &&
+        !this.submitting() &&
+        !this.adIsCommitting() &&
+        !this.adUcrsMediaLoading();   // don't submit while media is still loading
     }
     return !!this.category() &&
       !!this.programTitle().trim() &&
@@ -311,6 +321,12 @@ export class Schedule implements OnInit, OnDestroy {
   readonly adIsCommitting        = signal(false);
   readonly adCommitStage         = signal('Uploading...');
   readonly adUploadError         = signal<string | null>(null);
+  // Tracks where the current media came from: 'ucrs' = auto-filled from content link, 'manual' = user uploaded
+  readonly adMediaSource         = signal<'ucrs' | 'manual' | null>(null);
+  readonly adUcrsMediaLoading    = signal(false);
+  // Governance result for submitted ad
+  readonly adGovernanceDecision  = signal<GovernanceDecision | null>(null);
+  readonly adGovernanceReason    = signal<string>('');
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
 
@@ -321,12 +337,22 @@ export class Schedule implements OnInit, OnDestroy {
     this.fieldLookup$
       .pipe(debounceTime(500), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(q => this._doFieldLookup(q));
+
+    // Debounced auto-fetch of first image/video from linked UCRS content
+    this.ucrsMediaLink$
+      .pipe(debounceTime(600), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(link => this._fetchAdMediaFromUcrsLink(link));
+
     this.buildAddForm();
     this.loadMySchedules();
 
     this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
       if (params['category'] === 'advertisement') this.category.set('advertisement');
-      if (params['ucrsLink']) this.adUcrsLink.set(params['ucrsLink'] as string);
+      if (params['ucrsLink']) {
+        const link = params['ucrsLink'] as string;
+        this.adUcrsLink.set(link);
+        this.ucrsMediaLink$.next(link);
+      }
     });
   }
 
@@ -615,10 +641,9 @@ export class Schedule implements OnInit, OnDestroy {
   // ── Submit ──────────────────────────────────────────────────────────────────
 
   private _submitAdvertisement(): void {
-    this.submitting.set(true);
-    this.adSvc.createAd({
+    const payload = {
       title:                   this.adTitle().trim(),
-      description:             this.adDescription().trim(),
+      description:             this.adDescription().trim() || undefined,
       category:                this.adMandatoryCategories()[0] || 'Other',
       adType:                  this.adAdType()!,
       mediaUrl:                this.adMediaUrl(),
@@ -627,26 +652,53 @@ export class Schedule implements OnInit, OnDestroy {
       ratePerSecondPerStudent: this.adRate() / 100,
       totalBudget:             this.adBudget(),
       expiryDate:              this.adExpiryDate(),
-      contentCid:              this.adUcrsLink() || this.adCommittedCid() || undefined,
+      // UCRS link takes priority; fall back to UCE commit CID
+      contentCid: this.adUcrsLink().trim() || this.adCommittedCid() || undefined,
       mandatoryCriteria: {
-        categories:       this.adMandatoryCategories(),
-        ageGroup:         this.adAgeGroup(),
-        minRatePerSecond: 0,
+        categories: this.adMandatoryCategories().map(c => c.toLowerCase()),
+        ageGroup:   this.adAgeGroup(),
       },
       optionalCriteria: {
-        engagementScoreTarget: 0,
-        preferredLanguage:     '',
         interestTags:          this.adInterestTags(),
+        engagementScoreTarget: 0,
+        // preferredLanguage not exposed in UI — omit so Mongoose skips it
       },
-    } as any).subscribe({
-      next: () => {
+    };
+    console.log('[Ad Submit] payload →', payload);
+    this.submitting.set(true);
+    this.adSvc.createAd(payload as any).subscribe({
+      next: (res: any) => {
+        console.log('[Ad Submit] success →', res);
         this.submitting.set(false);
-        this.toast.success('Ad campaign submitted for review!');
+
+        // Surface governance result from response
+        const gov = res.governance;
+        if (gov) {
+          this.adGovernanceDecision.set(gov.decision ?? 'approved');
+          this.adGovernanceReason.set(gov.reason ?? '');
+          if (gov.decision === 'pending_human_review') {
+            this.toast.warning('Ad submitted — under semantic review. You\'ll be notified when it\'s approved.');
+          } else {
+            this.toast.success('Ad campaign submitted for review!');
+          }
+        } else {
+          this.toast.success('Ad campaign submitted for review!');
+        }
         this._resetAdForm();
       },
       error: (err: any) => {
+        console.error('[Ad Submit] error →', err);
         this.submitting.set(false);
-        this.toast.error(err?.error?.message ?? 'Ad submission failed.');
+        // Check for governance rejection (422 from semantic governance L1)
+        if (err?.message?.toLowerCase().includes('governance') ||
+            err?.message?.toLowerCase().includes('governance_rejected')) {
+          this.adGovernanceDecision.set('rejected');
+          this.adGovernanceReason.set(err?.message ?? 'Ad blocked by semantic governance.');
+          this.toast.error(`Ad blocked: ${err?.message ?? 'Content violates platform principles.'}`);
+        } else {
+          // AppError (from normalizeHttpError) has .message directly — not .error.message
+          this.toast.error(err?.message ?? err?.error?.message ?? 'Ad submission failed.');
+        }
       },
     });
   }
@@ -720,11 +772,12 @@ export class Schedule implements OnInit, OnDestroy {
         contentDescription,
         expertProfile,
       };
-
+      console.log('Payload : - ', payload);
       this.schedSvc.create(payload).subscribe({
         next: ({ isDuplicate }) => {
           isDuplicate ? this.toast.info('A session already exists for this slot.') : completed++;
           done();
+          console.log('Session created:', { isDuplicate });
         },
         error: (err) => {
           failed++;
@@ -769,10 +822,76 @@ export class Schedule implements OnInit, OnDestroy {
 
   // ── Advertisement ────────────────────────────────────────────────────────────
 
+  /** Called on every keystroke in the UCRS link field. */
+  onAdUcrsLinkInput(event: Event): void {
+    const link = (event.target as HTMLInputElement).value;
+    this.adUcrsLink.set(link);
+    // Clear UCRS-sourced media immediately when the link is erased
+    if (!link.trim()) {
+      if (this.adMediaSource() === 'ucrs') this.resetAdMedia();
+      this.adUcrsMediaLoading.set(false);
+      return;
+    }
+    this.ucrsMediaLink$.next(link.trim());
+  }
+
+  /** Clears the UCRS link field and any media that came from it. */
+  clearAdUcrsLink(): void {
+    this.adUcrsLink.set('');
+    if (this.adMediaSource() === 'ucrs') this.resetAdMedia();
+    this.adUcrsMediaLoading.set(false);
+  }
+
+  /**
+   * Fetches the first image or video block from the content identified by
+   * the given UCRS hybridId and auto-populates the Ad Media slot.
+   * baseId is always the prefix before the first '-' in a hybridId.
+   */
+  private _fetchAdMediaFromUcrsLink(link: string): void {
+    if (!link.trim()) return;
+
+    // Extract baseId: hybridId format is CB000000000001-D-L-001-V01-S
+    const baseId = link.trim().split('-')[0];
+    if (!baseId.startsWith('CB') || baseId.length < 4) return;
+
+    this.adUcrsMediaLoading.set(true);
+
+    this.creatorSvc.getDraft(baseId).subscribe({
+      next: ({ data }) => {
+        const rawBlocks = (data as any)['blocks'] as CreatorBlock[] | undefined;
+        const mediaBlock = rawBlocks?.find(
+          b => (b.type === 'image' || b.type === 'video') &&
+               !!(b.content['src'] as string)
+        );
+
+        if (mediaBlock) {
+          const src = mediaBlock.content['src'] as string;
+          // Only fill if slot is currently empty or previously came from UCRS
+          if (!this.adMediaUrl() || this.adMediaSource() === 'ucrs') {
+            this.adMediaUrl.set(src);
+            this.adAdType.set(mediaBlock.type as 'image' | 'video');
+            this.adMediaSource.set('ucrs');
+            this.adUploadError.set(null);
+          }
+        } else {
+          // Content exists but has no image/video — clear UCRS-sourced media
+          if (this.adMediaSource() === 'ucrs') this.resetAdMedia();
+        }
+        this.adUcrsMediaLoading.set(false);
+      },
+      error: () => {
+        // Draft not found or network error — don't touch manually uploaded media
+        if (this.adMediaSource() === 'ucrs') this.resetAdMedia();
+        this.adUcrsMediaLoading.set(false);
+      },
+    });
+  }
+
   onAdMediaSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
     this.adUploadError.set(null);
+    this.adMediaSource.set('manual');
     this.adIsCommitting.set(true);
     this.adCommitStage.set('Uploading media...');
     this.adSvc.uploadAdMedia(file).subscribe({
@@ -790,9 +909,15 @@ export class Schedule implements OnInit, OnDestroy {
             keywords: this.adMandatoryCategories().map((c: string) => c.toLowerCase()),
             category: this.adMandatoryCategories()[0] || '',
           },
-        }).subscribe({
-          next: (commit: any) => { this.adCommittedCid.set(commit.cid); this.adIsCommitting.set(false); },
-          error: ()            => { this.adCommittedCid.set(null);       this.adIsCommitting.set(false); },
+        }).pipe(
+          // Unblock the submit button if UCE commit takes too long — media is already uploaded
+          timeout(12000),
+          catchError(() => of(null))
+        ).subscribe({
+          next: (commit: any) => {
+            if (commit?.cid) this.adCommittedCid.set(commit.cid);
+            this.adIsCommitting.set(false);
+          },
         });
       },
       error: (err: any) => {
@@ -812,6 +937,7 @@ export class Schedule implements OnInit, OnDestroy {
     this.adAdType.set(null);
     this.adCommittedCid.set(null);
     this.adUploadError.set(null);
+    this.adMediaSource.set(null);
   }
 
   toggleAdCategory(cat: string): void {
@@ -848,6 +974,10 @@ export class Schedule implements OnInit, OnDestroy {
     this.adCommittedCid.set(null);
     this.adIsCommitting.set(false);
     this.adUploadError.set(null);
+    this.adMediaSource.set(null);
+    this.adUcrsMediaLoading.set(false);
+    this.adGovernanceDecision.set(null);
+    this.adGovernanceReason.set('');
   }
 
   formatDate(dateStr: string): string {

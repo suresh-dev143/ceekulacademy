@@ -90,8 +90,12 @@
           (blur)="onIdentityChange()" placeholder="Section Title..." />
         <input class="doc-meta" [value]="contentTitle()" (input)="contentTitle.set($any($event.target).value)"
           (blur)="onIdentityChange()" placeholder="Content Title..." />
-        <input class="doc-targeted-use" [value]="domain()" (input)="domain.set($any($event.target).value); onFieldChange()"
-          placeholder="Targeted Use (e.g. workshop, film, advertisement, poetry, lecture)..." />
+        <select class="doc-targeted-use" [value]="domain()" (change)="domain.set($any($event.target).value); onFieldChange()">
+          <option value="" disabled selected hidden>Targeted Use...</option>
+          @for (cat of CATEGORIES; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
 
         <!-- Start Creating CTA -->
         @if (!blocks().length) {

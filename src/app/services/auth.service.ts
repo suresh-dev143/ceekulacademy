@@ -2,7 +2,9 @@ import { Injectable, signal, computed, inject, PLATFORM_ID, OnDestroy } from '@a
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, map, tap, interval, Subscription } from 'rxjs';
+import { Observable, map, tap, interval, Subscription, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Address, GeoLocation } from '../core/models/address.model';
 
@@ -409,8 +411,12 @@ export class AuthService implements OnDestroy {
                         next: () => console.log('[Auth] Token refreshed automatically'),
                         error: (err) => {
                             console.warn('[Auth] Auto-refresh failed:', err);
-                            // If refresh fails, token is likely invalid
-                            this.logout();
+                            // Only force logout when the server explicitly rejects the token.
+                            // status -1 = network/parse error → keep the session and retry
+                            // next interval instead of kicking the user out unnecessarily.
+                            if (err?.status === 401 || err?.status === 403) {
+                                this.logout();
+                            }
                         }
                     });
                 } else {
@@ -437,12 +443,26 @@ export class AuthService implements OnDestroy {
 
     refreshTokens(): Observable<{ token: string; refreshToken: string }> {
         const refreshToken = this.getRefreshToken();
+        // X-Skip-Error-Toast prevents the error interceptor from showing a toast
+        // for refresh failures (HTML parse errors, network errors, etc.)
+        const headers = new HttpHeaders({ 'X-Skip-Error-Toast': 'true' });
         return this.http
             .post<{ status: boolean; accessToken: string; refreshToken: string }>(
                 `${this.base}/api/auth/refresh`,
-                { refreshToken }
+                { refreshToken },
+                { headers }
             )
             .pipe(
+                catchError((err) => {
+                    // If the server returned HTML instead of JSON (SyntaxError),
+                    // or there was a network error, wrap it in a plain Error so
+                    // callers can distinguish it from a 401 auth rejection.
+                    if (err?.error instanceof SyntaxError || err?.status === 0) {
+                        console.warn('[Auth] Refresh endpoint returned non-JSON or is unreachable.');
+                        return throwError(() => ({ status: -1, message: 'Refresh server unavailable' }));
+                    }
+                    return throwError(() => err);
+                }),
                 tap(res => {
                     this._token.set(res.accessToken);
                     if (this.isBrowser) {

@@ -2,6 +2,7 @@ import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupplyService, SupplyCategory, ScheduleRow, SupplyResource } from '../../../services/supply.service';
+import { SemanticGovernanceService, GovernanceDecision } from '../../../services/semantic-governance.service';
 
 export type PageView = 'form' | 'success';
 
@@ -49,10 +50,14 @@ export class Supply {
   readonly days        = DAYS;
 
   // ── Page state ─────────────────────────────────────────────────────────────
-  readonly view        = signal<PageView>('form');
-  readonly submitting  = signal(false);
-  readonly submitError = signal('');
-  readonly savedId     = signal('');
+  readonly view              = signal<PageView>('form');
+  readonly submitting        = signal(false);
+  readonly submitError       = signal('');
+  readonly savedId           = signal('');
+
+  // ── Governance result ──────────────────────────────────────────────────────
+  readonly governanceDecision = signal<GovernanceDecision | null>(null);
+  readonly governanceReason   = signal<string>('');
 
   // ── Category ───────────────────────────────────────────────────────────────
   readonly category    = signal<SupplyCategory | null>(null);
@@ -220,14 +225,31 @@ export class Supply {
     };
 
     this.supplyService.create(payload).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.savedId.set(res.data._id);
+        this.submitting.set(false);
+
+        // Surface governance result
+        const gov = res.governance;
+        if (gov) {
+          this.governanceDecision.set(gov.decision ?? 'approved');
+          this.governanceReason.set(gov.reason ?? '');
+        }
+
+        // Always show success page — governance review doesn't block the UX
         this.view.set('success');
-        this.submitting.set(false);
       },
-      error: (err) => {
-        this.submitError.set(err?.error?.message ?? 'Failed to submit. Please try again.');
+      error: (err: any) => {
         this.submitting.set(false);
+        const isGovernanceRejection = err?.code === 'VALIDATION_ERROR' &&
+          err?.message?.toLowerCase().includes('governance');
+        if (isGovernanceRejection) {
+          this.governanceDecision.set('rejected');
+          this.governanceReason.set(err?.message ?? 'Submission blocked by semantic governance.');
+          this.submitError.set(err?.message ?? 'Your submission could not be accepted. Please review the content guidelines.');
+        } else {
+          this.submitError.set(err?.message ?? err?.error?.message ?? 'Failed to submit. Please try again.');
+        }
       }
     });
   }

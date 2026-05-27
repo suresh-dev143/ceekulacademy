@@ -785,20 +785,29 @@
                   <span class="ucrs-link-ico">◈</span>
                   <input class="ghost-input mono-input"
                     [value]="adUcrsLink()"
-                    (input)="adUcrsLink.set($any($event.target).value)"
+                    (input)="onAdUcrsLinkInput($event)"
                     placeholder="CB100000000001-E-L-001-V01-S" />
+                  @if (adUcrsMediaLoading()) {
+                    <span class="ucrs-link-spinner"></span>
+                  }
                   @if (adUcrsLink()) {
-                    <button class="ucrs-clear-btn" (click)="adUcrsLink.set('')" title="Clear">✕</button>
+                    <button class="ucrs-clear-btn" (click)="clearAdUcrsLink()" title="Clear">✕</button>
                   }
                 </div>
-                @if (adUcrsLink()) {
+                @if (adUcrsLink() && !adUcrsMediaLoading()) {
                   <div class="ucrs-match-armed">
                     ✓ O(1) match armed — ad routes directly to every session teaching <code>{{ adUcrsLink() }}</code>
+                    @if (adMediaSource() === 'ucrs' && adMediaUrl()) {
+                      <span class="ucrs-media-found"> · media loaded from content</span>
+                    } @else if (!adMediaUrl()) {
+                      <span class="ucrs-media-none"> · no image/video found in content — upload one below</span>
+                    }
                   </div>
-                } @else {
+                } @else if (!adUcrsLink()) {
                   <p class="ucrs-link-desc">
                     Save your content in <strong>Create</strong> → copy the UCRS link → paste here.
-                    When set, your ad skips criteria scoring and is placed directly into matching sessions at zero runtime cost.
+                    When set, your ad skips criteria scoring, is placed directly into matching sessions,
+                    and the first image/video from your content auto-fills the media slot below.
                   </p>
                 }
               </div>
@@ -819,10 +828,18 @@
                   placeholder="What are you promoting?"></textarea>
               </div>
 
-              <!-- Media Upload -->
+              <!-- Media Upload — single slot: auto-filled from UCRS link OR manually uploaded -->
               <div class="sem-field">
                 <label class="sem-label">Ad Media (Image or Video) <span class="required">*</span></label>
-                @if (!adMediaUrl()) {
+
+                @if (adUcrsMediaLoading()) {
+                  <!-- Fetching media from the linked content -->
+                  <div class="ad-ucrs-media-loading">
+                    <span class="ad-upload-spinner"></span>
+                    <span>Loading media from linked content…</span>
+                  </div>
+                } @else if (!adMediaUrl()) {
+                  <!-- Empty slot — manual upload zone -->
                   <label class="ad-upload-zone" [class.uploading]="adIsCommitting()">
                     <input type="file" accept="image/*,video/*" (change)="onAdMediaSelected($event)" style="display:none" />
                     @if (adIsCommitting()) {
@@ -837,6 +854,7 @@
                     <div class="ad-upload-error">{{ adUploadError() }}</div>
                   }
                 } @else {
+                  <!-- Media present (from UCRS or manual) -->
                   <div class="ad-media-preview">
                     @if (adAdType() === 'video') {
                       <video class="ad-preview-media" [src]="adMediaUrl()" controls></video>
@@ -845,11 +863,21 @@
                     }
                     <div class="ad-media-meta">
                       <span class="ad-media-type-badge">{{ adAdType() === 'video' ? 'Video' : 'Image' }}</span>
+                      @if (adMediaSource() === 'ucrs') {
+                        <span class="ad-media-source-badge">◈ from content</span>
+                      }
                       @if (adCommittedCid()) {
                         <span class="ad-media-cid">◈ CID: {{ adCommittedCid() }}</span>
                       }
                     </div>
-                    <button class="ad-media-remove" (click)="resetAdMedia()">✕ Remove</button>
+                    <div class="ad-media-actions">
+                      <!-- Replace with a manual upload while keeping the single-slot rule -->
+                      <label class="ad-media-replace">
+                        <input type="file" accept="image/*,video/*" (change)="onAdMediaSelected($event)" style="display:none" />
+                        ↺ Replace
+                      </label>
+                      <button class="ad-media-remove" (click)="resetAdMedia()">✕ Remove</button>
+                    </div>
                   </div>
                 }
               </div>

@@ -40,9 +40,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     _refreshing = false;
                     return next(_withBearer(req, newToken));
                 }),
-                catchError(() => {
+                catchError((err) => {
                     _refreshing = false;
-                    authService.logout();
+                    // Only logout on explicit 401/403; network/parse errors (status -1 or 0)
+                    // should not invalidate the session — the server may just be unreachable.
+                    if (!err?.status || err.status === 401 || err.status === 403) {
+                        authService.logout();
+                    }
                     return EMPTY;
                 })
             );
@@ -70,9 +74,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     _refreshing = false;
                     return next(_withBearer(req, newToken));
                 }),
-                catchError(() => {
+                catchError((refreshErr) => {
                     _refreshing = false;
-                    authService.logout();
+                    // Only logout on explicit auth rejection, not network/parse errors
+                    if (!refreshErr?.status || refreshErr.status === 401 || refreshErr.status === 403) {
+                        authService.logout();
+                    }
                     return EMPTY;
                 })
             );

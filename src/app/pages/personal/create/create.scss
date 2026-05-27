@@ -1062,9 +1062,16 @@
   width: 100%;
   outline: none;
   padding: 0.7rem;
+  cursor: pointer;
 
   &::placeholder { color: rgba(139,148,158,0.35); }
   &:focus { border-bottom-color: rgba(99,102,241,0.4); }
+
+  option {
+    background: #161b22;
+    color: #e6edf3;
+    font-size: 0.8rem;
+  }
 }
 
 // ── Block — chapter style (no card) ──

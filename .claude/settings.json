@@ -18,7 +18,14 @@
       "d:\\Github\\ceekulacademyapi\\src\\routers",
       "d:\\Github\\ceekulacademyapi\\src\\models",
       "d:\\Github\\ceekulacademyapi\\src\\services",
-      "d:\\Github\\ceekulacademyapi\\src\\controllers"
+      "d:\\Github\\ceekulacademyapi\\src\\controllers",
+      "/Users/gs/Documents/GitHub/ceekulacademyapi/src/models",
+      "/Users/gs/Documents/GitHub/ceekulacademyapi/src/services",
+      "/Users/gs/Documents/GitHub/ceekulacademyapi/src/routers",
+      "/Users/gs/Documents/GitHub/ceekulacademyapi/src/domains/creator/content",
+      "/Users/gs/Documents/GitHub/ceekulacademyapi/src/controllers",
+      "/Users/gs/Documents/GitHub/ceekulacademyapi/src/domains/ads/campaigns",
+      "/Users/gs/Documents/GitHub/ceekulacademyapi"
     ]
   }
 }

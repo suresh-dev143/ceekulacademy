@@ -22,7 +22,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
             const skipToast = req.headers.has('X-Skip-Error-Toast');
 
-            if (raw.status === 0) {
+            if (raw.error instanceof SyntaxError) {
+                // Server returned HTML (or other non-JSON) instead of JSON.
+                // This is a backend/config issue the user cannot act on — log silently.
+                console.warn('[HTTP] Non-JSON response from server:', raw.status, req.url);
+
+            } else if (raw.status === 0) {
                 // Network-level failure (no connection, CORS blocked, etc.)
                 if (!skipToast) toast.error(err.message);
 
