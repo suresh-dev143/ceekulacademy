@@ -1,0 +1,94 @@
+<div
+  class="video-upload"
+  [class.video-upload--dragover]="isDragOver()"
+  [class.video-upload--disabled]="disabled()"
+  [class.video-upload--error]="status() === 'error'"
+  [class.video-upload--success]="status() === 'success'"
+>
+  <input
+    #fileInput
+    class="video-upload__input"
+    type="file"
+    accept=".mp4,.mov,.webm,video/mp4,video/quicktime,video/webm"
+    [disabled]="disabled() || isUploading() || isProcessing()"
+    (change)="onFileSelected($event)"
+  />
+
+  <button
+    type="button"
+    class="video-upload__dropzone"
+    [disabled]="disabled() || isUploading() || isProcessing()"
+    (click)="openFilePicker()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    @if (file(); as selectedFile) {
+      <span class="video-upload__poster">
+        @if (selectedFile.thumbnailUrl) {
+          <img [src]="selectedFile.thumbnailUrl" [alt]="selectedFile.name" />
+        } @else {
+          <video [src]="selectedFile.previewUrl" muted playsinline preload="metadata"></video>
+        }
+        <span class="video-upload__play" aria-hidden="true"></span>
+      </span>
+      <span class="video-upload__details">
+        <span class="video-upload__name">{{ selectedFile.name }}</span>
+        <span class="video-upload__meta">
+          {{ formatFileSize(selectedFile.size) }} · {{ formatDuration(selectedFile.duration) }}
+        </span>
+        <span class="video-upload__state">{{ statusLabel() }}</span>
+      </span>
+    } @else {
+      <span class="video-upload__icon" aria-hidden="true"></span>
+      <span class="video-upload__details">
+        <span class="video-upload__name">{{ label() }}</span>
+        <span class="video-upload__meta">{{ helperText() }}</span>
+        <span class="video-upload__state">Drag and drop, or tap to browse</span>
+      </span>
+    }
+  </button>
+
+  @if (isUploading() || isProcessing() || status() === 'success') {
+    <div class="video-upload__progress-wrap">
+      <div class="video-upload__progress" aria-label="Upload progress">
+        <span class="video-upload__progress-fill" [style.width.%]="progress()"></span>
+      </div>
+      <span class="video-upload__progress-label">
+        @if (isProcessing()) {
+          Processing
+        } @else {
+          {{ progress() }}%
+        }
+      </span>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <p class="video-upload__error">{{ message }}</p>
+  }
+
+  <div class="video-upload__actions">
+    @if (isUploading() || isProcessing()) {
+      <button type="button" class="video-upload__action video-upload__action--ghost" (click)="cancelUpload()">
+        Cancel
+      </button>
+    }
+
+    @if (file() && !isUploading() && !isProcessing()) {
+      <button type="button" class="video-upload__action video-upload__action--ghost" (click)="remove()">
+        Remove
+      </button>
+    }
+
+    @if (canRetry()) {
+      <button type="button" class="video-upload__action video-upload__action--primary" (click)="retry()">
+        Retry
+      </button>
+    } @else if (!autoUpload() && canUpload()) {
+      <button type="button" class="video-upload__action video-upload__action--primary" (click)="upload()">
+        Upload
+      </button>
+    }
+  </div>
+</div>

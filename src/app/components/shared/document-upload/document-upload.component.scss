@@ -1,0 +1,221 @@
+:host {
+  display: block;
+}
+
+.document-upload {
+  color: #172033;
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.document-upload__input {
+  display: none;
+}
+
+.document-upload__card {
+  align-items: center;
+  appearance: none;
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 6.25rem;
+  padding: 0.9rem;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+  width: 100%;
+}
+
+.document-upload__card:hover,
+.document-upload--dragover .document-upload__card {
+  border-color: #2563eb;
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.14);
+  transform: translateY(-1px);
+}
+
+.document-upload__card:focus-visible,
+.document-upload__action:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.75);
+  outline-offset: 3px;
+}
+
+.document-upload__card:disabled,
+.document-upload--disabled .document-upload__card {
+  cursor: not-allowed;
+  opacity: 0.62;
+  transform: none;
+}
+
+.document-upload__icon {
+  align-items: center;
+  border-radius: 8px;
+  color: #ffffff;
+  display: flex;
+  font-size: 0.78rem;
+  font-weight: 900;
+  height: 4.25rem;
+  justify-content: center;
+  letter-spacing: 0;
+  position: relative;
+  width: 3.4rem;
+}
+
+.document-upload__icon::after {
+  border-left: 0.7rem solid transparent;
+  border-top: 0.7rem solid rgba(255, 255, 255, 0.5);
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.document-upload__icon--pdf {
+  background: linear-gradient(135deg, #dc2626, #f97316);
+}
+
+.document-upload__icon--docx {
+  background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+}
+
+.document-upload__icon--pptx {
+  background: linear-gradient(135deg, #c2410c, #f59e0b);
+}
+
+.document-upload__icon--empty {
+  background: linear-gradient(135deg, #475569, #94a3b8);
+}
+
+.document-upload__details {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.document-upload__name {
+  color: #0f172a;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.document-upload__meta,
+.document-upload__state {
+  color: #64748b;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.document-upload__state {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.document-upload__progress-wrap {
+  align-items: center;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.document-upload__progress {
+  background: #e2e8f0;
+  border-radius: 999px;
+  height: 0.45rem;
+  overflow: hidden;
+}
+
+.document-upload__progress-fill {
+  background: linear-gradient(90deg, #2563eb, #14b8a6);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  min-width: 0.4rem;
+  transition: width 170ms ease;
+}
+
+.document-upload__progress-label {
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 800;
+  min-width: 2.7rem;
+  text-align: right;
+}
+
+.document-upload__error {
+  color: #b91c1c;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.document-upload__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+.document-upload__action {
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 800;
+  min-height: 2.4rem;
+  padding: 0.6rem 0.95rem;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.document-upload__action:hover {
+  transform: translateY(-1px);
+}
+
+.document-upload__action--ghost {
+  background: #ffffff;
+  color: #334155;
+}
+
+.document-upload__action--primary {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+
+.document-upload--error .document-upload__card {
+  border-color: #ef4444;
+}
+
+.document-upload--uploaded .document-upload__card {
+  border-color: #10b981;
+}
+
+@media (max-width: 520px) {
+  .document-upload__card {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .document-upload__actions {
+    justify-content: stretch;
+  }
+
+  .document-upload__action {
+    flex: 1 1 8rem;
+  }
+}

@@ -1,0 +1,76 @@
+<div
+  class="audio-upload"
+  [class.audio-upload--dragover]="isDragOver()"
+  [class.audio-upload--disabled]="disabled()"
+  [class.audio-upload--error]="!!error()"
+  [class.audio-upload--uploaded]="status() === 'uploaded'"
+>
+  <input
+    #fileInput
+    class="audio-upload__input"
+    type="file"
+    accept=".mp3,.wav,.ogg,audio/mpeg,audio/wav,audio/ogg"
+    [disabled]="disabled() || isUploading()"
+    (change)="onFileSelected($event)"
+  />
+
+  <button
+    type="button"
+    class="audio-upload__card"
+    [disabled]="disabled() || isUploading()"
+    (click)="openFilePicker()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <span class="audio-upload__wave" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </span>
+
+    <span class="audio-upload__details">
+      @if (file(); as selectedFile) {
+        <span class="audio-upload__name">{{ selectedFile.name }}</span>
+        <span class="audio-upload__meta">
+          {{ formatFileSize(selectedFile.size) }} · {{ formatDuration(selectedFile.duration) }}
+        </span>
+        <span class="audio-upload__state">{{ statusLabel() }}</span>
+      } @else {
+        <span class="audio-upload__name">{{ label() }}</span>
+        <span class="audio-upload__meta">{{ helperText() }}</span>
+        <span class="audio-upload__state">Drag and drop, or tap to browse</span>
+      }
+    </span>
+  </button>
+
+  @if (file(); as selectedFile) {
+    <audio class="audio-upload__player" [src]="selectedFile.previewUrl" controls preload="metadata"></audio>
+  }
+
+  @if (isUploading() || status() === 'uploaded') {
+    <div class="audio-upload__progress-wrap">
+      <div class="audio-upload__progress" aria-label="Upload progress">
+        <span class="audio-upload__progress-fill" [style.width.%]="progress()"></span>
+      </div>
+      <span class="audio-upload__progress-label">{{ progress() }}%</span>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <p class="audio-upload__error">{{ message }}</p>
+  }
+
+  <div class="audio-upload__actions">
+    @if (file()) {
+      <button type="button" class="audio-upload__action audio-upload__action--ghost" (click)="remove()">
+        {{ isUploading() ? 'Cancel' : 'Remove' }}
+      </button>
+    }
+
+    @if (!autoUpload() && canUpload()) {
+      <button type="button" class="audio-upload__action audio-upload__action--primary" (click)="upload()">
+        Upload
+      </button>
+    }
+  </div>
+</div>

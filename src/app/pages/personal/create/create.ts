@@ -5,6 +5,7 @@ import { CreatorService, ContentType, ContentState, CreatorBlock, DraftPayload, 
 import { ClaudeService } from '../../../services/claude.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { CreatorToolsService } from '../../../services/creator-tools.service';
+import { MediaUploadService } from '../../../services/media-upload/media-upload.service';
 import { ToastComponent } from '../../../components/toast/toast';
 import { DiscussionChatComponent } from '../../../components/discussion-chat/discussion-chat';
 import { Subject, takeUntil, debounceTime, switchMap } from 'rxjs';
@@ -215,6 +216,7 @@ export class Create implements OnInit, OnDestroy {
   private readonly claudeService = inject(ClaudeService);
   private readonly toast = inject(ToastService);
   private readonly creatorTools = inject(CreatorToolsService);
+  private readonly mediaUploadService = inject(MediaUploadService);
   private readonly destroy$ = new Subject<void>();
   private _isExistingDraft = false;
   private _loadedIdentity = { title: '', contentTitle: '' };
@@ -549,7 +551,7 @@ export class Create implements OnInit, OnDestroy {
     if (!this.title()) { this.toast.warning('Add a title before updating.'); return; }
     if (!this.baseId()) return;
     if (this._hasBlobUrls()) {
-      this.toast.warning('Re-upload temporary media before updating.');
+      this.toast.warning('@ warning Re-upload temporary media before updating.');
       return;
     }
     this.serverSyncState.set('saving');
@@ -1154,8 +1156,7 @@ export class Create implements OnInit, OnDestroy {
 
     const pending = this.uploadFiles().filter(f => f.status === 'pending');
     pending.forEach(f => {
-      const blobUrl = URL.createObjectURL(f.file);
-      this._simulateUpload(f.id, blobUrl, target);
+      this._performUpload(f.id, target);
     });
   }
 
@@ -1222,66 +1223,92 @@ export class Create implements OnInit, OnDestroy {
     return 'unknown';
   }
 
-  private _simulateUpload(
+  private _performUpload(
     fileId: string,
-    blobUrl: string,
     target: { blockId: string; cellId?: string } | null,
   ): void {
+    const file = this.uploadFiles().find(f => f.id === fileId);
+    if (!file) return;
+
     this._patchFile(fileId, { status: 'uploading', progress: 0 });
 
-    const interval = setInterval(() => {
-      const file = this.uploadFiles().find(f => f.id === fileId);
-      if (!file || file.status === 'done' || file.status === 'error') {
-        clearInterval(interval);
-        return;
+    const nativeFile = file.file;
+    const mediaType = file.mediaType;
+
+    let upload$;
+    const options = {
+      onProgress: (p: any) => {
+        this._patchFile(fileId, { progress: p.percentage });
       }
+    };
 
-      const next = Math.min(file.progress + 15, 100);
-      const done = next === 100;
-      this._patchFile(fileId, { progress: next, status: done ? 'done' : 'uploading' });
+    if (mediaType === 'image') {
+      upload$ = this.mediaUploadService.uploadImage(nativeFile, options);
+    } else if (mediaType === 'video') {
+      upload$ = this.mediaUploadService.uploadVideo(nativeFile, options);
+    } else if (mediaType === 'audio') {
+      upload$ = this.mediaUploadService.uploadAudio(nativeFile, options);
+    } else if (mediaType === 'document' || mediaType === 'animation') {
+      upload$ = this.mediaUploadService.uploadDocument(nativeFile, options);
+    } else {
+      this._patchFile(fileId, { status: 'error', error: 'Unsupported format' });
+      return;
+    }
 
-      if (done) {
-        clearInterval(interval);
-        const mt = file.mediaType;
+    upload$.subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          const remoteUrl = response.data.url;
+          this._patchFile(fileId, { status: 'done', progress: 100 });
 
-        if (mt === 'image' || mt === 'video' || mt === 'audio' || mt === 'animation') {
           if (target?.cellId) {
             this.updateCanvasCell(target.blockId, target.cellId, {
-              content: { src: blobUrl, alt: file.name, caption: file.name },
+              content: { src: remoteUrl, alt: file.name, caption: file.name },
             });
           } else {
-            const blockType: BlockType = mt;
-            const content = mt === 'audio'
-              ? { src: blobUrl, title: file.name }
-              : mt === 'animation'
-                ? { src: blobUrl, caption: file.name }
-                : mt === 'image'
-                  ? { src: blobUrl, alt: file.name, caption: '' }
-                  : { src: blobUrl, caption: '' };
-            const afterId = this.insertTargetId();
-            this.blocks.update(list => {
-              const newBlock: Block = {
-                id: 'blk_' + Date.now() + '_' + Math.random().toString(36).slice(2),
-                type: blockType, content, order: 0,
-              };
-              if (afterId) {
-                const idx = list.findIndex(b => b.id === afterId);
-                if (idx !== -1) {
-                  const next2 = [...list];
-                  next2.splice(idx + 1, 0, newBlock);
-                  return next2.map((b, i) => ({ ...b, order: i }));
+            if (mediaType === 'image' || mediaType === 'video' || mediaType === 'audio' || mediaType === 'animation') {
+              const blockType: BlockType = mediaType;
+              const content = mediaType === 'audio'
+                ? { src: remoteUrl, title: file.name }
+                : mediaType === 'animation'
+                  ? { src: remoteUrl, caption: file.name }
+                  : mediaType === 'image'
+                    ? { src: remoteUrl, alt: file.name, caption: '' }
+                    : { src: remoteUrl, caption: '' };
+              const afterId = this.insertTargetId();
+              this.blocks.update(list => {
+                const newBlock: Block = {
+                  id: 'blk_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+                  type: blockType, content, order: 0,
+                };
+                if (afterId) {
+                  const idx = list.findIndex(b => b.id === afterId);
+                  if (idx !== -1) {
+                    const next2 = [...list];
+                    next2.splice(idx + 1, 0, newBlock);
+                    return next2.map((b, i) => ({ ...b, order: i }));
+                  }
                 }
-              }
-              return [...list, newBlock].map((b, i) => ({ ...b, order: i }));
-            });
-            this.onFieldChange();
+                return [...list, newBlock].map((b, i) => ({ ...b, order: i }));
+              });
+              this.onFieldChange();
+            }
           }
-        }
 
+          const allSettled = this.uploadFiles().every(f => f.status === 'done' || f.status === 'error');
+          if (allSettled) setTimeout(() => this.closeModal(), 600);
+        } else {
+          this._patchFile(fileId, { status: 'error', error: response.error?.details || 'Upload failed' });
+          const allSettled = this.uploadFiles().every(f => f.status === 'done' || f.status === 'error');
+          if (allSettled) setTimeout(() => this.closeModal(), 600);
+        }
+      },
+      error: (err) => {
+        this._patchFile(fileId, { status: 'error', error: err.message || 'Upload failed' });
         const allSettled = this.uploadFiles().every(f => f.status === 'done' || f.status === 'error');
         if (allSettled) setTimeout(() => this.closeModal(), 600);
       }
-    }, 150);
+    });
   }
 
   private _patchFile(id: string, patch: Partial<UploadFile>): void {

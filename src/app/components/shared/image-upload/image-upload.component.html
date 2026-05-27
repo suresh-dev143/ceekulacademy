@@ -1,0 +1,74 @@
+<div
+  class="image-upload"
+  [class.image-upload--dragover]="isDragOver()"
+  [class.image-upload--disabled]="disabled()"
+  [class.image-upload--error]="!!error()"
+  [class.image-upload--uploaded]="status() === 'uploaded'"
+>
+  <input
+    #fileInput
+    class="image-upload__input"
+    type="file"
+    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+    [disabled]="disabled() || isUploading()"
+    (change)="onFileSelected($event)"
+  />
+
+  <button
+    type="button"
+    class="image-upload__dropzone"
+    [disabled]="disabled() || isUploading()"
+    (click)="openFilePicker()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    @if (file(); as selectedFile) {
+      <span class="image-upload__preview">
+        <img [src]="selectedFile.previewUrl" [alt]="selectedFile.name" />
+      </span>
+      <span class="image-upload__details">
+        <span class="image-upload__name">{{ selectedFile.name }}</span>
+        <span class="image-upload__meta">{{ formatFileSize(selectedFile.size) }}</span>
+      </span>
+    } @else {
+      <span class="image-upload__icon" aria-hidden="true">+</span>
+      <span class="image-upload__details">
+        <span class="image-upload__name">{{ label() }}</span>
+        <span class="image-upload__meta">{{ helperText() }}</span>
+      </span>
+    }
+  </button>
+
+  @if (isUploading() || status() === 'uploaded') {
+    <div class="image-upload__progress" aria-label="Upload progress">
+      <span class="image-upload__progress-fill" [style.width.%]="progress()"></span>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <p class="image-upload__error">{{ message }}</p>
+  }
+
+  <div class="image-upload__actions">
+    @if (file()) {
+      <button
+        type="button"
+        class="image-upload__action image-upload__action--ghost"
+        (click)="remove()"
+      >
+        {{ isUploading() ? 'Cancel' : 'Remove' }}
+      </button>
+    }
+
+    @if (!autoUpload() && canUpload()) {
+      <button
+        type="button"
+        class="image-upload__action image-upload__action--primary"
+        (click)="upload()"
+      >
+        Upload
+      </button>
+    }
+  </div>
+</div>

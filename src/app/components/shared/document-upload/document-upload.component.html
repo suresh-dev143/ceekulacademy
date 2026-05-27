@@ -1,0 +1,73 @@
+<div
+  class="document-upload"
+  [class.document-upload--dragover]="isDragOver()"
+  [class.document-upload--disabled]="disabled()"
+  [class.document-upload--error]="!!error()"
+  [class.document-upload--uploaded]="status() === 'uploaded'"
+>
+  <input
+    #fileInput
+    class="document-upload__input"
+    type="file"
+    accept=".pdf,.docx,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    [disabled]="disabled() || isUploading()"
+    (change)="onFileSelected($event)"
+  />
+
+  <button
+    type="button"
+    class="document-upload__card"
+    [disabled]="disabled() || isUploading()"
+    (click)="openFilePicker()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    @if (file(); as selectedFile) {
+      <span class="document-upload__icon" [class]="'document-upload__icon--' + selectedFile.kind">
+        {{ iconLabel(selectedFile.kind) }}
+      </span>
+      <span class="document-upload__details">
+        <span class="document-upload__name">{{ selectedFile.safeName }}</span>
+        <span class="document-upload__meta">
+          {{ formatFileSize(selectedFile.size) }} · {{ selectedFile.kind.toUpperCase() }}
+        </span>
+        <span class="document-upload__state">{{ statusLabel() }}</span>
+      </span>
+    } @else {
+      <span class="document-upload__icon document-upload__icon--empty">DOC</span>
+      <span class="document-upload__details">
+        <span class="document-upload__name">{{ label() }}</span>
+        <span class="document-upload__meta">{{ helperText() }}</span>
+        <span class="document-upload__state">Drag and drop, or click to browse</span>
+      </span>
+    }
+  </button>
+
+  @if (isUploading() || status() === 'uploaded') {
+    <div class="document-upload__progress-wrap">
+      <div class="document-upload__progress" aria-label="Upload progress">
+        <span class="document-upload__progress-fill" [style.width.%]="progress()"></span>
+      </div>
+      <span class="document-upload__progress-label">{{ progress() }}%</span>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <p class="document-upload__error">{{ message }}</p>
+  }
+
+  <div class="document-upload__actions">
+    @if (file()) {
+      <button type="button" class="document-upload__action document-upload__action--ghost" (click)="remove()">
+        {{ isUploading() ? 'Cancel' : 'Remove' }}
+      </button>
+    }
+
+    @if (!autoUpload() && canUpload()) {
+      <button type="button" class="document-upload__action document-upload__action--primary" (click)="upload()">
+        Upload
+      </button>
+    }
+  </div>
+</div>

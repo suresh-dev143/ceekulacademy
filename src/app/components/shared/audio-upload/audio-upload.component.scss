@@ -1,0 +1,247 @@
+:host {
+  display: block;
+}
+
+.audio-upload {
+  color: #f8fafc;
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.audio-upload__input {
+  display: none;
+}
+
+.audio-upload__card {
+  align-items: center;
+  appearance: none;
+  background:
+    linear-gradient(135deg, rgba(20, 184, 166, 0.16), rgba(99, 102, 241, 0.12)),
+    rgba(15, 23, 42, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  box-shadow: 0 18px 48px rgba(2, 6, 23, 0.22);
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  min-height: 6.4rem;
+  padding: 0.85rem;
+  text-align: left;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+  width: 100%;
+}
+
+@supports (backdrop-filter: blur(16px)) {
+  .audio-upload__card {
+    backdrop-filter: blur(16px);
+  }
+}
+
+.audio-upload__card:hover,
+.audio-upload--dragover .audio-upload__card {
+  background:
+    linear-gradient(135deg, rgba(45, 212, 191, 0.22), rgba(168, 85, 247, 0.16)),
+    rgba(15, 23, 42, 0.72);
+  border-color: rgba(45, 212, 191, 0.68);
+  box-shadow: 0 22px 56px rgba(20, 184, 166, 0.18);
+  transform: translateY(-1px);
+}
+
+.audio-upload__card:focus-visible,
+.audio-upload__action:focus-visible {
+  outline: 2px solid rgba(45, 212, 191, 0.9);
+  outline-offset: 3px;
+}
+
+.audio-upload__card:disabled,
+.audio-upload--disabled .audio-upload__card {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.audio-upload__wave {
+  align-items: center;
+  background: rgba(2, 6, 23, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.16rem;
+  grid-template-columns: repeat(12, 1fr);
+  height: 4.5rem;
+  overflow: hidden;
+  padding: 0.7rem;
+}
+
+.audio-upload__wave span {
+  background: linear-gradient(180deg, #67e8f9, #a78bfa);
+  border-radius: 999px;
+  display: block;
+  height: 35%;
+  opacity: 0.9;
+  transform-origin: center;
+}
+
+.audio-upload__wave span:nth-child(2n) { height: 62%; }
+.audio-upload__wave span:nth-child(3n) { height: 88%; }
+.audio-upload__wave span:nth-child(5n) { height: 48%; }
+
+.audio-upload--dragover .audio-upload__wave span,
+.audio-upload__card:hover .audio-upload__wave span {
+  animation: audioWave 760ms ease-in-out infinite alternate;
+}
+
+.audio-upload__details {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.audio-upload__name {
+  color: #ffffff;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audio-upload__meta,
+.audio-upload__state {
+  color: rgba(226, 232, 240, 0.76);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.audio-upload__state {
+  color: #99f6e4;
+}
+
+.audio-upload__player {
+  height: 2.5rem;
+  width: 100%;
+}
+
+.audio-upload__progress-wrap {
+  align-items: center;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.audio-upload__progress {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  height: 0.45rem;
+  overflow: hidden;
+}
+
+.audio-upload__progress-fill {
+  background: linear-gradient(90deg, #2dd4bf, #38bdf8, #a78bfa);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  min-width: 0.4rem;
+  transition: width 170ms ease;
+}
+
+.audio-upload__progress-label {
+  color: rgba(226, 232, 240, 0.86);
+  font-size: 0.78rem;
+  font-weight: 800;
+  min-width: 2.7rem;
+  text-align: right;
+}
+
+.audio-upload__error {
+  color: #fecaca;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.audio-upload__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+.audio-upload__action {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 800;
+  min-height: 2.4rem;
+  padding: 0.6rem 0.95rem;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.audio-upload__action:hover {
+  transform: translateY(-1px);
+}
+
+.audio-upload__action--ghost {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+.audio-upload__action--primary {
+  background: linear-gradient(135deg, #14b8a6, #4f46e5);
+  color: #ffffff;
+}
+
+.audio-upload--error .audio-upload__card {
+  border-color: rgba(248, 113, 113, 0.72);
+}
+
+.audio-upload--uploaded .audio-upload__card {
+  border-color: rgba(52, 211, 153, 0.72);
+}
+
+@keyframes audioWave {
+  from { transform: scaleY(0.75); }
+  to { transform: scaleY(1.08); }
+}
+
+@media (max-width: 520px) {
+  .audio-upload__card {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .audio-upload__wave {
+    justify-self: center;
+    max-width: 13rem;
+    width: 100%;
+  }
+
+  .audio-upload__progress-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .audio-upload__progress-label {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .audio-upload__actions {
+    justify-content: stretch;
+  }
+
+  .audio-upload__action {
+    flex: 1 1 8rem;
+  }
+}
