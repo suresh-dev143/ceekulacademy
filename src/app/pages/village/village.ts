@@ -1,9 +1,11 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, effect } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LayoutComponent } from '../../components/layout/layout';
 import { ResourceOrchestrationService } from '../../services/resource-orchestration.service';
 import { CoherenceService } from '../../services/coherence.service';
+import { VillageOsService, VillageIssue as ApiVillageIssue } from '../../services/village-os.service'; // Prompt 11
+import { SemanticCrdtWorkspaceService, workspaceKey } from '../../services/semantic-crdt-workspace.service'; // Prompt 13
 
 type VillageTab = 'issues' | 'welfare' | 'volunteers' | 'coordination' | 'resources';
 
@@ -117,24 +119,24 @@ interface Resource {
           </div>
 
           <div class="vos-issue-list">
-            @for (issue of filteredIssues(); track issue.id) {
+            @for (issue of filteredIssues(); track issue.issueId) {
               <div class="vos-issue-card">
                 <div class="vic-header">
                   <span class="vic-priority" [class]="'vic-pri-' + issue.priority">
                     {{ issue.priority | uppercase }}
                   </span>
                   <span class="vic-cat">{{ issue.category }}</span>
-                  <span class="vic-id">{{ issue.id }}</span>
+                  <span class="vic-id">{{ issue.issueId }}</span>
                 </div>
                 <div class="vic-title">{{ issue.title }}</div>
                 <div class="vic-meta">
-                  <span class="vic-reporter">Reported by {{ issue.reportedBy }}</span>
-                  <span class="vic-days">{{ issue.daysOpen }}d open</span>
+                  <span class="vic-reporter">Reported by {{ issue.reporterCbId ?? 'Anonymous' }}</span>
+                  <span class="vic-days">{{ daysOpen(issue.createdAt) }}d open</span>
                   <span class="vic-votes">▲ {{ issue.upvotes }}</span>
                 </div>
                 <div class="vic-footer">
-                  @if (issue.assignedTo) {
-                    <span class="vic-assigned">Assigned → {{ issue.assignedTo }}</span>
+                  @if (issue.assignedToCbId) {
+                    <span class="vic-assigned">Assigned → {{ issue.assignedToCbId }}</span>
                   } @else {
                     <span class="vic-unassigned">Unassigned</span>
                   }
@@ -445,7 +447,7 @@ interface Resource {
     </div>
     <div class="vos-sb-card">
       <div class="vos-sb-label">ALERTS</div>
-      @for (issue of criticalIssueList(); track issue.id) {
+      @for (issue of criticalIssueList(); track issue.issueId) {
         <div class="vos-sb-alert">
           <span class="vsba-dot"></span>
           <span class="vsba-title">{{ issue.title }}</span>
@@ -775,11 +777,43 @@ export class VillageComponent {
 
   readonly orchestration = inject(ResourceOrchestrationService);
   readonly coherence     = inject(CoherenceService);
+  readonly villageOs     = inject(VillageOsService);           // Prompt 11
+  readonly workspace     = inject(SemanticCrdtWorkspaceService); // Prompt 13
 
   constructor() {
     this.orchestration.fetchDemand(this.districtId);
     this.orchestration.fetchDispatch(this.districtId);
     this.coherence.fetchVillageCoherence(this.districtId);
+    // Prompt 11: load full Village OS summary (single call replaces mock arrays)
+    this.villageOs.loadSummary(this.districtId);
+    this.villageOs.loadHeatmap(this.districtId);
+
+    // Prompt 13: workspace state is restored asynchronously (IDB → server merge).
+    // This effect updates local signals whenever the workspace snapshot arrives.
+    // The guard prevents the restore from immediately re-triggering the save effects.
+    let restoring = false;
+    effect(() => {
+      const snap = this.workspace.snapshot();
+      const tab    = (snap['village.activeTab']?.value  as VillageTab | undefined) ?? 'issues';
+      const filter = (snap['village.issueFilter']?.value as string     | undefined) ?? 'all';
+      restoring = true;
+      this.activeTab.set(tab);
+      this.issueFilter.set(filter);
+      restoring = false;
+    });
+
+    // Save local changes back to workspace (skipped during a restore to avoid loops).
+    effect(() => {
+      const tab = this.activeTab();
+      if (!restoring) this.workspace.set('village.activeTab', tab);
+    });
+    effect(() => {
+      const filter = this.issueFilter();
+      if (!restoring) this.workspace.set('village.issueFilter', filter);
+    });
+
+    // Prompt 13: pre-populate IDB so village tabs work offline for 1 hour
+    this.workspace.prefetchVillageSnapshot(this.districtId);
   }
 
   /** Live welfare need total — falls back to mock count while loading. */
@@ -787,7 +821,7 @@ export class VillageComponent {
     this.orchestration.demandAggregate()?.totalOpen ?? this.pendingWelfare()
   );
 
-  activeTab = signal<VillageTab>('issues');
+  activeTab   = signal<VillageTab>('issues');
   issueFilter = signal<string>('all');
 
   readonly issueFilters = ['all', 'critical', 'open', 'assigned', 'resolved'];
@@ -800,25 +834,19 @@ export class VillageComponent {
     { id: 'resources'    as VillageTab, glyph: '◆', label: 'Resources'     },
   ];
 
-  readonly issues: VillageIssue[] = [
-    { id: 'ISS-0012', title: 'Water tanker schedule broken — 3 days no supply', category: 'Water', priority: 'critical', status: 'assigned', reportedBy: 'Anitha V', assignedTo: 'Rajan Kumar', daysOpen: 3, upvotes: 42 },
-    { id: 'ISS-0018', title: 'Street lights out on Main Road (12 poles)', category: 'Infrastructure', priority: 'high', status: 'open', reportedBy: 'Selvam M', assignedTo: null, daysOpen: 6, upvotes: 28 },
-    { id: 'ISS-0021', title: 'Garbage collection stopped for 8 days', category: 'Sanitation', priority: 'high', status: 'in-progress', reportedBy: 'Priya S', assignedTo: 'District Manager', daysOpen: 8, upvotes: 19 },
-    { id: 'ISS-0024', title: 'Road pothole near school entrance — accident risk', category: 'Roads', priority: 'medium', status: 'assigned', reportedBy: 'Lakshmi T', assignedTo: 'PWD Coordinator', daysOpen: 12, upvotes: 35 },
-    { id: 'ISS-0027', title: 'LCC power backup not working', category: 'Digital', priority: 'medium', status: 'open', reportedBy: 'Mani K', assignedTo: null, daysOpen: 2, upvotes: 11 },
-    { id: 'ISS-0009', title: 'Footpath encroachment resolved', category: 'Roads', priority: 'low', status: 'resolved', reportedBy: 'Suresh B', assignedTo: 'Local Manager', daysOpen: 0, upvotes: 7 },
-  ];
-
+  // Prompt 11: issues now from live API via VillageOsService
+  // Falls back to empty array while loading — no mock data
   readonly filteredIssues = computed(() => {
-    const f = this.issueFilter();
-    if (f === 'all') return this.issues;
-    if (f === 'critical') return this.issues.filter(i => i.priority === 'critical');
-    return this.issues.filter(i => i.status === f);
+    const issues = this.villageOs.issues();
+    const f      = this.issueFilter();
+    if (f === 'all') return issues;
+    if (f === 'critical') return issues.filter(i => i.priority === 'critical');
+    return issues.filter(i => i.status === f);
   });
 
-  readonly criticalIssues  = computed(() => this.issues.filter(i => i.priority === 'critical').length);
-  readonly openIssues      = computed(() => this.issues.filter(i => i.status === 'open' || i.status === 'assigned' || i.status === 'in-progress').length);
-  readonly criticalIssueList = computed(() => this.issues.filter(i => i.priority === 'critical'));
+  readonly criticalIssues    = computed(() => this.villageOs.issues().filter(i => i.priority === 'critical').length);
+  readonly openIssues        = computed(() => this.villageOs.issues().filter(i => i.status === 'open' || i.status === 'assigned' || i.status === 'in-progress').length);
+  readonly criticalIssueList = computed(() => this.villageOs.issues().filter(i => i.priority === 'critical'));
 
   readonly welfareSignals: WelfareSignal[] = [
     { id: 'W001', familyCode: 'FAM-3812', type: 'FUN', need: 'Food support for 4 days — no ration card access this week', urgency: 'critical', status: 'matched', matchedVolunteer: 'Rajan K' },
@@ -850,6 +878,10 @@ export class VillageComponent {
   ];
 
   readonly liveCoordinations = computed(() => this.coordEvents.filter(e => e.status === 'live').length);
+
+  daysOpen(createdAt: string): number {
+    return Math.floor((Date.now() - new Date(createdAt).getTime()) / 86_400_000);
+  }
 
   readonly resources: Resource[] = [
     { name: 'Vandavasi RCC Hub',       type: 'RCC', status: 'active',  utilization: 68, nextMaintenance: 'Jun 15' },

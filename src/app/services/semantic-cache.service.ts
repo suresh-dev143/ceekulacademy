@@ -3,6 +3,8 @@ import { isPlatformBrowser } from '@angular/common';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+export type CacheStore = 'api_cache' | 'content_objects' | 'workspace_state';
+
 export interface CacheEntry<T = unknown> {
   data:      T;
   cachedAt:  number;
@@ -31,7 +33,7 @@ export class SemanticCacheService {
   private db: IDBDatabase | null = null;
 
   private static readonly DB_NAME    = 'ceekul_semantic_v1';
-  private static readonly DB_VERSION = 1;
+  private static readonly DB_VERSION = 2;
 
   constructor() {
     if (!this.isBrowser) return;
@@ -40,7 +42,7 @@ export class SemanticCacheService {
 
   // ── Public API ────────────────────────────────────────────────────────────
 
-  async put<T>(store: 'api_cache' | 'content_objects', key: string, data: T, ttlMs: number): Promise<void> {
+  async put<T>(store: CacheStore, key: string, data: T, ttlMs: number): Promise<void> {
     const db = await this._ready();
     return new Promise((resolve, reject) => {
       const tx  = db.transaction(store, 'readwrite');
@@ -50,7 +52,7 @@ export class SemanticCacheService {
     });
   }
 
-  async get<T>(store: 'api_cache' | 'content_objects', key: string): Promise<T | null> {
+  async get<T>(store: CacheStore, key: string): Promise<T | null> {
     const db = await this._ready();
     return new Promise((resolve, reject) => {
       const tx  = db.transaction(store, 'readonly');
@@ -65,7 +67,7 @@ export class SemanticCacheService {
     });
   }
 
-  async delete(store: 'api_cache' | 'content_objects', key: string): Promise<void> {
+  async delete(store: CacheStore, key: string): Promise<void> {
     const db = await this._ready();
     return new Promise((resolve, reject) => {
       const tx  = db.transaction(store, 'readwrite');
@@ -91,6 +93,8 @@ export class SemanticCacheService {
       const db = (e.target as IDBOpenDBRequest).result;
       if (!db.objectStoreNames.contains('api_cache'))       db.createObjectStore('api_cache');
       if (!db.objectStoreNames.contains('content_objects')) db.createObjectStore('content_objects');
+      // v2: workspace CRDT state per user (Layer 13 — cross-device sync)
+      if (!db.objectStoreNames.contains('workspace_state')) db.createObjectStore('workspace_state');
     };
 
     req.onsuccess = (e) => {

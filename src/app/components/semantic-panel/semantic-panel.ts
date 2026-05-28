@@ -7,6 +7,8 @@ import { CoherenceService, CoherenceLevel } from '../../services/coherence.servi
 import { DScoreService } from '../../services/dscore.service';
 import { NeedsIntelligenceService } from '../../services/needs-intelligence.service';
 import { AuthService } from '../../services/auth.service';
+import { SemanticUIService } from '../../services/semantic-ui.service'; // Prompt 15
+import { DeviceMetabolismService } from '../../services/device-metabolism.service'; // Prompt 16
 
 // ── Mode configuration ─────────────────────────────────────────────────────────
 
@@ -75,6 +77,31 @@ const DEFAULT_ACTIONS: QuickAction[] = [
   { label: 'Neurons',     route: '/neurons' },
   { label: 'Mission',     route: '/mission' },
 ];
+
+// Map descriptor action strings to Angular router routes
+function _actionToRoute(action: string): string {
+  const MAP: Record<string, string> = {
+    'open:notes':            '/notes',
+    'content:bookmark':      '/bookmarks',
+    'content:quiz':          '/quiz',
+    'va:ask':                '/va',
+    'content:cite':          '/cite',
+    'content:compare':       '/compare',
+    'va:synthesize':         '/research',
+    'profile:dscore':        '/dashboard/digital-twin',
+    'content:contribute':    '/contribute',
+    'va:mentor-mode':        '/mentor',
+    'wellness:breathe':      '/wellness',
+    'wellness:journal':      '/journal',
+    'village:report-issue':  '/issues',
+    'village:dispatch':      '/village',
+    'open:dinner':           '/dinner',
+    'welfare:apply':         '/personal/welfare',
+    'welfare:track':         '/personal/welfare',
+    'open:schedule':         '/personal/schedule',
+  };
+  return MAP[action] ?? '/home';
+}
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
@@ -159,10 +186,42 @@ const DEFAULT_ACTIONS: QuickAction[] = [
     .sp-nb-pill {
       font-size: 0.52rem; color: #475569; background: #0f172a;
       border: 1px solid #1e293b; padding: 0.1rem 0.3rem;
-      font-family: monospace; max-width: 88px;
+      font-family: monospace; max-width: 96px;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      display: flex; align-items: center; gap: 0.2rem;
     }
+    .sp-nb-rel  { color: #334155; font-size: 0.5rem; flex-shrink: 0; }
     .sp-nb-empty { font-size: 0.55rem; color: #1e293b; font-style: italic; }
+
+    /* ── Learning path next-step strip (Prompt 15) ── */
+    .sp-next-step {
+      background: #0a0f1a; border: 1px solid #0f172a; border-left: 2px solid #3b82f633;
+      padding: 0.35rem 0.55rem; display: flex; flex-direction: column; gap: 0.15rem;
+      animation: sp-fade 0.2s ease;
+    }
+    .sp-ns-label { font-size: 0.5rem; color: #3b82f666; text-transform: uppercase; letter-spacing: 0.1em; }
+    .sp-ns-cid   { font-size: 0.58rem; color: #3b82f6; font-family: monospace; }
+    .sp-ns-meta  { font-size: 0.5rem; color: #334155; }
+
+    /* ── Eco meter strip (Prompt 16) ── */
+    .sp-eco {
+      background: #0a0f1a; border: 1px solid #0f172a; border-left: 2px solid #22c55e33;
+      padding: 0.35rem 0.55rem; display: flex; flex-direction: column; gap: 0.2rem;
+      animation: sp-fade 0.2s ease;
+    }
+    .sp-eco--balanced  { border-left-color: #f59e0b33; }
+    .sp-eco--intensive { border-left-color: #ef444433; }
+    .sp-eco-top { display: flex; align-items: center; gap: 0.4rem; }
+    .sp-eco-label { font-size: 0.5rem; color: #334155; text-transform: uppercase; letter-spacing: 0.1em; flex: 1; }
+    .sp-eco-pct   { font-size: 0.58rem; font-weight: 700; color: #22c55e; font-variant-numeric: tabular-nums; }
+    .sp-eco--balanced  .sp-eco-pct { color: #f59e0b; }
+    .sp-eco--intensive .sp-eco-pct { color: #ef4444; }
+    .sp-eco-track { height: 2px; background: #0f172a; overflow: hidden; border-radius: 1px; }
+    .sp-eco-fill  { height: 100%; background: #22c55e; border-radius: 1px; transition: width 0.4s ease; }
+    .sp-eco--balanced  .sp-eco-fill { background: #f59e0b; }
+    .sp-eco--intensive .sp-eco-fill { background: #ef4444; }
+    .sp-eco-sub   { font-size: 0.48rem; color: #1e293b; }
+    .sp-eco-defer { color: #3b82f666; }
 
     /* ── Flow health ── */
     .sp-health {
@@ -307,6 +366,27 @@ const DEFAULT_ACTIONS: QuickAction[] = [
         </div>
       }
 
+      <!-- Eco meter — device compute budget (Prompt 16) -->
+      @if (metabolism.snapshot() !== null) {
+        <div class="sp-eco"
+             [class.sp-eco--balanced]="metabolism.snapshot()!.today.level === 'balanced'"
+             [class.sp-eco--intensive]="metabolism.snapshot()!.today.level === 'intensive'">
+          <div class="sp-eco-top">
+            <span class="sp-eco-label">Eco budget</span>
+            <span class="sp-eco-pct">{{ metabolism.snapshot()!.today.percentUsed }}%</span>
+          </div>
+          <div class="sp-eco-track">
+            <div class="sp-eco-fill" [style.width.%]="metabolism.snapshot()!.today.percentUsed"></div>
+          </div>
+          <span class="sp-eco-sub">
+            {{ metabolism.snapshot()!.today.level }}
+            @if (metabolism.snapshot()!.today.deferredCount > 0) {
+              · <span class="sp-eco-defer">{{ metabolism.snapshot()!.today.deferredCount }} deferred</span>
+            }
+          </span>
+        </div>
+      }
+
       <!-- Quick actions grid -->
       <div class="sp-actions">
         @for (a of quickActions(); track a.route) {
@@ -314,61 +394,116 @@ const DEFAULT_ACTIONS: QuickAction[] = [
         }
       </div>
 
-      <!-- Semantic neighbors -->
+      <!-- Semantic neighbors (Prompt 15: now include relation type) -->
       <div class="sp-neighbors">
-        <span class="sp-nb-label">Neighbors</span>
+        <span class="sp-nb-label">Graph neighbors</span>
         @if (visibleNeighbors().length > 0) {
           <div class="sp-nb-pills">
-            @for (cid of visibleNeighbors(); track cid) {
-              <span class="sp-nb-pill" [title]="cid">{{ cid }}</span>
+            @for (n of visibleNeighbors(); track n.cid) {
+              <span class="sp-nb-pill" [title]="n.cid">
+                <span class="sp-nb-rel">{{ relationGlyph(n.relation) }}</span>{{ n.cid.slice(0, 10) }}
+              </span>
             }
           </div>
         } @else {
-          <span class="sp-nb-empty">No neighbors</span>
+          <span class="sp-nb-empty">No neighbors yet</span>
         }
       </div>
+
+      <!-- Learning path (Prompt 15: next step from semantic graph) -->
+      @if (learningPath() !== null && learningPath()!.nextCid) {
+        <div class="sp-next-step">
+          <span class="sp-ns-label">Next step</span>
+          <span class="sp-ns-cid" [title]="learningPath()!.nextCid!">
+            {{ learningPath()!.nextCid!.slice(0, 16) }}…
+          </span>
+          <span class="sp-ns-meta">
+            +{{ learningPath()!.advancementCount }} ahead
+            @if (learningPath()!.prerequisiteCount > 0) {
+              · {{ learningPath()!.prerequisiteCount }} prereq
+            }
+          </span>
+        </div>
+      }
 
     </div>
   `,
 })
 export class SemanticIntelligencePanelComponent {
-  readonly ctx       = inject(SemanticContextService);
-  readonly optimizer = inject(WorkflowOptimizerService);
-  readonly coherence = inject(CoherenceService);
-  readonly dScore    = inject(DScoreService);
-  readonly needs     = inject(NeedsIntelligenceService);
+  readonly ctx        = inject(SemanticContextService);
+  readonly optimizer  = inject(WorkflowOptimizerService);
+  readonly coherence  = inject(CoherenceService);
+  readonly dScore     = inject(DScoreService);
+  readonly needs      = inject(NeedsIntelligenceService);
+  readonly semanticUI = inject(SemanticUIService);        // Prompt 15
+  readonly metabolism = inject(DeviceMetabolismService);  // Prompt 16
   private readonly _auth = inject(AuthService);
 
   constructor() {
-    // Self-populate D-Score and needs signals on every page when authenticated.
     effect(() => {
       const user = this._auth.currentUserProfile();
       if (user?.id) {
         this.dScore.fetch(user.id);
         this.needs.assess(user.id);
+        this.metabolism.fetchSnapshot(); // Prompt 16: ecological footprint
       }
     });
   }
 
+  // ── Mode (hardcoded fallback while descriptor loads) ─────────────────────
+
   private readonly activeMode = computed<AssistanceMode>(() =>
     this.ctx.assistanceMode() ?? 'navigator'
   );
-
   private readonly modeConfig = computed<ModeConfig>(() => MODE_CONFIG[this.activeMode()]);
 
   readonly modeColor = computed(() => this.modeConfig().color);
   readonly modeGlyph = computed(() => this.modeConfig().glyph);
   readonly modeName  = computed(() => this.modeConfig().name);
 
-  readonly quickActions = computed<QuickAction[]>(() =>
-    this.ctx.assistanceMode() ? this.modeConfig().actions : DEFAULT_ACTIONS
-  );
+  // ── Descriptor-driven tools (Prompt 15) ──────────────────────────────────
+
+  /**
+   * Quick actions now come from the server descriptor instead of MODE_CONFIG.
+   * Falls back to MODE_CONFIG actions while descriptor is loading.
+   */
+  readonly quickActions = computed<QuickAction[]>(() => {
+    const tools = this.semanticUI.tools();
+    if (tools.length > 0) {
+      // Map descriptor tools to QuickAction shape
+      return tools.slice(0, 4).map(t => ({
+        label: t.label,
+        route: _actionToRoute(t.action),
+      }));
+    }
+    // Fallback: hardcoded mode config
+    return this.ctx.assistanceMode() ? this.modeConfig().actions : DEFAULT_ACTIONS;
+  });
+
+  // ── Semantic neighbors (Prompt 15: actual graph edges, not raw CIDs) ─────
+
+  /**
+   * Neighbors now carry relation type from the semantic graph.
+   * Falls back to raw CIDs from SemanticContextService when descriptor is absent.
+   */
+  readonly visibleNeighbors = computed(() => {
+    const fromDescriptor = this.semanticUI.semanticNeighbors();
+    if (fromDescriptor.length > 0) return fromDescriptor.slice(0, 4);
+    // Fallback to context service raw CIDs
+    return this.ctx.neighbors().slice(0, 3).map(cid => ({ cid, relation: 'adjacent' }));
+  });
+
+  // ── Learning path (Prompt 15: next step from semantic graph) ─────────────
+
+  readonly learningPath = computed(() => this.semanticUI.learningPath());
+
+  // ── Workflow ──────────────────────────────────────────────────────────────
 
   readonly workflowProgress = computed(() =>
     Math.min(100, Math.round((this.ctx.depth() / 10) * 100))
   );
 
-  readonly visibleNeighbors = computed(() => this.ctx.neighbors().slice(0, 3));
+  // ── Helpers ───────────────────────────────────────────────────────────────
 
   suggestionGlyph(type: SuggestionType): string {
     switch (type) {
@@ -384,6 +519,17 @@ export class SemanticIntelligencePanelComponent {
       case 'medium': return '◉';
       case 'low':    return '◎';
       default:       return '◎';
+    }
+  }
+
+  relationGlyph(relation: string): string {
+    switch (relation) {
+      case 'extends':      return '↗';
+      case 'depends_on':   return '←';
+      case 'derived_from': return '⊃';
+      case 'references':   return '→';
+      case 'synthesizes':  return '⊕';
+      default:             return '·';
     }
   }
 }

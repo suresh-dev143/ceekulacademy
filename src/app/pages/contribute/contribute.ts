@@ -6,6 +6,14 @@ import { NeuronService } from '../../services/neuron.service';
 import { environment } from '../../../environments/environment';
 import { LayoutComponent } from '../../components/layout/layout';
 
+// Neuron valuation response shape
+interface ValuationResponse {
+  success:        boolean;
+  neuronValueINR: number;
+  simulationPhase: boolean;
+  example: { inr1000ToNeurons: number; neurons100ToINR: number };
+}
+
 @Component({
   selector: 'app-contribute',
   standalone: true,
@@ -27,9 +35,15 @@ export class Contribute implements OnInit {
   contributionError   = signal<string | null>(null);
   contributionSuccess = signal<string | null>(null);
 
+  // Current neuron valuation — 1N = 1 INR in Phase 1 (Mission)
+  neuronValueINR     = signal<number>(1.0);
+  valuationPhase     = signal<'simulation' | 'civilizational'>('simulation');
+  // Future: neuronValueINR = totalUniversalProduction / totalNeuronsInCirculation
+
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.neuronService.loadAll();
+      this._loadValuation();
     }
     this.contributionForm = this.fb.group({
       entityType: ['', Validators.required],
@@ -83,5 +97,24 @@ export class Contribute implements OnInit {
       confirmed: 'status--confirmed',
       rejected:  'status--rejected',
     } as Record<string, string>)[status] ?? '';
+  }
+
+  /** INR amount typed in the form → neuron preview */
+  inrToNeuronPreview(amountINR: number): number {
+    return Math.floor(amountINR / this.neuronValueINR());
+  }
+
+  private _loadValuation(): void {
+    this.http.get<ValuationResponse>(
+      `${environment.apiUrl}/neurons/valuation`
+    ).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          this.neuronValueINR.set(res.neuronValueINR);
+          this.valuationPhase.set(res.simulationPhase ? 'simulation' : 'civilizational');
+        }
+      },
+      error: () => { /* server not yet seeded — fallback to 1 INR */ },
+    });
   }
 }

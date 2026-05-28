@@ -2,6 +2,7 @@ import { Component, inject, Input, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SemanticContextService } from '../../services/semantic-context.service';
 import { AuthService } from '../../services/auth.service';
+import { SemanticUIService } from '../../services/semantic-ui.service'; // Prompt 15
 
 // ── Mode configuration ─────────────────────────────────────────────────────────
 
@@ -325,6 +326,24 @@ const CORE_NAV: ContextLink[] = [
         </div>
       }
 
+      <!-- Secondary nav (Prompt 15: descriptor-driven — studio, governance, welfare, etc.) -->
+      @if (!collapsed && secondaryLinks().length > 0) {
+        <div class="lp-context">
+          <div class="lp-ctx-header" style="border-left-color: #334155;">
+            <span class="lp-ctx-glyph" style="color:#334155;">◇</span>
+            <span class="lp-ctx-label" style="color:#334155;">Contextual</span>
+          </div>
+          <div class="lp-ctx-links">
+            @for (link of secondaryLinks(); track link.route) {
+              <a class="lp-link"
+                 [routerLink]="link.route"
+                 routerLinkActive="lp-link--active"
+                 [routerLinkActiveOptions]="{ exact: false }">{{ link.label }}</a>
+            }
+          </div>
+        </div>
+      }
+
       <!-- Core nav — always visible (expanded only) -->
       @if (!collapsed) {
         <div class="lp-core">
@@ -353,7 +372,8 @@ const CORE_NAV: ContextLink[] = [
   `,
 })
 export class SemanticLeftPanelComponent {
-  readonly ctx  = inject(SemanticContextService);
+  readonly ctx        = inject(SemanticContextService);
+  readonly semanticUI = inject(SemanticUIService); // Prompt 15
   private readonly auth = inject(AuthService);
 
   @Input() collapsed = false;
@@ -372,14 +392,33 @@ export class SemanticLeftPanelComponent {
   readonly modeColor    = computed(() => this.modeCfg().color);
   readonly modeGlyph    = computed(() => this.modeCfg().glyph);
   readonly sectionLabel = computed(() => this.modeCfg().sectionLabel);
-  readonly contextLinks = computed(() => this.modeCfg().links);
+
+  /**
+   * Context links come from the server descriptor (Prompt 15).
+   * Falls back to MODE_CONFIG links while descriptor is loading.
+   */
+  readonly contextLinks = computed<ContextLink[]>(() => {
+    const primary = this.semanticUI.primaryNav();
+    if (primary.length > 0) {
+      return primary.map(n => ({ label: n.label, route: n.route }));
+    }
+    return this.modeCfg().links;
+  });
+
+  /**
+   * Secondary nav (creator studio, governance, welfare, etc.) is purely
+   * descriptor-driven — it doesn't exist in the hardcoded MODE_CONFIG.
+   */
+  readonly secondaryLinks = computed<ContextLink[]>(() =>
+    this.semanticUI.secondaryNav().map(n => ({ label: n.label, route: n.route }))
+  );
 
   readonly profileRoute = computed(() => {
     const role = this.userRole();
-    if (role === 'Student')                        return '/dashboard/student';
+    if (role === 'Student')                          return '/dashboard/student';
     if (role === 'Teacher' || role === 'Instructor') return '/dashboard/teacher';
-    if (role === 'Partner')                        return '/dashboard/partner';
-    if (role === 'Director')                       return '/dashboard/director';
+    if (role === 'Partner')                          return '/dashboard/partner';
+    if (role === 'Director')                         return '/dashboard/director';
     return '/my-profile';
   });
 

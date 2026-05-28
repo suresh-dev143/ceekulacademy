@@ -340,6 +340,123 @@ Analyzes UCRS saga workflows from MongoDB. `analyzeWorkflows(name?)` returns ste
 
 **Phase 1 complete.** All near-term Layer 1 foundation items done.
 
+### Implementation Prompt 12 — Planetary Resource Orchestration (May 2026)
+
+- ✅ `resourceOrchestrationService.js` extended — three Prompt 12 capabilities added:
+  - `crossDistrictDispatch(sourceDistrictId)`: finds surplus volunteers in a district (more free volunteers than critical applications), ranks neighboring districts (same state) by urgency score (critical×3 + high×2 + medium), routes surplus volunteers to top-need neighbors. Geographic proximity via state field + demand severity ranking.
+  - `forecastDemand(districtId, daysAhead)`: 90-day historical analysis of WelfareApplication filing dates → day-of-week application rate averages → project forward N days with risk levels (high/elevated/normal). No ML required — simple moving average, upgradeable to Prophet/ARIMA.
+  - `getRegionalDemandMap(state?)`: aggregates demand across all districts in a state (or all states), ranks by urgency score. Used by governance bodies for cross-district resource allocation decisions.
+- ✅ `orchestration.route.js` updated — 3 new routes: `GET /dispatch/cross-district/:districtId`, `GET /demand/forecast/:districtId`, `GET /demand/regional?state=`.
+- **Result:** Resource orchestration scales beyond single districts. Surplus volunteers in Vandavasi can now be suggested to high-need neighboring districts. Governance bodies see a regional demand map to inform cross-district commons pool allocation. Demand forecasting enables proactive volunteer pre-positioning before predicted peak filing days.
+
+### Implementation Prompt 11 — Village OS & Human Coherence (May 2026)
+
+- ✅ `villageIssueModel.js` — village issue tracker: districtId, category, priority, status lifecycle (open→assigned→in-progress→resolved→escalated), upvotedBy[] for community signaling, escalatedToProposalId (C4 subsidiarity link), contentCid.
+- ✅ `villageOsService.js` — six capabilities: `getVillageOsSummary()` (single aggregated call for all tabs: coherence + welfare demand/dispatch + issues + governance proposals — C3), `getCoherenceHeatmap()` (per-member levels, not D-score details — C1), `createIssue()` (UCE commit + D-score village_welfare_act), `updateIssueStatus()`, `upvoteIssue()`, `escalateToProposal()` (calls collectiveGovernanceService — C4 subsidiarity).
+- ✅ `villageOs.route.js` + registered at `/api/village/os/:districtId/` — 7 endpoints: summary, coherence-heatmap, issues CRUD, upvote, escalate.
+- ✅ `village-os.service.ts` (Angular) — new service with signals: `summary`, `issues`, `heatmap`, `loading`. Methods: `loadSummary()`, `loadHeatmap()`, `reportIssue()`, `updateIssueStatus()`, `upvoteIssue()`, `escalateIssue()`.
+- ✅ `village.ts` updated — injects `VillageOsService`. Constructor loads summary + heatmap. `filteredIssues` computed from live API signals — mock arrays removed.
+- **Result:** Village OS is now fully live-data-driven across all tabs. Issues are reported, assigned, upvoted, and escalated to governance proposals. The coherence heatmap shows per-member alignment levels. Divergent coherence signals support need — not exclusion. The village is an autonomous semantic coordination node.
+
+### Implementation Prompt 10 — Collective Governance (May 2026)
+
+- ✅ 3 UCE content types: `governance.proposal`, `governance.vote`, `governance.deliberation` — every governance act enters civilization semantic memory permanently.
+- ✅ `governanceProposalModel.js` — 4 subsidiarity levels (village/district/regional/civilizational), domain classification, `contentCid`, status lifecycle (draft→open→voting→ratified|rejected), quorum threshold, weighted tally.
+- ✅ `governanceVoteModel.js` — append-only, immutable after casting. Pre-save hook prevents modification. Weight range: 1 (constitutional minimum) to 3 (highest D-score amplification). Constitutional minimum = dignity floor that can never reach zero (C4+C1).
+- ✅ `governanceDeliberationModel.js` — append-only discussion entries. Permanently preserved even when overruled (C4: minority view preservation).
+- ✅ `collectiveGovernanceService.js` — six capabilities: `computeVoteWeight()` (constitutional formula: min + D-score amplification, transparent), `createProposal()` (UCE commit + D-score recognition), `openProposal()`, `castVote()` (weight computed + UCE commit + SemanticEdge to proposal + D-score), `recordDeliberation()` (UCE commit + SemanticEdge references proposal + D-score +3), `closeVoting()` (weighted tally, quorum awareness, ratified proposer gets `policy_ratified` D-score +5).
+- ✅ 7 API routes on `/api/collective-governance/`: proposals CRUD, vote, deliberate, close (admin), and `GET /vote-weight` — transparency endpoint showing every member exactly what their vote weighs and why (C6).
+- **Result:** C4 is now operational. Governance is distributed, lineage-aware, and dignity-constrained. No member's voice is silenced (constitutional minimum weight). D-score amplifies governance experience (1–3x range). Every vote, deliberation, and proposal is permanently committed to UCE and wired into the SemanticEdge graph — the civilization can trace any decision to its full deliberative history.
+
+### Implementation Prompt 9 — Knowledge Commons (May 2026)
+
+- ✅ `knowledge-commons.article` content type registered in UCE schema registry + normalizer — published creator content enters the civilization's knowledge commons with full collaborator attribution in payload.
+- ✅ `creatorContentModel.js` — `contentCid` field added (sparse indexed). Published articles now join the semantic memory.
+- ✅ `knowledgeCommonsService.js` — five capabilities:
+  - `commitPublishedContent()`: UCE commit on publish → D-score `content_committed` for author
+  - `recordCollaborationLineage()`: `co_authored` SemanticEdge per contributor → D-score `content_committed` per contributor — attribution automatic, not manual
+  - `recordPeerReview()`: `peer_reviewed` SemanticEdge → quality signal in graph → D-score `peer_review_given` (+3) for reviewer
+  - `searchKnowledgeCommons()`: semantic graph traversal (domain, relationship type, fromCid) → returns edges + UCE metadata — replaces keyword search with graph-walk
+  - `getAttributionChain(contentCid)`: full chain — primary author, co-authors, peer reviewers, what it builds on, what builds on it, translations, challenges — with quality signal counts
+- ✅ `creatorService.js` — `publishContent()` calls `commitPublishedContent()` + `recordCollaborationLineage()` fire-and-forget. `_getCollaboratorCbIds()` resolves active collaborators from collaboration record.
+- ✅ 3 new routes on `/api/knowledge-commons/`: `GET /search`, `GET /attribution/:cid`, `POST /peer-review` (ucrsVerify, earns D-score).
+- **Result:** C5 is now operational. Knowledge cannot be owned — it can only be attributed. Every published article carries its full semantic lineage. Every collaborator's contribution is permanently recorded in the SemanticEdge graph. Every peer review signals quality across the entire knowledge commons. The AI can now traverse the knowledge graph to surface related content for any learner, without keyword matching.
+
+### Implementation Prompt 8 — Semantic Economy (May 2026)
+
+- ✅ `semanticObligationModel.js` — append-only obligation ledger: fromCbId, toCbId, amount, obligationType (6 types), semanticSourceCid, districtId. Status: pending → compressed. TTL index: 30-day auto-expiry on pending obligations (C3). District + status compound index for O(district_size) compression.
+- ✅ `neuronTransactionModel.js` extended — `semanticSourceCid` (traces transaction back to the content that generated it) and `districtId` fields added (both sparse indexed). Every economic act now carries its semantic lineage.
+- ✅ `semanticEconomyService.js` — six capabilities:
+  - `recordObligation()`: append pending obligation, non-blocking (deferred settlement — C2)
+  - `recordLearningLineageObligation()`: when learner annotates, teacher receives lineage credit obligation
+  - `compressDistrictObligations(districtId)`: net all pending obligations for a district → minimal NeuronTransactions; O(n) netting algorithm eliminates reverse flows
+  - `checkAccumulationCeiling(userId, cbId)`: surplus above ceiling → SUN pool + D-score `sun_donated` event
+  - `getContributionLineage(contentCid)`: total economic value generated by a piece of content (pending + settled)
+  - `getMemberEconomicSnapshot(cbId, userId)`: full semantic economic standing — pending credits, obligations, ceiling status
+- ✅ `semanticLearningService.js` extended — calls `recordLearningLineageObligation()` after annotation edge creation; `_getCreatorCbId()` resolves creator's CB ID from contentCid via Lecture model or SemanticEdge.
+- ✅ 4 new API routes on `/api/neurons/semantic-economy/`: `GET /snapshot`, `GET /lineage/:contentCid`, `POST /compress` (admin), `POST /ceiling-check` (admin).
+- **Result:** C2 is now operational. Value flows are deferred (obligations accumulate), compressed locally (village netting before regional), traced semantically (every transaction links to its source contentCid), and ceiling-enforced (no unlimited accumulation). Teachers receive lineage credit when learners build on their work.
+
+### Implementation Prompt 7 — Semantic Learning (May 2026)
+
+- ✅ `annotation` content type registered in UCE schema registry + normalizer — every learner annotation gets a `contentCid` and enters the civilization's knowledge commons (C5).
+- ✅ `lectureModel.js` — `contentCid` field added (sparse index). Lectures now join the semantic graph.
+- ✅ `lectureController.js` — `commitLectureToSeed()` called fire-and-forget after creation; lecture is committed to UCE with its title/category/tags payload.
+- ✅ `semanticLearningService.js` — three capabilities:
+  - `commitLectureToSeed()`: UCE commit → contentCid stored on lecture document
+  - `processAnnotationAsSeed()`: UCE commit → SemanticEdge created (tool→relationship: question=references, insight=extends, summary=synthesizes, challenge=contradicts) → D-score events fired (content_committed + semantic_edge_created) → civilization event published
+  - `buildLearningPath(contentCid)`: 2-hop semantic graph traversal → `{ prerequisites, advancement, peers }` — adaptive path derived from the knowledge graph, not a fixed curriculum
+- ✅ `annotationService.js` — `createAnnotation()` now accepts `authorCbId`; calls `processAnnotationAsSeed()` fire-and-forget after save.
+- ✅ `annotation.route.js` — `POST /` upgraded to `ucrsVerify()` to extract CB ID for attribution. `GET /learning-path/:contentCid` — new semantic learning path endpoint.
+- **Result:** Learning is now semantic co-evolution. A learner who challenges a lecture creates a `contradicts` SemanticEdge, earns D-score `learningContribution` (+3), and their challenge becomes part of the knowledge path every future learner sees. The lecture's learning path grows richer with every annotation from every learner — the collective intelligence of all learners shapes the curriculum.
+
+### Implementation Prompt 6 — Self-Evolving Workflows (May 2026)
+
+- ✅ `workflowRunModel.js` — cross-user workflow run store: cbId, workflowName, startedAt, endedAt, abandoned, steps[]. TTL index: 90-day auto-purge (C3: aggregate patterns matter, not infinite raw data).
+- ✅ `workflowTelemetryService.js` — `recordRun()` + `getPatterns()`: aggregate detection across all users for abandonment rate, bottleneck step (step seen in 30%+ of runs, 2.5× longer than average), drop-off point analysis. Confidence levels: high/medium/low by sample size (C6: transparent to members). Min 5 runs before patterns surface.
+- ✅ `workflow.route.js` extended — `POST /api/workflows/telemetry` (ucrsVerify, fire-and-forget persist, immediate response). `GET /api/workflows/patterns/:name` (aggregate only, no individual data exposed — C1 compliant).
+- ✅ `workflow-optimizer.service.ts` upgraded — sends telemetry on every run finalization; fetches server patterns on workflow start (5-min cache); server suggestions preferred when fresh; local detection (localStorage) is offline fallback (C13); slow-run detection remains local-only (real-time, can't aggregate). `source` field on suggestions shows 'server' vs 'local' (C6 transparency).
+- **Result:** Workflows now learn from all users, not just one device. If 60% of users abandon the welfare application workflow at step 3, that pattern surfaces immediately for the next user — before they reach step 3. The system has genuine cross-user self-awareness, not just per-session memory.
+
+### Implementation Prompt 5 — Contextual AI Orchestration (May 2026)
+
+- ✅ `semanticOrchestrationContextService.js` — assembles the full semantic context before every Claude call: identity (CB ID, coherence level, assistanceDepth, top D-score dimensions, welfare need flag), semantic graph neighborhood (adjacent contentCids + relationship types), recent civilization events (last 5 acts from CivilizationMemory), active computation modules (what Prompt 4 already pre-warmed), assistance mode + workflow from Angular context.
+- ✅ `vaController.js` updated — builds orchestration context via `orchCtx.build()` before `runVirtualAvatar()`. Replaces raw `evaluateTriggers` with Prompt 4's `resolveAndActivate()` (complexity-aware, identity-modulated). `orchestrationContext` passed as first-class parameter.
+- ✅ `virtualAvatarService.js` expanded — user message now includes four semantic sections: `identityContext` (who the member IS), `semanticNeighbors` (adjacent knowledge), `recentCivilizationEvents` (recent civilization acts), `activeComputeModules` (pre-warmed state). Prompt caching added: `cache_control: { type: 'ephemeral' }` on system prompt — stable system prompt cached across calls (C3: reduces token cost ~80% on cache hits).
+- **Result:** Claude now reads the civilization's semantic memory before responding. A welfare-mode interaction includes the member's recent welfare events, coherence level, and which welfare-analysis module has already run. A research-mode interaction includes semantic neighbors of the active contentCid and the member's researchCollaboration D-score dimension. AI orchestration is now semantic-aware, not route-aware.
+
+### Implementation Prompt 4 — Temporary Computation Fabric (May 2026)
+
+- ✅ `semanticComplexityService.js` — evaluates perturbation complexity: detects type (content_access/learning/welfare/governance/research/family/emotional_distress/multi_domain), assigns complexity level (local/single/compound/civilization), defines co-activation groups, applies identity modulation (D-score + coherence level from Prompt 2 identity context). C3: returns ecological cost (0.0–1.0). C6: every decision includes transparent rationale.
+- ✅ `moduleLifecycleService.js` extended — `resolveAndActivate(semanticContext, identityContext)`: complexity-aware activation with co-activation group enforcement and TTL modulation. `notifyComplete(moduleId)`: result-based dissolution — modules dissolve immediately on completion, not just on TTL expiry.
+- ✅ `moduleHandlers.js` updated — 6 of 7 handlers now call `notifyComplete()` after computation. `empathy-support` intentionally excluded (C1: support resource stays available until TTL, never dissolved on result-completion).
+- ✅ `POST /api/modules/resolve` — new endpoint replacing raw `evaluate`: uses ucrsVerify identity context (D-score + coherence), returns perturbationType, complexityLevel, ecologicalCost, rationale, activated modules with expiry.
+- **Result:** The execution flow from Prompt 0 is now fully operational: perturbation → complexity evaluated → appropriate modules synthesized → co-activation rules respected → result generated → modules dissolved. The system no longer activates maximum compute for minimum perturbations.
+
+### Implementation Prompt 3 — Semantic Memory Continuity (May 2026)
+
+- ✅ 7 civilization content types registered in UCE schema registry + normalizer: `civilization.vote`, `civilization.deliberation`, `civilization.welfare-application`, `civilization.welfare-disbursement`, `civilization.solidarity`, `civilization.research`, `civilization.community-act`
+- ✅ `civilizationMemoryModel.js` — append-only semantic memory index: every civilization event gets a `contentCid` + referenceId map for O(1) cross-event lookup
+- ✅ `civilizationMemoryService.js` — background event consumer (mirrors dscoreEventConsumer pattern): subscribes to 8 civilization streams, commits each to UCE, wires SemanticEdges between related events (welfare disbursement `derived_from` application · solidarity `synthesizes` application · research collaboration `extends` discovery · vote `references` deliberation)
+- ✅ `civilizationWorkers.js` updated — `civilizationMemory.start()` added to startup sequence
+- **Result:** The civilization's semantic memory is now a full continuity field. Every welfare decision, governance vote, research collaboration, and community act has a permanent `contentCid` and a lineage of `SemanticEdge`s linking it to what caused it. The AI orchestration layer can now traverse the civilization's decision graph — not just read content.
+
+### Implementation Prompt 2 — Semantic Identity (May 2026)
+
+- ✅ `cbIdService.js` — canonical CB ID normalization: `normalizeCbId(user)` guarantees consistent `CB...` format across the entire system. Mongo-fallback IDs flagged as `CBM_` for future migration. `getCbIdFromRequest(req)` for clean handler access.
+- ✅ `ucrsVerify.js` enriched — D-score summary (`overall` + `components` + `computedAt`) now attached to `req.ucrsContext.dScore` on every authenticated request. Non-blocking — AI orchestration reads it without extra calls. CB ID derivation now uses `cbIdService.normalizeCbId()` for full consistency.
+- ✅ `semanticSeedService.js` updated — fires `dScoreService.recordEvent(cbId, 'semantic_edge_created')` for each edge wired. Every knowledge relationship created now automatically increases the creator's `semanticLineage` D-score dimension.
+- ✅ `GET /api/identity/me` — full semantic identity profile: CB ID, D-score 7-dimension breakdown, last 5 lineage events, `edgesEstablished`, `edgesReferenced`, `seedsCommitted`. C6 transparency: shows member exactly what AI orchestration sees about them.
+- **Result:** Identity = semantic lineage + dignity score is now operational. Every route handler and AI orchestration call has the full identity context without extra database calls.
+
+### Implementation Prompt 1 — Semantic Seed (May 2026)
+
+- ✅ `content-atom` registered in UCE schema registry (`schemaRegistryService.js`) with required fields `[atomId, title, domain]`
+- ✅ `content-atom` normalizer added (`normalizerService.js`) — deterministic canonical form for CID generation
+- ✅ `contentCid` + `semanticMeta` fields added to `contentAtomModel.js` — every atom now carries UCE identity, interaction surfaces, transformation readiness flags, lineage depth, and CB attribution
+- ✅ `semanticSeedService.js` — canonical creation path: UCE commit → SemanticEdge wiring (depends_on for prerequisites, extends for followUps, supersedes for updates). `backfillSeeds()` retroactively links existing atoms.
+- **Result:** Every ContentAtom created via `createSeed()` is immediately part of the civilization's semantic memory graph — queryable by the AI orchestration layer, linkable by semantic edges, and attribution-traced through lineage.
+
 ### Phase 1 Depth Pass (post-completion wiring)
 - ✅ D-score → welfare priority: `composite_dscore` (weight 30%, direction `asc`) and `dscore_welfare_dimension` added as valid policy criteria. Default policy updated to 35/30/20/10/5 split (goal_category / D-score / monthly_inflow / outstanding_need / days_in_queue). Monthly neuron inflows now auto-computed from NeuronTransaction history (`toBucket: 'my_neurons'`) — EC admin no longer needs to pass the map manually. `welfareService._getDScores()` fetches scores lazily only when the active policy references them.
 

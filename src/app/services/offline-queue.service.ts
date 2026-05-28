@@ -15,9 +15,10 @@ export interface QueuedRequest {
   retries:   number;
 }
 
-const STORAGE_KEY = 'ck_offline_queue_v1';
-const MAX_ITEMS   = 20;
-const MAX_AGE_MS  = 2 * 60 * 60 * 1000; // 2 hours
+const STORAGE_KEY     = 'ck_offline_queue_v1';
+const MAX_ITEMS       = 20;
+const MAX_AGE_MS      = 2 * 60 * 60 * 1000; // 2 hours
+const BGSYNC_TAG      = 'ck-offline-sync';   // Web Background Sync API tag
 
 // ── Service ───────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,14 @@ const MAX_AGE_MS  = 2 * 60 * 60 * 1000; // 2 hours
  *
  * Only network failures (status 0) are queued — HTTP errors (4xx/5xx) are NOT
  * queued, they represent server-side problems not connectivity issues.
+ *
+ * Background Sync API (Layer 13 — NEXT):
+ *   When a ServiceWorker is registered, enqueue() also registers the
+ *   'ck-offline-sync' sync tag. The SW's sync event handler (in the SW script)
+ *   then calls POST /api/sync/drain on reconnect — even if the tab is closed.
+ *   This guarantees delivery of critical mutations (welfare applications, votes)
+ *   that must reach the server eventually.
+ *   The SW handler is expected in the service worker that registers this scope.
  */
 @Injectable({ providedIn: 'root' })
 export class OfflineQueueService implements OnDestroy {
@@ -81,12 +90,41 @@ export class OfflineQueueService implements OnDestroy {
     this.queue.push(item);
     this._save();
     this.queueLength.set(this.queue.length);
+    this._registerBackgroundSync();
+  }
+
+  /**
+   * Trigger a server-side drain of the Redis UCE sync queue.
+   * Complements the client-side localStorage replay — the two queues are separate:
+   *   - localStorage queue: HTTP mutations that failed with network error (status 0)
+   *   - Redis queue: UCE commit payloads buffered on the server side
+   */
+  async drainServerQueue(batchSize = 20): Promise<{ processed: number; failed: number; deadLettered: number }> {
+    try {
+      const res = await this.http.post<{ success: boolean; processed: number; failed: number; deadLettered: number }>(
+        '/api/sync/drain', { batchSize }
+      ).toPromise();
+      return { processed: res?.processed ?? 0, failed: res?.failed ?? 0, deadLettered: res?.deadLettered ?? 0 };
+    } catch {
+      return { processed: 0, failed: 0, deadLettered: 0 };
+    }
   }
 
   clear(): void {
     this.queue = [];
     this._save();
     this.queueLength.set(0);
+  }
+
+  // ── Background Sync API ───────────────────────────────────────────────────
+
+  private _registerBackgroundSync(): void {
+    if (!this.isBrowser || !('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.ready.then((sw) => {
+      // SyncManager is not yet in TypeScript's lib — use property access with safety check.
+      const sync = (sw as unknown as { sync?: { register(tag: string): Promise<void> } }).sync;
+      if (sync) sync.register(BGSYNC_TAG).catch(() => { /* permission denied or quota */ });
+    }).catch(() => { /* SW not installed */ });
   }
 
   // ── Replay ────────────────────────────────────────────────────────────────
