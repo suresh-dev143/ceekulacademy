@@ -76,10 +76,10 @@ export const semanticDeltaInterceptor: HttpInterceptorFn = (
       const body = event.body as Record<string, unknown> | null;
 
       // Full response — no merge needed, IDB updated by semanticCacheInterceptor
-      if (!body?._delta) return of(event);
+      if (!body?.['_delta']) return of(event);
 
       // Delta response — merge into cached full state
-      const changes = body.changes as Record<string, unknown> | undefined;
+      const changes = body['changes'] as Record<string, unknown> | undefined;
       if (!changes) return of(event);
 
       return from(cache.get<Record<string, unknown>>('api_cache', key)).pipe(

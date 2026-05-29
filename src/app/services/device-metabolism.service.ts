@@ -109,7 +109,11 @@ export class DeviceMetabolismService implements OnDestroy {
 
   private _initNetwork(): void {
     const conn = (navigator as Navigator & {
-      connection?: { effectiveType?: string; type?: string };
+      connection?: {
+        effectiveType?: string;
+        type?: string;
+        addEventListener?: (event: string, handler: () => void) => void;
+      };
     }).connection;
 
     if (!conn) return;
